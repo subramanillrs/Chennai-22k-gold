@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#b48718">
+<meta name="description" content="Chennai 22K Gold Price Tracker">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg">
+<title>Chennai 22K Gold</title>
+<style>
+:root{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#171717;background:#f7f6f2}
+*{box-sizing:border-box}body{margin:0}.app{max-width:760px;margin:auto;padding:18px 14px 32px}
+.top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px}.loc{font-size:11px;color:#777;font-weight:700;letter-spacing:.1em;text-transform:uppercase}.title{font-size:27px;font-weight:800;letter-spacing:-.04em}.status{font-size:11px;color:#55704d;margin-top:5px}.status i{display:inline-block;width:7px;height:7px;border-radius:50%;background:#719b62;margin-right:5px}
+.hero{border:1px solid #e7e3da;border-radius:24px;padding:21px;background:linear-gradient(140deg,#fffdf8,#f2ead7)}.label{font-size:12px;color:#777}.price{font-size:42px;font-weight:850;letter-spacing:-.055em;margin-top:4px}.move{font-size:13px;font-weight:700;margin-top:6px}.up{color:#4e7652}.down{color:#a54d45}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:18px}.card{background:#ffffffb8;border:1px solid #0000000b;border-radius:16px;padding:13px}.card small{display:block;color:#777;font-size:11px}.card strong{display:block;font-size:20px;margin-top:4px}
+.section{margin-top:12px;background:#fff;border:1px solid #e7e3da;border-radius:20px;padding:15px}.head{display:flex;justify-content:space-between;align-items:center;gap:8px}.head h2{font-size:16px;margin:0}.tabs{display:flex;background:#f7f6f2;padding:3px;border-radius:10px}.tabs button,.action{border:0;background:transparent;padding:7px 9px;border-radius:8px;font-size:10px;font-weight:700;color:#777}.tabs button.active{background:#fff;color:#171717;box-shadow:0 1px 3px #0001}.chart{height:220px;margin-top:8px}.chart svg{width:100%;height:100%}.line{fill:none;stroke:#b48718;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}.area{fill:#b4871818}.gridline{stroke:#ece9e1}.axis{fill:#999;font-size:10px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.stat{background:#f7f6f2;border-radius:13px;padding:10px}.stat small{display:block;color:#777;font-size:10px}.stat b{display:block;margin-top:3px;font-size:13px}
+.history{margin-top:10px}.row{display:grid;grid-template-columns:1.2fr 1fr 1fr;padding:10px 0;border-bottom:1px solid #efede7;font-size:12px}.row.h{font-size:10px;color:#777;text-transform:uppercase}.right{text-align:right}
+.note{margin-top:12px;background:#f7f6f2;border-radius:13px;padding:11px;font-size:11px;line-height:1.45;color:#666}.note b{color:#171717}.offline{color:#a54d45}.small{font-size:10px;color:#888;margin-top:9px;line-height:1.45}
+@media(max-width:420px){.app{padding:14px 11px 28px}.title{font-size:24px}.price{font-size:36px}.tabs button{padding:7px 7px}}
+</style>
+</head>
+<body>
+<main class="app" id="app">
+<header class="top"><div><div class="loc">Chennai · Tamil Nadu</div><div class="title">22K Gold Price</div></div><div class="status" id="status"><i></i>Updating…</div></header>
+<section class="hero">
+<div class="label">22K spot-derived metal value · 1 gram</div>
+<div class="price" id="price">—</div><div class="move" id="move">Loading live rate…</div>
+<div class="grid"><div class="card"><small>8 grams · 1 sovereign</small><strong id="eight">—</strong></div><div class="card"><small>10 grams</small><strong id="ten">—</strong></div></div>
+</section>
+<section class="section"><div class="head"><h2>Price trend</h2><div class="tabs"><button class="active" data-days="7">7D</button><button data-days="30">30D</button></div></div>
+<div class="chart"><svg id="chart" viewBox="0 0 700 220" preserveAspectRatio="none"></svg></div>
+<div class="stats"><div class="stat"><small>Low</small><b id="low">—</b></div><div class="stat"><small>High</small><b id="high">—</b></div><div class="stat"><small>Change</small><b id="net">—</b></div></div></section>
+<section class="section"><div class="head"><h2>Recent history</h2><button class="action" id="refresh">Refresh</button></div><div class="history" id="history"></div>
+<div class="note"><b>Data note:</b> the free API provides a 22K purity-adjusted metal value, not a Chennai jeweller's final retail quote. Making charges, GST and dealer premiums are excluded. <a href="https://goldprice.dev/docs/carat" target="_blank" rel="noopener">Source documentation</a>.</div>
+<div class="small">The app stores successful observations locally. If the live request fails, the last saved value is shown as offline/stale instead of inventing a price.</div></section>
+</main>
+<script>
+const API="https://api.goldprice.dev/v1/carat?currency=INR";
+const KEY="chennai22k-history-v1";
+let days=7, history=[];
+const fmt=n=>"₹"+Math.round(n).toLocaleString("en-IN");
+const load=()=>{try{history=JSON.parse(localStorage.getItem(KEY)||"[]")}catch{history=[]}};
+const save=()=>localStorage.setItem(KEY,JSON.stringify(history.slice(-365)));
+function render(){
+ const latest=history.at(-1); if(!latest)return;
+ document.getElementById("price").textContent=fmt(latest.v);
+ document.getElementById("eight").textContent=fmt(latest.v*8);
+ document.getElementById("ten").textContent=fmt(latest.v*10);
+ const prev=history.length>1?history.at(-2).v:null;
+ const move=document.getElementById("move");
+ if(prev!=null){const d=latest.v-prev,p=(d/prev)*100;move.textContent=(d>=0?"▲ ":"▼ ")+fmt(Math.abs(d))+" · "+Math.abs(p).toFixed(2)+"% from previous observation";move.className="move "+(d>=0?"up":"down")}else move.textContent="First saved observation";
+ const a=history.slice(-days), vals=a.map(x=>x.v), mn=Math.min(...vals),mx=Math.max(...vals);
+ document.getElementById("low").textContent=fmt(mn);document.getElementById("high").textContent=fmt(mx);
+ const net=a.at(-1).v-a[0].v;document.getElementById("net").textContent=(net>=0?"+":"−")+fmt(Math.abs(net));
+ draw(a); renderHistory(a);
+}
+function draw(a){
+ const svg=document.getElementById("chart"),W=700,H=220,L=22,R=22,T=18,B=32,mn=Math.min(...a.map(x=>x.v)),mx=Math.max(...a.map(x=>x.v)),den=mx-mn||1;
+ const pts=a.map((x,i)=>[L+i*(W-L-R)/(Math.max(1,a.length-1)),T+(mx-x.v)/den*(H-T-B),x]);
+ const poly=pts.map(p=>p[0]+","+p[1]).join(" ");
+ const area="M "+pts[0][0]+" "+(H-B)+" L "+pts.map(p=>p[0]+" "+p[1]).join(" L ")+" L "+pts.at(-1)[0]+" "+(H-B)+" Z";
+ svg.innerHTML='<line class="gridline" x1="22" y1="55" x2="678" y2="55"/><line class="gridline" x1="22" y1="110" x2="678" y2="110"/><line class="gridline" x1="22" y1="165" x2="678" y2="165"/><path class="area" d="'+area+'"/><polyline class="line" points="'+poly+'"/>'+
+ pts.map(p=>'<circle cx="'+p[0]+'" cy="'+p[1]+'" r="4" fill="#fff" stroke="#b48718" stroke-width="2"><title>'+p[2].d+' · '+fmt(p[2].v)+'</title></circle>').join("")+
+ '<text class="axis" x="22" y="211">'+a[0].d+'</text><text class="axis" x="678" y="211" text-anchor="end">'+a.at(-1).d+'</text>';
+}
+function renderHistory(a){
+ document.getElementById("history").innerHTML='<div class="row h"><span>Date</span><span class="right">22K / 1g</span><span class="right">Change</span></div>'+
+ a.slice().reverse().map((x,i)=>{const p=i<a.length-1?a[a.length-2-i].v:null,d=p==null?null:x.v-p;return '<div class="row"><span>'+x.d+'</span><span class="right">'+fmt(x.v)+'</span><span class="right '+(d==null?"":d<0?"down":"up")+'">'+(d==null?"—":(d>0?"▲ ":"▼ ")+fmt(Math.abs(d)))+'</span></div>'}).join("");
+}
+async function fetchLive(){
+ const status=document.getElementById("status");status.innerHTML="<i></i>Updating…";
+ try{
+  const c=new AbortController();const t=setTimeout(()=>c.abort(),9000);
+  const r=await fetch(API,{signal:c.signal,cache:"no-store"});clearTimeout(t);
+  if(!r.ok)throw new Error("HTTP "+r.status);
+  const j=await r.json(),v=Number(j.price_gram_22k);
+  if(!Number.isFinite(v)||v<=0)throw new Error("Invalid rate");
+  const d=new Date(j.timestamp), label=d.toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"});
+  const stamp=j.timestamp;
+  const last=history.at(-1);
+  if(!last || Math.abs(last.v-v)>0.001 || last.ts!==stamp) history.push({d:label,v,ts:stamp});
+  save();status.innerHTML="<i></i>Live · "+d.toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit"});
+  render();
+ }catch(e){
+  status.innerHTML='<i></i><span class="offline">Offline · last saved rate</span>';
+  render();
+ }
+}
+document.querySelectorAll("[data-days]").forEach(b=>b.addEventListener("click",()=>{document.querySelectorAll("[data-days]").forEach(x=>x.classList.remove("active"));b.classList.add("active");days=Number(b.dataset.days);render()}));
+document.getElementById("refresh").addEventListener("click",fetchLive);
+load();render();fetchLive();
+setInterval(fetchLive,15*60*1000);
+if("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(()=>{});
+</script>
+</body>
+</html>
