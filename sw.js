@@ -1,8 +1,23 @@
-const CACHE="chennai22k-v1";
-const ASSETS=["./","./index.html","./manifest.webmanifest","./icon.svg"];
-self.addEventListener("install",e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS))));
-self.addEventListener("activate",e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k))))));
-self.addEventListener("fetch",e=>{
- if(e.request.url.includes("api.goldprice.dev")) return;
- e.respondWith(caches.match(e.request).then(c=>c||fetch(e.request).then(r=>{const copy=r.clone();caches.open(CACHE).then(x=>x.put(e.request,copy));return r}).catch(()=>c)));
+const CACHE="chennai22k-v2";
+self.addEventListener("install",e=>{
+  self.skipWaiting();
+  e.waitUntil(
+    caches.open(CACHE).then(c=>c.addAll([
+      "./",
+      "./index.html",
+      "./manifest.webmanifest",
+      "./icon.svg",
+      "./data.json"
+    ]))
+  );
+});
+
+self.addEventListener("activate",e=>{
+  e.waitUntil(
+    caches.keys().then(keys =>
+      Promise.all(
+        keys.filter(k=>k!==CACHE).map(k=>caches.delete(k))
+      )
+    ).then(()=>self.clients.claim())
+  );
 });
