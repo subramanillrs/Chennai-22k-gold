@@ -38,19 +38,49 @@
 </main>
 <script>
 const DATA_URL="./data.json";
+const RAW_DATA_URL="https://raw.githubusercontent.com/subramanilrs/Chennai-22k-gold/main/data.json";
+const KEY="chennai22k-history-v1";
 let days=7, history=[];
+
 const fmt=n=>"₹"+Math.round(n).toLocaleString("en-IN");
-const load=async()=>{
+
+function localHistory(){
   try{
-    const r=await fetch(DATA_URL+"?t="+Date.now(),{cache:"no-store"});
-    if(!r.ok) throw new Error("data");
-    const j=await r.json();
-    if(Array.isArray(j.history)) history=j.history.filter(x=>Number.isFinite(Number(x.v))).map(x=>({d:x.d,v:Number(x.v),ts:x.ts||""}));
-  }catch(e){
-    try{history=JSON.parse(localStorage.getItem("chennai22k-history-v1")||"[]")}catch{history=[]}
-  }
-};
-const save=()=>{try{localStorage.setItem("chennai22k-history-v1",JSON.stringify(history.slice(-365)))}catch{}};
+    const x=JSON.parse(localStorage.getItem(KEY)||"[]");
+    return Array.isArray(x)?x:[];
+  }catch{return []}
+}
+
+async function getJSON(url){
+  const u=url+(url.includes("?")?"&":"?")+"v="+Date.now();
+  const r=await fetch(u,{cache:"no-store",headers:{"Cache-Control":"no-cache"}});
+  if(!r.ok) throw new Error("HTTP "+r.status);
+  return await r.json();
+}
+
+async function loadLatest(){
+  // Try GitHub Pages first.
+  try{
+    const j=await getJSON(DATA_URL);
+    if(Array.isArray(j.history) && j.history.length) return j.history;
+  }catch(e){}
+
+  // Fallback to the raw GitHub file, bypassing Pages/CDN propagation.
+  try{
+    const j=await getJSON(RAW_DATA_URL);
+    if(Array.isArray(j.history) && j.history.length) return j.history;
+  }catch(e){}
+
+  // Final offline fallback.
+  return localHistory();
+}
+
+function save(){
+  try{
+    localStorage.setItem(KEY,JSON.stringify(history.slice(-365)));
+  }catch(e){}
+}
+
 function render(){
  const latest=history.at(-1); if(!latest){
    document.getElementById("status").innerHTML='<i></i><span class="offline">No saved rate yet</span>';
@@ -83,18 +113,62 @@ function renderHistory(a){
  a.slice().reverse().map((x,i)=>{const p=i<a.length-1?a[a.length-2-i].v:null,d=p==null?null:x.v-p;return '<div class="row"><span>'+x.d+'</span><span class="right">'+fmt(x.v)+'</span><span class="right '+(d==null?"":d<0?"down":"up")+'">'+(d==null?"—":(d>0?"▲ ":"▼ ")+fmt(Math.abs(d)))+'</span></div>'}).join("");
 }
 async function refresh(){
- const status=document.getElementById("status");
- status.innerHTML="<i></i>Loading latest…";
- await load();
- if(history.length){
-   const latest=history.at(-1);
-   const when=latest.ts?new Date(latest.ts):null;
-   const fresh=when && !Number.isNaN(when.getTime()) && (Date.now()-when.getTime()<2*60*60*1000);
-   status.innerHTML='<i></i><span class="'+(fresh?"":"offline")+'">'+(fresh?"Updated · ":"Last saved · ")+(when?when.toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit"}):"")+'</span>';
-   save();render();
- }else{
-   status.innerHTML='<i></i><span class="offline">Waiting for first update</span>';
- }
+  const status=document.getElementById("status");
+  status.innerHTML="<i></i>Updating…";
+
+  const previous=history.slice();
+  const loaded=await loadLatest();
+
+  if(loaded.length){
+    history=loaded.map(x=>({
+      d:x.d,
+      v:Number(x.v),
+      ts:x.ts||""
+    })).filter(x=>Number.isFinite(x.v));
+
+    if(history.length){
+      const latest=history.at(-1);
+      const when=latest.ts?new Date(latest.ts):null;
+      const validWhen=when && !Number.isNaN(when.getTime());
+
+      if(validWhen){
+        status.innerHTML='<i></i><span class="'+
+          ((Date.now()-when.getTime()<3*60*60*1000)?"":"offline")+
+          '">'+
+          ((Date.now()-when.getTime()<3*60*60*1000)?"LIVE · ":"Last saved · ")+
+          when.toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit"})+
+          '</span>';
+      }else{
+        status.innerHTML='<i></i><span class="offline">Last saved rate</span>';
+      }
+
+      save();
+      render();
+      return;
+    }
+  }
+
+  history=previous.length?previous:localHistory();
+  if(history.length){
+    status.innerHTML='<i></i><span class="offline">Offline · last saved rate</span>';
+    render();
+  }else{
+    status.innerHTML='<i></i><span class="offline">Unable to load price data</span>';
+  }
+}
+
+document.querySelectorAll("[data-days]").forEach(b=>b.addEventListener("click",()=>{
+  document.querySelectorAll("[data-days]").forEach(x=>x.classList.remove("active"));
+  b.classList.add("active");
+  days=Number(b.dataset.days);
+  render();
+}));
+document.getElementById("refresh").addEventListener("click",refresh);
+refresh();
+setInterval(refresh,15*60*1000);
+
+if("serviceWorker" in navigator){
+  navigator.serviceWorker.register("sw.js?v=3").catch(()=>{});
 }
 document.querySelectorAll("[data-days]").forEach(b=>b.addEventListener("click",()=>{document.querySelectorAll("[data-days]").forEach(x=>x.classList.remove("active"));b.classList.add("active");days=Number(b.dataset.days);render()}));
 document.getElementById("refresh").addEventListener("click",refresh);
