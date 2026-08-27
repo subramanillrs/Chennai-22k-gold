@@ -33,30 +33,43 @@
 <div class="chart"><svg id="chart" viewBox="0 0 700 220" preserveAspectRatio="none"></svg></div>
 <div class="stats"><div class="stat"><small>Low</small><b id="low">—</b></div><div class="stat"><small>High</small><b id="high">—</b></div><div class="stat"><small>Change</small><b id="net">—</b></div></div></section>
 <section class="section"><div class="head"><h2>Recent history</h2><button class="action" id="refresh">Refresh</button></div><div class="history" id="history"></div>
-<div class="note"><b>Data note:</b> the free API provides a 22K purity-adjusted metal value, not a Chennai jeweller's final retail quote. Making charges, GST and dealer premiums are excluded. <a href="https://goldprice.dev/docs/carat" target="_blank" rel="noopener">Source documentation</a>.</div>
+<div class="note"><b>Data note:</b> the app uses a scheduled server-side fetch of a 22K purity-adjusted metal value, not a Chennai jeweller's final retail quote. Making charges, GST and dealer premiums are excluded. <a href="https://goldprice.dev/docs/carat" target="_blank" rel="noopener">Source documentation</a>.</div>
 <div class="small">The app stores successful observations locally. If the live request fails, the last saved value is shown as offline/stale instead of inventing a price.</div></section>
 </main>
 <script>
-const API="https://api.goldprice.dev/v1/carat?currency=INR";
-const KEY="chennai22k-history-v1";
+const DATA_URL="./data.json";
 let days=7, history=[];
 const fmt=n=>"₹"+Math.round(n).toLocaleString("en-IN");
-const load=()=>{try{history=JSON.parse(localStorage.getItem(KEY)||"[]")}catch{history=[]}};
-const save=()=>localStorage.setItem(KEY,JSON.stringify(history.slice(-365)));
+const load=async()=>{
+  try{
+    const r=await fetch(DATA_URL+"?t="+Date.now(),{cache:"no-store"});
+    if(!r.ok) throw new Error("data");
+    const j=await r.json();
+    if(Array.isArray(j.history)) history=j.history.filter(x=>Number.isFinite(Number(x.v))).map(x=>({d:x.d,v:Number(x.v),ts:x.ts||""}));
+  }catch(e){
+    try{history=JSON.parse(localStorage.getItem("chennai22k-history-v1")||"[]")}catch{history=[]}
+  }
+};
+const save=()=>{try{localStorage.setItem("chennai22k-history-v1",JSON.stringify(history.slice(-365)))}catch{}};
 function render(){
- const latest=history.at(-1); if(!latest)return;
+ const latest=history.at(-1); if(!latest){
+   document.getElementById("status").innerHTML='<i></i><span class="offline">No saved rate yet</span>';
+   return;
+ }
  document.getElementById("price").textContent=fmt(latest.v);
  document.getElementById("eight").textContent=fmt(latest.v*8);
  document.getElementById("ten").textContent=fmt(latest.v*10);
  const prev=history.length>1?history.at(-2).v:null;
  const move=document.getElementById("move");
- if(prev!=null){const d=latest.v-prev,p=(d/prev)*100;move.textContent=(d>=0?"▲ ":"▼ ")+fmt(Math.abs(d))+" · "+Math.abs(p).toFixed(2)+"% from previous observation";move.className="move "+(d>=0?"up":"down")}else move.textContent="First saved observation";
+ if(prev!=null){const d=latest.v-prev,p=(d/prev)*100;move.textContent=(d>=0?"▲ ":"▼ ")+fmt(Math.abs(d))+" · "+Math.abs(p).toFixed(2)+"% from previous observation";move.className="move "+(d>=0?"up":"down")}
+ else move.textContent="First saved observation";
  const a=history.slice(-days), vals=a.map(x=>x.v), mn=Math.min(...vals),mx=Math.max(...vals);
  document.getElementById("low").textContent=fmt(mn);document.getElementById("high").textContent=fmt(mx);
  const net=a.at(-1).v-a[0].v;document.getElementById("net").textContent=(net>=0?"+":"−")+fmt(Math.abs(net));
  draw(a); renderHistory(a);
 }
 function draw(a){
+ if(!a.length)return;
  const svg=document.getElementById("chart"),W=700,H=220,L=22,R=22,T=18,B=32,mn=Math.min(...a.map(x=>x.v)),mx=Math.max(...a.map(x=>x.v)),den=mx-mn||1;
  const pts=a.map((x,i)=>[L+i*(W-L-R)/(Math.max(1,a.length-1)),T+(mx-x.v)/den*(H-T-B),x]);
  const poly=pts.map(p=>p[0]+","+p[1]).join(" ");
@@ -69,25 +82,23 @@ function renderHistory(a){
  document.getElementById("history").innerHTML='<div class="row h"><span>Date</span><span class="right">22K / 1g</span><span class="right">Change</span></div>'+
  a.slice().reverse().map((x,i)=>{const p=i<a.length-1?a[a.length-2-i].v:null,d=p==null?null:x.v-p;return '<div class="row"><span>'+x.d+'</span><span class="right">'+fmt(x.v)+'</span><span class="right '+(d==null?"":d<0?"down":"up")+'">'+(d==null?"—":(d>0?"▲ ":"▼ ")+fmt(Math.abs(d)))+'</span></div>'}).join("");
 }
-async function fetchLive(){
- const status=document.getElementById("status");status.innerHTML="<i></i>Updating…";
- try{
-  const c=new AbortController();const t=setTimeout(()=>c.abort(),9000);
-  const r=await fetch(API,{signal:c.signal,cache:"no-store"});clearTimeout(t);
-  if(!r.ok)throw new Error("HTTP "+r.status);
-  const j=await r.json(),v=Number(j.price_gram_22k);
-  if(!Number.isFinite(v)||v<=0)throw new Error("Invalid rate");
-  const d=new Date(j.timestamp), label=d.toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"});
-  const stamp=j.timestamp;
-  const last=history.at(-1);
-  if(!last || Math.abs(last.v-v)>0.001 || last.ts!==stamp) history.push({d:label,v,ts:stamp});
-  save();status.innerHTML="<i></i>Live · "+d.toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit"});
-  render();
- }catch(e){
-  status.innerHTML='<i></i><span class="offline">Offline · last saved rate</span>';
-  render();
+async function refresh(){
+ const status=document.getElementById("status");
+ status.innerHTML="<i></i>Loading latest…";
+ await load();
+ if(history.length){
+   const latest=history.at(-1);
+   const when=latest.ts?new Date(latest.ts):null;
+   const fresh=when && !Number.isNaN(when.getTime()) && (Date.now()-when.getTime()<2*60*60*1000);
+   status.innerHTML='<i></i><span class="'+(fresh?"":"offline")+'">'+(fresh?"Updated · ":"Last saved · ")+(when?when.toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit"}):"")+'</span>';
+   save();render();
+ }else{
+   status.innerHTML='<i></i><span class="offline">Waiting for first update</span>';
  }
 }
+document.querySelectorAll("[data-days]").forEach(b=>b.addEventListener("click",()=>{document.querySelectorAll("[data-days]").forEach(x=>x.classList.remove("active"));b.classList.add("active");days=Number(b.dataset.days);render()}));
+document.getElementById("refresh").addEventListener("click",refresh);
+refresh();
 document.querySelectorAll("[data-days]").forEach(b=>b.addEventListener("click",()=>{document.querySelectorAll("[data-days]").forEach(x=>x.classList.remove("active"));b.classList.add("active");days=Number(b.dataset.days);render()}));
 document.getElementById("refresh").addEventListener("click",fetchLive);
 load();render();fetchLive();

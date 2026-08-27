@@ -28,3 +28,7 @@ The browser calls the public endpoint directly. The API documentation says the k
 - manifest.webmanifest — PWA manifest
 - sw.js — offline shell
 - icon.svg — app icon
+
+
+## Live update architecture
+GitHub Pages is static and browsers cannot reliably call this API because the provider intentionally does not expose it as a browser CORS surface. The included GitHub Actions workflow fetches the public `/v1/carat?currency=INR` endpoint every 30 minutes and commits the 22K value into `data.json`. The PWA reads that same-origin JSON file, so it works from GitHub Pages.
