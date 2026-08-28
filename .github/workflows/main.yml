@@ -1,0 +1,549 @@
+name: Update Chennai 22K Gold Rate
+
+on:
+  schedule:
+    # 11:00 AM IST
+    - cron: "30 5 * * *"
+
+    # 5:00 PM IST
+    - cron: "30 11 * * *"
+
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests beautifulsoup4
+
+      - name: Fetch Chennai 22K rate and historical data
+        shell: python
+        run: |
+          import json
+          import re
+          import time
+          from datetime import datetime, timedelta
+          from pathlib import Path
+          from zoneinfo import ZoneInfo
+
+          import requests
+          from bs4 import BeautifulSoup
+
+
+          TZ = ZoneInfo("Asia/Kolkata")
+
+          LIVE_URL = "https://www.livechennai.com/gold_silverrate.asp"
+          HISTORY_URL = "https://www.livechennai.com/get_goldrate_history.asp"
+
+          DATA_DIR = Path("data")
+          DATA_DIR.mkdir(exist_ok=True)
+
+          LIVE_FILE = DATA_DIR / "live.json"
+          HISTORY_FILE = DATA_DIR / "history.json"
+
+          HEADERS = {
+              "User-Agent": (
+                  "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
+                  "AppleWebKit/537.36 (KHTML, like Gecko) "
+                  "Chrome/139.0 Safari/537.36"
+              ),
+              "Accept-Language": "en-IN,en;q=0.9",
+              "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+          }
+
+
+          def get(url, params=None, timeout=30):
+              r = requests.get(
+                  url,
+                  params=params,
+                  headers=HEADERS,
+                  timeout=timeout
+              )
+              r.raise_for_status()
+              return r.text
+
+
+          def clean_number(value):
+              if value is None:
+                  return None
+
+              value = str(value)
+              value = value.replace(",", "")
+              value = value.replace("₹", "")
+              value = value.replace("Rs.", "")
+              value = value.replace("Rs", "")
+              value = value.replace("INR", "")
+
+              m = re.search(r"\d+(?:\.\d+)?", value)
+
+              if not m:
+                  return None
+
+              return int(float(m.group(0)))
+
+
+          def find_current_22k(html):
+              soup = BeautifulSoup(html, "html.parser")
+
+              text = soup.get_text(" ", strip=True)
+
+              candidates = []
+
+              patterns = [
+                  r"22\s*K.*?₹?\s*([\d,]{4,7})",
+                  r"22\s*K.*?Rs\.?\s*([\d,]{4,7})",
+                  r"Standard\s+Gold.*?([\d,]{4,7})",
+                  r"22\s*Carat.*?([\d,]{4,7})",
+              ]
+
+              for pattern in patterns:
+                  for m in re.finditer(
+                      pattern,
+                      text,
+                      flags=re.IGNORECASE
+                  ):
+                      value = clean_number(m.group(1))
+
+                      if value and 5000 <= value <= 50000:
+                          candidates.append(value)
+
+              if not candidates:
+                  raise RuntimeError(
+                      "Could not find current Chennai 22K rate"
+                  )
+
+              # Current Chennai 22K gram rate is normally
+              # the first valid value in this range.
+              return candidates[0]
+
+
+          def parse_date(value, year, month):
+              value = value.strip()
+
+              formats = [
+                  "%d-%b-%Y",
+                  "%d/%b/%Y",
+                  "%d-%B-%Y",
+                  "%d/%B/%Y",
+                  "%d-%m-%Y",
+                  "%d/%m/%Y",
+                  "%Y-%m-%d",
+              ]
+
+              for fmt in formats:
+                  try:
+                      return datetime.strptime(value, fmt).date()
+                  except ValueError:
+                      pass
+
+              # Day only
+              m = re.fullmatch(r"(\d{1,2})", value)
+
+              if m:
+                  return datetime(
+                      year,
+                      month,
+                      int(m.group(1))
+                  ).date()
+
+              return None
+
+
+          def parse_history_page(html, year, month):
+              soup = BeautifulSoup(html, "html.parser")
+
+              records = []
+
+              # First try HTML tables.
+              for table in soup.find_all("table"):
+                  rows = table.find_all("tr")
+
+                  if not rows:
+                      continue
+
+                  header = [
+                      x.get_text(" ", strip=True).lower()
+                      for x in rows[0].find_all(["th", "td"])
+                  ]
+
+                  header_text = " ".join(header)
+
+                  has_22k = (
+                      "22" in header_text
+                      or "standard gold" in header_text
+                  )
+
+                  if not has_22k:
+                      continue
+
+                  for row in rows[1:]:
+                      cells = [
+                          x.get_text(" ", strip=True)
+                          for x in row.find_all(["th", "td"])
+                      ]
+
+                      if len(cells) < 2:
+                          continue
+
+                      row_text = " | ".join(cells)
+
+                      date_value = None
+
+                      for cell in cells:
+                          d = parse_date(cell, year, month)
+
+                          if d:
+                              date_value = d
+                              break
+
+                      if not date_value:
+                          continue
+
+                      # Prefer the column associated with 22K.
+                      rate = None
+
+                      for i, h in enumerate(header):
+                          if (
+                              "22" in h
+                              or "standard gold" in h
+                          ):
+                              if i < len(cells):
+                                  rate = clean_number(cells[i])
+                                  break
+
+                      # Fallback: find a plausible gold value.
+                      if rate is None:
+                          nums = [
+                              clean_number(x)
+                              for x in cells
+                          ]
+
+                          nums = [
+                              x for x in nums
+                              if x and 5000 <= x <= 50000
+                          ]
+
+                          if len(nums) >= 2:
+                              # Usually 24K then 22K.
+                              rate = nums[1]
+
+                      if rate and 5000 <= rate <= 50000:
+                          records.append({
+                              "date": date_value.isoformat(),
+                              "rate_22k": rate,
+                              "rate_8g": rate * 8,
+                              "source": "LiveChennai",
+                          })
+
+              return records
+
+
+          def load_history():
+              if not HISTORY_FILE.exists():
+                  return []
+
+              try:
+                  data = json.loads(
+                      HISTORY_FILE.read_text(
+                          encoding="utf-8"
+                      )
+                  )
+
+                  if isinstance(data, list):
+                      return data
+
+                  if isinstance(data, dict):
+                      return data.get("records", [])
+
+              except Exception:
+                  pass
+
+              return []
+
+
+          def save_history(records):
+              records = sorted(
+                  records,
+                  key=lambda x: x["date"]
+              )
+
+              HISTORY_FILE.write_text(
+                  json.dumps(
+                      {
+                          "source": "LiveChennai",
+                          "updated_at": datetime.now(
+                              TZ
+                          ).isoformat(),
+                          "records": records,
+                      },
+                      indent=2,
+                      ensure_ascii=False
+                  ),
+                  encoding="utf-8"
+              )
+
+
+          print("=" * 60)
+          print("CHENNAI 22K GOLD RATE UPDATE")
+          print("=" * 60)
+
+          now = datetime.now(TZ)
+
+          # ---------------------------------------------------------
+          # CURRENT RATE
+          # ---------------------------------------------------------
+
+          live_html = get(LIVE_URL)
+
+          current_rate = find_current_22k(live_html)
+
+          print()
+          print("Current 22K rate :", current_rate)
+          print("Current 8g rate  :", current_rate * 8)
+          print("Date             :", now.date())
+          print("Time             :", now.strftime("%H:%M:%S"))
+          print()
+
+          # ---------------------------------------------------------
+          # HISTORY
+          # ---------------------------------------------------------
+
+          history = load_history()
+
+          by_date = {
+              x["date"]: x
+              for x in history
+              if x.get("date") and x.get("rate_22k")
+          }
+
+          print("Existing history :", len(by_date), "records")
+
+          # We need approximately 3 years.
+          # Fetch every month individually.
+          start_date = now.date() - timedelta(days=365 * 3)
+
+          cursor = start_date.replace(day=1)
+
+          while cursor <= now.date():
+
+              year = cursor.year
+              month = cursor.month
+
+              print(
+                  f"Fetching history: {year}-{month:02d}"
+              )
+
+              try:
+                  html = get(
+                      HISTORY_URL,
+                      params={
+                          "month": str(month),
+                          "year": str(year),
+                      },
+                      timeout=30
+                  )
+
+                  records = parse_history_page(
+                      html,
+                      year,
+                      month
+                  )
+
+                  print(
+                      f"  Found {len(records)} records"
+                  )
+
+                  for record in records:
+                      by_date[record["date"]] = record
+
+              except Exception as e:
+                  print(
+                      f"  History fetch failed: {e}"
+                  )
+
+              # Move to next month.
+              if month == 12:
+                  cursor = cursor.replace(
+                      year=year + 1,
+                      month=1
+                  )
+              else:
+                  cursor = cursor.replace(
+                      month=month + 1
+                  )
+
+              # Be polite to the source.
+              time.sleep(0.5)
+
+          # ---------------------------------------------------------
+          # GUARANTEE TODAY'S CURRENT RATE EXISTS
+          # ---------------------------------------------------------
+
+          today_key = now.date().isoformat()
+
+          previous_today = by_date.get(today_key)
+
+          by_date[today_key] = {
+              "date": today_key,
+              "rate_22k": current_rate,
+              "rate_8g": current_rate * 8,
+              "source": "LiveChennai",
+              "updated_at": now.isoformat(),
+          }
+
+          # ---------------------------------------------------------
+          # DETERMINE LAST RATE CHANGE
+          # ---------------------------------------------------------
+
+          sorted_history = sorted(
+              by_date.values(),
+              key=lambda x: x["date"]
+          )
+
+          last_change_date = None
+          last_change_rate = None
+
+          previous_rate = None
+
+          for item in sorted_history:
+              rate = item.get("rate_22k")
+
+              if not rate:
+                  continue
+
+              if previous_rate is not None and rate != previous_rate:
+                  last_change_date = item["date"]
+                  last_change_rate = rate
+
+              previous_rate = rate
+
+          changed_now = (
+              previous_today is None
+              or previous_today.get("rate_22k") != current_rate
+          )
+
+          # ---------------------------------------------------------
+          # SAVE HISTORY
+          # ---------------------------------------------------------
+
+          final_history = sorted(
+              by_date.values(),
+              key=lambda x: x["date"]
+          )
+
+          save_history(final_history)
+
+          # ---------------------------------------------------------
+          # SAVE LIVE DATA
+          # ---------------------------------------------------------
+
+          live = {
+              "rate_22k": current_rate,
+              "eight_22k": current_rate * 8,
+              "rate_24k": None,
+              "rate_18k": None,
+
+              "updated_at": now.isoformat(),
+
+              "source": "LiveChennai",
+              "source_url": LIVE_URL,
+
+              "session": (
+                  "AM"
+                  if now.hour < 13
+                  else "PM"
+              ),
+
+              "changed": changed_now,
+
+              "last_change_date": last_change_date,
+              "last_change_rate": last_change_rate,
+
+              "history_count": len(final_history),
+
+              "history_start": (
+                  final_history[0]["date"]
+                  if final_history
+                  else None
+              ),
+
+              "history_end": (
+                  final_history[-1]["date"]
+                  if final_history
+                  else None
+              ),
+          }
+
+          LIVE_FILE.write_text(
+              json.dumps(
+                  live,
+                  indent=2,
+                  ensure_ascii=False
+              ),
+              encoding="utf-8"
+          )
+
+          print()
+          print("=" * 60)
+          print("FINAL RESULT")
+          print("=" * 60)
+
+          print(
+              "22K / gram : ₹",
+              f"{current_rate:,}"
+          )
+
+          print(
+              "22K / 8g   : ₹",
+              f"{current_rate * 8:,}"
+          )
+
+          print(
+              "History    :",
+              len(final_history),
+              "records"
+          )
+
+          print(
+              "Changed    :",
+              changed_now
+          )
+
+          print(
+              "Last change:",
+              last_change_date
+          )
+
+          print("=" * 60)
+
+
+      - name: Save updated data
+        shell: bash
+        run: |
+          git config user.name "Chennai 22K Gold Bot"
+          git config user.email "actions@users.noreply.github.com"
+
+          git add data/live.json data/history.json
+
+          if git diff --cached --quiet; then
+            echo "No data changes to commit."
+            exit 0
+          fi
+
+          git commit -m "Update Chennai 22K gold rate"
+          git push
