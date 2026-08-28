@@ -1,40 +1,25 @@
 # Chennai 22K Gold PWA
 
-A mobile-first Progressive Web App for tracking 22K gold metal value in INR.
+A mobile-first Progressive Web App for tracking the Chennai 22K reference gold rate.
 
-## Live data
-Uses the Chennai 22K retail-market reference from Golden Chennai. The GitHub Actions updater fetches the Chennai page server-side and commits the latest 22K/g value into `data.json`.
+## Main display
+- **8 grams / 1 sovereign is the primary prominent rate**
+- 1 gram and 10 gram secondary rates
+- Automatic 8g = 1g × 8 calculation
 
-The app tracks the Chennai 22K retail-market reference rate. It excludes making charges, GST and other jewellery-specific charges. Source: Golden Chennai.
+## Graph
+- 7D, 30D, 90D and 1Y ranges
+- Toggle between 8g and 1g
+- Automatic scale
+- High/low/change/average statistics
+- Point tooltips
+- Uses every available historical observation
 
-## Run locally
-Because service workers require a secure origin, serve this folder from localhost:
+## Data
+The GitHub Actions workflow updates `data.json` from the configured Chennai 22K reference source. This is a reference market rate; jewellery invoices can differ because of making charges, GST, offers and dealer premiums.
 
-```bash
-python -m http.server 8000
-```
-
-Open:
-http://localhost:8000
-
-For phone installation, deploy the folder to an HTTPS host (GitHub Pages, Netlify, Cloudflare Pages, etc.), open it in Chrome, then choose Add to Home screen / Install app.
-
-## Important
-The browser calls the public endpoint directly. The API documentation says the karat endpoint is free and requires no key. Anonymous limits still apply. For a production/commercial deployment, use a server-side cache/proxy and follow the provider's terms.
-
-## Files
-- index.html — app UI and logic
-- manifest.webmanifest — PWA manifest
-- sw.js — offline shell
-- icon.svg — app icon
-
-
-## Live update architecture
-GitHub Pages is static and browsers cannot reliably call this API because the provider intentionally does not expose it as a browser CORS surface. The included GitHub Actions workflow fetches the public `/v1/carat?currency=INR` endpoint every 30 minutes and commits the 22K value into `data.json`. The PWA reads that same-origin JSON file, so it works from GitHub Pages.
-
-
-## Troubleshooting v3
-The PWA uses cache-busting requests and a Raw GitHub fallback for `data.json`. The service worker never caches `data.json` and uses network-first behavior for the HTML shell. This is intended to prevent stale PWA content on Android Chrome.
-
-## Data source
-The updater uses the Golden Chennai Chennai 22K rate page as the reference source. Rates are indicative retail-market rates and should not be treated as a final jeweller invoice.
+## Files to replace
+1. `index.html`
+2. `sw.js`
+3. `data.json`
+4. `.github/workflows/update-gold.yml`

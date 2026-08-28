@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#b48718">
+<meta name="description" content="Chennai 22K Gold Price Tracker">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg">
+<title>Chennai 22K Gold</title>
+<style>
+:root{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#171717;background:#f7f6f2}
+*{box-sizing:border-box}body{margin:0}.app{max-width:760px;margin:auto;padding:16px 12px 34px}
+.top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px}.loc{font-size:11px;color:#777;font-weight:800;letter-spacing:.12em;text-transform:uppercase}.title{font-size:29px;font-weight:850;letter-spacing:-.05em}.status{font-size:11px;color:#55704d;margin-top:5px;white-space:nowrap}.status i{display:inline-block;width:8px;height:8px;border-radius:50%;background:#719b62;margin-right:5px}.offline{color:#a54d45}.offline i{background:#a54d45}
+.hero{border:1px solid #e5dfd2;border-radius:25px;padding:18px;background:linear-gradient(140deg,#fffdf8,#f0e6cf);box-shadow:0 4px 18px #00000008}
+.hero-label{font-size:12px;color:#777}.hero8{margin-top:2px}.hero8 small{font-size:13px;color:#6f6b63;font-weight:700}.price8{font-size:50px;line-height:1.03;font-weight:900;letter-spacing:-.065em;margin-top:3px}.price8-sub{font-size:13px;color:#6f6b63;margin-top:3px}.move{font-size:14px;font-weight:800;margin-top:9px}.up{color:#4e7652}.down{color:#a54d45}
+.secondary{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:15px}.card{background:#ffffffc9;border:1px solid #0000000b;border-radius:16px;padding:12px}.card small{display:block;color:#777;font-size:11px}.card strong{display:block;font-size:20px;margin-top:4px;letter-spacing:-.025em}.card.primary1{background:#fff}
+.section{margin-top:12px;background:#fff;border:1px solid #e5dfd2;border-radius:21px;padding:15px;box-shadow:0 2px 10px #00000005}.head{display:flex;justify-content:space-between;align-items:center;gap:8px}.head h2{font-size:17px;margin:0}.controls{display:flex;flex-wrap:wrap;gap:5px}.tabs{display:flex;background:#f7f6f2;padding:3px;border-radius:10px}.tabs button,.action{border:0;background:transparent;padding:7px 9px;border-radius:8px;font-size:10px;font-weight:800;color:#777}.tabs button.active{background:#fff;color:#171717;box-shadow:0 1px 3px #0001}
+.chart-wrap{position:relative;height:285px;margin-top:8px}.chart{width:100%;height:100%}.chart svg{width:100%;height:100%;overflow:visible}.line{fill:none;stroke:#b48718;stroke-width:3.5;stroke-linecap:round;stroke-linejoin:round}.area{fill:#b4871818}.gridline{stroke:#ece9e1}.axis{fill:#999;font-size:10px}.point{fill:#fff;stroke:#b48718;stroke-width:2}.empty{fill:#aaa;font-size:12px}
+.graph-toolbar{display:flex;justify-content:space-between;align-items:center;margin-top:5px;gap:8px}.metric-tabs{display:flex;background:#f7f6f2;border-radius:10px;padding:3px}.metric-tabs button{border:0;background:transparent;padding:6px 8px;border-radius:8px;font-size:10px;font-weight:800;color:#777}.metric-tabs button.active{background:#fff;color:#171717;box-shadow:0 1px 3px #0001}.legend{font-size:10px;color:#888}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:9px}.stat{background:#f7f6f2;border-radius:13px;padding:9px}.stat small{display:block;color:#777;font-size:9px}.stat b{display:block;margin-top:3px;font-size:12px}.history{margin-top:10px}.row{display:grid;grid-template-columns:1.2fr 1fr 1fr;padding:10px 0;border-bottom:1px solid #efede7;font-size:12px}.row.h{font-size:10px;color:#777;text-transform:uppercase}.right{text-align:right}.note{margin-top:12px;background:#f7f6f2;border-radius:13px;padding:11px;font-size:11px;line-height:1.45;color:#666}.note b{color:#171717}.small{font-size:10px;color:#888;margin-top:9px;line-height:1.45}
+@media(max-width:420px){.app{padding:13px 10px 28px}.title{font-size:26px}.price8{font-size:45px}.chart-wrap{height:260px}.stats{grid-template-columns:repeat(2,1fr)}.controls{justify-content:flex-end}}
+</style>
+</head>
+<body>
+
+<main class="app" id="app">
+<header class="top">
+  <div><div class="loc">Chennai · Tamil Nadu</div><div class="title">22K Gold Price</div></div>
+  <div class="status" id="status"><i></i>Updating…</div>
+</header>
+
+<section class="hero">
+  <div class="hero-label">Chennai 22K reference rate</div>
+  <div class="hero8"><small>8 grams · 1 sovereign</small><div class="price8" id="eightHero">—</div><div class="price8-sub">Primary rate · 22K</div></div>
+  <div class="move" id="move">Loading latest rate…</div>
+  <div class="secondary">
+    <div class="card primary1"><small>1 gram</small><strong id="one">—</strong></div>
+    <div class="card"><small>10 grams</small><strong id="ten">—</strong></div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="head">
+    <h2>Price trend</h2>
+    <div class="tabs">
+      <button class="active" data-days="7">7D</button>
+      <button data-days="30">30D</button>
+      <button data-days="90">90D</button>
+      <button data-days="365">1Y</button>
+    </div>
+  </div>
+  <div class="chart-wrap"><svg id="chart" viewBox="0 0 700 285" preserveAspectRatio="none"></svg></div>
+  <div class="graph-toolbar">
+    <div class="metric-tabs"><button class="active" data-metric="8">8g</button><button data-metric="1">1g</button></div>
+    <div class="legend" id="graphLabel">8g Chennai 22K rate</div>
+  </div>
+  <div class="stats">
+    <div class="stat"><small>Low</small><b id="low">—</b></div>
+    <div class="stat"><small>High</small><b id="high">—</b></div>
+    <div class="stat"><small>Change</small><b id="change">—</b></div>
+    <div class="stat"><small>Average</small><b id="avg">—</b></div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="head"><h2>Recent history</h2><button class="action" id="refresh">Refresh</button></div>
+  <div class="history">
+    <div class="row h"><div>Date</div><div class="right">8G / 1S</div><div class="right">Change</div></div>
+    <div id="historyRows"></div>
+  </div>
+  <div class="note"><b>Rate note:</b> This app tracks a Chennai 22K reference rate. Jewellery shop bills may differ because of making charges, GST, offers and dealer premiums.</div>
+  <div class="small" id="sourceNote">Source: Chennai 22K reference feed · Values are indicative market references.</div>
+</section>
+</main>
+
+<script>
+const DATA_URL="./data.json";
+const RAW_DATA_URL="https://raw.githubusercontent.com/subramanilrs/Chennai-22k-gold/main/data.json";
+const KEY="chennai22k-history-v2";
+let days=7, metric=8, history=[];
+
+const fmt=n=>"₹"+Math.round(n).toLocaleString("en-IN");
+const fmt1=n=>"₹"+Number(n).toLocaleString("en-IN",{maximumFractionDigits:0});
+
+function localHistory(){try{const x=JSON.parse(localStorage.getItem(KEY)||"[]");return Array.isArray(x)?x:[]}catch{return[]}}
+
+async function getJSON(url){
+  const u=url+(url.includes("?")?"&":"?")+"v="+Date.now();
+  const r=await fetch(u,{cache:"no-store",headers:{"Cache-Control":"no-cache"}});
+  if(!r.ok)throw new Error("HTTP "+r.status);
+  return r.json();
+}
+
+async function loadLatest(){
+  try{const j=await getJSON(DATA_URL);if(Array.isArray(j.history)&&j.history.length)return j.history}catch(e){}
+  try{const j=await getJSON(RAW_DATA_URL);if(Array.isArray(j.history)&&j.history.length)return j.history}catch(e){}
+  return localHistory();
+}
+
+function save(){try{localStorage.setItem(KEY,JSON.stringify(history.slice(-365)))}catch(e){}}
+
+function filtered(){
+  const n=days;
+  return history.slice(Math.max(0,history.length-n));
+}
+
+function render(){
+  const data=filtered().filter(x=>Number.isFinite(Number(x.v)));
+  if(!history.length)return;
+
+  const latest=history.at(-1), previous=history.length>1?history.at(-2):null;
+  const v=Number(latest.v), prev=previous?Number(previous.v):null, delta=prev===null?null:v-prev;
+
+  document.getElementById("eightHero").textContent=fmt(v*8);
+  document.getElementById("one").textContent=fmt(v);
+  document.getElementById("ten").textContent=fmt(v*10);
+
+  const move=document.getElementById("move");
+  if(delta===null)move.textContent="Latest Chennai 22K reference rate";
+  else{
+    const pct=prev?Math.abs(delta/prev*100):0;
+    move.className="move "+(delta>=0?"up":"down");
+    move.textContent=(delta>=0?"▲ ":"▼ ")+fmt(Math.abs(delta))+" / gram · "+pct.toFixed(2)+"% from previous observation";
+  }
+
+  const vals=data.map(x=>Number(x.v)*metric);
+  const lo=Math.min(...vals), hi=Math.max(...vals), av=vals.reduce((a,b)=>a+b,0)/vals.length;
+  const first=vals[0], last=vals.at(-1), ch=last-first;
+  document.getElementById("low").textContent=fmt(lo);
+  document.getElementById("high").textContent=fmt(hi);
+  document.getElementById("change").textContent=(ch>=0?"+":"−")+fmt(Math.abs(ch));
+  document.getElementById("change").className=ch>=0?"up":"down";
+  document.getElementById("avg").textContent=fmt(av);
+  document.getElementById("graphLabel").textContent=(metric===8?"8g":"1g")+" Chennai 22K rate";
+
+  draw(data);
+  renderHistory();
+}
+
+function draw(data){
+  const svg=document.getElementById("chart");
+  const W=700,H=285,L=48,R=12,T=18,B=36;
+  svg.innerHTML="";
+  if(!data.length){svg.innerHTML='<text x="350" y="140" text-anchor="middle" class="empty">No history available</text>';return}
+  const vals=data.map(x=>Number(x.v)*metric);
+  let lo=Math.min(...vals),hi=Math.max(...vals);
+  if(lo===hi){lo-=1;hi+=1}
+  const pad=(hi-lo)*.10;lo-=pad;hi+=pad;
+  const x=i=>data.length===1?W/2:L+(W-L-R)*(i/(data.length-1));
+  const y=v=T+(H-T-B)*(1-(v-lo)/(hi-lo));
+  const pts=vals.map((v,i)=>[x(i),y(v)]);
+  const ns="http://www.w3.org/2000/svg";
+
+  for(let g=0;g<4;g++){
+    const yy=T+(H-T-B)*g/3;
+    const line=document.createElementNS(ns,"line");line.setAttribute("x1",L);line.setAttribute("x2",W-R);line.setAttribute("y1",yy);line.setAttribute("y2",yy);line.setAttribute("class","gridline");svg.appendChild(line);
+    const tv=hi-(hi-lo)*g/3, tx=document.createElementNS(ns,"text");tx.setAttribute("x",L-7);tx.setAttribute("y",yy+4);tx.setAttribute("text-anchor","end");tx.setAttribute("class","axis");tx.textContent="₹"+Math.round(tv).toLocaleString("en-IN");svg.appendChild(tx);
+  }
+
+  const poly=pts.map(p=>p.join(",")).join(" ");
+  const area=document.createElementNS(ns,"polygon");area.setAttribute("points",L+","+ (H-B)+" "+poly+" "+(W-R)+","+(H-B));area.setAttribute("class","area");svg.appendChild(area);
+  const line=document.createElementNS(ns,"polyline");line.setAttribute("points",poly);line.setAttribute("class","line");svg.appendChild(line);
+
+  pts.forEach((p,i)=>{
+    const c=document.createElementNS(ns,"circle");c.setAttribute("cx",p[0]);c.setAttribute("cy",p[1]);c.setAttribute("r",i===pts.length-1?5:3.5);c.setAttribute("class","point");
+    const title=document.createElementNS(ns,"title");title.textContent=data[i].d+" · "+fmt(vals[i]);c.appendChild(title);svg.appendChild(c);
+  });
+
+  const left=document.createElementNS(ns,"text");left.setAttribute("x",L);left.setAttribute("y",H-8);left.setAttribute("class","axis");left.textContent=data[0].d.replace(/ \d{4}$/,"");svg.appendChild(left);
+  const right=document.createElementNS(ns,"text");right.setAttribute("x",W-R);right.setAttribute("y",H-8);right.setAttribute("text-anchor","end");right.setAttribute("class","axis");right.textContent=data.at(-1).d.replace(/ \d{4}$/,"");svg.appendChild(right);
+}
+
+function renderHistory(){
+  const box=document.getElementById("historyRows");box.innerHTML="";
+  const rows=history.slice(-8).reverse();
+  rows.forEach((x,i)=>{
+    const prev=history[history.length-1-i-1];
+    const v=Number(x.v), d=prev? v-Number(prev.v):null;
+    const row=document.createElement("div");row.className="row";
+    row.innerHTML="<div>"+x.d+"</div><div class='right'>"+fmt(v*8)+"</div><div class='right "+(d===null?"":d>=0?"up":"down")+"'>"+(d===null?"—":(d>=0?"+":"−")+fmt(Math.abs(d*8)))+"</div>";
+    box.appendChild(row);
+  });
+}
+
+async function refresh(){
+  const status=document.getElementById("status");
+  status.innerHTML="<i></i>Updating…";
+  const loaded=await loadLatest();
+  if(loaded.length){
+    history=loaded.map(x=>({d:x.d,v:Number(x.v),ts:x.ts||"",source:x.source||""})).filter(x=>Number.isFinite(x.v));
+    if(history.length){
+      save();
+      const ts=history.at(-1).ts, dt=ts?new Date(ts):null;
+      const live=dt&&!Number.isNaN(dt.getTime())&&(Date.now()-dt.getTime()<3*60*60*1000);
+      status.className="status"+(live?"":" offline");
+      status.innerHTML="<i></i>"+(live?"LIVE · ":"Last saved · ")+(dt&&!Number.isNaN(dt.getTime())?dt.toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit"}):"");
+      const src=history.at(-1).source;
+      document.getElementById("sourceNote").textContent="Source: "+(src||"Chennai 22K reference feed")+" · 1g reference × 8 = 8g sovereign rate.";
+      render();
+      return;
+    }
+  }
+  status.className="status offline";status.innerHTML="<i></i>Offline · last saved rate";
+  if(history.length)render();
+}
+
+document.querySelectorAll("[data-days]").forEach(b=>b.addEventListener("click",()=>{
+  document.querySelectorAll("[data-days]").forEach(x=>x.classList.remove("active"));b.classList.add("active");days=Number(b.dataset.days);render();
+}));
+document.querySelectorAll("[data-metric]").forEach(b=>b.addEventListener("click",()=>{
+  document.querySelectorAll("[data-metric]").forEach(x=>x.classList.remove("active"));b.classList.add("active");metric=Number(b.dataset.metric);render();
+}));
+document.getElementById("refresh").addEventListener("click",refresh);
+refresh();
+setInterval(refresh,15*60*1000);
+
+if("serviceWorker" in navigator)navigator.serviceWorker.register("sw.js?v=4").catch(()=>{});
+</script>
+
+</body>
+</html>
