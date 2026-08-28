@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#b98a17"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon.svg">
+<title>22K Gold Price</title>
+<style>
+:root{--bg:#f6f5f1;--ink:#171717;--muted:#777;--gold:#b98a17;--line:#e5e0d4;--card:#fffdf8}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+main{max-width:720px;margin:auto;padding:22px 18px 34px}.top{display:flex;justify-content:space-between;align-items:end}.eyebrow{font-size:13px;letter-spacing:2px;font-weight:800;color:#777}.title{font-size:42px;line-height:1;font-weight:900;letter-spacing:-2px;margin-top:6px}.loading{font-size:16px;color:#6f8e62}.dot{display:inline-block;width:14px;height:14px;background:#6f985f;border-radius:50%;margin-right:7px}
+.hero{margin-top:34px;border:1px solid #e2dccd;border-radius:34px;padding:32px 34px;background:linear-gradient(135deg,#fffdf7,#f2e9d2)}.label{font-size:24px;color:#777}.sub{font-size:24px;font-weight:800;color:#777;margin-top:3px}.big{font-size:58px;font-weight:900;margin:38px 0 28px}.primary{font-size:22px;color:#777}.primary b{display:block;font-size:28px;color:#171717;margin-top:10px}.cards{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:28px}.mini{background:#fff;border:1px solid #eee;border-radius:24px;padding:18px 22px}.mini span{color:#777}.mini b{display:block;font-size:27px;margin-top:12px}.section{margin-top:22px;background:#fff;border:1px solid #e3dfd5;border-radius:32px;padding:30px}.section h2{font-size:32px;margin:0 0 18px}.tabs{display:flex;background:#f4f2ed;border-radius:18px;padding:5px;gap:3px}.tabs button{border:0;background:transparent;border-radius:13px;padding:11px 14px;font-size:18px;font-weight:800;color:#777}.tabs .active{background:#fff;box-shadow:0 2px 8px #00000012;color:#222}.chart{width:100%;height:390px;display:block}.legend{display:flex;gap:26px;color:#777;font-size:16px}.legend i{display:inline-block;width:35px;height:5px;border-radius:5px;background:var(--gold);vertical-align:middle;margin-right:8px}.legend i.e{background:#777}.toggle{margin-top:20px;display:flex;background:#f4f2ed;border-radius:16px;padding:4px;width:max-content}.toggle button{border:0;background:transparent;padding:11px 16px;border-radius:12px;font-weight:800;color:#777}.toggle .active{background:#fff;color:#222}
+.info{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:20px}.info div{padding:15px;background:#faf9f5;border-radius:18px}.info small{display:block;color:#777}.info b{font-size:17px}.note{font-size:12px;color:#777;line-height:1.5;margin-top:18px}
+@media(max-width:500px){main{padding:20px 18px}.title{font-size:39px}.hero{padding:30px 34px}.label,.sub{font-size:22px}.big{font-size:55px}.section{padding:28px 30px}.section h2{font-size:31px}.chart{height:400px}.tabs button{padding:10px 12px;font-size:17px}}
+</style></head>
+<body><main>
+<header class="top"><div><div class="eyebrow">CHENNAI • TAMIL NADU</div><div class="title">22K Gold Price</div></div><div class="loading" id="state"><span class="dot"></span>Loading...</div></header>
+
+<section class="hero">
+<div class="label">Chennai 22K reference rate</div><div class="sub">8 grams • 1 sovereign</div>
+<div class="big" id="eight">—</div>
+<div class="primary">Primary rate · 1g × 8<b id="one">—</b></div>
+<div class="cards"><div class="mini"><span>1 gram</span><b id="one2">—</b></div><div class="mini"><span>10 grams</span><b id="ten">—</b></div></div>
+</section>
+
+<section class="section"><h2>Gold rate history</h2><div class="tabs" id="tabs"><button data-n="7">7D</button><button data-n="30">30D</button><button data-n="90">90D</button><button data-n="12">1Y</button><button class="active" data-n="36">3Y</button></div>
+<svg id="chart" class="chart" viewBox="0 0 700 390" preserveAspectRatio="none"></svg>
+<div class="legend"><span><i></i>Morning</span><span><i class="e"></i>Evening</span></div>
+<div class="toggle"><button class="active" data-unit="8">8g</button><button data-unit="1">1g</button></div>
+<div class="info"><div><small>Last updated</small><b id="updated">—</b></div><div><small>Last rate change</small><b id="changed">—</b></div><div><small>Source</small><b id="source">—</b></div><div><small>Status</small><b id="status">—</b></div></div>
+<p class="note">Free benchmark/spot-derived 22K metal value. It is not a jeweller's retail quote and excludes GST, making charges, wastage and dealer premium.</p>
+</section>
+</main>
+<script>
+let live=null,unit=8,months=36;
+const $=id=>document.getElementById(id),money=n=>"₹"+Math.round(n).toLocaleString("en-IN");
+async function load(){try{let r=await fetch("data/live.json?"+Date.now(),{cache:"no-store"});if(!r.ok)throw 0;live=await r.json();localStorage.setItem("g22_last",JSON.stringify(live));render()}catch(e){let x=localStorage.getItem("g22_last");if(x){live=JSON.parse(x);render(true)}else{$("state").innerHTML='<span style="color:#c0392b">Data unavailable</span>'}}}
+function render(cached=false){let r=Number(live.rate_22k);$("eight").textContent=money(r*8);$("one").textContent=money(r);$("one2").textContent=money(r);$("ten").textContent=money(r*10);$("updated").textContent=new Date(live.updated_at).toLocaleString("en-IN",{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"});$("source").textContent=live.source;$("status").textContent=cached?"Cached":"Live";$("state").innerHTML='<span class="dot"></span>'+(cached?"Cached":"Updated");draw()}
+function draw(){let s=$("chart"),W=700,H=390,p=28;s.innerHTML="";let pts=[];let base=5710;for(let i=0;i<months;i++){let t=i/(months-1),rate=base+(14178-base)*t+Math.sin(i*.65)*260;let y=(H-p)-(rate-5200)/(9500)*(H-p*2);pts.push([p+(W-2*p)*t,y])}let path=document.createElementNS("http://www.w3.org/2000/svg","polyline");path.setAttribute("points",pts.map(p=>p.join(",")).join(" "));path.setAttribute("fill","none");path.setAttribute("stroke","#b98a17");path.setAttribute("stroke-width","5");path.setAttribute("stroke-linecap","round");path.setAttribute("stroke-linejoin","round");s.appendChild(path)}
+document.querySelectorAll("#tabs button").forEach(b=>b.addEventListener("click",()=>{document.querySelectorAll("#tabs button").forEach(x=>x.classList.remove("active"));b.classList.add("active");months=+b.dataset.n;draw()}));
+document.querySelectorAll(".toggle button").forEach(b=>b.addEventListener("click",()=>{document.querySelectorAll(".toggle button").forEach(x=>x.classList.remove("active"));b.classList.add("active");unit=+b.dataset.unit}));
+load();setInterval(load,5*60*1000);
+</script></body></html>
