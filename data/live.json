@@ -3,8 +3,14 @@
   "eight_22k": 118400,
   "rate_24k": null,
   "rate_18k": null,
-  "updated_at": "2026-08-28T23:29:46.065184+05:30",
+  "updated_at": "2026-08-28T23:43:06.547730+05:30",
+  "last_changed_at": "2026-08-28T23:29:46.065184+05:30",
+  "last_changed_date": "2026-08-28",
+  "last_changed_time": "23:43:06",
+  "last_changed_session": "PM",
+  "rate_changed": false,
   "source": "LiveChennai",
   "source_url": "https://www.livechennai.com/gold_silverrate.asp",
-  "session": "PM"
+  "session": "PM",
+  "timezone": "Asia/Kolkata"
 }
