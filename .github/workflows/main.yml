@@ -2,10 +2,10 @@ name: Update Chennai 22K Gold Rate
 
 on:
   schedule:
-    # 11:00 AM IST = 05:30 UTC
+    # 11:00 AM IST
     - cron: "30 5 * * *"
 
-    # 5:00 PM IST = 11:30 UTC
+    # 5:00 PM IST
     - cron: "30 11 * * *"
 
   workflow_dispatch:
@@ -18,6 +18,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -35,25 +36,35 @@ jobs:
         env:
           PYTHONUNBUFFERED: "1"
         run: |
-          python <<'PY'
+          python - <<'PY'
           import json
           import re
           import time
+          from pathlib import Path
           from datetime import datetime, date
           from zoneinfo import ZoneInfo
-          from pathlib import Path
 
           import requests
           from bs4 import BeautifulSoup
 
 
+          # ============================================================
+          # CONFIGURATION
+          # ============================================================
+
           TZ = ZoneInfo("Asia/Kolkata")
 
-          CURRENT_URL = "https://www.livechennai.com/gold_silverrate.asp"
-          HISTORY_URL = "https://www.livechennai.com/get_goldrate_history.asp"
+          CURRENT_URL = (
+              "https://www.livechennai.com/gold_silverrate.asp"
+          )
+
+          HISTORY_URL = (
+              "https://www.livechennai.com/"
+              "get_goldrate_history.asp"
+          )
 
           DATA_DIR = Path("data")
-          DATA_DIR.mkdir(exist_ok=True)
+          DATA_DIR.mkdir(parents=True, exist_ok=True)
 
           LIVE_FILE = DATA_DIR / "live.json"
           HISTORY_FILE = DATA_DIR / "history.json"
@@ -61,7 +72,8 @@ jobs:
           HEADERS = {
               "User-Agent": (
                   "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
-                  "AppleWebKit/537.36 (KHTML, like Gecko) "
+                  "AppleWebKit/537.36 "
+                  "(KHTML, like Gecko) "
                   "Chrome/139.0 Safari/537.36"
               )
           }
@@ -70,27 +82,46 @@ jobs:
           session.headers.update(HEADERS)
 
 
+          # ============================================================
+          # HELPERS
+          # ============================================================
+
           def clean_number(value):
               if value is None:
                   return None
 
               text = str(value)
+
               text = text.replace(",", "")
               text = text.replace("₹", "")
               text = text.replace("Rs.", "")
               text = text.replace("Rs", "")
+              text = text.strip()
 
-              m = re.search(r"\d+(?:\.\d+)?", text)
+              match = re.search(
+                  r"\d+(?:\.\d+)?",
+                  text
+              )
 
-              if not m:
+              if not match:
                   return None
 
-              return float(m.group(0))
+              try:
+                  return float(match.group(0))
+              except Exception:
+                  return None
 
 
           def get_html(url, params=None):
-              for attempt in range(3):
+              last_error = None
+
+              for attempt in range(1, 4):
                   try:
+                      print(
+                          f"Request {attempt}/3: "
+                          f"{url}"
+                      )
+
                       response = session.get(
                           url,
                           params=params,
@@ -99,69 +130,139 @@ jobs:
 
                       response.raise_for_status()
 
+                      print(
+                          f"HTTP {response.status_code} "
+                          f"received"
+                      )
+
                       return response.text
 
                   except Exception as exc:
+                      last_error = exc
+
                       print(
-                          f"Request failed ({attempt + 1}/3): "
-                          f"{url} -> {exc}"
+                          f"Request failed: {exc}"
                       )
 
-                      if attempt < 2:
+                      if attempt < 3:
                           time.sleep(3)
 
-              raise RuntimeError(f"Unable to fetch {url}")
+              raise RuntimeError(
+                  f"Unable to fetch {url}: {last_error}"
+              )
 
 
           def parse_date(text):
-              text = " ".join(str(text).split())
+              if not text:
+                  return None
+
+              text = " ".join(
+                  str(text).split()
+              )
 
               formats = [
                   "%d/%B/%Y",
                   "%d/%b/%Y",
-                  "%d/%B/%Y",
-                  "%d-%b-%Y",
                   "%d-%B-%Y",
+                  "%d-%b-%Y",
                   "%d/%m/%Y",
+                  "%d-%m-%Y",
+                  "%Y-%m-%d",
               ]
 
               for fmt in formats:
                   try:
-                      return datetime.strptime(text, fmt).date()
+                      return datetime.strptime(
+                          text,
+                          fmt
+                      ).date()
                   except ValueError:
                       pass
 
-              # Fallback: extract dd/month/yyyy
-              m = re.search(
-                  r"(\d{1,2})[/-]([A-Za-z]+|\d{1,2})[/-](\d{4})",
+              # Generic fallback.
+              match = re.search(
+                  r"(\d{1,2})[/-]"
+                  r"([A-Za-z]+|\d{1,2})[/-]"
+                  r"(\d{4})",
                   text
               )
 
-              if m:
-                  d, month, y = m.groups()
+              if not match:
+                  return None
 
-                  if month.isdigit():
+              d, month, year = match.groups()
+
+              if month.isdigit():
+                  try:
                       return date(
-                          int(y),
+                          int(year),
                           int(month),
                           int(d)
                       )
+                  except ValueError:
+                      return None
 
-                  for fmt in ("%d/%B/%Y", "%d/%b/%Y"):
-                      try:
-                          return datetime.strptime(
-                              f"{d}/{month}/{y}",
-                              fmt
-                          ).date()
-                      except ValueError:
-                          pass
+              for fmt in (
+                  "%d/%B/%Y",
+                  "%d/%b/%Y",
+              ):
+                  try:
+                      return datetime.strptime(
+                          f"{d}/{month}/{year}",
+                          fmt
+                      ).date()
+                  except ValueError:
+                      pass
 
               return None
 
 
+          def load_json(path, default):
+              if not path.exists():
+                  return default
+
+              try:
+                  with path.open(
+                      "r",
+                      encoding="utf-8"
+                  ) as file:
+                      return json.load(file)
+
+              except Exception as exc:
+                  print(
+                      f"Could not read {path}: {exc}"
+                  )
+                  return default
+
+
+          def save_json(path, value):
+              temp = path.with_suffix(
+                  path.suffix + ".tmp"
+              )
+
+              with temp.open(
+                  "w",
+                  encoding="utf-8"
+              ) as file:
+                  json.dump(
+                      value,
+                      file,
+                      ensure_ascii=False,
+                      indent=2
+                  )
+
+              temp.replace(path)
+
+
+          # ============================================================
+          # HISTORICAL DATA
+          # ============================================================
+
           def parse_history_month(month, year):
+
+              print("")
               print(
-                  f"Fetching history: "
+                  f"Fetching historical data "
                   f"{year:04d}-{month:02d}"
               )
 
@@ -173,209 +274,263 @@ jobs:
                   }
               )
 
-              soup = BeautifulSoup(html, "html.parser")
+              soup = BeautifulSoup(
+                  html,
+                  "html.parser"
+              )
 
               records = []
 
               for table in soup.find_all("table"):
 
-                  rows = table.find_all("tr")
+                  for row in table.find_all("tr"):
 
-                  for tr in rows:
-                      cells = tr.find_all(
+                      cells = row.find_all(
                           ["td", "th"]
                       )
 
                       values = [
                           " ".join(
-                              c.get_text(
+                              cell.get_text(
                                   " ",
                                   strip=True
                               ).split()
                           )
-                          for c in cells
+                          for cell in cells
                       ]
 
                       if len(values) < 3:
                           continue
 
-                      # Header row
                       joined = " ".join(
-                          v.lower()
-                          for v in values
+                          value.lower()
+                          for value in values
                       )
 
-                      if "date" in joined and (
-                          "standard" in joined
-                          or "22" in joined
+                      # Ignore header rows.
+                      if (
+                          "date" in joined
+                          and (
+                              "standard" in joined
+                              or "22" in joined
+                          )
                       ):
                           continue
 
-                      d = parse_date(values[0])
+                      parsed_date = parse_date(
+                          values[0]
+                      )
 
-                      if d is None:
+                      if parsed_date is None:
                           continue
 
-                      rate_22k = clean_number(values[2])
+                      # Prefer the third column because the
+                      # LiveChennai historical table places
+                      # Standard Gold / 22K there.
+                      rate = clean_number(
+                          values[2]
+                      )
 
-                      if rate_22k is None:
+                      if rate is None:
                           continue
 
-                      # LiveChennai's historical page gives
-                      # the Standard Gold 22K rate per gram.
                       if not (
-                          5000 <= rate_22k <= 30000
+                          5000 <= rate <= 30000
                       ):
                           continue
 
                       records.append({
-                          "date": d.isoformat(),
-                          "rate_22k": int(round(rate_22k)),
-                          "source": "LiveChennai",
+                          "date":
+                              parsed_date.isoformat(),
+
+                          "rate_22k":
+                              int(round(rate)),
+
+                          "source":
+                              "LiveChennai",
+
                           "source_url": (
                               f"{HISTORY_URL}"
                               f"?monthno={month}"
                               f"&yearno={year}"
                           ),
-                          "type": "daily_history"
+
+                          "type":
+                              "daily_history"
                       })
 
               # Remove duplicate dates.
               unique = {}
 
               for item in records:
-                  unique[item["date"]] = item
+                  unique[
+                      item["date"]
+                  ] = item
 
               records = list(
                   unique.values()
               )
 
               records.sort(
-                  key=lambda x: x["date"]
+                  key=lambda item:
+                      item["date"]
               )
 
               print(
-                  f"  Found {len(records)} records"
+                  f"Found {len(records)} "
+                  f"historical records"
               )
 
               return records
 
 
-          def parse_current_rate():
-              print("Fetching current Chennai rate")
+          # ============================================================
+          # CURRENT RATE
+          # ============================================================
 
-              html = get_html(CURRENT_URL)
-              soup = BeautifulSoup(html, "html.parser")
+          def parse_current_rate():
+
+              print("")
+              print(
+                  "Fetching current Chennai 22K rate..."
+              )
+
+              html = get_html(
+                  CURRENT_URL
+              )
+
+              soup = BeautifulSoup(
+                  html,
+                  "html.parser"
+              )
 
               rate = None
 
-              # First try tables.
-              for table in soup.find_all("table"):
-                  rows = table.find_all("tr")
+              # --------------------------------------------------------
+              # Method 1: tables
+              # --------------------------------------------------------
 
-                  for tr in rows:
-                      cells = tr.find_all(
+              for table in soup.find_all("table"):
+
+                  for row in table.find_all("tr"):
+
+                      cells = row.find_all(
                           ["td", "th"]
                       )
 
                       values = [
                           " ".join(
-                              c.get_text(
+                              cell.get_text(
                                   " ",
                                   strip=True
                               ).split()
                           )
-                          for c in cells
+                          for cell in cells
                       ]
 
                       if len(values) < 2:
                           continue
 
                       joined = " ".join(
-                          v.lower()
-                          for v in values
+                          value.lower()
+                          for value in values
                       )
 
                       if "22" not in joined:
                           continue
 
-                      # Look for plausible 22K values.
+                      # If a row explicitly mentions 22K,
+                      # look for a plausible price.
                       for value in values:
-                          n = clean_number(value)
 
-                          if n is not None and (
-                              5000 <= n <= 30000
+                          number = clean_number(
+                              value
+                          )
+
+                          if (
+                              number is not None
+                              and
+                              5000 <= number <= 30000
                           ):
-                              rate = int(round(n))
+                              rate = int(
+                                  round(number)
+                              )
                               break
 
-                      if rate:
+                      if rate is not None:
                           break
 
-                  if rate:
+                  if rate is not None:
                       break
 
-              # Fallback regexes.
+              # --------------------------------------------------------
+              # Method 2: regex fallback
+              # --------------------------------------------------------
+
               if rate is None:
+
                   text = soup.get_text(
                       " ",
                       strip=True
                   )
 
                   patterns = [
-                      r"22\s*K[^0-9]{0,80}"
+
+                      r"22\s*K"
+                      r"[^0-9]{0,100}"
                       r"([0-9][0-9,]{3,6})",
 
-                      r"22\s*K\s*/?\s*1?\s*Gm"
-                      r"[^0-9]{0,80}"
+                      r"22\s*K\s*/?"
+                      r"\s*(?:1\s*)?(?:Gm|Gram)"
+                      r"[^0-9]{0,100}"
                       r"([0-9][0-9,]{3,6})",
 
-                      r"Standard Gold\s*\(22\s*K\)"
-                      r"[^0-9]{0,80}"
+                      r"Standard\s+Gold"
+                      r"[^0-9]{0,100}"
                       r"([0-9][0-9,]{3,6})",
                   ]
 
                   for pattern in patterns:
-                      m = re.search(
+
+                      match = re.search(
                           pattern,
                           text,
                           re.IGNORECASE
                       )
 
-                      if not m:
+                      if not match:
                           continue
 
-                      n = clean_number(
-                          m.group(1)
+                      number = clean_number(
+                          match.group(1)
                       )
 
-                      if n is not None and (
-                          5000 <= n <= 30000
+                      if (
+                          number is not None
+                          and
+                          5000 <= number <= 30000
                       ):
-                          rate = int(round(n))
+                          rate = int(
+                              round(number)
+                          )
                           break
 
               if rate is None:
                   raise RuntimeError(
-                      "Could not find current Chennai 22K rate"
+                      "Could not find current "
+                      "Chennai 22K rate"
                   )
+
+              print(
+                  f"CURRENT 22K RATE: ₹{rate:,}"
+              )
 
               return rate
 
 
-          def load_json(path, default):
-              if not path.exists():
-                  return default
-
-              try:
-                  with path.open(
-                      "r",
-                      encoding="utf-8"
-                  ) as f:
-                      return json.load(f)
-              except Exception:
-                  return default
-
+          # ============================================================
+          # LOAD EXISTING DATA
+          # ============================================================
 
           history = load_json(
               HISTORY_FILE,
@@ -385,28 +540,27 @@ jobs:
           if not isinstance(history, list):
               history = []
 
-
-          # ---------------------------------------------------------
-          # 1. BACKFILL LAST 36 MONTHS IF HISTORY IS EMPTY/INCOMPLETE
-          # ---------------------------------------------------------
-
           print("")
           print("=" * 70)
-          print("CHENNAI 22K GOLD HISTORICAL BACKFILL")
+          print("CHENNAI 22K GOLD RATE UPDATE")
           print("=" * 70)
           print(
               f"Existing history: "
               f"{len(history)} records"
           )
 
-          # We expect roughly 900-1100 daily records
-          # for a 36-month period.
-          NEED_BACKFILL = len(history) < 700
 
-          if NEED_BACKFILL:
+          # ============================================================
+          # 36-MONTH BACKFILL
+          # ============================================================
 
+          # If there are fewer than 700 records,
+          # rebuild the historical dataset.
+          if len(history) < 700:
+
+              print("")
               print(
-                  "History is incomplete."
+                  "Historical data incomplete."
               )
 
               print(
@@ -415,12 +569,13 @@ jobs:
 
               now = datetime.now(TZ)
 
+              months = []
+
               year = now.year
               month = now.month
 
-              months = []
-
               for _ in range(36):
+
                   months.append(
                       (year, month)
                   )
@@ -435,37 +590,58 @@ jobs:
 
               all_history = {}
 
-              # Preserve anything already present.
+              # Preserve existing records.
               for item in history:
+
+                  if not isinstance(
+                      item,
+                      dict
+                  ):
+                      continue
+
+                  item_date = item.get(
+                      "date"
+                  )
+
+                  item_rate = item.get(
+                      "rate_22k"
+                  )
+
                   if (
-                      isinstance(item, dict)
-                      and item.get("date")
-                      and item.get("rate_22k")
+                      item_date
+                      and item_rate
                   ):
                       all_history[
-                          item["date"]
+                          item_date
                       ] = item
 
               for year, month in months:
 
                   try:
-                      records = parse_history_month(
-                          month,
-                          year
+
+                      records = (
+                          parse_history_month(
+                              month,
+                              year
+                          )
                       )
 
                       for item in records:
+
                           all_history[
                               item["date"]
                           ] = item
 
                   except Exception as exc:
+
                       print(
-                          f"  ERROR for "
+                          f"ERROR "
                           f"{year:04d}-{month:02d}: "
                           f"{exc}"
                       )
 
+                  # Small delay to avoid
+                  # hammering the website.
                   time.sleep(0.7)
 
               history = list(
@@ -473,7 +649,8 @@ jobs:
               )
 
               history.sort(
-                  key=lambda x: x["date"]
+                  key=lambda item:
+                      item["date"]
               )
 
               print("")
@@ -483,17 +660,23 @@ jobs:
               )
 
           else:
+
               print(
-                  "History already populated; "
-                  "skipping 36-month backfill."
+                  "History already populated."
+              )
+
+              print(
+                  "Skipping full backfill."
               )
 
 
-          # ---------------------------------------------------------
-          # 2. FETCH CURRENT RATE
-          # ---------------------------------------------------------
+          # ============================================================
+          # CURRENT RATE + TIME
+          # ============================================================
 
-          current_rate = parse_current_rate()
+          current_rate = (
+              parse_current_rate()
+          )
 
           now = datetime.now(TZ)
 
@@ -510,139 +693,77 @@ jobs:
           )
 
 
-          # ---------------------------------------------------------
-          # 3. DETERMINE LAST CHANGE
-          # ---------------------------------------------------------
+          # ============================================================
+          # PREVIOUS LIVE DATA
+          # ============================================================
 
           previous_live = load_json(
               LIVE_FILE,
               {}
           )
 
+          if not isinstance(
+              previous_live,
+              dict
+          ):
+              previous_live = {}
+
           previous_rate = None
 
-          if isinstance(previous_live, dict):
-              try:
-                  previous_rate = int(
-                      previous_live.get(
-                          "rate_22k"
-                      )
-                  )
-              except Exception:
-                  previous_rate = None
+          try:
 
+              if previous_live.get(
+                  "rate_22k"
+              ) is not None:
+
+                  previous_rate = int(
+                      previous_live[
+                          "rate_22k"
+                      ]
+                  )
+
+          except Exception:
+
+              previous_rate = None
+
+
+          # ============================================================
+          # DETERMINE WHETHER RATE CHANGED
+          # ============================================================
 
           changed = (
               previous_rate != current_rate
           )
 
           if changed:
+
               last_changed_at = (
                   now.isoformat()
               )
+
+              last_change_date = today
+
+              last_change_time = (
+                  current_time
+              )
+
+              last_change_session = (
+                  session_name
+              )
+
           else:
+
               last_changed_at = (
                   previous_live.get(
                       "last_changed_at"
                   )
-                  if isinstance(
-                      previous_live,
-                      dict
+              )
+
+              last_change_date = (
+                  previous_live.get(
+                      "last_change_date"
                   )
-                  else None
               )
 
-
-          # ---------------------------------------------------------
-          # 4. RECORD CURRENT RATE ONLY WHEN IT CHANGES
-          # ---------------------------------------------------------
-
-          if changed:
-
-              history.append({
-                  "date": today,
-                  "time": current_time,
-                  "rate_22k": current_rate,
-                  "source": "LiveChennai",
-                  "source_url": CURRENT_URL,
-                  "session": session_name,
-                  "type": "live_change"
-              })
-
-              print("")
-              print(
-                  "RATE CHANGED:"
-              )
-              print(
-                  f"  Previous: "
-                  f"{previous_rate}"
-              )
-              print(
-                  f"  Current : "
-                  f"{current_rate}"
-              )
-              print(
-                  f"  Change  : "
-                  f"{current_rate - previous_rate}"
-                  if previous_rate is not None
-                  else "  Change  : N/A"
-              )
-
-          else:
-
-              print("")
-              print(
-                  "RATE UNCHANGED:"
-              )
-              print(
-                  f"  Current: "
-                  f"{current_rate}"
-              )
-
-
-          # ---------------------------------------------------------
-          # 5. CLEAN DUPLICATES
-          # ---------------------------------------------------------
-
-          cleaned = {}
-
-          for item in history:
-
-              if not isinstance(
-                  item,
-                  dict
-              ):
-                  continue
-
-              d = item.get("date")
-              r = item.get("rate_22k")
-
-              if not d or r is None:
-                  continue
-
-              try:
-                  r = int(r)
-              except Exception:
-                  continue
-
-              if not (
-                  5000 <= r <= 30000
-              ):
-                  continue
-
-              # For the historical daily records,
-              # keep one record per date.
-              #
-              # For live changes, keep timestamped
-              # records when available.
-              key = (
-                  f"{d}_{item.get('time','')}"
-              )
-
-              cleaned[key] = {
-                  **item,
-                  "rate_22k": r
-              }
-
-
-          history = list(
+              last_change_time = (
+                  previous_live.
