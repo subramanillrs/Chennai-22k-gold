@@ -1,8 +1,7 @@
 {
-  "rate_22k": 14650,
-  "rate_24k": 15982,
+  "rate_22k": 12617.86,
+  "rate_24k": 13764.94,
   "unit": "INR/g",
-  "updated_at": "2026-08-28T17:30:00Z",
-  "session": "PM",
-  "source": "Starter value \u2014 replace by GitHub Action"
+  "updated_at": "2026-08-28T17:37:03.615319Z",
+  "source": "GoldPrice.dev"
 }
