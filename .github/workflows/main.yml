@@ -4,82 +4,217 @@ on:
   workflow_dispatch:
 
   schedule:
-    # Start before the learned AM monitoring window
-    - cron: "00 03 * * *"
+    # Start at 8:15 AM IST
+    # 08:15 IST = 02:45 UTC
+    - cron: "45 2 * * *"
 
-    # Start before the learned PM monitoring window
-    - cron: "00 10 * * *"
+    # Start at 4:45 PM IST
+    # 16:45 IST = 11:15 UTC
+    - cron: "15 11 * * *"
 
 permissions:
   contents: write
 
 concurrency:
-  group: chennai-22k-gold-updater
+  group: chennai-22k-gold-monitor
   cancel-in-progress: false
 
 jobs:
   update:
-    name: Update Chennai 22K Gold Rate
+
+    name: Monitor and Update Chennai 22K Gold
+
     runs-on: ubuntu-latest
-    timeout-minutes: 420
+
+    # The Python program may remain running
+    # for several hours while it monitors.
+    timeout-minutes: 360
 
     steps:
-      - name: Checkout
+
+      # =====================================================
+      # CHECKOUT REPOSITORY
+      # =====================================================
+
+      - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
+      # =====================================================
+      # PYTHON
+      # =====================================================
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
+      # =====================================================
+      # DEPENDENCIES
+      # =====================================================
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           python -m pip install requests beautifulsoup4
 
+      # =====================================================
+      # RUN GOLD MONITOR
+      # =====================================================
+
       - name: Monitor and update Chennai 22K rate
         run: |
-          python update_gold.py
+          echo "============================================================"
+          echo "CHENNAI 22K GOLD RATE MONITOR"
+          echo "============================================================"
+          echo "Starting update_gold.py..."
+          echo "The Python program will monitor every 10 seconds"
+          echo "while inside the active monitoring window."
+          echo "============================================================"
+
+          python -u update_gold.py
+
+      # =====================================================
+      # VERIFY LIVE DATA
+      # =====================================================
 
       - name: Verify generated data
         run: |
-          echo "Checking generated data files..."
 
-          if [ ! -f "data/live.json" ]; then
-            echo "ERROR: data/live.json was not created."
-            exit 1
-          fi
+          echo "Checking generated files..."
 
-          if [ ! -f "data/history.json" ]; then
-            echo "ERROR: data/history.json was not created."
-            exit 1
-          fi
-
-          echo "Generated data files are present."
+          test -f data/live.json
+          test -f data/history.json
+          test -f data/monitoring_windows.json
 
           echo ""
-          echo "Current live data:"
-          cat data/live.json
+          echo "Generated files:"
+          ls -lh data/
+
+          echo ""
+          echo "Checking JSON files..."
+
+          python - <<'PY'
+          import json
+
+          files = [
+              "data/live.json",
+              "data/history.json",
+              "data/monitoring_windows.json"
+          ]
+
+          for filename in files:
+
+              print("Checking:", filename)
+
+              with open(filename, "r", encoding="utf-8") as f:
+                  data = json.load(f)
+
+              print("Valid JSON:", filename)
+
+          print("")
+          print("All generated data files are valid.")
+          PY
+
+      # =====================================================
+      # SHOW CURRENT LIVE DATA
+      # =====================================================
 
       - name: Show current live data
         run: |
-          echo "Current live data:"
+
+          echo "============================================================"
+          echo "CURRENT LIVE DATA"
+          echo "============================================================"
+
           cat data/live.json
+
+          echo ""
+          echo "============================================================"
+
+      # =====================================================
+      # SHOW MONITORING WINDOWS
+      # =====================================================
+
+      - name: Show monitoring windows
+        run: |
+
+          echo "============================================================"
+          echo "CURRENT MONITORING WINDOWS"
+          echo "============================================================"
+
+          cat data/monitoring_windows.json
+
+          echo ""
+          echo "============================================================"
+
+      # =====================================================
+      # SAVE DATA TO GITHUB
+      # =====================================================
 
       - name: Save updated data
         run: |
-          git config user.name "Chennai 22K Gold Bot"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          git add data/live.json data/history.json
+          echo "Preparing Git commit..."
+
+          git config user.name \
+            "github-actions[bot]"
+
+          git config user.email \
+            "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add \
+            data/live.json \
+            data/history.json \
+            data/monitoring_windows.json
 
           if git diff --cached --quiet; then
+
             echo "No data changes detected."
-            exit 0
+            echo "Nothing to commit."
+
+          else
+
+            echo "Changes detected."
+
+            git commit \
+              -m "Update Chennai 22K gold rate"
+
+            git push
+
+            echo "Updated data pushed to GitHub."
+
           fi
 
-          git commit -m "Update Chennai 22K gold rate"
+      # =====================================================
+      # FINAL STATUS
+      # =====================================================
 
-          git push origin HEAD:main
+      - name: Final status
+        run: |
+
+          echo ""
+          echo "============================================================"
+          echo "CHENNAI 22K GOLD UPDATE COMPLETE"
+          echo "============================================================"
+
+          if [ -f data/live.json ]; then
+            echo "live.json                 : OK"
+          else
+            echo "live.json                 : MISSING"
+          fi
+
+          if [ -f data/history.json ]; then
+            echo "history.json              : OK"
+          else
+            echo "history.json              : MISSING"
+          fi
+
+          if [ -f data/monitoring_windows.json ]; then
+            echo "monitoring_windows.json   : OK"
+          else
+            echo "monitoring_windows.json   : MISSING"
+          fi
+
+          echo "============================================================"
