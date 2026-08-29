@@ -1,0 +1,2043 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1, viewport-fit=cover">
+
+  <meta name="theme-color" content="#111827">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="22K Gold Price">
+
+  <meta name="description"
+        content="Chennai 22K Gold Price with live updates and historical data">
+
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icon.svg">
+
+  <title>22K Gold Price — Chennai</title>
+
+  <style>
+    :root {
+      --bg: #f4f6f8;
+      --card: #ffffff;
+      --text: #111827;
+      --muted: #6b7280;
+      --border: #e5e7eb;
+      --gold: #b7791f;
+      --gold-light: #fff7df;
+      --green: #16803c;
+      --red: #c62828;
+      --blue: #2563eb;
+      --shadow: 0 8px 30px rgba(0,0,0,.07);
+      --radius: 20px;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Roboto,
+        Helvetica,
+        Arial,
+        sans-serif;
+    }
+
+    .app {
+      width: min(100%, 900px);
+      margin: 0 auto;
+      padding:
+        max(18px, env(safe-area-inset-top))
+        16px
+        max(30px, env(safe-area-inset-bottom));
+    }
+
+    /* HEADER */
+
+    .header {
+      padding: 14px 4px 18px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+    }
+
+    .brand-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      background: #111827;
+      color: #f7c948;
+      font-size: 23px;
+      box-shadow: var(--shadow);
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 21px;
+      font-weight: 800;
+      letter-spacing: -.4px;
+    }
+
+    .brand p {
+      margin: 2px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .refresh-button {
+      margin-left: auto;
+      border: 0;
+      width: 43px;
+      height: 43px;
+      border-radius: 14px;
+      background: white;
+      box-shadow: var(--shadow);
+      font-size: 20px;
+      cursor: pointer;
+    }
+
+    .header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* STATUS */
+
+    .status {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      margin-top: 13px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--green);
+    }
+
+    .status.offline .status-dot {
+      background: var(--red);
+    }
+
+    /* MAIN RATE */
+
+    .hero {
+      background:
+        linear-gradient(
+          145deg,
+          #fffdf6 0%,
+          #fff8e4 55%,
+          #fff1c5 100%
+        );
+
+      border: 1px solid #f1dfaa;
+      border-radius: 26px;
+      padding: 25px 22px;
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::after {
+      content: "22K";
+      position: absolute;
+      right: -10px;
+      bottom: -32px;
+      font-size: 150px;
+      font-weight: 900;
+      color: rgba(183,121,31,.055);
+      pointer-events: none;
+    }
+
+    .hero-label {
+      color: #76541a;
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .8px;
+    }
+
+    .hero-price {
+      margin-top: 5px;
+      font-size: clamp(42px, 11vw, 72px);
+      line-height: 1;
+      font-weight: 900;
+      letter-spacing: -2.5px;
+      color: #16120a;
+    }
+
+    .hero-unit {
+      margin-top: 7px;
+      color: #806328;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .eight-gram {
+      margin-top: 21px;
+      padding-top: 18px;
+      border-top: 1px solid rgba(183,121,31,.2);
+    }
+
+    .eight-gram-label {
+      color: #806328;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .eight-gram-price {
+      margin-top: 2px;
+      font-size: clamp(30px, 8vw, 48px);
+      line-height: 1.1;
+      font-weight: 900;
+      color: #17120a;
+      letter-spacing: -1px;
+    }
+
+    /* CHANGE */
+
+    .change {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      margin-top: 16px;
+      padding: 7px 11px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .change.up {
+      color: var(--green);
+      background: #eaf8ef;
+    }
+
+    .change.down {
+      color: var(--red);
+      background: #fdecec;
+    }
+
+    .change.same {
+      color: var(--muted);
+      background: #f0f1f3;
+    }
+
+    /* CARDS */
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 17px;
+      box-shadow: var(--shadow);
+    }
+
+    .card-label {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+    }
+
+    .card-value {
+      margin-top: 6px;
+      font-size: 18px;
+      font-weight: 850;
+    }
+
+    .card-small {
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    /* SECTION */
+
+    .section {
+      margin-top: 24px;
+    }
+
+    .section-title {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      margin-bottom: 11px;
+    }
+
+    .section-title h2 {
+      margin: 0;
+      font-size: 19px;
+      letter-spacing: -.3px;
+    }
+
+    .section-title span {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    /* RANGE */
+
+    .ranges {
+      display: flex;
+      gap: 7px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+
+    .range {
+      flex: 0 0 auto;
+      border: 1px solid var(--border);
+      background: white;
+      color: var(--muted);
+      border-radius: 999px;
+      padding: 8px 13px;
+      font-size: 12px;
+      font-weight: 750;
+      cursor: pointer;
+    }
+
+    .range.active {
+      background: #111827;
+      color: white;
+      border-color: #111827;
+    }
+
+    /* CHART */
+
+    .chart-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px;
+      box-shadow: var(--shadow);
+    }
+
+    .chart-wrap {
+      width: 100%;
+      height: 300px;
+      position: relative;
+    }
+
+    canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .chart-info {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 10px;
+      padding: 0 3px;
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    /* LAST CHANGE */
+
+    .last-change {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px;
+      box-shadow: var(--shadow);
+    }
+
+    .last-change-main {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+    }
+
+    .last-change-date {
+      font-size: 15px;
+      font-weight: 800;
+    }
+
+    .last-change-time {
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 4px;
+    }
+
+    .last-change-amount {
+      font-size: 20px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .last-change-amount.up {
+      color: var(--green);
+    }
+
+    .last-change-amount.down {
+      color: var(--red);
+    }
+
+    /* TABLE */
+
+    .history-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .history-scroll {
+      max-height: 430px;
+      overflow-y: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    th {
+      position: sticky;
+      top: 0;
+      background: #f8f9fa;
+      color: var(--muted);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .4px;
+      text-align: left;
+      padding: 12px 14px;
+      z-index: 2;
+    }
+
+    td {
+      padding: 12px 14px;
+      border-top: 1px solid #f0f1f2;
+      font-weight: 600;
+    }
+
+    td:last-child,
+    th:last-child {
+      text-align: right;
+    }
+
+    /* FOOTER */
+
+    footer {
+      padding: 25px 5px 10px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.6;
+    }
+
+    footer a {
+      color: inherit;
+    }
+
+    /* LOADING */
+
+    .loading {
+      color: var(--muted);
+      text-align: center;
+      padding: 30px;
+    }
+
+    /* MOBILE */
+
+    @media (max-width: 480px) {
+
+      .app {
+        padding-left: 12px;
+        padding-right: 12px;
+      }
+
+      .hero {
+        padding: 23px 18px;
+      }
+
+      .grid {
+        gap: 9px;
+      }
+
+      .card {
+        padding: 14px;
+      }
+
+      .chart-wrap {
+        height: 255px;
+      }
+    }
+
+    /* DARK MODE */
+
+    @media (prefers-color-scheme: dark) {
+
+      :root {
+        --bg: #0b0f14;
+        --card: #121820;
+        --text: #f3f4f6;
+        --muted: #9ca3af;
+        --border: #26303b;
+        --gold-light: #201b0d;
+        --shadow: 0 8px 30px rgba(0,0,0,.25);
+      }
+
+      .brand-icon {
+        background: #f4c95d;
+        color: #111827;
+      }
+
+      .refresh-button,
+      .range,
+      .chart-card,
+      .last-change,
+      .history-card {
+        background: var(--card);
+        color: var(--text);
+      }
+
+      .hero {
+        background:
+          linear-gradient(
+            145deg,
+            #211b0d,
+            #19150b
+          );
+        border-color: #554316;
+      }
+
+      .hero-price,
+      .eight-gram-price {
+        color: #fff7dc;
+      }
+
+      .hero-label,
+      .hero-unit,
+      .eight-gram-label {
+        color: #d9b75d;
+      }
+
+      th {
+        background: #171d24;
+      }
+
+      td {
+        border-color: #242c35;
+      }
+
+      .range {
+        border-color: var(--border);
+      }
+
+      .range.active {
+        background: #f3f4f6;
+        color: #111827;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="app">
+
+  <!-- HEADER -->
+
+  <header class="header">
+
+    <div class="header-row">
+
+      <div class="brand">
+
+        <div class="brand-icon">₹</div>
+
+        <div>
+          <h1>22K Gold Price</h1>
+          <p>Chennai · 22 Karat</p>
+        </div>
+
+      </div>
+
+      <button
+        class="refresh-button"
+        id="refreshButton"
+        aria-label="Refresh">
+        ↻
+      </button>
+
+    </div>
+
+    <div class="status" id="status">
+      <span class="status-dot"></span>
+      <span id="statusText">Loading latest rate…</span>
+    </div>
+
+  </header>
+
+
+  <!-- MAIN PRICE -->
+
+  <section class="hero">
+
+    <div class="hero-label">
+      Chennai 22K Gold
+    </div>
+
+    <div
+      class="hero-price"
+      id="pricePerGram">
+      ₹—
+    </div>
+
+    <div class="hero-unit">
+      per gram
+    </div>
+
+    <div class="eight-gram">
+
+      <div class="eight-gram-label">
+        8 gram rate
+      </div>
+
+      <div
+        class="eight-gram-price"
+        id="price8Gram">
+        ₹—
+      </div>
+
+    </div>
+
+    <div
+      class="change same"
+      id="changeBadge">
+      No change
+    </div>
+
+  </section>
+
+
+  <!-- INFO CARDS -->
+
+  <section class="grid">
+
+    <div class="card">
+
+      <div class="card-label">
+        Last Updated
+      </div>
+
+      <div
+        class="card-value"
+        id="updatedDate">
+        —
+      </div>
+
+      <div
+        class="card-small"
+        id="updatedTime">
+        —
+      </div>
+
+    </div>
+
+
+    <div class="card">
+
+      <div class="card-label">
+        Session
+      </div>
+
+      <div
+        class="card-value"
+        id="session">
+        —
+      </div>
+
+      <div class="card-small">
+        Chennai / IST
+      </div>
+
+    </div>
+
+
+    <div class="card">
+
+      <div class="card-label">
+        History
+      </div>
+
+      <div
+        class="card-value"
+        id="historyCount">
+        —
+      </div>
+
+      <div class="card-small">
+        daily records
+      </div>
+
+    </div>
+
+
+    <div class="card">
+
+      <div class="card-label">
+        Data Source
+      </div>
+
+      <div
+        class="card-value">
+        LiveChennai
+      </div>
+
+      <div class="card-small">
+        22K standard gold
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- LAST RATE CHANGE -->
+
+  <section class="section">
+
+    <div class="section-title">
+      <h2>Last Rate Change</h2>
+    </div>
+
+    <div class="last-change">
+
+      <div
+        class="last-change-main"
+        id="lastChangeContent">
+
+        <div>
+          <div class="last-change-date">
+            No recorded change
+          </div>
+
+          <div class="last-change-time">
+            —
+          </div>
+        </div>
+
+        <div class="last-change-amount">
+          —
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- CHART -->
+
+  <section class="section">
+
+    <div class="section-title">
+
+      <h2>Gold Price History</h2>
+
+      <span id="chartRecordCount">
+        —
+      </span>
+
+    </div>
+
+
+    <div class="ranges">
+
+      <button class="range active" data-range="30">
+        30D
+      </button>
+
+      <button class="range" data-range="90">
+        3M
+      </button>
+
+      <button class="range" data-range="180">
+        6M
+      </button>
+
+      <button class="range" data-range="365">
+        1Y
+      </button>
+
+      <button class="range" data-range="1095">
+        3Y
+      </button>
+
+      <button class="range" data-range="all">
+        ALL
+      </button>
+
+    </div>
+
+
+    <div class="chart-card">
+
+      <div class="chart-wrap">
+        <canvas id="goldChart"></canvas>
+      </div>
+
+      <div class="chart-info">
+
+        <span id="chartStart">
+          —
+        </span>
+
+        <span id="chartEnd">
+          —
+        </span>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- HISTORY -->
+
+  <section class="section">
+
+    <div class="section-title">
+
+      <h2>Daily History</h2>
+
+      <span id="tableCount">
+        —
+      </span>
+
+    </div>
+
+
+    <div class="history-card">
+
+      <div class="history-scroll">
+
+        <table>
+
+          <thead>
+
+            <tr>
+              <th>Date</th>
+              <th>22K / gram</th>
+              <th>8 gram</th>
+            </tr>
+
+          </thead>
+
+          <tbody id="historyBody">
+
+            <tr>
+              <td colspan="3" class="loading">
+                Loading historical data…
+              </td>
+            </tr>
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <footer>
+
+    <div>
+      Chennai 22K Gold Price
+    </div>
+
+    <div>
+      Data updated automatically through GitHub Actions.
+    </div>
+
+    <div>
+      Source:
+      <a
+        href="https://www.livechennai.com/gold_silverrate.asp"
+        target="_blank"
+        rel="noopener">
+        LiveChennai
+      </a>
+    </div>
+
+  </footer>
+
+</div>
+
+
+<script>
+
+  const LIVE_URL =
+    "data/live.json";
+
+  const HISTORY_URL =
+    "data/history.json";
+
+
+  let liveData = null;
+  let historyData = [];
+  let selectedRange = 30;
+
+
+  /* =========================================================
+     HELPERS
+     ========================================================= */
+
+  function money(value) {
+
+    if (
+      value === null ||
+      value === undefined ||
+      Number.isNaN(Number(value))
+    ) {
+      return "₹—";
+    }
+
+    return "₹" + Number(value).toLocaleString("en-IN");
+  }
+
+
+  function formatDate(value) {
+
+    if (!value) {
+      return "—";
+    }
+
+    const d = new Date(value + "T00:00:00");
+
+    if (Number.isNaN(d.getTime())) {
+      return value;
+    }
+
+    return d.toLocaleDateString(
+      "en-IN",
+      {
+        day: "2-digit",
+        month: "short",
+        year: "numeric"
+      }
+    );
+  }
+
+
+  function formatTime(value) {
+
+    if (!value) {
+      return "—";
+    }
+
+    const parts = value.split(":");
+
+    if (parts.length < 2) {
+      return value;
+    }
+
+    let hour = Number(parts[0]);
+    const minute = parts[1];
+
+    const suffix = hour >= 12
+      ? "PM"
+      : "AM";
+
+    hour = hour % 12;
+
+    if (hour === 0) {
+      hour = 12;
+    }
+
+    return `${hour}:${minute} ${suffix}`;
+  }
+
+
+  function escapeHtml(value) {
+
+    return String(value)
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
+
+  /* =========================================================
+     STATUS
+     ========================================================= */
+
+  function setStatus(
+    text,
+    offline = false
+  ) {
+
+    const status =
+      document.getElementById("status");
+
+    const statusText =
+      document.getElementById("statusText");
+
+    statusText.textContent = text;
+
+    status.classList.toggle(
+      "offline",
+      offline
+    );
+  }
+
+
+  /* =========================================================
+     LOAD JSON
+     ========================================================= */
+
+  async function loadJson(url) {
+
+    const response = await fetch(
+      url + "?v=" + Date.now(),
+      {
+        cache: "no-store"
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(
+        `HTTP ${response.status}`
+      );
+    }
+
+    return response.json();
+  }
+
+
+  /* =========================================================
+     DISPLAY LIVE DATA
+     ========================================================= */
+
+  function displayLive(data) {
+
+    liveData = data;
+
+    document.getElementById(
+      "pricePerGram"
+    ).textContent =
+      money(data.rate_22k);
+
+
+    document.getElementById(
+      "price8Gram"
+    ).textContent =
+      money(data.rate_8g);
+
+
+    document.getElementById(
+      "updatedDate"
+    ).textContent =
+      formatDate(data.date);
+
+
+    document.getElementById(
+      "updatedTime"
+    ).textContent =
+      formatTime(data.time);
+
+
+    document.getElementById(
+      "session"
+    ).textContent =
+      data.session || "—";
+
+
+    const change =
+      Number(data.change || 0);
+
+    const badge =
+      document.getElementById(
+        "changeBadge"
+      );
+
+    badge.className =
+      "change";
+
+
+    if (change > 0) {
+
+      badge.classList.add("up");
+
+      badge.textContent =
+        `▲ ${money(change)} / gram`;
+
+    } else if (change < 0) {
+
+      badge.classList.add("down");
+
+      badge.textContent =
+        `▼ ${money(Math.abs(change))} / gram`;
+
+    } else {
+
+      badge.classList.add("same");
+
+      badge.textContent =
+        "No rate change";
+
+    }
+
+
+    displayLastChange(
+      data.last_change
+    );
+  }
+
+
+  /* =========================================================
+     LAST CHANGE
+     ========================================================= */
+
+  function displayLastChange(change) {
+
+    const container =
+      document.getElementById(
+        "lastChangeContent"
+      );
+
+
+    if (!change) {
+
+      container.innerHTML = `
+        <div>
+          <div class="last-change-date">
+            No recorded change
+          </div>
+
+          <div class="last-change-time">
+            Waiting for the first detected rate change
+          </div>
+        </div>
+
+        <div class="last-change-amount">
+          —
+        </div>
+      `;
+
+      return;
+    }
+
+
+    const amount =
+      Number(change.change || 0);
+
+
+    const direction =
+      amount > 0
+        ? "up"
+        : amount < 0
+          ? "down"
+          : "";
+
+
+    const symbol =
+      amount > 0
+        ? "▲"
+        : amount < 0
+          ? "▼"
+          : "•";
+
+
+    container.innerHTML = `
+
+      <div>
+
+        <div class="last-change-date">
+          ${escapeHtml(
+            formatDate(change.date)
+          )}
+        </div>
+
+        <div class="last-change-time">
+          ${escapeHtml(
+            formatTime(change.time)
+          )}
+          ·
+          ${escapeHtml(
+            change.session || ""
+          )}
+        </div>
+
+      </div>
+
+      <div class="last-change-amount ${direction}">
+
+        ${symbol}
+        ${money(Math.abs(amount))}
+
+      </div>
+
+    `;
+  }
+
+
+  /* =========================================================
+     HISTORY
+     ========================================================= */
+
+  function normalizeHistory(data) {
+
+    if (!Array.isArray(data)) {
+      return [];
+    }
+
+
+    return data
+      .filter(item => {
+
+        return (
+          item &&
+          item.date &&
+          Number.isFinite(
+            Number(item.rate_22k)
+          )
+        );
+
+      })
+      .map(item => ({
+
+        ...item,
+
+        rate_22k:
+          Number(item.rate_22k)
+
+      }))
+      .sort(
+        (a, b) =>
+          a.date.localeCompare(b.date)
+      );
+  }
+
+
+  function displayHistory() {
+
+    document.getElementById(
+      "historyCount"
+    ).textContent =
+      historyData.length.toLocaleString(
+        "en-IN"
+      );
+
+
+    document.getElementById(
+      "tableCount"
+    ).textContent =
+      `${historyData.length.toLocaleString("en-IN")} records`;
+
+
+    drawChart();
+
+
+    const body =
+      document.getElementById(
+        "historyBody"
+      );
+
+
+    const rows =
+      [...historyData]
+        .reverse()
+        .slice(0, 250);
+
+
+    if (!rows.length) {
+
+      body.innerHTML = `
+        <tr>
+          <td colspan="3" class="loading">
+            No historical data available.
+          </td>
+        </tr>
+      `;
+
+      return;
+    }
+
+
+    body.innerHTML =
+      rows.map(item => {
+
+        const rate =
+          Number(item.rate_22k);
+
+        return `
+
+          <tr>
+
+            <td>
+              ${escapeHtml(
+                formatDate(item.date)
+              )}
+            </td>
+
+            <td>
+              ${money(rate)}
+            </td>
+
+            <td>
+              ${money(rate * 8)}
+            </td>
+
+          </tr>
+
+        `;
+
+      }).join("");
+  }
+
+
+  /* =========================================================
+     CHART
+     ========================================================= */
+
+  function getChartData() {
+
+    if (!historyData.length) {
+      return [];
+    }
+
+
+    let count;
+
+
+    if (selectedRange === "all") {
+
+      return historyData;
+
+    }
+
+
+    count =
+      Number(selectedRange);
+
+
+    if (
+      !Number.isFinite(count) ||
+      count <= 0
+    ) {
+
+      return historyData;
+
+    }
+
+
+    return historyData.slice(
+      Math.max(
+        0,
+        historyData.length - count
+      )
+    );
+  }
+
+
+  function drawChart() {
+
+    const canvas =
+      document.getElementById(
+        "goldChart"
+      );
+
+
+    const wrapper =
+      canvas.parentElement;
+
+
+    const width =
+      wrapper.clientWidth;
+
+
+    const height =
+      wrapper.clientHeight;
+
+
+    if (
+      width <= 0 ||
+      height <= 0
+    ) {
+
+      return;
+
+    }
+
+
+    const dpr =
+      window.devicePixelRatio || 1;
+
+
+    canvas.width =
+      Math.round(width * dpr);
+
+
+    canvas.height =
+      Math.round(height * dpr);
+
+
+    const ctx =
+      canvas.getContext("2d");
+
+
+    ctx.setTransform(
+      dpr,
+      0,
+      0,
+      dpr,
+      0,
+      0
+    );
+
+
+    ctx.clearRect(
+      0,
+      0,
+      width,
+      height
+    );
+
+
+    const data =
+      getChartData();
+
+
+    if (data.length < 2) {
+
+      ctx.font =
+        "13px -apple-system, sans-serif";
+
+      ctx.fillStyle =
+        "#6b7280";
+
+      ctx.textAlign =
+        "center";
+
+      ctx.fillText(
+        "Not enough historical data",
+        width / 2,
+        height / 2
+      );
+
+      return;
+    }
+
+
+    const values =
+      data.map(
+        item => Number(item.rate_22k)
+      );
+
+
+    let min =
+      Math.min(...values);
+
+
+    let max =
+      Math.max(...values);
+
+
+    const padding =
+      Math.max(
+        100,
+        (max - min) * 0.12
+      );
+
+
+    min -= padding;
+    max += padding;
+
+
+    const left = 46;
+    const right = 12;
+    const top = 18;
+    const bottom = 30;
+
+
+    const plotWidth =
+      width - left - right;
+
+
+    const plotHeight =
+      height - top - bottom;
+
+
+    function x(index) {
+
+      return (
+        left +
+        (
+          index /
+          (data.length - 1)
+        ) *
+        plotWidth
+      );
+
+    }
+
+
+    function y(value) {
+
+      return (
+        top +
+        (
+          1 -
+          (
+            (value - min) /
+            (max - min)
+          )
+        ) *
+        plotHeight
+      );
+
+    }
+
+
+    /* GRID */
+
+    ctx.lineWidth = 1;
+
+
+    for (let i = 0; i <= 4; i++) {
+
+      const gy =
+        top +
+        (plotHeight / 4) * i;
+
+
+      ctx.beginPath();
+
+      ctx.moveTo(
+        left,
+        gy
+      );
+
+      ctx.lineTo(
+        width - right,
+        gy
+      );
+
+      ctx.strokeStyle =
+        "rgba(128,128,128,.16)";
+
+      ctx.stroke();
+
+
+      const value =
+        max -
+        (
+          (max - min) / 4
+        ) * i;
+
+
+      ctx.font =
+        "10px -apple-system, sans-serif";
+
+      ctx.fillStyle =
+        "#8a8f98";
+
+      ctx.textAlign =
+        "right";
+
+      ctx.fillText(
+        "₹" +
+        Math.round(value).toLocaleString("en-IN"),
+        left - 6,
+        gy + 3
+      );
+
+    }
+
+
+    /* AREA */
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+      x(0),
+      y(values[0])
+    );
+
+
+    for (
+      let i = 1;
+      i < values.length;
+      i++
+    ) {
+
+      ctx.lineTo(
+        x(i),
+        y(values[i])
+      );
+
+    }
+
+
+    ctx.lineTo(
+      x(values.length - 1),
+      height - bottom
+    );
+
+
+    ctx.lineTo(
+      x(0),
+      height - bottom
+    );
+
+
+    ctx.closePath();
+
+
+    const gradient =
+      ctx.createLinearGradient(
+        0,
+        top,
+        0,
+        height
+      );
+
+
+    gradient.addColorStop(
+      0,
+      "rgba(183,121,31,.22)"
+    );
+
+
+    gradient.addColorStop(
+      1,
+      "rgba(183,121,31,.02)"
+    );
+
+
+    ctx.fillStyle =
+      gradient;
+
+    ctx.fill();
+
+
+    /* LINE */
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+      x(0),
+      y(values[0])
+    );
+
+
+    for (
+      let i = 1;
+      i < values.length;
+      i++
+    ) {
+
+      ctx.lineTo(
+        x(i),
+        y(values[i])
+      );
+
+    }
+
+
+    ctx.strokeStyle =
+      "#b7791f";
+
+    ctx.lineWidth = 2.5;
+
+    ctx.lineJoin =
+      "round";
+
+    ctx.lineCap =
+      "round";
+
+    ctx.stroke();
+
+
+    /* END DOT */
+
+    const last =
+      values.length - 1;
+
+
+    ctx.beginPath();
+
+    ctx.arc(
+      x(last),
+      y(values[last]),
+      4,
+      0,
+      Math.PI * 2
+    );
+
+
+    ctx.fillStyle =
+      "#b7791f";
+
+    ctx.fill();
+
+
+    /* DATE LABELS */
+
+    document.getElementById(
+      "chartStart"
+    ).textContent =
+      formatDate(
+        data[0].date
+      );
+
+
+    document.getElementById(
+      "chartEnd"
+    ).textContent =
+      formatDate(
+        data[data.length - 1].date
+      );
+
+
+    document.getElementById(
+      "chartRecordCount"
+    ).textContent =
+      `${data.length.toLocaleString("en-IN")} days`;
+
+  }
+
+
+  /* =========================================================
+     REFRESH
+     ========================================================= */
+
+  async function refreshData(
+    manual = false
+  ) {
+
+    const button =
+      document.getElementById(
+        "refreshButton"
+      );
+
+
+    if (manual) {
+
+      button.style.transform =
+        "rotate(360deg)";
+
+      setTimeout(() => {
+
+        button.style.transform =
+          "";
+
+      }, 500);
+
+    }
+
+
+    try {
+
+      setStatus(
+        "Checking latest rate…"
+      );
+
+
+      const live =
+        await loadJson(
+          LIVE_URL
+        );
+
+
+      const history =
+        await loadJson(
+          HISTORY_URL
+        );
+
+
+      displayLive(live);
+
+
+      historyData =
+        normalizeHistory(history);
+
+
+      displayHistory();
+
+
+      const now =
+        new Date();
+
+
+      setStatus(
+        `Updated ${now.toLocaleTimeString(
+          "en-IN",
+          {
+            hour: "numeric",
+            minute: "2-digit"
+          }
+        )}`
+      );
+
+
+      /* Save local backup */
+
+      try {
+
+        localStorage.setItem(
+          "gold_live_backup",
+          JSON.stringify(live)
+        );
+
+        localStorage.setItem(
+          "gold_history_backup",
+          JSON.stringify(historyData)
+        );
+
+      } catch (_) {}
+
+    } catch (error) {
+
+      console.error(error);
+
+
+      /* Offline/local backup */
+
+      try {
+
+        const backupLive =
+          JSON.parse(
+            localStorage.getItem(
+              "gold_live_backup"
+            )
+          );
+
+
+        const backupHistory =
+          JSON.parse(
+            localStorage.getItem(
+              "gold_history_backup"
+            )
+          );
+
+
+        if (backupLive) {
+
+          displayLive(
+            backupLive
+          );
+
+        }
+
+
+        if (
+          Array.isArray(
+            backupHistory
+          )
+        ) {
+
+          historyData =
+            backupHistory;
+
+          displayHistory();
+
+        }
+
+
+        setStatus(
+          "Offline · showing saved data",
+          true
+        );
+
+
+      } catch (_) {
+
+        setStatus(
+          "Unable to load data",
+          true
+        );
+
+      }
+
+    }
+
+  }
+
+
+  /* =========================================================
+     RANGE BUTTONS
+     ========================================================= */
+
+  document
+    .querySelectorAll(".range")
+    .forEach(button => {
+
+      button.addEventListener(
+        "click",
+        () => {
+
+          document
+            .querySelectorAll(".range")
+            .forEach(item => {
+
+              item.classList.remove(
+                "active"
+              );
+
+            });
+
+
+          button.classList.add(
+            "active"
+          );
+
+
+          selectedRange =
+            button.dataset.range === "all"
+              ? "all"
+              : Number(
+                  button.dataset.range
+                );
+
+
+          drawChart();
+
+        }
+      );
+
+    });
+
+
+  /* =========================================================
+     REFRESH BUTTON
+     ========================================================= */
+
+  document
+    .getElementById(
+      "refreshButton"
+    )
+    .addEventListener(
+      "click",
+      () => refreshData(true)
+    );
+
+
+  /* =========================================================
+     REFRESH WHEN APP BECOMES VISIBLE
+     ========================================================= */
+
+  document.addEventListener(
+    "visibilitychange",
+    () => {
+
+      if (
+        document.visibilityState ===
+        "visible"
+      ) {
+
+        refreshData();
+
+      }
+
+    }
+  );
+
+
+  window.addEventListener(
+    "pageshow",
+    () => {
+
+      refreshData();
+
+    }
+  );
+
+
+  window.addEventListener(
+    "resize",
+    () => {
+
+      drawChart();
+
+    }
+  );
+
+
+  /* =========================================================
+     SERVICE WORKER
+     ========================================================= */
+
+  if (
+    "serviceWorker" in navigator
+  ) {
+
+    window.addEventListener(
+      "load",
+      () => {
+
+        navigator.serviceWorker
+          .register(
+            "sw.js"
+          )
+          .catch(
+            error =>
+              console.warn(
+                "Service worker:",
+                error
+              )
+          );
+
+      }
+    );
+
+  }
+
+
+  /* =========================================================
+     START
+     ========================================================= */
+
+  refreshData();
+
+</script>
+
+</body>
+</html>
