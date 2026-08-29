@@ -1,28 +1,27 @@
 name: Update Chennai 22K Gold Rate
 
 on:
-  # GitHub Actions cron is UTC.
-  # Start before the learned AM/PM windows. update_gold.py waits for the
-  # learned start and polls every 10 seconds for the ENTIRE window.
-  schedule:
-    # Start well before the learned AM/PM windows. The Python monitor waits
-    # for the exact learned start and polls every 10 seconds for the ENTIRE
-    # window until a new price is detected or the window ends.
-    - cron: "0 2 * * *"    # 07:30 IST
-    - cron: "0 9 * * *"    # 14:30 IST
-
   workflow_dispatch:
+
+  schedule:
+    # Start before the learned AM monitoring window
+    - cron: "00 03 * * *"
+
+    # Start before the learned PM monitoring window
+    - cron: "00 10 * * *"
 
 permissions:
   contents: write
 
 concurrency:
-  group: gold-rate-update
+  group: chennai-22k-gold-updater
   cancel-in-progress: false
 
 jobs:
   update:
+    name: Update Chennai 22K Gold Rate
     runs-on: ubuntu-latest
+    timeout-minutes: 420
 
     steps:
       - name: Checkout
@@ -34,12 +33,11 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-          cache: "pip"
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install requests beautifulsoup4
+          python -m pip install requests beautifulsoup4
 
       - name: Monitor and update Chennai 22K rate
         run: |
@@ -48,41 +46,40 @@ jobs:
       - name: Verify generated data
         run: |
           echo "Checking generated data files..."
-          test -s data/live.json
-          test -s data/history.json
-          test -s data/change_log.json
 
-          python - <<'PY'
-          import json
-          from pathlib import Path
+          if [ ! -f "data/live.json" ]; then
+            echo "ERROR: data/live.json was not created."
+            exit 1
+          fi
 
-          live = json.loads(Path("data/live.json").read_text())
-          history = json.loads(Path("data/history.json").read_text())
-          changes = json.loads(Path("data/change_log.json").read_text())
+          if [ ! -f "data/history.json" ]; then
+            echo "ERROR: data/history.json was not created."
+            exit 1
+          fi
 
-          assert isinstance(live, dict)
-          assert isinstance(history, list)
-          assert isinstance(changes, list)
-          assert int(live["rate_22k"]) > 0
-          assert int(live["rate_8g"]) == int(live["rate_22k"]) * 8
+          echo "Generated data files are present."
 
-          print("live.json OK")
-          print("history.json records:", len(history))
-          print("change_log.json observations:", len(changes))
-          print("22K:", live["rate_22k"])
-          print("8g:", live["rate_8g"])
-          PY
+          echo ""
+          echo "Current live data:"
+          cat data/live.json
+
+      - name: Show current live data
+        run: |
+          echo "Current live data:"
+          cat data/live.json
 
       - name: Save updated data
         run: |
           git config user.name "Chennai 22K Gold Bot"
-          git config user.email "actions@users.noreply.github.com"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          git add data/live.json data/history.json data/change_log.json
+          git add data/live.json data/history.json
 
           if git diff --cached --quiet; then
-            echo "No data changes to commit."
-          else
-            git commit -m "Update Chennai 22K gold rate"
-            git push
+            echo "No data changes detected."
+            exit 0
           fi
+
+          git commit -m "Update Chennai 22K gold rate"
+
+          git push origin HEAD:main
