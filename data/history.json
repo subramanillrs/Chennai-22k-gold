@@ -11248,5 +11248,16 @@
     "source": "LiveChennai",
     "source_url": "https://www.livechennai.com/get_goldrate_history.asp?monthno=8&yearno=2026",
     "type": "daily_history"
+  },
+  {
+    "date": "2026-08-30",
+    "time": "01:26:47",
+    "timestamp": "2026-08-30T01:26:47.577934+05:30",
+    "rate_22k": 14505,
+    "rate_8g": 116040,
+    "changed": false,
+    "sources": [
+      "GoodReturns"
+    ]
   }
 ]

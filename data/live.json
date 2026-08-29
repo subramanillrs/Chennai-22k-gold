@@ -1,118 +1,24 @@
 {
   "rate_22k": 14505,
   "rate_8g": 116040,
-  "rate_24k": null,
-  "rate_18k": null,
-  "updated_at": "2026-08-30T00:38:48.070634+05:30",
   "date": "2026-08-30",
-  "time": "00:38:48",
-  "session": "AM",
-  "source": "LiveChennai",
-  "source_url": "https://www.livechennai.com/gold_silverrate.asp",
-  "source_last_update": "29/08/2026 9:44:41 AM",
+  "time": "01:26:47",
+  "timezone": "Asia/Kolkata",
   "changed": false,
-  "source_update_changed": false,
   "previous_rate_22k": 14505,
-  "change": 0,
-  "last_change": null,
-  "intraday": [
+  "sources": [
+    "GoodReturns"
+  ],
+  "source_details": [
     {
-      "date": "2026-08-29",
-      "time": "23:34:08",
+      "source": "GoodReturns",
       "rate_22k": 14505,
-      "rate_8g": 116040,
-      "session": "PM",
-      "type": "poll"
-    },
-    {
-      "date": "2026-08-30",
-      "time": "00:13:45",
-      "rate_22k": 14505,
-      "rate_8g": 116040,
-      "session": "AM",
-      "type": "poll"
-    },
-    {
-      "date": "2026-08-30",
-      "time": "00:19:42",
-      "rate_22k": 14505,
-      "rate_8g": 116040,
-      "session": "AM",
-      "type": "poll"
-    },
-    {
-      "date": "2026-08-30",
-      "time": "00:20:17",
-      "rate_22k": 14505,
-      "rate_8g": 116040,
-      "session": "AM",
-      "type": "poll"
-    },
-    {
-      "date": "2026-08-30",
-      "time": "00:20:44",
-      "rate_22k": 14505,
-      "rate_8g": 116040,
-      "session": "AM",
-      "type": "poll"
-    },
-    {
-      "date": "2026-08-30",
-      "time": "00:21:48",
-      "rate_22k": 14505,
-      "rate_8g": 116040,
-      "session": "AM",
-      "type": "poll"
-    },
-    {
-      "date": "2026-08-30",
-      "time": "00:22:28",
-      "rate_22k": 14505,
-      "rate_8g": 116040,
-      "session": "AM",
-      "type": "poll"
-    },
-    {
-      "date": "2026-08-30",
-      "time": "00:26:32",
-      "rate_22k": 14505,
-      "rate_8g": 116040,
-      "session": "AM",
-      "type": "poll"
-    },
-    {
-      "date": "2026-08-30",
-      "time": "00:34:16",
-      "rate_22k": 14505,
-      "rate_8g": 116040,
-      "session": "AM",
-      "type": "poll"
-    },
-    {
-      "date": "2026-08-30",
-      "time": "00:38:48",
-      "rate_22k": 14505,
-      "rate_8g": 116040,
-      "session": "AM",
-      "type": "poll"
+      "update_time": null,
+      "url": "https://www.goodreturns.in/gold-rates/chennai.html",
+      "fetched_at": "2026-08-30T01:26:47.574126+05:30"
     }
   ],
-  "change_history": [],
-  "adaptive_monitor": {
-    "source": "3-month",
-    "observations_3m": 0,
-    "observations_30d": 0,
-    "am": {
-      "start": 510,
-      "end": 690,
-      "center": 600,
-      "observations": 0
-    },
-    "pm": {
-      "start": 1020,
-      "end": 1200,
-      "center": 1110,
-      "observations": 0
-    }
-  }
+  "last_fetch": "2026-08-30T01:26:47.575319+05:30",
+  "status": "live",
+  "last_change": null
 }
