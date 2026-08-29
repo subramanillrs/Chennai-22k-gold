@@ -2,8 +2,9 @@
   "rate_22k": 14505,
   "rate_8g": 116040,
   "date": "2026-08-30",
-  "time": "01:26:47",
+  "time": "01:30:15",
   "timezone": "Asia/Kolkata",
+  "timestamp": "2026-08-30T01:30:15.989607+05:30",
   "changed": false,
   "previous_rate_22k": 14505,
   "sources": [
@@ -15,10 +16,10 @@
       "rate_22k": 14505,
       "update_time": null,
       "url": "https://www.goodreturns.in/gold-rates/chennai.html",
-      "fetched_at": "2026-08-30T01:26:47.574126+05:30"
+      "fetched_at": "2026-08-30T01:30:15.988359+05:30"
     }
   ],
-  "last_fetch": "2026-08-30T01:26:47.575319+05:30",
+  "last_fetch": "2026-08-30T01:30:15.989613+05:30",
   "status": "live",
   "last_change": null
 }

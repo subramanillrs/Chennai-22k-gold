@@ -11259,5 +11259,16 @@
     "sources": [
       "GoodReturns"
     ]
+  },
+  {
+    "date": "2026-08-30",
+    "time": "01:30:15",
+    "timestamp": "2026-08-30T01:30:15.991975+05:30",
+    "rate_22k": 14505,
+    "rate_8g": 116040,
+    "changed": false,
+    "sources": [
+      "GoodReturns"
+    ]
   }
 ]
