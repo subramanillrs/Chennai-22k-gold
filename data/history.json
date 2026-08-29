@@ -11299,5 +11299,17 @@
         "fetched_at": "2026-08-30T01:35:10.885967+05:30"
       }
     ]
+  },
+  {
+    "timestamp": "2026-08-30T01:48:16.242233+05:30",
+    "date": "2026-08-30",
+    "time": "01:48:16",
+    "rate_22k": 14505,
+    "rate_8g": 116040,
+    "changed": false,
+    "sources": [
+      "LiveChennai",
+      "GoodReturns"
+    ]
   }
 ]
