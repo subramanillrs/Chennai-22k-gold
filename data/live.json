@@ -2,7 +2,7 @@
   "rate_22k": 14505,
   "rate_8g": 116040,
   "date": "2026-08-30",
-  "time": "01:35:10",
+  "time": "01:39:58",
   "timezone": "Asia/Kolkata",
   "timestamp": "2026-08-30T01:35:10.887108+05:30",
   "changed": false,
@@ -29,5 +29,24 @@
   ],
   "last_fetch": "2026-08-30T01:35:10.887114+05:30",
   "status": "live",
-  "last_change": null
+  "last_change": null,
+  "updated_at": "2026-08-30T01:39:58.146920+05:30",
+  "source": "LiveChennai + GoodReturns",
+  "livechennai": {
+    "source": "LiveChennai",
+    "url": "https://www.livechennai.com/gold_silverrate.asp",
+    "rate_22k": 14505,
+    "update_time": null,
+    "date": "2026-08-30",
+    "fetched_at": "2026-08-30T01:39:57.373312+05:30"
+  },
+  "goodreturns": {
+    "source": "GoodReturns",
+    "url": "https://www.goodreturns.in/gold-rates/chennai.html",
+    "rate_22k": 14505,
+    "update_time": null,
+    "date": "2026-08-30",
+    "fetched_at": "2026-08-30T01:39:58.145691+05:30"
+  },
+  "monitoring": true
 }
