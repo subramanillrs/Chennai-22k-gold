@@ -5,8 +5,8 @@
   "city": "Chennai",
   "purity": "22K",
   "date": "2026-08-30",
-  "time": "01:52:05",
-  "timestamp": "2026-08-30T01:52:05.651652+05:30",
+  "time": "01:56:15",
+  "timestamp": "2026-08-30T01:56:15.477996+05:30",
   "changed": false,
   "previous_rate_22k": 14505,
   "sources": {
@@ -15,7 +15,7 @@
       "source": "GoodReturns",
       "rate_22k": 14505,
       "url": "https://www.goodreturns.in/gold-rates/chennai.html",
-      "fetched_at": "2026-08-30T01:52:05.651480+05:30"
+      "fetched_at": "2026-08-30T01:56:15.477928+05:30"
     }
   },
   "source_update_times": [
@@ -28,5 +28,5 @@
   "sources_agree": true,
   "last_checked_at": "2026-08-30T01:48:16.242233+05:30",
   "source": "GoodReturns",
-  "last_checked": "2026-08-30T01:52:05.651652+05:30"
+  "last_checked": "2026-08-30T01:56:15.477996+05:30"
 }
