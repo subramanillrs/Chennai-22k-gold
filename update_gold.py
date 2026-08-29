@@ -1,1048 +1,1514 @@
+#!/usr/bin/env python3
+
+from __future__ import annotations
+
 import json
-import os
 import re
 import sys
 import time
-from datetime import datetime, timedelta, time as dt_time
+from datetime import datetime, timedelta
 from pathlib import Path
+from typing import Any, Optional
 from zoneinfo import ZoneInfo
 
 import requests
 from bs4 import BeautifulSoup
 
-
-# ============================================================
-# CHENNAI 22K GOLD PRICE MONITOR
-# Sources:
-#   1. LiveChennai
-#   2. GoodReturns
-#
-# Monitoring:
-#   - Learns historical update times
-#   - Last 30 days receive higher weight
-#   - Polls every 10 seconds during monitoring window
-#   - Stops immediately after a confirmed NEW price
-#   - Outside window: one normal fetch only
-# ============================================================
-
 IST = ZoneInfo("Asia/Kolkata")
 
-BASE_DIR = Path(__file__).resolve().parent
-DATA_DIR = BASE_DIR / "data"
+ROOT = Path(__file__).resolve().parent
+DATA = ROOT / "data"
 
-LIVE_FILE = DATA_DIR / "live.json"
-HISTORY_FILE = DATA_DIR / "history.json"
-WINDOW_FILE = DATA_DIR / "monitoring_windows.json"
+LIVE_FILE = DATA / "live.json"
+HISTORY_FILE = DATA / "history.json"
+WINDOW_FILE = DATA / "monitoring_windows.json"
 
 LIVECHENNAI_URL = "https://www.livechennai.com/gold_silverrate.asp"
 GOODRETURNS_URL = "https://www.goodreturns.in/gold-rates/chennai.html"
 
 POLL_SECONDS = 10
-REQUEST_TIMEOUT = 20
+REQUEST_TIMEOUT = 15
 
-# Maximum number of polls in one monitoring window.
-# This protects GitHub Actions from an accidental endless loop.
-MAX_MONITOR_SECONDS = 5 * 60 * 60
-
+FALLBACK_WINDOWS = {
+    "am": {
+        "start": "08:30",
+        "end": "11:30"
+    },
+    "pm": {
+        "start": "17:00",
+        "end": "20:00"
+    }
+}
 
 HEADERS = {
     "User-Agent": (
         "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
-        "AppleWebKit/605.1.15 (KHTML, like Gecko) "
+        "AppleWebKit/605.1.15 "
+        "(KHTML, like Gecko) "
         "Version/18.0 Safari/605.1.15"
     ),
-    "Accept-Language": "en-IN,en;q=0.9",
-    "Cache-Control": "no-cache",
-    "Pragma": "no-cache",
+    "Accept-Language": "en-IN,en;q=0.9"
 }
 
 
 # ============================================================
-# BASIC HELPERS
+# BASIC JSON FUNCTIONS
 # ============================================================
 
-def now_ist():
+def now_ist() -> datetime:
     return datetime.now(IST)
 
 
-def ensure_data_dir():
-    DATA_DIR.mkdir(parents=True, exist_ok=True)
-
-
-def load_json(path, default):
+def load_json(path: Path, default: Any) -> Any:
     try:
         if path.exists():
-            with open(path, "r", encoding="utf-8") as f:
+            with path.open("r", encoding="utf-8") as f:
                 return json.load(f)
-    except Exception as e:
-        print(f"WARNING: Could not read {path}: {e}")
+    except Exception as exc:
+        print(f"WARNING: Could not read {path}: {exc}")
 
     return default
 
 
-def save_json(path, data):
+def save_json(path: Path, data: Any) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
 
     temp = path.with_suffix(path.suffix + ".tmp")
 
-    with open(temp, "w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
+    with temp.open("w", encoding="utf-8") as f:
+        json.dump(
+            data,
+            f,
+            ensure_ascii=False,
+            indent=2
+        )
+        f.write("\n")
 
     temp.replace(path)
 
 
-def clean_number(value):
-    if value is None:
+# ============================================================
+# NUMBER PARSING
+# ============================================================
+
+def clean_number(value: str) -> Optional[int]:
+
+    if not value:
         return None
 
-    if isinstance(value, (int, float)):
-        return int(value)
+    value = str(value)
 
-    text = str(value)
-    text = text.replace(",", "")
-    text = text.replace("₹", "")
-    text = text.replace("Rs.", "")
-    text = text.replace("Rs", "")
-    text = text.replace("/gram", "")
-    text = text.strip()
-
-    match = re.search(r"\d+(?:\.\d+)?", text)
+    match = re.search(
+        r"(?:₹|Rs\.?|INR)?\s*([0-9][0-9,]*)",
+        value,
+        re.IGNORECASE
+    )
 
     if not match:
         return None
 
     try:
-        return int(float(match.group(0)))
-    except Exception:
+        return int(
+            match.group(1)
+            .replace(",", "")
+        )
+    except ValueError:
         return None
 
 
-def parse_time_string(value):
-    """
-    Convert strings such as:
-      9:44:41 AM
-      09:44 AM
-      10:04:58
-    into an IST datetime time object.
-    """
+# ============================================================
+# DATE/TIME PARSING
+# ============================================================
 
-    if not value:
+def parse_time(text: str) -> Optional[datetime]:
+
+    if not text:
         return None
-
-    value = value.strip().upper()
 
     patterns = [
-        "%I:%M:%S %p",
-        "%I:%M %p",
-        "%H:%M:%S",
-        "%H:%M",
+
+        # 29/Aug/2026 9:44:41 AM
+        (
+            r"(\d{1,2})/"
+            r"([A-Za-z]{3})/"
+            r"(\d{4})\s+"
+            r"(\d{1,2}):"
+            r"(\d{2})"
+            r"(?::(\d{2}))?"
+            r"\s*([AP]M)"
+        ),
+
+        # 29/08/2026 9:44:41 AM
+        (
+            r"(\d{1,2})/"
+            r"(\d{1,2})/"
+            r"(\d{4})\s+"
+            r"(\d{1,2}):"
+            r"(\d{2})"
+            r"(?::(\d{2}))?"
+            r"\s*([AP]M)"
+        )
     ]
 
+    months = {
+        "Jan": 1,
+        "Feb": 2,
+        "Mar": 3,
+        "Apr": 4,
+        "May": 5,
+        "Jun": 6,
+        "Jul": 7,
+        "Aug": 8,
+        "Sep": 9,
+        "Oct": 10,
+        "Nov": 11,
+        "Dec": 12
+    }
+
     for pattern in patterns:
+
+        match = re.search(
+            pattern,
+            text,
+            re.IGNORECASE
+        )
+
+        if not match:
+            continue
+
+        a, b, c, hh, mm, ss, ap = match.groups()
+
         try:
-            return datetime.strptime(value, pattern).time()
+
+            if b.title() in months:
+
+                day = int(a)
+                month = months[b.title()]
+                year = int(c)
+
+            else:
+
+                day = int(a)
+                month = int(b)
+                year = int(c)
+
+            hour = int(hh) % 12
+
+            if ap.upper() == "PM":
+                hour += 12
+
+            return datetime(
+                year,
+                month,
+                day,
+                hour,
+                int(mm),
+                int(ss or 0),
+                tzinfo=IST
+            )
+
         except ValueError:
             pass
 
     return None
 
 
-def time_to_minutes(t):
-    return t.hour * 60 + t.minute
+def parse_iso_datetime(value: Any) -> Optional[datetime]:
 
+    if not isinstance(value, str):
+        return None
 
-def minutes_to_string(minutes):
-    minutes = int(minutes) % (24 * 60)
+    try:
 
-    h = minutes // 60
-    m = minutes % 60
+        dt = datetime.fromisoformat(
+            value.replace("Z", "+00:00")
+        )
 
-    suffix = "AM" if h < 12 else "PM"
+        if dt.tzinfo is None:
+            dt = dt.replace(tzinfo=IST)
 
-    display_h = h % 12
-    if display_h == 0:
-        display_h = 12
+        return dt.astimezone(IST)
 
-    return f"{display_h}:{m:02d} {suffix}"
+    except Exception:
+        return None
 
 
 # ============================================================
-# FETCH LIVECHENNAI
+# HTTP
 # ============================================================
 
-def fetch_livechennai():
+def fetch_html(url: str) -> str:
+
+    response = requests.get(
+        url,
+        headers=HEADERS,
+        timeout=REQUEST_TIMEOUT
+    )
+
+    response.raise_for_status()
+
+    return response.text
+
+
+# ============================================================
+# LIVECHENNAI
+# ============================================================
+
+def fetch_livechennai() -> dict[str, Any]:
+
     print("Checking LiveChennai...")
 
-    try:
-        # Cache-busting query parameter.
-        url = f"{LIVECHENNAI_URL}?_={int(time.time())}"
+    html = fetch_html(
+        LIVECHENNAI_URL
+    )
 
-        response = requests.get(
-            url,
-            headers=HEADERS,
-            timeout=REQUEST_TIMEOUT,
+    soup = BeautifulSoup(
+        html,
+        "html.parser"
+    )
+
+    text = soup.get_text(
+        " ",
+        strip=True
+    )
+
+    rate = None
+
+    patterns = [
+
+        r"Standard\s*Gold\s*\(22\s*K\).*?"
+        r"1\s*Gm.*?"
+        r"([0-9,]{4,})",
+
+        r"22\s*K.*?"
+        r"1\s*Gm.*?"
+        r"([0-9,]{4,})",
+
+        r"22K\s*Gold.*?"
+        r"₹\s*([0-9,]{4,})",
+
+        r"22\s*carat.*?"
+        r"₹\s*([0-9,]{4,})"
+    ]
+
+    for pattern in patterns:
+
+        match = re.search(
+            pattern,
+            text,
+            re.IGNORECASE | re.DOTALL
         )
 
-        response.raise_for_status()
+        if match:
 
-        soup = BeautifulSoup(response.text, "html.parser")
-
-        text = soup.get_text(" ", strip=True)
-
-        # ----------------------------------------------------
-        # 22K price
-        # ----------------------------------------------------
-
-        rate = None
-
-        patterns = [
-            r"Standard Gold\s*\(22\s*K\).*?1\s*Gm.*?8\s*Gm.*?1\s*Gm.*?8\s*Gm",
-            r"1\s*Gm\s+8\s*Gm\s+1\s*Gm\s+8\s*Gm",
-        ]
-
-        # First search for the common explicit format:
-        # "22K Gold ... ₹14,505"
-        price_patterns = [
-            r"22K[^₹\d]{0,100}₹\s*([\d,]+)",
-            r"22\s*carat[^₹\d]{0,100}₹\s*([\d,]+)",
-            r"22\s*K[^0-9]{0,100}([\d,]{4,6})",
-            r"Standard Gold\s*\(22\s*K\)[^0-9]{0,100}([\d,]{4,6})",
-        ]
-
-        for pattern in price_patterns:
-            match = re.search(pattern, text, re.I)
-
-            if match:
-                candidate = clean_number(match.group(1))
-
-                if candidate and 8000 <= candidate <= 30000:
-                    rate = candidate
-                    break
-
-        # ----------------------------------------------------
-        # Last Update Time
-        # ----------------------------------------------------
-
-        update_time = None
-
-        time_patterns = [
-            r"Last Update Time\s*:\s*([0-9]{1,2}:[0-9]{2}(?::[0-9]{2})?\s*[AP]M)",
-            r"Last Updated?\s*:?\s*([0-9]{1,2}:[0-9]{2}(?::[0-9]{2})?\s*[AP]M)",
-            r"Updated\s*:?\s*([0-9]{1,2}:[0-9]{2}(?::[0-9]{2})?\s*[AP]M)",
-        ]
-
-        for pattern in time_patterns:
-            match = re.search(pattern, text, re.I)
-
-            if match:
-                update_time = parse_time_string(match.group(1))
-                if update_time:
-                    break
-
-        # ----------------------------------------------------
-        # Date
-        # ----------------------------------------------------
-
-        today = now_ist().date()
-
-        result = {
-            "source": "LiveChennai",
-            "url": LIVECHENNAI_URL,
-            "rate_22k": rate,
-            "update_time": update_time.strftime("%H:%M:%S")
-            if update_time
-            else None,
-            "date": today.isoformat(),
-            "fetched_at": now_ist().isoformat(),
-        }
-
-        if rate is None:
-            print("LiveChennai: 22K price not found")
-            return result
-
-        print(
-            f"LiveChennai: ₹{rate:,}/gram"
-            + (
-                f" | source update {update_time.strftime('%I:%M:%S %p')}"
-                if update_time
-                else ""
+            number = clean_number(
+                match.group(1)
             )
+
+            if number and 8000 <= number <= 30000:
+
+                rate = number
+                break
+
+    # Additional fallback.
+    if rate is None:
+
+        candidates = re.findall(
+            r"22\s*K.{0,150}?"
+            r"₹?\s*([0-9][0-9,]{3,})",
+            text,
+            re.IGNORECASE | re.DOTALL
         )
 
-        return result
+        for candidate in candidates:
 
-    except Exception as e:
-        print(f"LiveChennai failed: {e}")
+            number = clean_number(
+                candidate
+            )
 
-        return {
-            "source": "LiveChennai",
-            "url": LIVECHENNAI_URL,
-            "rate_22k": None,
-            "update_time": None,
-            "date": now_ist().date().isoformat(),
-            "fetched_at": now_ist().isoformat(),
-            "error": str(e),
-        }
+            if number and 8000 <= number <= 30000:
+
+                rate = number
+                break
+
+    if rate is None:
+
+        raise RuntimeError(
+            "Could not locate valid Chennai 22K rate on LiveChennai"
+        )
+
+    update_time = None
+
+    labels = [
+        "Last Update Time",
+        "Updated:",
+        "Last Updated"
+    ]
+
+    for label in labels:
+
+        position = text.lower().find(
+            label.lower()
+        )
+
+        if position >= 0:
+
+            update_time = parse_time(
+                text[
+                    position:
+                    position + 150
+                ]
+            )
+
+            if update_time:
+                break
+
+    return {
+        "source": "LiveChennai",
+        "rate_22k": rate,
+        "updated_at": (
+            update_time.isoformat()
+            if update_time
+            else None
+        ),
+        "url": LIVECHENNAI_URL,
+        "fetched_at": now_ist().isoformat()
+    }
 
 
 # ============================================================
-# FETCH GOODRETURNS
+# GOODRETURNS
 # ============================================================
 
-def fetch_goodreturns():
+def fetch_goodreturns() -> dict[str, Any]:
+
     print("Checking GoodReturns...")
 
-    try:
-        url = f"{GOODRETURNS_URL}?_={int(time.time())}"
+    html = fetch_html(
+        GOODRETURNS_URL
+    )
 
-        response = requests.get(
-            url,
-            headers=HEADERS,
-            timeout=REQUEST_TIMEOUT,
+    soup = BeautifulSoup(
+        html,
+        "html.parser"
+    )
+
+    text = soup.get_text(
+        " ",
+        strip=True
+    )
+
+    rate = None
+
+    patterns = [
+
+        r"22K\s*Gold\s*/\s*g\s*₹?\s*([0-9,]{4,})",
+
+        r"22K\s*Gold[^₹]{0,100}"
+        r"₹\s*([0-9,]{4,})",
+
+        r"22K\s*Gold.{0,150}?"
+        r"([0-9,]{4,})"
+    ]
+
+    for pattern in patterns:
+
+        match = re.search(
+            pattern,
+            text,
+            re.IGNORECASE | re.DOTALL
         )
 
-        response.raise_for_status()
+        if match:
 
-        soup = BeautifulSoup(response.text, "html.parser")
-        text = soup.get_text(" ", strip=True)
+            number = clean_number(
+                match.group(1)
+            )
 
-        rate = None
+            if number and 8000 <= number <= 30000:
 
-        patterns = [
-            r"22K\s*Gold\s*/\s*g\s*₹?\s*([\d,]+)",
-            r"22K\s*Gold[^₹\d]{0,80}₹\s*([\d,]+)",
-            r"22K[^₹\d]{0,100}₹\s*([\d,]+)",
-            r"22K[^0-9]{0,100}([\d,]{4,6})",
-        ]
+                rate = number
+                break
 
-        for pattern in patterns:
-            match = re.search(pattern, text, re.I)
+    # Table fallback.
+    if rate is None:
 
-            if match:
-                candidate = clean_number(match.group(1))
+        for row in soup.find_all(
+            ["tr", "div", "p"]
+        ):
 
-                if candidate and 8000 <= candidate <= 30000:
-                    rate = candidate
+            row_text = row.get_text(
+                " ",
+                strip=True
+            )
+
+            if (
+                "22K Gold" in row_text
+                and "Chennai" in row_text
+            ):
+
+                number = clean_number(
+                    row_text
+                )
+
+                if number and 8000 <= number <= 30000:
+
+                    rate = number
                     break
 
-        result = {
-            "source": "GoodReturns",
-            "url": GOODRETURNS_URL,
-            "rate_22k": rate,
-            "update_time": None,
-            "date": now_ist().date().isoformat(),
-            "fetched_at": now_ist().isoformat(),
-        }
+    if rate is None:
 
-        if rate is None:
-            print("GoodReturns: 22K price not found")
-        else:
-            print(f"GoodReturns: ₹{rate:,}/gram")
+        raise RuntimeError(
+            "Could not locate valid Chennai 22K rate on GoodReturns"
+        )
 
-        return result
+    return {
+        "source": "GoodReturns",
+        "rate_22k": rate,
+        "updated_at": None,
+        "url": GOODRETURNS_URL,
+        "fetched_at": now_ist().isoformat()
+    }
 
-    except Exception as e:
-        print(f"GoodReturns failed: {e}")
 
-        return {
-            "source": "GoodReturns",
-            "url": GOODRETURNS_URL,
-            "rate_22k": None,
-            "update_time": None,
-            "date": now_ist().date().isoformat(),
-            "fetched_at": now_ist().isoformat(),
-            "error": str(e),
-        }
+# ============================================================
+# FETCH BOTH SOURCES
+# ============================================================
+
+def fetch_sources() -> list[dict[str, Any]]:
+
+    results = []
+
+    try:
+
+        result = fetch_livechennai()
+
+        print(
+            f"LiveChennai: "
+            f"₹{result['rate_22k']:,}/gram"
+        )
+
+        results.append(result)
+
+    except Exception as exc:
+
+        print(
+            f"LiveChennai FAILED: {exc}"
+        )
+
+    try:
+
+        result = fetch_goodreturns()
+
+        print(
+            f"GoodReturns: "
+            f"₹{result['rate_22k']:,}/gram"
+        )
+
+        results.append(result)
+
+    except Exception as exc:
+
+        print(
+            f"GoodReturns FAILED: {exc}"
+        )
+
+    return results
 
 
 # ============================================================
 # SOURCE CONSENSUS
 # ============================================================
 
-def fetch_sources():
-    live = fetch_livechennai()
-    good = fetch_goodreturns()
+def determine_rate(
+    results: list[dict[str, Any]]
+) -> Optional[int]:
 
-    live_rate = live.get("rate_22k")
-    good_rate = good.get("rate_22k")
+    if not results:
+        return None
 
-    # Prefer agreement between sources.
-    if live_rate and good_rate:
-        if live_rate == good_rate:
-            return {
-                "rate": live_rate,
-                "confirmed": True,
-                "source": "LiveChennai + GoodReturns",
-                "livechennai": live,
-                "goodreturns": good,
-            }
+    valid = []
 
-        # If they disagree, prefer LiveChennai because it provides
-        # an explicit source update timestamp.
-        return {
-            "rate": live_rate,
-            "confirmed": False,
-            "source": "LiveChennai",
-            "source_disagreement": True,
-            "livechennai": live,
-            "goodreturns": good,
-        }
+    for result in results:
 
-    if live_rate:
-        return {
-            "rate": live_rate,
-            "confirmed": False,
-            "source": "LiveChennai",
-            "livechennai": live,
-            "goodreturns": good,
-        }
+        rate = result.get(
+            "rate_22k"
+        )
 
-    if good_rate:
-        return {
-            "rate": good_rate,
-            "confirmed": False,
-            "source": "GoodReturns",
-            "livechennai": live,
-            "goodreturns": good,
-        }
+        if isinstance(rate, int):
 
-    return {
-        "rate": None,
-        "confirmed": False,
-        "source": None,
-        "livechennai": live,
-        "goodreturns": good,
-    }
+            if 8000 <= rate <= 30000:
+                valid.append(rate)
+
+    if not valid:
+        return None
+
+    # Both sources agree.
+    if len(valid) >= 2:
+
+        if valid[0] == valid[1]:
+
+            return valid[0]
+
+        print(
+            "WARNING: Sources disagree."
+        )
+
+        print(
+            "Keeping previous rate until "
+            "a later poll produces agreement."
+        )
+
+        return None
+
+    # Only one source available.
+    return valid[0]
 
 
 # ============================================================
 # HISTORY
 # ============================================================
 
-def load_history():
-    data = load_json(HISTORY_FILE, [])
-
-    if isinstance(data, dict):
-        if isinstance(data.get("history"), list):
-            return data["history"]
-
-        if isinstance(data.get("records"), list):
-            return data["records"]
-
-    if isinstance(data, list):
-        return data
-
-    return []
-
-
-def extract_rate(record):
-    if not isinstance(record, dict):
-        return None
-
-    keys = [
-        "rate_22k",
-        "rate22k",
-        "22k",
-        "gold_22k",
-        "price_22k",
-        "rate",
-    ]
-
-    for key in keys:
-        if key in record:
-            value = clean_number(record[key])
-
-            if value and 8000 <= value <= 30000:
-                return value
-
-    return None
-
-
-def extract_datetime(record):
-    if not isinstance(record, dict):
-        return None
-
-    candidates = [
-        record.get("source_update_time"),
-        record.get("update_time"),
-        record.get("updated_at"),
-        record.get("timestamp"),
-        record.get("datetime"),
-        record.get("date"),
-    ]
-
-    for value in candidates:
-        if not value:
-            continue
-
-        text = str(value)
-
-        try:
-            dt = datetime.fromisoformat(text.replace("Z", "+00:00"))
-
-            if dt.tzinfo is None:
-                dt = dt.replace(tzinfo=IST)
-
-            return dt.astimezone(IST)
-        except Exception:
-            pass
-
-    return None
-
-
-# ============================================================
-# LEARN MONITORING WINDOW
-# ============================================================
-
-def learn_windows():
-    """
-    Learn actual historical update times.
-
-    IMPORTANT:
-    We only use records that have an actual time.
-    Daily records without a timestamp are NOT treated as
-    intraday update observations.
-    """
-
-    history = load_history()
-
-    now = now_ist()
-
-    three_month_cutoff = now - timedelta(days=92)
-    thirty_day_cutoff = now - timedelta(days=30)
+def extract_timestamped_history(
+    history: Any
+) -> list[tuple[datetime, int]]:
 
     observations = []
 
-    for record in history:
-        dt = extract_datetime(record)
+    if not isinstance(history, list):
+        return observations
 
-        if not dt:
+    for item in history:
+
+        if not isinstance(item, dict):
             continue
 
-        if dt < three_month_cutoff:
-            continue
+        rate = None
 
-        rate = extract_rate(record)
+        for key in [
+            "rate_22k",
+            "rate22k",
+            "22k",
+            "gold_22k",
+            "price_22k"
+        ]:
+
+            if key in item:
+
+                try:
+
+                    rate = int(
+                        str(item[key])
+                        .replace(",", "")
+                        .replace("₹", "")
+                        .strip()
+                    )
+
+                    break
+
+                except Exception:
+                    pass
 
         if not rate:
             continue
 
-        observations.append(
-            {
-                "dt": dt,
-                "rate": rate,
-                "recent": dt >= thirty_day_cutoff,
-            }
+        dt = None
+
+        for key in [
+            "timestamp",
+            "updated_at",
+            "datetime",
+            "date_time"
+        ]:
+
+            if key in item:
+
+                dt = parse_iso_datetime(
+                    item[key]
+                )
+
+                if dt:
+                    break
+
+        if not dt:
+
+            if (
+                item.get("date")
+                and item.get("time")
+            ):
+
+                dt = parse_time(
+                    f"{item['date']} "
+                    f"{item['time']}"
+                )
+
+        if dt and 5000 <= rate <= 50000:
+
+            observations.append(
+                (dt, rate)
+            )
+
+    observations.sort()
+
+    return observations
+
+
+# ============================================================
+# LEARN MONITORING WINDOWS
+# ============================================================
+
+def learn_monitoring_windows(
+    history: Any
+) -> dict[str, Any]:
+
+    current = now_ist()
+
+    observations = (
+        extract_timestamped_history(
+            history
         )
+    )
 
-    # --------------------------------------------------------
-    # Detect only genuine rate-change observations.
-    # --------------------------------------------------------
+    cutoff_90 = (
+        current -
+        timedelta(days=90)
+    )
 
-    observations.sort(key=lambda x: x["dt"])
+    cutoff_30 = (
+        current -
+        timedelta(days=30)
+    )
 
-    change_times = []
+    observations_90 = [
+        item
+        for item in observations
+        if item[0] >= cutoff_90
+    ]
+
+    observations_30 = [
+        item
+        for item in observations
+        if item[0] >= cutoff_30
+    ]
+
+    # Detect actual changes.
+    changes_90 = []
 
     previous_rate = None
 
-    for item in observations:
-        rate = item["rate"]
+    for timestamp, rate in observations_90:
 
-        if previous_rate is None:
-            previous_rate = rate
-            continue
+        if (
+            previous_rate is not None
+            and rate != previous_rate
+        ):
 
-        if rate != previous_rate:
-            change_times.append(item)
+            changes_90.append(
+                timestamp
+            )
 
         previous_rate = rate
 
-    # --------------------------------------------------------
-    # Last 30 days are weighted heavily.
-    # --------------------------------------------------------
+    changes_30 = [
+        timestamp
+        for timestamp in changes_90
+        if timestamp >= cutoff_30
+    ]
 
-    recent_am = []
-    recent_pm = []
+    # Separate AM/PM.
+    am_90 = [
+        timestamp
+        for timestamp in changes_90
+        if timestamp.hour < 14
+    ]
 
-    all_am = []
-    all_pm = []
+    pm_90 = [
+        timestamp
+        for timestamp in changes_90
+        if timestamp.hour >= 14
+    ]
 
-    for item in change_times:
-        dt = item["dt"]
+    am_30 = [
+        timestamp
+        for timestamp in changes_30
+        if timestamp.hour < 14
+    ]
 
-        mins = time_to_minutes(dt.time())
+    pm_30 = [
+        timestamp
+        for timestamp in changes_30
+        if timestamp.hour >= 14
+    ]
 
-        # Morning market window.
-        if 5 * 60 <= mins < 14 * 60:
-            all_am.append(mins)
+    def make_window(
+        timestamps: list[datetime],
+        fallback: dict[str, str]
+    ) -> dict[str, str]:
 
-            if item["recent"]:
-                recent_am.append(mins)
+        if not timestamps:
+            return fallback.copy()
 
-        # Evening market window.
-        elif 14 * 60 <= mins <= 23 * 60:
-            all_pm.append(mins)
+        minutes = [
+            t.hour * 60 + t.minute
+            for t in timestamps
+        ]
 
-            if item["recent"]:
-                recent_pm.append(mins)
+        minimum = min(minutes)
+        maximum = max(minutes)
 
-    # If enough recent observations exist, use them.
-    # Otherwise use the full 3-month observations.
-    am_points = recent_am if len(recent_am) >= 3 else all_am
-    pm_points = recent_pm if len(recent_pm) >= 3 else all_pm
+        # 45-minute safety margin.
+        start = max(
+            0,
+            minimum - 45
+        )
 
-    def build_window(points, default_start, default_end):
-        if not points:
-            return {
-                "start": default_start,
-                "end": default_end,
-                "observations": 0,
-            }
+        end = min(
+            1439,
+            maximum + 45
+        )
 
-        # Use a robust central cluster rather than the extreme earliest
-        # and latest observations.
-        points = sorted(points)
+        # Never create an excessively broad window
+        # from sparse/bad observations.
+        if end - start > 240:
 
-        if len(points) >= 5:
-            trim = max(1, int(len(points) * 0.10))
-            trimmed = points[trim:-trim]
+            sorted_minutes = sorted(
+                minutes
+            )
 
-            if trimmed:
-                points = trimmed
+            center = sorted_minutes[
+                len(sorted_minutes) // 2
+            ]
 
-        center = sum(points) / len(points)
+            start = max(
+                0,
+                center - 90
+            )
 
-        # Monitoring window deliberately covers ±45 minutes
-        # around the learned centre.
-        start = int(center - 45)
-        end = int(center + 45)
-
-        # Clamp.
-        start = max(5 * 60, min(start, 23 * 60))
-        end = max(start + 30, min(end, 23 * 60 + 30))
+            end = min(
+                1439,
+                center + 90
+            )
 
         return {
-            "start": start,
-            "end": end,
-            "observations": len(points),
+            "start": (
+                f"{start // 60:02d}:"
+                f"{start % 60:02d}"
+            ),
+            "end": (
+                f"{end // 60:02d}:"
+                f"{end % 60:02d}"
+            )
         }
 
-    am = build_window(
-        am_points,
-        8 * 60 + 30,
-        11 * 60 + 30,
-    )
+    # 30-day data gets priority.
+    if am_30:
+        am_window = make_window(
+            am_30,
+            FALLBACK_WINDOWS["am"]
+        )
+        am_basis = "30-day"
+    elif am_90:
+        am_window = make_window(
+            am_90,
+            FALLBACK_WINDOWS["am"]
+        )
+        am_basis = "90-day"
+    else:
+        am_window = FALLBACK_WINDOWS["am"].copy()
+        am_basis = "fallback"
 
-    pm = build_window(
-        pm_points,
-        17 * 60,
-        20 * 60,
-    )
+    if pm_30:
+        pm_window = make_window(
+            pm_30,
+            FALLBACK_WINDOWS["pm"]
+        )
+        pm_basis = "30-day"
+    elif pm_90:
+        pm_window = make_window(
+            pm_90,
+            FALLBACK_WINDOWS["pm"]
+        )
+        pm_basis = "90-day"
+    else:
+        pm_window = FALLBACK_WINDOWS["pm"].copy()
+        pm_basis = "fallback"
 
-    windows = {
-        "generated_at": now.isoformat(),
-        "timezone": "Asia/Kolkata",
-        "learning_period_days": 92,
-        "priority_period_days": 30,
-        "change_observations": len(change_times),
-        "am_observations": len(am_points),
-        "pm_observations": len(pm_points),
-        "am": {
-            "start_minutes": am["start"],
-            "end_minutes": am["end"],
-            "start": minutes_to_string(am["start"]),
-            "end": minutes_to_string(am["end"]),
-            "observations": am["observations"],
+    return {
+
+        "generated_at":
+            current.isoformat(),
+
+        "timezone":
+            "Asia/Kolkata",
+
+        "learning_method":
+            "30-day priority, 90-day fallback",
+
+        "historical_observations":
+            len(observations),
+
+        "three_month_observations":
+            len(observations_90),
+
+        "thirty_day_observations":
+            len(observations_30),
+
+        "price_change_observations_90d":
+            len(changes_90),
+
+        "price_change_observations_30d":
+            len(changes_30),
+
+        "timestamp_learning_available":
+            bool(changes_90),
+
+        "windows": {
+
+            "am": am_window,
+
+            "pm": pm_window
+
         },
-        "pm": {
-            "start_minutes": pm["start"],
-            "end_minutes": pm["end"],
-            "start": minutes_to_string(pm["start"]),
-            "end": minutes_to_string(pm["end"]),
-            "observations": pm["observations"],
+
+        "basis": {
+
+            "am": am_basis,
+
+            "pm": pm_basis
+
         },
+
+        "poll_interval_seconds":
+            POLL_SECONDS
     }
 
-    save_json(WINDOW_FILE, windows)
+
+# ============================================================
+# WINDOW CHECKING
+# ============================================================
+
+def time_to_minutes(
+    value: str
+) -> int:
+
+    hour, minute = map(
+        int,
+        value.split(":")
+    )
+
+    return (
+        hour * 60 +
+        minute
+    )
+
+
+def inside_window(
+    current: datetime,
+    window: dict[str, str]
+) -> bool:
+
+    current_minutes = (
+        current.hour * 60 +
+        current.minute
+    )
+
+    start = time_to_minutes(
+        window["start"]
+    )
+
+    end = time_to_minutes(
+        window["end"]
+    )
+
+    return (
+        start <=
+        current_minutes <=
+        end
+    )
+
+
+# ============================================================
+# FULL 10 SECOND MONITOR
+# ============================================================
+
+def monitor_window(
+    previous_rate: Optional[int],
+    window: dict[str, str]
+) -> tuple[
+    Optional[int],
+    list[dict[str, Any]]
+]:
 
     print()
-    print("LEARNED MONITORING WINDOWS")
-    print("--------------------------------")
+    print("=" * 72)
     print(
-        f"AM: {windows['am']['start']} - {windows['am']['end']} "
-        f"({windows['am']['observations']} observations)"
+        "FULL MONITORING WINDOW"
     )
+    print("=" * 72)
+
     print(
-        f"PM: {windows['pm']['start']} - {windows['pm']['end']} "
-        f"({windows['pm']['observations']} observations)"
+        f"Window: "
+        f"{window['start']} - "
+        f"{window['end']} IST"
     )
-    print(f"Price-change observations: {len(change_times)}")
-    print(f"Saved: {WINDOW_FILE}")
 
-    return windows
+    print(
+        f"Polling every "
+        f"{POLL_SECONDS} seconds"
+    )
 
+    print(
+        "Monitoring will continue "
+        "until a NEW price is discovered "
+        "or the window ends."
+    )
 
-# ============================================================
-# WINDOW CHECK
-# ============================================================
+    print("=" * 72)
 
-def get_active_window(windows, current):
-    minutes = current.hour * 60 + current.minute
+    all_results = []
 
-    for name in ("am", "pm"):
-        window = windows.get(name, {})
+    while inside_window(
+        now_ist(),
+        window
+    ):
 
-        start = window.get("start_minutes")
-        end = window.get("end_minutes")
+        print()
+        print(
+            f"[{now_ist():%H:%M:%S}] "
+            "FETCH"
+        )
 
-        if start is None or end is None:
-            continue
+        results = fetch_sources()
 
-        if start <= minutes <= end:
-            return name, start, end
+        all_results.extend(
+            results
+        )
 
-    return None
+        candidate = determine_rate(
+            results
+        )
+
+        print(
+            f"Candidate rate: "
+            f"{candidate}"
+        )
+
+        if (
+            candidate is not None
+            and previous_rate is not None
+            and candidate != previous_rate
+        ):
+
+            print()
+            print(
+                "****************************************"
+            )
+
+            print(
+                f"NEW PRICE DISCOVERED!"
+            )
+
+            print(
+                f"Previous: "
+                f"₹{previous_rate:,}"
+            )
+
+            print(
+                f"New: "
+                f"₹{candidate:,}"
+            )
+
+            print(
+                "****************************************"
+            )
+
+            return candidate, all_results
+
+        if (
+            candidate is not None
+            and previous_rate is None
+        ):
+
+            return candidate, all_results
+
+        # IMPORTANT:
+        # Do not sleep after the window has already ended.
+        remaining = (
+            time_to_minutes(
+                window["end"]
+            )
+            -
+            (
+                now_ist().hour * 60
+                +
+                now_ist().minute
+            )
+        )
+
+        if remaining <= 0:
+            break
+
+        time.sleep(
+            POLL_SECONDS
+        )
+
+    print()
+    print(
+        "Monitoring window ended."
+    )
+
+    return previous_rate, all_results
 
 
 # ============================================================
 # LIVE.JSON
 # ============================================================
 
-def load_live():
-    return load_json(LIVE_FILE, {})
+def build_live_data(
+    previous: dict[str, Any],
+    rate: int,
+    results: list[dict[str, Any]],
+    changed: bool
+) -> dict[str, Any]:
 
+    current = now_ist()
 
-def save_live(result, previous_rate, changed):
-    rate = result.get("rate")
+    old_rate = None
 
-    if not rate:
-        return
+    try:
 
-    live = load_live()
-
-    now = now_ist()
-
-    live.update(
-        {
-            "rate_22k": rate,
-            "rate_8g": rate * 8,
-            "date": now.date().isoformat(),
-            "time": now.strftime("%H:%M:%S"),
-            "updated_at": now.isoformat(),
-            "timezone": "Asia/Kolkata",
-            "changed": changed,
-            "previous_rate_22k": previous_rate,
-            "source": result.get("source"),
-            "livechennai": result.get("livechennai"),
-            "goodreturns": result.get("goodreturns"),
-            "monitoring": True,
-        }
-    )
-
-    save_json(LIVE_FILE, live)
-
-
-# ============================================================
-# MAIN NORMAL FETCH
-# ============================================================
-
-def normal_fetch(previous_rate):
-    print()
-    print("NORMAL FETCH")
-    print("--------------------------------")
-
-    result = fetch_sources()
-
-    rate = result.get("rate")
-
-    if not rate:
-        print("No valid 22K rate found.")
-        return previous_rate, False
-
-    changed = (
-        previous_rate is not None
-        and rate != previous_rate
-    )
-
-    print(f"Current 22K rate: ₹{rate:,}")
-    print(f"Previous 22K rate: ₹{previous_rate:,}" if previous_rate else "No previous rate")
-    print(f"Changed: {changed}")
-
-    save_live(
-        result,
-        previous_rate,
-        changed,
-    )
-
-    return rate, changed
-
-
-# ============================================================
-# FULL 10-SECOND MONITOR
-# ============================================================
-
-def monitor_window(window_name, start_minutes, end_minutes, previous_rate):
-    """
-    Poll every 10 seconds for the ENTIRE monitoring window.
-
-    This is intentionally a blocking loop.
-    """
-
-    print()
-    print("=" * 70)
-    print("FULL MONITORING STARTED")
-    print("=" * 70)
-
-    print(f"Window: {minutes_to_string(start_minutes)} - {minutes_to_string(end_minutes)}")
-    print(f"Polling interval: {POLL_SECONDS} seconds")
-    print("Sources: LiveChennai + GoodReturns")
-    print("Will stop only when:")
-    print("  1. A genuinely new 22K rate is confirmed")
-    print("  2. Monitoring window ends")
-    print()
-
-    window_end = end_minutes
-
-    # Maximum safety limit.
-    monitor_started = time.monotonic()
-
-    last_seen_rate = previous_rate
-
-    poll_number = 0
-
-    while True:
-        now = now_ist()
-
-        current_minutes = (
-            now.hour * 60
-            + now.minute
-            + now.second / 60
-        )
-
-        # ----------------------------------------------------
-        # End of monitoring window.
-        # ----------------------------------------------------
-
-        if current_minutes > window_end:
-            print()
-            print("MONITORING WINDOW ENDED")
-            print(f"Final time: {now.strftime('%I:%M:%S %p')}")
-            break
-
-        # ----------------------------------------------------
-        # Safety timeout.
-        # ----------------------------------------------------
-
-        if time.monotonic() - monitor_started > MAX_MONITOR_SECONDS:
-            print()
-            print("SAFETY TIMEOUT REACHED")
-            break
-
-        poll_number += 1
-
-        print()
-        print("-" * 70)
-        print(
-            f"POLL #{poll_number} | "
-            f"{now.strftime('%d-%m-%Y %I:%M:%S %p')}"
-        )
-        print("-" * 70)
-
-        result = fetch_sources()
-
-        rate = result.get("rate")
-
-        if not rate:
-            print("No valid rate found.")
-            print(f"Retrying in {POLL_SECONDS} seconds...")
-            time.sleep(POLL_SECONDS)
-            continue
-
-        print(f"Observed 22K rate: ₹{rate:,}")
-        print(f"Previous saved rate: ₹{previous_rate:,}" if previous_rate else "Previous saved rate: NONE")
-
-        # ----------------------------------------------------
-        # New price discovered.
-        # ----------------------------------------------------
-
-        if previous_rate is not None and rate != previous_rate:
-            print()
-            print("=" * 70)
-            print("NEW 22K GOLD PRICE DISCOVERED")
-            print("=" * 70)
-            print(f"Old: ₹{previous_rate:,}/gram")
-            print(f"New: ₹{rate:,}/gram")
-            print(f"Source: {result.get('source')}")
-
-            save_live(
-                result,
-                previous_rate,
-                True,
+        old_rate = int(
+            previous.get(
+                "rate_22k"
             )
-
-            print("live.json updated.")
-            print("Monitoring stopped.")
-
-            return rate, True
-
-        # ----------------------------------------------------
-        # First valid price if no previous price exists.
-        # ----------------------------------------------------
-
-        if previous_rate is None:
-            print("No previous saved price.")
-            print("Saving first valid price.")
-
-            save_live(
-                result,
-                None,
-                False,
-            )
-
-            previous_rate = rate
-            last_seen_rate = rate
-
-        else:
-            print("No new price yet.")
-
-        # ----------------------------------------------------
-        # IMPORTANT:
-        # Always wait exactly 10 seconds before next poll.
-        # ----------------------------------------------------
-
-        remaining = max(
-            0,
-            int((window_end - current_minutes) * 60)
         )
 
-        if remaining <= 0:
-            break
+    except Exception:
+        pass
 
-        sleep_for = min(POLL_SECONDS, remaining)
+    source_names = [
+        item["source"]
+        for item in results
+        if item.get("source")
+    ]
 
-        print(f"Next fetch in {sleep_for} seconds...")
-        time.sleep(sleep_for)
+    source_times = [
+        item["updated_at"]
+        for item in results
+        if item.get("updated_at")
+    ]
 
-    return previous_rate, False
+    rates = [
+        item["rate_22k"]
+        for item in results
+        if isinstance(
+            item.get("rate_22k"),
+            int
+        )
+    ]
+
+    return {
+
+        "rate_22k":
+            rate,
+
+        "rate_8g":
+            rate * 8,
+
+        "currency":
+            "INR",
+
+        "city":
+            "Chennai",
+
+        "purity":
+            "22K",
+
+        "date":
+            current.strftime(
+                "%Y-%m-%d"
+            ),
+
+        "time":
+            current.strftime(
+                "%H:%M:%S"
+            ),
+
+        "timestamp":
+            current.isoformat(),
+
+        "changed":
+            changed,
+
+        "previous_rate_22k":
+            old_rate,
+
+        "sources":
+            source_names,
+
+        "source_update_times":
+            source_times,
+
+        "source_rates":
+            rates,
+
+        "sources_agree":
+            (
+                len(set(rates)) <= 1
+                if rates
+                else False
+            ),
+
+        "last_checked_at":
+            current.isoformat()
+    }
+
+
+# ============================================================
+# HISTORY UPDATE
+# ============================================================
+
+def append_history(
+    history: Any,
+    live: dict[str, Any]
+) -> list:
+
+    if not isinstance(
+        history,
+        list
+    ):
+
+        history = []
+
+    entry = {
+
+        "timestamp":
+            live["timestamp"],
+
+        "date":
+            live["date"],
+
+        "time":
+            live["time"],
+
+        "rate_22k":
+            live["rate_22k"],
+
+        "rate_8g":
+            live["rate_8g"],
+
+        "changed":
+            live["changed"],
+
+        "sources":
+            live.get(
+                "sources",
+                []
+            )
+    }
+
+    # Keep history useful without storing every
+    # identical 10-second poll.
+    if history:
+
+        last = history[-1]
+
+        if (
+            isinstance(last, dict)
+            and
+            last.get("rate_22k")
+            ==
+            entry["rate_22k"]
+            and
+            last.get("date")
+            ==
+            entry["date"]
+            and
+            last.get("time")
+            ==
+            entry["time"]
+        ):
+
+            return history
+
+    history.append(
+        entry
+    )
+
+    # Keep existing history.
+    return history
 
 
 # ============================================================
 # MAIN
 # ============================================================
 
-def main():
-    ensure_data_dir()
-
-    print("=" * 70)
-    print("CHENNAI 22K GOLD RATE")
-    print("FULL-WINDOW 10-SECOND MONITOR")
-    print("=" * 70)
-
-    now = now_ist()
-
-    print(
-        f"IST time: {now.strftime('%d-%m-%Y %I:%M:%S %p')}"
-    )
-
-    # --------------------------------------------------------
-    # Load existing live price.
-    # --------------------------------------------------------
-
-    live = load_live()
-
-    previous_rate = clean_number(
-        live.get("rate_22k")
-    )
-
-    if previous_rate:
-        print(f"Previous saved 22K rate: ₹{previous_rate:,}")
-    else:
-        print("Previous saved 22K rate: NONE")
-
-    # --------------------------------------------------------
-    # Learn monitoring windows every run.
-    # --------------------------------------------------------
-
-    windows = learn_windows()
-
-    # --------------------------------------------------------
-    # Determine whether currently inside a window.
-    # --------------------------------------------------------
-
-    active = get_active_window(
-        windows,
-        now,
-    )
-
-    if active:
-        window_name, start_minutes, end_minutes = active
-
-        print()
-        print("=" * 70)
-        print("CURRENTLY INSIDE MONITORING WINDOW")
-        print("=" * 70)
-        print(
-            f"{window_name.upper()}: "
-            f"{minutes_to_string(start_minutes)} - "
-            f"{minutes_to_string(end_minutes)}"
-        )
-
-        # ----------------------------------------------------
-        # FULL 10-second monitoring.
-        # ----------------------------------------------------
-
-        new_rate, changed = monitor_window(
-            window_name,
-            start_minutes,
-            end_minutes,
-            previous_rate,
-        )
-
-        previous_rate = new_rate
-
-    else:
-        print()
-        print("=" * 70)
-        print("OUTSIDE MONITORING WINDOW")
-        print("=" * 70)
-        print("Performing ONE normal fetch and exiting.")
-
-        previous_rate, changed = normal_fetch(
-            previous_rate
-        )
-
-    # --------------------------------------------------------
-    # Final output.
-    # --------------------------------------------------------
+def main() -> int:
 
     print()
-    print("=" * 70)
-    print("UPDATE COMPLETE")
-    print("=" * 70)
+    print("=" * 72)
+    print(
+        "CHENNAI 22K GOLD RATE"
+    )
+    print(
+        "ADAPTIVE FULL-WINDOW MONITOR"
+    )
+    print("=" * 72)
 
-    if previous_rate:
-        print(f"22K / gram : ₹{previous_rate:,}")
-        print(f"22K / 8g   : ₹{previous_rate * 8:,}")
+    DATA.mkdir(
+        exist_ok=True
+    )
 
-    print(f"Date       : {now_ist().date().isoformat()}")
-    print(f"Time       : {now_ist().strftime('%H:%M:%S')}")
-    print(f"Changed    : {changed}")
-    print(f"Live file  : {LIVE_FILE}")
-    print(f"Window file: {WINDOW_FILE}")
-    print("=" * 70)
+    previous = load_json(
+        LIVE_FILE,
+        {}
+    )
+
+    history = load_json(
+        HISTORY_FILE,
+        []
+    )
+
+    windows = learn_monitoring_windows(
+        history
+    )
+
+    save_json(
+        WINDOW_FILE,
+        windows
+    )
+
+    current = now_ist()
+
+    print(
+        f"IST: "
+        f"{current:%d-%m-%Y %I:%M:%S %p}"
+    )
+
+    print()
+    print(
+        "LEARNING INFORMATION"
+    )
+
+    print(
+        f"Historical observations: "
+        f"{windows['historical_observations']}"
+    )
+
+    print(
+        f"3-month observations: "
+        f"{windows['three_month_observations']}"
+    )
+
+    print(
+        f"30-day observations: "
+        f"{windows['thirty_day_observations']}"
+    )
+
+    print(
+        f"Price changes 90d: "
+        f"{windows['price_change_observations_90d']}"
+    )
+
+    print(
+        f"Price changes 30d: "
+        f"{windows['price_change_observations_30d']}"
+    )
+
+    print(
+        f"Timestamp learning: "
+        f"{windows['timestamp_learning_available']}"
+    )
+
+    print()
+    print(
+        "CURRENT MONITORING WINDOWS"
+    )
+
+    print(
+        f"AM: "
+        f"{windows['windows']['am']['start']} - "
+        f"{windows['windows']['am']['end']} "
+        f"({windows['basis']['am']})"
+    )
+
+    print(
+        f"PM: "
+        f"{windows['windows']['pm']['start']} - "
+        f"{windows['windows']['pm']['end']} "
+        f"({windows['basis']['pm']})"
+    )
+
+    try:
+
+        previous_rate = int(
+            previous.get(
+                "rate_22k"
+            )
+        )
+
+    except Exception:
+
+        previous_rate = None
+
+    # Determine active monitoring window.
+    active_window = None
+
+    for key in (
+        "am",
+        "pm"
+    ):
+
+        window = windows[
+            "windows"
+        ][key]
+
+        if inside_window(
+            current,
+            window
+        ):
+
+            active_window = window
+            break
+
+    if active_window:
+
+        print()
+        print(
+            "CURRENTLY INSIDE "
+            "MONITORING WINDOW"
+        )
+
+        rate, results = monitor_window(
+            previous_rate,
+            active_window
+        )
+
+    else:
+
+        print()
+        print(
+            "OUTSIDE MONITORING WINDOW"
+        )
+
+        print(
+            "Performing one normal fetch."
+        )
+
+        results = fetch_sources()
+
+        candidate = determine_rate(
+            results
+        )
+
+        if candidate is not None:
+
+            rate = candidate
+
+        else:
+
+            rate = previous_rate
+
+    if rate is None:
+
+        print()
+        print(
+            "ERROR: No valid rate available."
+        )
+
+        return 1
+
+    changed = (
+        previous_rate is not None
+        and
+        rate != previous_rate
+    )
+
+    live = build_live_data(
+        previous,
+        rate,
+        results,
+        changed
+    )
+
+    save_json(
+        LIVE_FILE,
+        live
+    )
+
+    history = append_history(
+        history,
+        live
+    )
+
+    save_json(
+        HISTORY_FILE,
+        history
+    )
+
+    # Relearn after every successful run.
+    windows = learn_monitoring_windows(
+        history
+    )
+
+    save_json(
+        WINDOW_FILE,
+        windows
+    )
+
+    print()
+    print("=" * 72)
+    print(
+        "UPDATE COMPLETE"
+    )
+    print("=" * 72)
+
+    print(
+        f"22K / gram : "
+        f"₹{rate:,}"
+    )
+
+    print(
+        f"22K / 8g   : "
+        f"₹{rate * 8:,}"
+    )
+
+    print(
+        f"Date       : "
+        f"{live['date']}"
+    )
+
+    print(
+        f"Time       : "
+        f"{live['time']}"
+    )
+
+    print(
+        f"Changed    : "
+        f"{changed}"
+    )
+
+    print(
+        f"History    : "
+        f"{len(history)} records"
+    )
+
+    print(
+        f"Live file  : "
+        f"{LIVE_FILE}"
+    )
+
+    print(
+        f"Window file: "
+        f"{WINDOW_FILE}"
+    )
+
+    print("=" * 72)
+
+    return 0
 
 
 if __name__ == "__main__":
-    try:
+    sys.exit(
         main()
-    except KeyboardInterrupt:
-        print()
-        print("Monitoring manually stopped.")
-        sys.exit(130)
-    except Exception as e:
-        print()
-        print("=" * 70)
-        print("FATAL ERROR")
-        print("=" * 70)
-        print(str(e))
-        sys.exit(1)
+    )
