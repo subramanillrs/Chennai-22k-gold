@@ -3,10 +3,10 @@
   "rate_8g": 116040,
   "rate_24k": null,
   "rate_18k": null,
-  "updated_at": "2026-08-29T23:34:08.617362+05:30",
-  "date": "2026-08-29",
-  "time": "23:34:08",
-  "session": "PM",
+  "updated_at": "2026-08-30T00:13:45.526122+05:30",
+  "date": "2026-08-30",
+  "time": "00:13:45",
+  "session": "AM",
   "source": "LiveChennai",
   "source_url": "https://www.livechennai.com/gold_silverrate.asp",
   "source_last_update": "29/08/2026 9:44:41 AM",
@@ -22,6 +22,14 @@
       "rate_22k": 14505,
       "rate_8g": 116040,
       "session": "PM",
+      "type": "poll"
+    },
+    {
+      "date": "2026-08-30",
+      "time": "00:13:45",
+      "rate_22k": 14505,
+      "rate_8g": 116040,
+      "session": "AM",
       "type": "poll"
     }
   ],
