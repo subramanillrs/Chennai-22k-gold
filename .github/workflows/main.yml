@@ -2,36 +2,35 @@ name: Update Chennai 22K Gold Rate
 
 on:
   schedule:
-    # Bootstrap/learn morning window: every 30 minutes.
-    - cron: "0 4 * * *"
-    - cron: "30 4 * * *"
-    - cron: "0 5 * * *"
+    # 11:00 AM IST
     - cron: "30 5 * * *"
 
-    # Bootstrap/learn evening window: every 30 minutes.
-    - cron: "0 10 * * *"
-    - cron: "30 10 * * *"
-    - cron: "0 11 * * *"
+    # 5:00 PM IST
     - cron: "30 11 * * *"
 
   workflow_dispatch:
 
+# Prevent two monitoring runs from running at the same time.
+concurrency:
+  group: chennai-22k-gold-update
+  cancel-in-progress: false
+
 permissions:
   contents: write
-
-concurrency:
-  group: gold-rate-update
-  cancel-in-progress: false
 
 jobs:
   update:
     runs-on: ubuntu-latest
 
+    # Absolute safety limit for the entire job.
+    # 400 checks × 10 seconds ≈ 66 minutes 40 seconds.
+    timeout-minutes: 75
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 1
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -44,14 +43,37 @@ jobs:
           pip install requests beautifulsoup4
 
       - name: Monitor and update Chennai 22K rate
-        run: python update_gold.py
+        run: |
+          python update_gold.py
+
+      - name: Verify generated data
+        run: |
+          echo "Checking generated data files..."
+
+          if [ ! -f data/live.json ]; then
+            echo "ERROR: data/live.json was not created."
+            exit 1
+          fi
+
+          if [ ! -f data/history.json ]; then
+            echo "ERROR: data/history.json was not created."
+            exit 1
+          fi
+
+          echo "data/live.json exists."
+          echo "data/history.json exists."
+
+      - name: Show current live data
+        run: |
+          echo "Current live.json:"
+          cat data/live.json
 
       - name: Save updated data
         run: |
           git config user.name "Chennai 22K Gold Bot"
           git config user.email "actions@users.noreply.github.com"
 
-          git add data/live.json data/history.json data/change_log.json
+          git add -A -- data/
 
           if git diff --cached --quiet; then
             echo "No data changes to commit."
