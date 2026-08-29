@@ -11238,5 +11238,15 @@
     "source": "LiveChennai",
     "source_url": "https://www.livechennai.com/get_goldrate_history.asp?monthno=8&yearno=2026",
     "type": "daily_history"
+  },
+  {
+    "date": "2026-08-29",
+    "rate_22k": 14505,
+    "rate_24k": 15824,
+    "weight_1g": 14505,
+    "weight_8g": 116040,
+    "source": "LiveChennai",
+    "source_url": "https://www.livechennai.com/get_goldrate_history.asp?monthno=8&yearno=2026",
+    "type": "daily_history"
   }
 ]
