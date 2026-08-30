@@ -1,160 +1,3708 @@
-name: Monitor and Update Chennai 22K Gold
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 
-on:
-  workflow_dispatch:
+  <meta name="theme-color" content="#15130f">
+  <meta name="description" content="Chennai 22K Gold Price Tracker">
 
-  schedule:
-    # 08:30 AM IST = 03:00 UTC
-    - cron: "0 3 * * *"
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Gold price 22k">
 
-    # 05:00 PM IST = 11:30 UTC
-    - cron: "30 11 * * *"
+  <title>Gold price 22k</title>
 
-permissions:
-  contents: write
+  <style>
+    :root {
+      --bg:#f7f6f2;
+      --card:#ffffff;
+      --card2:#f0eee8;
+      --text:#191a17;
+      --muted:#74746e;
+      --line:#dfddd6;
+      --gold:#9b6b16;
+      --gold2:#f8e7ae;
+      --green:#13764b;
+      --greenbg:#e7f5ed;
+      --red:#b3261e;
+      --redbg:#fdeceb;
+      --shadow:0 3px 12px rgba(0,0,0,.06);
+    }
 
-jobs:
-  update:
-    runs-on: ubuntu-latest
-    timeout-minutes: 210
+    * {
+      box-sizing:border-box;
+      -webkit-tap-highlight-color:transparent;
+    }
 
-    steps:
+    html {
+      scroll-behavior:smooth;
+    }
 
-      # ----------------------------------------------------
-      # CHECKOUT
-      # ----------------------------------------------------
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+    body {
+      margin:0;
+      background:var(--bg);
+      color:var(--text);
+      font-family:
+        Roboto,
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+    }
 
-      # ----------------------------------------------------
-      # PYTHON
-      # ----------------------------------------------------
-      - name: Set up Python
-        uses: actions/setup-python@v6
-        with:
-          python-version: "3.12"
+    button,
+    input,
+    select {
+      font:inherit;
+    }
 
-      # ----------------------------------------------------
-      # DEPENDENCIES
-      # ----------------------------------------------------
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install requests beautifulsoup4
+    button {
+      cursor:pointer;
+    }
 
-      # ----------------------------------------------------
-      # DETERMINE FETCH MODE
-      # ----------------------------------------------------
-      - name: Determine fetch mode
-        shell: bash
-        run: |
-          echo "Event: ${{ github.event_name }}"
+    .app {
+      width:100%;
+      max-width:850px;
+      margin:auto;
+      padding:
+        calc(8px + env(safe-area-inset-top))
+        14px
+        calc(35px + env(safe-area-inset-bottom));
+    }
 
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            echo "FORCE_FETCH=true" >> "$GITHUB_ENV"
-          else
-            echo "FORCE_FETCH=false" >> "$GITHUB_ENV"
-          fi
+    /* HEADER */
 
-      # ----------------------------------------------------
-      # START GOLD MONITOR
-      # ----------------------------------------------------
-      - name: Monitor and update Chennai 22K rate
-        env:
-          GITHUB_ACTIONS: "true"
-          GITHUB_EVENT_NAME: ${{ github.event_name }}
-          FORCE_FETCH: ${{ env.FORCE_FETCH }}
-        run: |
-          echo "============================================================"
-          echo "CHENNAI 22K GOLD RATE MONITOR"
-          echo "============================================================"
-          echo "Event: $GITHUB_EVENT_NAME"
-          echo "FORCE_FETCH: $FORCE_FETCH"
-          echo ""
-          echo "Starting update_gold.py..."
-          echo ""
-          echo "Scheduled runs:"
-          echo "AM : 08:30 IST"
-          echo "PM : 17:00 IST"
-          echo ""
-          echo "During monitoring:"
-          echo "LiveChennai + GoodReturns checked every 10 seconds."
-          echo "============================================================"
+    .topbar {
+      min-height:65px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+    }
 
-          python update_gold.py
+    .brand {
+      display:flex;
+      align-items:center;
+      gap:12px;
+    }
 
-      # ----------------------------------------------------
-      # VERIFY DATA
-      # ----------------------------------------------------
-      - name: Verify generated data
-        shell: bash
-        run: |
-          echo "Checking generated data files..."
+    .logo {
+      width:46px;
+      height:46px;
+      border-radius:16px;
+      display:grid;
+      place-items:center;
+      background:#201e19;
+      color:#f4ca50;
+      font-size:22px;
+      font-weight:900;
+      box-shadow:var(--shadow);
+    }
 
-          if [ -f data/live.json ]; then
-            echo "live.json: OK"
-          else
-            echo "ERROR: data/live.json missing"
-            exit 1
-          fi
+    .brand h1 {
+      margin:0;
+      font-size:21px;
+      font-weight:850;
+      letter-spacing:-.5px;
+    }
 
-          if [ -f data/history.json ]; then
-            echo "history.json: OK"
-          else
-            echo "history.json missing - creating empty file"
-            echo "[]" > data/history.json
-          fi
+    .brand p {
+      margin:4px 0 0;
+      color:var(--muted);
+      font-size:12px;
+    }
 
-          if [ -f data/monitoring_windows.json ]; then
-            echo "monitoring_windows.json: OK"
-          else
-            echo "monitoring_windows.json not generated"
-          fi
+    .refresh {
+      width:48px;
+      height:48px;
+      border:1px solid var(--line);
+      border-radius:50%;
+      background:var(--card);
+      color:var(--text);
+      font-size:23px;
+      box-shadow:var(--shadow);
+    }
 
-      # ----------------------------------------------------
-      # SHOW LIVE DATA
-      # ----------------------------------------------------
-      - name: Show current live data
-        shell: bash
-        run: |
-          echo "============================================================"
-          echo "CURRENT LIVE DATA"
-          echo "============================================================"
+    .refresh:active {
+      transform:scale(.94);
+    }
 
-          cat data/live.json
+    .spin {
+      animation:spin .75s linear infinite;
+    }
 
-      # ----------------------------------------------------
-      # SHOW MONITORING WINDOW
-      # ----------------------------------------------------
-      - name: Show monitoring window
-        shell: bash
-        run: |
-          echo "============================================================"
-          echo "MONITORING WINDOW"
-          echo "============================================================"
+    @keyframes spin {
+      to {
+        transform:rotate(360deg);
+      }
+    }
 
-          if [ -f data/monitoring_windows.json ]; then
-            cat data/monitoring_windows.json
-          else
-            echo "No monitoring window file."
-          fi
+    /* STATUS */
 
-      # ----------------------------------------------------
-      # SAVE UPDATED DATA
-      # ----------------------------------------------------
-      - name: Save updated data
-        shell: bash
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+    .status {
+      display:flex;
+      align-items:center;
+      gap:8px;
+      margin:4px 5px 12px;
+      color:var(--muted);
+      font-size:12px;
+    }
 
-          git add data/*.json
+    .status-dot {
+      width:8px;
+      height:8px;
+      border-radius:50%;
+      background:var(--green);
+      box-shadow:0 0 0 4px rgba(19,118,75,.1);
+    }
 
-          if git diff --cached --quiet; then
-            echo "No data changes to commit."
-          else
-            git commit -m "Update Chennai 22K gold rate"
-            git push
-          fi
+    .status.offline .status-dot {
+      background:var(--red);
+      box-shadow:0 0 0 4px rgba(179,38,30,.1);
+    }
+
+    /* FETCH */
+
+    .fetch-area {
+      margin-bottom:10px;
+    }
+
+    .fetch-button {
+      width:100%;
+      min-height:56px;
+      border:0;
+      border-radius:19px;
+      background:#201e19;
+      color:#fff;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:9px;
+      font-size:14px;
+      font-weight:850;
+      box-shadow:var(--shadow);
+    }
+
+    .fetch-button:active {
+      transform:scale(.985);
+    }
+
+    .fetch-button:disabled {
+      opacity:.55;
+      cursor:wait;
+    }
+
+    .fetch-icon {
+      font-size:21px;
+    }
+
+    .fetch-note {
+      margin-top:7px;
+      color:var(--muted);
+      text-align:center;
+      font-size:10px;
+    }
+
+    /* HERO */
+
+    .hero {
+      position:relative;
+      overflow:hidden;
+      padding:27px;
+      border-radius:31px;
+      background:
+        linear-gradient(
+          145deg,
+          #fffef8 0%,
+          #fff8e4 55%,
+          #ffefc1 100%
+        );
+      border:1px solid #ead6a1;
+      box-shadow:var(--shadow);
+    }
+
+    .hero::after {
+      content:"22K";
+      position:absolute;
+      right:-15px;
+      bottom:-47px;
+      font-size:150px;
+      font-weight:900;
+      color:rgba(138,101,15,.055);
+      pointer-events:none;
+    }
+
+    .eyebrow {
+      position:relative;
+      z-index:1;
+      color:#76520e;
+      font-size:11px;
+      font-weight:850;
+      text-transform:uppercase;
+      letter-spacing:1px;
+    }
+
+    .hero-price {
+      position:relative;
+      z-index:1;
+      margin:8px 0 0;
+      font-size:clamp(45px,12vw,78px);
+      line-height:1;
+      letter-spacing:-4px;
+      font-weight:900;
+    }
+
+    .hero-unit {
+      position:relative;
+      z-index:1;
+      margin-top:8px;
+      color:#806d45;
+      font-size:13px;
+      font-weight:650;
+    }
+
+    .pergram {
+      position:relative;
+      z-index:1;
+      margin-top:20px;
+      padding-top:17px;
+      border-top:1px solid rgba(138,101,15,.2);
+    }
+
+    .pergram label {
+      display:block;
+      color:#806d45;
+      font-size:11px;
+      font-weight:850;
+      text-transform:uppercase;
+      letter-spacing:.7px;
+    }
+
+    .pergram strong {
+      display:block;
+      margin-top:3px;
+      font-size:clamp(31px,8vw,49px);
+      letter-spacing:-2px;
+      font-weight:900;
+    }
+
+    .change {
+      position:relative;
+      z-index:1;
+      display:inline-flex;
+      margin-top:14px;
+      padding:8px 12px;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:850;
+    }
+
+    .change.same {
+      color:var(--muted);
+      background:var(--card2);
+    }
+
+    .change.up {
+      color:var(--green);
+      background:var(--greenbg);
+    }
+
+    .change.down {
+      color:var(--red);
+      background:var(--redbg);
+    }
+
+    /* QUICK CARDS */
+
+    .quick {
+      display:grid;
+      grid-template-columns:repeat(2,1fr);
+      gap:10px;
+      margin-top:12px;
+    }
+
+    .card {
+      padding:16px;
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:22px;
+      box-shadow:var(--shadow);
+    }
+
+    .label {
+      color:var(--muted);
+      font-size:10px;
+      font-weight:850;
+      text-transform:uppercase;
+      letter-spacing:.7px;
+    }
+
+    .value {
+      margin-top:6px;
+      font-size:18px;
+      font-weight:850;
+    }
+
+    .sub {
+      margin-top:4px;
+      color:var(--muted);
+      font-size:11px;
+    }
+
+    /* SECTIONS */
+
+    .section {
+      margin-top:26px;
+    }
+
+    .section-head {
+      display:flex;
+      align-items:end;
+      justify-content:space-between;
+      gap:10px;
+      margin:0 3px 11px;
+    }
+
+    .section-head h2 {
+      margin:0;
+      font-size:19px;
+      font-weight:800;
+      letter-spacing:-.35px;
+    }
+
+    .section-head span {
+      color:var(--muted);
+      font-size:11px;
+    }
+
+    /* TODAY */
+
+    .today-grid {
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+    }
+
+    .session {
+      padding:16px;
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:22px;
+      box-shadow:var(--shadow);
+    }
+
+    .session-title {
+      color:var(--muted);
+      font-size:10px;
+      font-weight:850;
+      text-transform:uppercase;
+      letter-spacing:.7px;
+    }
+
+    .session-rate {
+      margin-top:7px;
+      font-size:21px;
+      font-weight:900;
+    }
+
+    .session-time {
+      margin-top:4px;
+      color:var(--muted);
+      font-size:11px;
+    }
+
+    /* SEGMENT */
+
+    .segments {
+      display:flex;
+      gap:7px;
+      overflow:auto;
+      padding:2px 0 7px;
+      scrollbar-width:none;
+    }
+
+    .segments::-webkit-scrollbar {
+      display:none;
+    }
+
+    .segments button {
+      white-space:nowrap;
+      padding:9px 14px;
+      border:1px solid var(--line);
+      border-radius:999px;
+      background:var(--card);
+      color:var(--muted);
+      font-size:12px;
+      font-weight:850;
+    }
+
+    .segments button.active {
+      background:#201e19;
+      color:#fff;
+      border-color:#201e19;
+    }
+
+    /* PANEL */
+
+    .panel {
+      padding:15px;
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:25px;
+      box-shadow:var(--shadow);
+    }
+
+    /* METRICS */
+
+    .metrics {
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:9px;
+      margin-bottom:12px;
+    }
+
+    .metric {
+      padding:13px 10px;
+      border-radius:18px;
+      background:var(--card2);
+    }
+
+    .metric small {
+      color:var(--muted);
+      font-size:10px;
+    }
+
+    .metric b {
+      display:block;
+      margin-top:4px;
+      font-size:15px;
+    }
+
+    /* CHART */
+
+    .chart-wrap {
+      height:285px;
+    }
+
+    #chart {
+      width:100%;
+      height:100%;
+      display:block;
+    }
+
+    .chart-meta {
+      display:flex;
+      justify-content:space-between;
+      margin-top:6px;
+      color:var(--muted);
+      font-size:10px;
+    }
+
+    /* LAST CHANGE */
+
+    .last-change {
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+    }
+
+    .last-date {
+      font-weight:800;
+    }
+
+    .last-date small {
+      display:block;
+      margin-top:4px;
+      color:var(--muted);
+      font-size:11px;
+    }
+
+    .last-amount {
+      font-size:20px;
+      font-weight:900;
+      text-align:right;
+    }
+
+    .positive {
+      color:var(--green);
+    }
+
+    .negative {
+      color:var(--red);
+    }
+
+    /* FORMS */
+
+    .form-grid {
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+    }
+
+    .field label {
+      display:block;
+      margin-bottom:6px;
+      color:var(--muted);
+      font-size:11px;
+      font-weight:800;
+    }
+
+    .field input,
+    .field select {
+      width:100%;
+      height:50px;
+      padding:0 13px;
+      border:1px solid var(--line);
+      border-radius:16px;
+      background:var(--card);
+      color:var(--text);
+      outline:none;
+    }
+
+    .field input:focus,
+    .field select:focus {
+      border-color:var(--gold);
+      box-shadow:0 0 0 3px rgba(155,107,22,.1);
+    }
+
+    .result {
+      margin-top:12px;
+      padding:15px;
+      border-radius:19px;
+      background:var(--card2);
+    }
+
+    .result b {
+      font-size:23px;
+    }
+
+    .result p {
+      margin:4px 0 0;
+      color:var(--muted);
+      font-size:11px;
+    }
+
+    /* COMPARE */
+
+    .compare-grid {
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+    }
+
+    .compare-result {
+      margin-top:11px;
+      padding:15px;
+      border-radius:19px;
+      background:var(--card2);
+      line-height:1.5;
+    }
+
+    .compare-result strong {
+      font-size:22px;
+    }
+
+    /* HISTORY */
+
+    .history-wrap {
+      max-height:430px;
+      overflow:auto;
+      border-radius:19px;
+    }
+
+    .history {
+      width:100%;
+      border-collapse:collapse;
+      font-size:12px;
+    }
+
+    .history th {
+      position:sticky;
+      top:0;
+      z-index:1;
+      padding:12px;
+      background:var(--card2);
+      color:var(--muted);
+      font-size:10px;
+      text-transform:uppercase;
+      letter-spacing:.5px;
+      text-align:left;
+    }
+
+    .history td {
+      padding:12px;
+      border-top:1px solid var(--line);
+      font-weight:650;
+    }
+
+    .history th:last-child,
+    .history td:last-child {
+      text-align:right;
+    }
+
+    /* FOOTER */
+
+    footer {
+      padding:26px 4px 8px;
+      color:var(--muted);
+      text-align:center;
+      font-size:10px;
+      line-height:1.7;
+    }
+
+    /* TOAST */
+
+    .toast {
+      position:fixed;
+      left:50%;
+      bottom:calc(20px + env(safe-area-inset-bottom));
+      transform:translate(-50%,20px);
+      padding:11px 16px;
+      border-radius:999px;
+      background:#201e19;
+      color:#fff;
+      font-size:12px;
+      font-weight:700;
+      opacity:0;
+      pointer-events:none;
+      transition:.25s;
+      z-index:50;
+      white-space:nowrap;
+    }
+
+    .toast.show {
+      opacity:1;
+      transform:translate(-50%,0);
+    }
+
+    /* RESPONSIVE */
+
+    @media(min-width:650px) {
+      .quick {
+        grid-template-columns:repeat(4,1fr);
+      }
+    }
+
+    @media(max-width:430px) {
+      .hero {
+        padding:22px;
+      }
+
+      .chart-wrap {
+        height:250px;
+      }
+    }
+
+    /* DARK MODE */
+
+    @media(prefers-color-scheme:dark) {
+
+      :root {
+        --bg:#0d0e0c;
+        --card:#171815;
+        --card2:#22231f;
+        --text:#f5f3ed;
+        --muted:#aaa79e;
+        --line:#30312c;
+        --shadow:0 3px 12px rgba(0,0,0,.25);
+      }
+
+      .logo {
+        background:#f1c653;
+        color:#191712;
+      }
+
+      .hero {
+        background:
+          linear-gradient(
+            145deg,
+            #2b2618,
+            #1d1a10
+          );
+        border-color:#574615;
+      }
+
+      .eyebrow,
+      .hero-unit,
+      .pergram label {
+        color:#d8b967;
+      }
+
+      .segments button {
+        background:var(--card);
+      }
+
+      .segments button.active {
+        background:#f4f1e8;
+        color:#171612;
+      }
+
+      .fetch-button {
+        background:#f4f1e8;
+        color:#171612;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="app">
+
+  <!-- HEADER -->
+
+  <header class="topbar">
+
+    <div class="brand">
+
+      <div class="logo">₹</div>
+
+      <div>
+        <h1>Gold price 22k</h1>
+        <p>Chennai · 22 Karat</p>
+      </div>
+
+    </div>
+
+    <button
+      class="refresh"
+      id="refreshButton"
+      type="button"
+      aria-label="Fetch latest gold price"
+    >
+      ↻
+    </button>
+
+  </header>
+
+
+  <!-- STATUS -->
+
+  <div class="status" id="status">
+
+    <span class="status-dot"></span>
+
+    <span id="statusText">
+      Loading latest rate…
+    </span>
+
+  </div>
+
+
+  <!-- FETCH -->
+
+  <div class="fetch-area">
+
+    <button
+      class="fetch-button"
+      id="fetchButton"
+      type="button"
+    >
+
+      <span class="fetch-icon" id="fetchIcon">
+        ↻
+      </span>
+
+      <span id="fetchText">
+        Fetch latest rate
+      </span>
+
+    </button>
+
+    <div class="fetch-note">
+      Fetch → Cloudflare Worker → GitHub Actions → update_gold.py → JSON
+    </div>
+
+  </div>
+
+
+  <!-- HERO -->
+
+  <section class="hero">
+
+    <div class="eyebrow">
+      22K GOLD · 8 GRAM
+    </div>
+
+    <div
+      class="hero-price"
+      id="hero8"
+    >
+      ₹—
+    </div>
+
+    <div class="hero-unit">
+      8 grams / 1 sovereign
+    </div>
+
+    <div class="pergram">
+
+      <label>
+        Current rate per gram
+      </label>
+
+      <strong id="hero1">
+        ₹—
+      </strong>
+
+    </div>
+
+    <div
+      class="change same"
+      id="changeBadge"
+    >
+      No change
+    </div>
+
+  </section>
+
+
+  <!-- QUICK CARDS -->
+
+  <section class="quick">
+
+    <div class="card">
+
+      <div class="label">
+        Today
+      </div>
+
+      <div
+        class="value"
+        id="todayDate"
+      >
+        —
+      </div>
+
+      <div
+        class="sub"
+        id="todayTime"
+      >
+        —
+      </div>
+
+    </div>
+
+
+    <div class="card">
+
+      <div class="label">
+        Session
+      </div>
+
+      <div
+        class="value"
+        id="session"
+      >
+        —
+      </div>
+
+      <div class="sub">
+        Chennai · IST
+      </div>
+
+    </div>
+
+
+    <div class="card">
+
+      <div class="label">
+        3Y High
+      </div>
+
+      <div
+        class="value"
+        id="threeYearHigh"
+      >
+        —
+      </div>
+
+      <div
+        class="sub"
+        id="threeYearHighDate"
+      >
+        —
+      </div>
+
+    </div>
+
+
+    <div class="card">
+
+      <div class="label">
+        3Y Low
+      </div>
+
+      <div
+        class="value"
+        id="threeYearLow"
+      >
+        —
+      </div>
+
+      <div
+        class="sub"
+        id="threeYearLowDate"
+      >
+        —
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- TODAY -->
+
+  <section class="section">
+
+    <div class="section-head">
+
+      <h2>
+        Today's rate
+      </h2>
+
+      <span id="todaySummary">
+        —
+      </span>
+
+    </div>
+
+
+    <div class="today-grid">
+
+      <div class="session">
+
+        <div class="session-title">
+          Morning
+        </div>
+
+        <div
+          class="session-rate"
+          id="amRate"
+        >
+          —
+        </div>
+
+        <div
+          class="session-time"
+          id="amTime"
+        >
+          Not recorded
+        </div>
+
+      </div>
+
+
+      <div class="session">
+
+        <div class="session-title">
+          Evening
+        </div>
+
+        <div
+          class="session-rate"
+          id="pmRate"
+        >
+          —
+        </div>
+
+        <div
+          class="session-time"
+          id="pmTime"
+        >
+          Not recorded
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- CHART -->
+
+  <section class="section">
+
+    <div class="section-head">
+
+      <h2>
+        Gold price history
+      </h2>
+
+      <span id="chartCount">
+        —
+      </span>
+
+    </div>
+
+
+    <div class="segments">
+
+      <button data-range="7">
+        7D
+      </button>
+
+      <button
+        class="active"
+        data-range="30"
+      >
+        30D
+      </button>
+
+      <button data-range="90">
+        3M
+      </button>
+
+      <button data-range="180">
+        6M
+      </button>
+
+      <button data-range="365">
+        1Y
+      </button>
+
+      <button data-range="1095">
+        3Y
+      </button>
+
+      <button data-range="all">
+        ALL
+      </button>
+
+    </div>
+
+
+    <div class="panel">
+
+      <div class="metrics">
+
+        <div class="metric">
+
+          <small>
+            Period change
+          </small>
+
+          <b id="periodChange">
+            —
+          </b>
+
+        </div>
+
+
+        <div class="metric">
+
+          <small>
+            Period high
+          </small>
+
+          <b id="periodHigh">
+            —
+          </b>
+
+        </div>
+
+
+        <div class="metric">
+
+          <small>
+            Period low
+          </small>
+
+          <b id="periodLow">
+            —
+          </b>
+
+        </div>
+
+      </div>
+
+
+      <div class="chart-wrap">
+
+        <canvas id="chart"></canvas>
+
+      </div>
+
+
+      <div class="chart-meta">
+
+        <span id="chartStart">
+          —
+        </span>
+
+        <span id="chartEnd">
+          —
+        </span>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- LAST CHANGE -->
+
+  <section class="section">
+
+    <div class="section-head">
+
+      <h2>
+        Last rate change
+      </h2>
+
+    </div>
+
+
+    <div class="panel last-change">
+
+      <div class="last-date">
+
+        <span id="lastChangeDate">
+          No recorded change
+        </span>
+
+        <small id="lastChangeTime">
+          —
+        </small>
+
+      </div>
+
+
+      <div
+        class="last-amount"
+        id="lastChangeAmount"
+      >
+        —
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- DATE COMPARISON -->
+
+  <section class="section">
+
+    <div class="section-head">
+
+      <h2>
+        Compare two dates
+      </h2>
+
+    </div>
+
+
+    <div class="panel">
+
+      <div class="compare-grid">
+
+        <div class="field">
+
+          <label>
+            Earlier date
+          </label>
+
+          <input
+            type="date"
+            id="dateA"
+          >
+
+        </div>
+
+
+        <div class="field">
+
+          <label>
+            Later date
+          </label>
+
+          <input
+            type="date"
+            id="dateB"
+          >
+
+        </div>
+
+      </div>
+
+
+      <div
+        class="compare-result"
+        id="compareResult"
+      >
+        Choose two dates to compare.
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- CALCULATOR -->
+
+  <section class="section">
+
+    <div class="section-head">
+
+      <h2>
+        Gold value calculator
+      </h2>
+
+    </div>
+
+
+    <div class="panel">
+
+      <div class="form-grid">
+
+        <div class="field">
+
+          <label>
+            Weight (grams)
+          </label>
+
+          <input
+            id="weight"
+            type="number"
+            inputmode="decimal"
+            min="0"
+            step="0.01"
+            value="8"
+          >
+
+        </div>
+
+
+        <div class="field">
+
+          <label>
+            Calculation
+          </label>
+
+          <select id="calcMode">
+
+            <option value="value">
+              Gold value
+            </option>
+
+            <option value="grams">
+              Gold for budget
+            </option>
+
+          </select>
+
+        </div>
+
+
+        <div class="field">
+
+          <label>
+            Budget / value (₹)
+          </label>
+
+          <input
+            id="budget"
+            type="number"
+            inputmode="decimal"
+            min="0"
+            step="100"
+            value="100000"
+          >
+
+        </div>
+
+
+        <div class="field">
+
+          <label>
+            Making charge %
+          </label>
+
+          <input
+            id="making"
+            type="number"
+            inputmode="decimal"
+            min="0"
+            step="0.1"
+            value="0"
+          >
+
+        </div>
+
+      </div>
+
+
+      <div class="result">
+
+        <b id="calcResult">
+          ₹—
+        </b>
+
+        <p id="calcSub">
+          Based on current 22K rate.
+        </p>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- HISTORY -->
+
+  <section class="section">
+
+    <div class="section-head">
+
+      <h2>
+        Daily history
+      </h2>
+
+      <span id="historyCount">
+        —
+      </span>
+
+    </div>
+
+
+    <div class="panel history-wrap">
+
+      <table class="history">
+
+        <thead>
+
+          <tr>
+
+            <th>
+              Date
+            </th>
+
+            <th>
+              22K / g
+            </th>
+
+            <th>
+              8g
+            </th>
+
+          </tr>
+
+        </thead>
+
+
+        <tbody id="historyBody">
+
+          <tr>
+            <td colspan="3">
+              Loading…
+            </td>
+          </tr>
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  </section>
+
+
+  <!-- FOOTER -->
+
+  <footer>
+
+    <div>
+      Gold price 22k · Chennai
+    </div>
+
+    <div>
+      Live data is updated through GitHub Actions.
+    </div>
+
+    <div>
+      Sources: LiveChennai + GoodReturns
+    </div>
+
+  </footer>
+
+</div>
+
+
+<div
+  class="toast"
+  id="toast"
+>
+</div>
+
+
+<script>
+
+/* =========================================================
+   IMPORTANT CONFIGURATION
+   ========================================================= */
+
+/*
+   THIS IS YOUR ACTUAL CLOUDFLARE WORKER URL
+   READ FROM YOUR SCREENSHOT.
+*/
+
+const TRIGGER_URL =
+  "https://gold-price-fetch.subramanilrs.workers.dev/";
+
+
+/*
+   These files are generated by GitHub Actions.
+*/
+
+const LIVE_URL =
+  "data/live.json";
+
+const HISTORY_URL =
+  "data/history.json";
+
+
+/*
+   GitHub Actions + GitHub Pages can take a little time.
+
+   The Fetch button:
+   
+   1. Calls Cloudflare Worker
+   2. Worker calls GitHub Actions
+   3. update_gold.py fetches the gold rate
+   4. JSON files are updated
+   5. GitHub Pages publishes them
+   6. This app reloads the new JSON
+*/
+
+const INITIAL_WAIT = 5000;
+
+const POLL_INTERVAL = 5000;
+
+const MAX_POLLS = 48;
+
+
+/* =========================================================
+   STATE
+   ========================================================= */
+
+let liveData = null;
+
+let historyData = [];
+
+let selectedRange = 30;
+
+let fetching = false;
+
+
+/* =========================================================
+   SHORTCUT
+   ========================================================= */
+
+const $ = id =>
+  document.getElementById(id);
+
+
+/* =========================================================
+   MONEY
+   ========================================================= */
+
+function money(value) {
+
+  if (
+    value === null ||
+    value === undefined ||
+    !Number.isFinite(Number(value))
+  ) {
+    return "₹—";
+  }
+
+  return (
+    "₹" +
+    Math.round(Number(value))
+      .toLocaleString("en-IN")
+  );
+}
+
+
+/* =========================================================
+   DATE
+   ========================================================= */
+
+function formatDate(value) {
+
+  if (!value) {
+    return "—";
+  }
+
+  const d =
+    new Date(
+      value + "T00:00:00"
+    );
+
+  if (isNaN(d)) {
+    return value;
+  }
+
+  return d.toLocaleDateString(
+    "en-IN",
+    {
+      day:"2-digit",
+      month:"short",
+      year:"numeric"
+    }
+  );
+}
+
+
+/* =========================================================
+   TIME
+   ========================================================= */
+
+function formatTime(value) {
+
+  if (!value) {
+    return "—";
+  }
+
+  const parts =
+    String(value).split(":");
+
+  let hour =
+    Number(parts[0]);
+
+  if (!Number.isFinite(hour)) {
+    return value;
+  }
+
+  const minute =
+    parts[1] || "00";
+
+  const suffix =
+    hour >= 12
+      ? "PM"
+      : "AM";
+
+  hour =
+    hour % 12 || 12;
+
+  return (
+    hour +
+    ":" +
+    minute +
+    " " +
+    suffix
+  );
+}
+
+
+/* =========================================================
+   STATUS
+   ========================================================= */
+
+function setStatus(
+  message,
+  offline = false
+) {
+
+  $("statusText")
+    .textContent = message;
+
+  $("status")
+    .classList
+    .toggle(
+      "offline",
+      offline
+    );
+}
+
+
+/* =========================================================
+   TOAST
+   ========================================================= */
+
+function showToast(message) {
+
+  const t =
+    $("toast");
+
+  t.textContent =
+    message;
+
+  t.classList.add("show");
+
+  setTimeout(
+    () =>
+      t.classList.remove("show"),
+    2500
+  );
+}
+
+
+/* =========================================================
+   FETCH JSON WITHOUT CACHE
+   ========================================================= */
+
+async function fetchJSON(url) {
+
+  const response =
+    await fetch(
+      url +
+      "?v=" +
+      Date.now(),
+      {
+        cache:"no-store"
+      }
+    );
+
+  if (!response.ok) {
+
+    throw new Error(
+      "HTTP " +
+      response.status
+    );
+
+  }
+
+  return response.json();
+}
+
+
+/* =========================================================
+   NORMALIZE HISTORY
+   ========================================================= */
+
+function normalizeHistory(data) {
+
+  if (!Array.isArray(data)) {
+    return [];
+  }
+
+  return data
+    .filter(
+      item =>
+        item &&
+        item.date &&
+        Number.isFinite(
+          Number(item.rate_22k)
+        )
+    )
+    .map(
+      item => ({
+        ...item,
+        rate_22k:
+          Number(
+            item.rate_22k
+          )
+      })
+    )
+    .sort(
+      (a,b) =>
+        a.date.localeCompare(
+          b.date
+        )
+    );
+}
+
+
+/* =========================================================
+   RENDER LIVE
+   ========================================================= */
+
+function renderLive(data) {
+
+  liveData = data;
+
+
+  const rate =
+    Number(data.rate_22k);
+
+
+  const rate8 =
+    Number.isFinite(
+      Number(data.rate_8g)
+    )
+      ? Number(data.rate_8g)
+      : rate * 8;
+
+
+  $("hero8")
+    .textContent =
+      money(rate8);
+
+
+  $("hero1")
+    .textContent =
+      money(rate);
+
+
+  $("todayDate")
+    .textContent =
+      formatDate(data.date);
+
+
+  $("todayTime")
+    .textContent =
+      formatTime(data.time);
+
+
+  $("session")
+    .textContent =
+      data.session ||
+      "—";
+
+
+  /* CHANGE */
+
+  let change =
+    Number(
+      data.change || 0
+    );
+
+
+  const badge =
+    $("changeBadge");
+
+
+  badge.className =
+    "change " +
+    (
+      change > 0
+        ? "up"
+        : change < 0
+          ? "down"
+          : "same"
+    );
+
+
+  if (change > 0) {
+
+    badge.textContent =
+      "▲ " +
+      money(change) +
+      " / gram";
+
+  } else if (change < 0) {
+
+    badge.textContent =
+      "▼ " +
+      money(
+        Math.abs(change)
+      ) +
+      " / gram";
+
+  } else {
+
+    badge.textContent =
+      "No rate change";
+
+  }
+
+
+  renderToday();
+
+
+  renderLastChange();
+
+}
+
+
+/* =========================================================
+   TODAY
+   ========================================================= */
+
+function renderToday() {
+
+  if (!liveData) {
+    return;
+  }
+
+
+  const today =
+    liveData.date;
+
+
+  const changes =
+    Array.isArray(
+      liveData.intraday
+    )
+      ? liveData.intraday.filter(
+          item =>
+            item.date === today
+        )
+      : [];
+
+
+  let am =
+    changes.find(
+      item =>
+        item.session === "AM"
+    );
+
+
+  let pm =
+    changes.find(
+      item =>
+        item.session === "PM"
+    );
+
+
+  /*
+     If live.json has current session information,
+     use it as today's observation.
+  */
+
+  if (
+    !am &&
+    liveData.session === "AM"
+  ) {
+
+    am = {
+      rate_22k:
+        liveData.rate_22k,
+      time:
+        liveData.time
+    };
+
+  }
+
+
+  if (
+    !pm &&
+    liveData.session === "PM"
+  ) {
+
+    pm = {
+      rate_22k:
+        liveData.rate_22k,
+      time:
+        liveData.time
+    };
+
+  }
+
+
+  $("amRate")
+    .textContent =
+      am
+        ? money(am.rate_22k)
+        : "—";
+
+
+  $("amTime")
+    .textContent =
+      am
+        ? formatTime(am.time)
+        : "Not recorded";
+
+
+  $("pmRate")
+    .textContent =
+      pm
+        ? money(pm.rate_22k)
+        : "—";
+
+
+  $("pmTime")
+    .textContent =
+      pm
+        ? formatTime(pm.time)
+        : "Not recorded";
+
+
+  $("todaySummary")
+    .textContent =
+      changes.length
+        ? changes.length +
+          " detected change" +
+          (
+            changes.length === 1
+              ? ""
+              : "s"
+          )
+        : "No detected change";
+
+}
+
+
+/* =========================================================
+   LAST CHANGE
+   ========================================================= */
+
+function renderLastChange() {
+
+  if (!liveData) {
+    return;
+  }
+
+
+  const last =
+    liveData.last_change;
+
+
+  if (!last) {
+
+    $("lastChangeDate")
+      .textContent =
+      "No recorded change";
+
+    $("lastChangeTime")
+      .textContent =
+      "—";
+
+    $("lastChangeAmount")
+      .textContent =
+      "—";
+
+    return;
+
+  }
+
+
+  $("lastChangeDate")
+    .textContent =
+    formatDate(
+      last.date
+    );
+
+
+  $("lastChangeTime")
+    .textContent =
+    formatTime(
+      last.time
+    ) +
+    (
+      last.session
+        ? " · " +
+          last.session
+        : ""
+    );
+
+
+  const amount =
+    Number(
+      last.change || 0
+    );
+
+
+  $("lastChangeAmount")
+    .textContent =
+      amount > 0
+        ? "▲ " +
+          money(amount)
+        : amount < 0
+          ? "▼ " +
+            money(
+              Math.abs(amount)
+            )
+          : "• " +
+            money(
+              Math.abs(amount)
+            );
+
+
+  $("lastChangeAmount")
+    .className =
+      "last-amount " +
+      (
+        amount > 0
+          ? "positive"
+          : amount < 0
+            ? "negative"
+            : ""
+      );
+
+}
+
+
+/* =========================================================
+   HISTORY STATS
+   ========================================================= */
+
+function renderHistoryStats() {
+
+  if (!historyData.length) {
+    return;
+  }
+
+
+  const values =
+    historyData.map(
+      item =>
+        item.rate_22k
+    );
+
+
+  const high =
+    Math.max(...values);
+
+  const low =
+    Math.min(...values);
+
+
+  const highItem =
+    historyData.find(
+      item =>
+        item.rate_22k === high
+    );
+
+
+  const lowItem =
+    historyData.find(
+      item =>
+        item.rate_22k === low
+    );
+
+
+  $("threeYearHigh")
+    .textContent =
+    money(high);
+
+
+  $("threeYearLow")
+    .textContent =
+    money(low);
+
+
+  $("threeYearHighDate")
+    .textContent =
+    formatDate(
+      highItem?.date
+    );
+
+
+  $("threeYearLowDate")
+    .textContent =
+    formatDate(
+      lowItem?.date
+    );
+
+
+  $("historyCount")
+    .textContent =
+    historyData.length
+      .toLocaleString(
+        "en-IN"
+      ) +
+      " records";
+
+
+  renderHistoryTable();
+
+  setupDateDefaults();
+
+  compareDates();
+
+  drawChart();
+
+}
+
+
+/* =========================================================
+   HISTORY TABLE
+   ========================================================= */
+
+function renderHistoryTable() {
+
+  const body =
+    $("historyBody");
+
+
+  if (!historyData.length) {
+
+    body.innerHTML =
+      `<tr>
+        <td colspan="3">
+          No historical data available.
+        </td>
+      </tr>`;
+
+    return;
+  }
+
+
+  body.innerHTML =
+    historyData
+      .slice()
+      .reverse()
+      .slice(
+        0,
+        500
+      )
+      .map(
+        item =>
+          `<tr>
+            <td>
+              ${escapeHTML(
+                formatDate(
+                  item.date
+                )
+              )}
+            </td>
+
+            <td>
+              ${money(
+                item.rate_22k
+              )}
+            </td>
+
+            <td>
+              ${money(
+                item.rate_22k * 8
+              )}
+            </td>
+          </tr>`
+      )
+      .join("");
+
+}
+
+
+/* =========================================================
+   ESCAPE
+   ========================================================= */
+
+function escapeHTML(value) {
+
+  return String(
+    value ?? ""
+  )
+    .replaceAll(
+      "&",
+      "&amp;"
+    )
+    .replaceAll(
+      "<",
+      "&lt;"
+    )
+    .replaceAll(
+      ">",
+      "&gt;"
+    )
+    .replaceAll(
+      '"',
+      "&quot;"
+    );
+
+}
+
+
+/* =========================================================
+   CHART DATA
+   ========================================================= */
+
+function getChartData() {
+
+  if (
+    selectedRange ===
+    "all"
+  ) {
+
+    return historyData;
+
+  }
+
+
+  return historyData.slice(
+    Math.max(
+      0,
+      historyData.length -
+      Number(
+        selectedRange
+      )
+    )
+  );
+
+}
+
+
+/* =========================================================
+   DRAW CHART
+   ========================================================= */
+
+function drawChart() {
+
+  const canvas =
+    $("chart");
+
+
+  const container =
+    canvas.parentElement;
+
+
+  const width =
+    container.clientWidth;
+
+
+  const height =
+    container.clientHeight;
+
+
+  if (
+    !width ||
+    !height
+  ) {
+    return;
+  }
+
+
+  const dpr =
+    window.devicePixelRatio ||
+    1;
+
+
+  canvas.width =
+    Math.round(
+      width * dpr
+    );
+
+
+  canvas.height =
+    Math.round(
+      height * dpr
+    );
+
+
+  const ctx =
+    canvas.getContext(
+      "2d"
+    );
+
+
+  ctx.setTransform(
+    dpr,
+    0,
+    0,
+    dpr,
+    0,
+    0
+  );
+
+
+  ctx.clearRect(
+    0,
+    0,
+    width,
+    height
+  );
+
+
+  const data =
+    getChartData();
+
+
+  $("chartCount")
+    .textContent =
+      data.length
+        .toLocaleString(
+          "en-IN"
+        ) +
+      " days";
+
+
+  if (
+    data.length <
+    2
+  ) {
+
+    ctx.fillStyle =
+      "#777";
+
+    ctx.textAlign =
+      "center";
+
+    ctx.font =
+      "13px system-ui";
+
+    ctx.fillText(
+      "Not enough historical data",
+      width / 2,
+      height / 2
+    );
+
+    $("chartStart")
+      .textContent =
+      "—";
+
+    $("chartEnd")
+      .textContent =
+      "—";
+
+    $("periodChange")
+      .textContent =
+      "—";
+
+    $("periodHigh")
+      .textContent =
+      "—";
+
+    $("periodLow")
+      .textContent =
+      "—";
+
+    return;
+  }
+
+
+  const values =
+    data.map(
+      item =>
+        item.rate_22k
+    );
+
+
+  const minValue =
+    Math.min(
+      ...values
+    );
+
+
+  const maxValue =
+    Math.max(
+      ...values
+    );
+
+
+  const padding =
+    Math.max(
+      80,
+      (maxValue - minValue) * .1
+    );
+
+
+  const min =
+    minValue - padding;
+
+
+  const max =
+    maxValue + padding;
+
+
+  const left = 48;
+
+  const right = 10;
+
+  const top = 12;
+
+  const bottom = 27;
+
+
+  const plotWidth =
+    width -
+    left -
+    right;
+
+
+  const plotHeight =
+    height -
+    top -
+    bottom;
+
+
+  function x(index) {
+
+    return (
+      left +
+      (
+        index /
+        (data.length - 1)
+      ) *
+      plotWidth
+    );
+
+  }
+
+
+  function y(value) {
+
+    return (
+      top +
+      (
+        1 -
+        (
+          value - min
+        ) /
+        (
+          max - min
+        )
+      ) *
+      plotHeight
+    );
+
+  }
+
+
+  /* GRID */
+
+  ctx.font =
+    "10px system-ui";
+
+  ctx.textAlign =
+    "right";
+
+
+  for (
+    let i = 0;
+    i <= 4;
+    i++
+  ) {
+
+    const gy =
+      top +
+      plotHeight *
+      i /
+      4;
+
+
+    ctx.strokeStyle =
+      "rgba(120,120,120,.15)";
+
+    ctx.lineWidth =
+      1;
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+      left,
+      gy
+    );
+
+    ctx.lineTo(
+      width - right,
+      gy
+    );
+
+    ctx.stroke();
+
+
+    const value =
+      max -
+      (
+        max - min
+      ) *
+      i /
+      4;
+
+
+    ctx.fillStyle =
+      "#888";
+
+    ctx.fillText(
+      money(value),
+      left - 5,
+      gy + 3
+    );
+
+  }
+
+
+  /* FILL */
+
+  ctx.beginPath();
+
+  ctx.moveTo(
+    x(0),
+    y(values[0])
+  );
+
+
+  for (
+    let i = 1;
+    i < values.length;
+    i++
+  ) {
+
+    ctx.lineTo(
+      x(i),
+      y(values[i])
+    );
+
+  }
+
+
+  ctx.lineTo(
+    x(values.length - 1),
+    height - bottom
+  );
+
+
+  ctx.lineTo(
+    x(0),
+    height - bottom
+  );
+
+
+  ctx.closePath();
+
+
+  const gradient =
+    ctx.createLinearGradient(
+      0,
+      top,
+      0,
+      height
+    );
+
+
+  gradient.addColorStop(
+    0,
+    "rgba(155,107,22,.22)"
+  );
+
+
+  gradient.addColorStop(
+    1,
+    "rgba(155,107,22,.02)"
+  );
+
+
+  ctx.fillStyle =
+    gradient;
+
+  ctx.fill();
+
+
+  /* LINE */
+
+  ctx.beginPath();
+
+  ctx.moveTo(
+    x(0),
+    y(values[0])
+  );
+
+
+  for (
+    let i = 1;
+    i < values.length;
+    i++
+  ) {
+
+    ctx.lineTo(
+      x(i),
+      y(values[i])
+    );
+
+  }
+
+
+  ctx.strokeStyle =
+    "#9b6b16";
+
+  ctx.lineWidth =
+    2.5;
+
+  ctx.lineJoin =
+    "round";
+
+  ctx.lineCap =
+    "round";
+
+  ctx.stroke();
+
+
+  /* CURRENT POINT */
+
+  ctx.beginPath();
+
+  ctx.arc(
+    x(values.length - 1),
+    y(
+      values[
+        values.length - 1
+      ]
+    ),
+    4,
+    0,
+    Math.PI * 2
+  );
+
+
+  ctx.fillStyle =
+    "#9b6b16";
+
+  ctx.fill();
+
+
+  /* META */
+
+  $("chartStart")
+    .textContent =
+    formatDate(
+      data[0].date
+    );
+
+
+  $("chartEnd")
+    .textContent =
+    formatDate(
+      data[
+        data.length - 1
+      ].date
+    );
+
+
+  const first =
+    values[0];
+
+
+  const last =
+    values[
+      values.length - 1
+    ];
+
+
+  const difference =
+    last - first;
+
+
+  const percentage =
+    first
+      ? (
+          difference /
+          first *
+          100
+        )
+      : 0;
+
+
+  $("periodChange")
+    .textContent =
+      (
+        difference >= 0
+          ? "+"
+          : ""
+      ) +
+      money(difference) +
+      " (" +
+      (
+        percentage >= 0
+          ? "+"
+          : ""
+      ) +
+      percentage.toFixed(1) +
+      "%)";
+
+
+  $("periodChange")
+    .className =
+      difference > 0
+        ? "positive"
+        : difference < 0
+          ? "negative"
+          : "";
+
+
+  $("periodHigh")
+    .textContent =
+    money(maxValue);
+
+
+  $("periodLow")
+    .textContent =
+    money(minValue);
+
+}
+
+
+/* =========================================================
+   DATE DEFAULTS
+   ========================================================= */
+
+function setupDateDefaults() {
+
+  if (!historyData.length) {
+    return;
+  }
+
+
+  if (!$("dateA").value) {
+
+    $("dateA").value =
+      historyData[0].date;
+
+  }
+
+
+  if (!$("dateB").value) {
+
+    $("dateB").value =
+      historyData[
+        historyData.length - 1
+      ].date;
+
+  }
+
+}
+
+
+/* =========================================================
+   DATE COMPARISON
+   ========================================================= */
+
+function compareDates() {
+
+  const dateA =
+    $("dateA").value;
+
+
+  const dateB =
+    $("dateB").value;
+
+
+  const a =
+    historyData.find(
+      item =>
+        item.date === dateA
+    );
+
+
+  const b =
+    historyData.find(
+      item =>
+        item.date === dateB
+    );
+
+
+  const result =
+    $("compareResult");
+
+
+  if (!a || !b) {
+
+    result.textContent =
+      "Choose two dates available in the historical data.";
+
+    return;
+  }
+
+
+  const difference =
+    b.rate_22k -
+    a.rate_22k;
+
+
+  const percentage =
+    a.rate_22k
+      ? (
+          difference /
+          a.rate_22k *
+          100
+        )
+      : 0;
+
+
+  result.innerHTML =
+    `<strong>
+      ${money(a.rate_22k)}
+      →
+      ${money(b.rate_22k)}
+    </strong>
+
+    <br>
+
+    <span class="${
+      difference > 0
+        ? "positive"
+        : difference < 0
+          ? "negative"
+          : ""
+    }">
+
+      ${
+        difference >= 0
+          ? "+"
+          : ""
+      }
+
+      ${money(difference)}
+
+      / gram ·
+
+      ${
+        percentage >= 0
+          ? "+"
+          : ""
+      }
+
+      ${percentage.toFixed(2)}%
+
+    </span>
+
+    <br>
+
+    <small>
+
+      ${formatDate(a.date)}
+      →
+      ${formatDate(b.date)}
+
+      · 8g difference:
+      ${money(difference * 8)}
+
+    </small>`;
+
+}
+
+
+/* =========================================================
+   CALCULATOR
+   ========================================================= */
+
+function calculate() {
+
+  if (!liveData) {
+    return;
+  }
+
+
+  const rate =
+    Number(
+      liveData.rate_22k
+    );
+
+
+  const weight =
+    Math.max(
+      0,
+      Number(
+        $("weight").value
+      ) || 0
+    );
+
+
+  const budget =
+    Math.max(
+      0,
+      Number(
+        $("budget").value
+      ) || 0
+    );
+
+
+  const making =
+    Math.max(
+      0,
+      Number(
+        $("making").value
+      ) || 0
+    );
+
+
+  if (
+    $("calcMode").value ===
+    "value"
+  ) {
+
+    const goldValue =
+      rate * weight;
+
+
+    const total =
+      goldValue *
+      (
+        1 +
+        making / 100
+      );
+
+
+    $("calcResult")
+      .textContent =
+      money(total);
+
+
+    $("calcSub")
+      .textContent =
+      weight.toLocaleString(
+        "en-IN"
+      ) +
+      " g · gold " +
+      money(goldValue) +
+      " · making charge " +
+      making +
+      "%";
+
+  } else {
+
+    const grams =
+      budget /
+      (
+        rate *
+        (
+          1 +
+          making / 100
+        )
+      );
+
+
+    $("calcResult")
+      .textContent =
+      grams.toFixed(3) +
+      " g";
+
+
+    $("calcSub")
+      .textContent =
+      "Budget " +
+      money(budget) +
+      " including " +
+      making +
+      "% making charge.";
+
+  }
+
+}
+
+
+/* =========================================================
+   LOAD DATA
+   ========================================================= */
+
+async function loadData() {
+
+  const [
+    live,
+    history
+  ] =
+    await Promise.all([
+      fetchJSON(
+        LIVE_URL
+      ),
+      fetchJSON(
+        HISTORY_URL
+      )
+    ]);
+
+
+  renderLive(
+    live
+  );
+
+
+  historyData =
+    normalizeHistory(
+      history
+    );
+
+
+  renderHistoryStats();
+
+  calculate();
+
+
+  /*
+     Save backup locally.
+     This allows the app to show the last known
+     price if GitHub Pages is temporarily unavailable.
+  */
+
+  localStorage.setItem(
+    "gold_live_backup",
+    JSON.stringify(
+      live
+    )
+  );
+
+
+  localStorage.setItem(
+    "gold_history_backup",
+    JSON.stringify(
+      historyData
+    )
+  );
+
+
+  return live;
+
+}
+
+
+/* =========================================================
+   NORMAL REFRESH
+   ========================================================= */
+
+async function refreshPublishedData() {
+
+  try {
+
+    setStatus(
+      "Loading latest published rate…"
+    );
+
+
+    await loadData();
+
+
+    setStatus(
+      "Updated · " +
+      new Date()
+        .toLocaleTimeString(
+          "en-IN",
+          {
+            hour:"numeric",
+            minute:"2-digit"
+          }
+        )
+    );
+
+  } catch(error) {
+
+    console.error(
+      error
+    );
+
+
+    /*
+       Try local backup.
+    */
+
+    try {
+
+      const savedLive =
+        JSON.parse(
+          localStorage.getItem(
+            "gold_live_backup"
+          ) || "null"
+        );
+
+
+      const savedHistory =
+        JSON.parse(
+          localStorage.getItem(
+            "gold_history_backup"
+          ) || "[]"
+        );
+
+
+      if (savedLive) {
+
+        renderLive(
+          savedLive
+        );
+
+      }
+
+
+      historyData =
+        normalizeHistory(
+          savedHistory
+        );
+
+
+      renderHistoryStats();
+
+      calculate();
+
+
+      setStatus(
+        "Offline · showing saved data",
+        true
+      );
+
+    } catch (_) {
+
+      setStatus(
+        "Unable to load data",
+        true
+      );
+
+    }
+
+  }
+
+}
+
+
+/* =========================================================
+   TRIGGER CLOUDFLARE WORKER
+   ========================================================= */
+
+async function triggerWorker() {
+
+  const response =
+    await fetch(
+      TRIGGER_URL,
+      {
+        method:"POST",
+
+        headers:{
+          "Content-Type":
+            "application/json"
+        },
+
+        body:JSON.stringify({
+          action:"fetch",
+          source:"Gold price 22k"
+        })
+      }
+    );
+
+
+  const text =
+    await response.text();
+
+
+  let result = null;
+
+
+  try {
+
+    result =
+      JSON.parse(
+        text
+      );
+
+  } catch (_) {
+
+    result = null;
+
+  }
+
+
+  if (!response.ok) {
+
+    throw new Error(
+      result?.error ||
+      "Cloudflare Worker HTTP " +
+      response.status
+    );
+
+  }
+
+
+  if (
+    result &&
+    result.ok === false
+  ) {
+
+    throw new Error(
+      result.error ||
+      "GitHub trigger failed"
+    );
+
+  }
+
+
+  return result;
+
+}
+
+
+/* =========================================================
+   WAIT FOR NEW JSON
+   ========================================================= */
+
+async function waitForUpdatedData(
+  previousTimestamp,
+  previousRate,
+  previousTime
+) {
+
+  let latest = null;
+
+
+  for (
+    let attempt = 1;
+    attempt <= MAX_POLLS;
+    attempt++
+  ) {
+
+    setStatus(
+      "Waiting for GitHub update… " +
+      attempt +
+      "/" +
+      MAX_POLLS
+    );
+
+
+    await new Promise(
+      resolve =>
+        setTimeout(
+          resolve,
+          POLL_INTERVAL
+        )
+    );
+
+
+    try {
+
+      latest =
+        await fetchJSON(
+          LIVE_URL
+        );
+
+
+      const timestamp =
+        latest?.timestamp ||
+        latest?.last_checked ||
+        "";
+
+
+      /*
+         Best signal:
+         generated timestamp changed.
+      */
+
+      if (
+        timestamp &&
+        timestamp !==
+        previousTimestamp
+      ) {
+
+        return latest;
+
+      }
+
+
+      /*
+         Fallback:
+         rate changed.
+      */
+
+      if (
+        Number(
+          latest?.rate_22k
+        ) !==
+        Number(
+          previousRate
+        )
+      ) {
+
+        return latest;
+
+      }
+
+
+      /*
+         Fallback:
+         time changed.
+      */
+
+      if (
+        latest?.time &&
+        latest.time !==
+        previousTime
+      ) {
+
+        return latest;
+
+      }
+
+    } catch(error) {
+
+      console.warn(
+        "Polling error:",
+        error
+      );
+
+    }
+
+  }
+
+
+  return latest;
+
+}
+
+
+/* =========================================================
+   MAIN FETCH BUTTON
+   ========================================================= */
+
+async function performFetch() {
+
+  if (fetching) {
+    return;
+  }
+
+
+  fetching = true;
+
+
+  const button =
+    $("fetchButton");
+
+
+  const refresh =
+    $("refreshButton");
+
+
+  const text =
+    $("fetchText");
+
+
+  const icon =
+    $("fetchIcon");
+
+
+  button.disabled =
+    true;
+
+
+  refresh.disabled =
+    true;
+
+
+  icon.classList.add(
+    "spin"
+  );
+
+
+  refresh.classList.add(
+    "spin"
+  );
+
+
+  try {
+
+    const previousTimestamp =
+      liveData?.timestamp ||
+      liveData?.last_checked ||
+      "";
+
+
+    const previousRate =
+      liveData?.rate_22k;
+
+
+    const previousTime =
+      liveData?.time;
+
+
+    /* STEP 1 */
+
+    text.textContent =
+      "Triggering GitHub…";
+
+
+    setStatus(
+      "Calling Cloudflare Worker…"
+    );
+
+
+    await triggerWorker();
+
+
+    /* STEP 2 */
+
+    text.textContent =
+      "GitHub is fetching…";
+
+
+    setStatus(
+      "GitHub Actions started…"
+    );
+
+
+    await new Promise(
+      resolve =>
+        setTimeout(
+          resolve,
+          INITIAL_WAIT
+        )
+    );
+
+
+    /* STEP 3 */
+
+    text.textContent =
+      "Waiting for new data…";
+
+
+    const updatedLive =
+      await waitForUpdatedData(
+        previousTimestamp,
+        previousRate,
+        previousTime
+      );
+
+
+    /* STEP 4 */
+
+    text.textContent =
+      "Refreshing app…";
+
+
+    const updatedHistory =
+      await fetchJSON(
+        HISTORY_URL
+      );
+
+
+    if (updatedLive) {
+
+      liveData =
+        updatedLive;
+
+      renderLive(
+        updatedLive
+      );
+
+      localStorage.setItem(
+        "gold_live_backup",
+        JSON.stringify(
+          updatedLive
+        )
+      );
+
+    }
+
+
+    historyData =
+      normalizeHistory(
+        updatedHistory
+      );
+
+
+    localStorage.setItem(
+      "gold_history_backup",
+      JSON.stringify(
+        historyData
+      )
+    );
+
+
+    renderHistoryStats();
+
+    calculate();
+
+
+    setStatus(
+      "Fetch complete · " +
+      new Date()
+        .toLocaleTimeString(
+          "en-IN",
+          {
+            hour:"numeric",
+            minute:"2-digit"
+          }
+        )
+    );
+
+
+    showToast(
+      "GitHub fetched · app updated"
+    );
+
+
+  } catch(error) {
+
+    console.error(
+      "FETCH ERROR:",
+      error
+    );
+
+
+    setStatus(
+      "Fetch failed · current data retained",
+      true
+    );
+
+
+    showToast(
+      error.message ||
+      "Fetch failed"
+    );
+
+
+  } finally {
+
+    fetching = false;
+
+
+    button.disabled =
+      false;
+
+
+    refresh.disabled =
+      false;
+
+
+    icon.classList.remove(
+      "spin"
+    );
+
+
+    refresh.classList.remove(
+      "spin"
+    );
+
+
+    text.textContent =
+      "Fetch latest rate";
+
+  }
+
+}
+
+
+/* =========================================================
+   BUTTONS
+   ========================================================= */
+
+$("fetchButton")
+  .addEventListener(
+    "click",
+    performFetch
+  );
+
+
+$("refreshButton")
+  .addEventListener(
+    "click",
+    performFetch
+  );
+
+
+/* =========================================================
+   CHART RANGE BUTTONS
+   ========================================================= */
+
+document
+  .querySelectorAll(
+    ".segments button"
+  )
+  .forEach(
+    button => {
+
+      button.addEventListener(
+        "click",
+        () => {
+
+          document
+            .querySelectorAll(
+              ".segments button"
+            )
+            .forEach(
+              item =>
+                item.classList.remove(
+                  "active"
+                )
+            );
+
+
+          button.classList.add(
+            "active"
+          );
+
+
+          selectedRange =
+            button.dataset.range ===
+            "all"
+              ? "all"
+              : Number(
+                  button.dataset.range
+                );
+
+
+          drawChart();
+
+        }
+      );
+
+    }
+  );
+
+
+/* =========================================================
+   DATE INPUTS
+   ========================================================= */
+
+$("dateA")
+  .addEventListener(
+    "change",
+    compareDates
+  );
+
+
+$("dateB")
+  .addEventListener(
+    "change",
+    compareDates
+  );
+
+
+/* =========================================================
+   CALCULATOR INPUTS
+   ========================================================= */
+
+[
+  "weight",
+  "budget",
+  "making",
+  "calcMode"
+]
+.forEach(
+  id => {
+
+    $(id)
+      .addEventListener(
+        "input",
+        calculate
+      );
+
+    $(id)
+      .addEventListener(
+        "change",
+        calculate
+      );
+
+  }
+);
+
+
+/* =========================================================
+   RESIZE
+   ========================================================= */
+
+window.addEventListener(
+  "resize",
+  drawChart
+);
+
+
+/* =========================================================
+   VISIBILITY
+   ========================================================= */
+
+document.addEventListener(
+  "visibilitychange",
+  () => {
+
+    if (
+      document.visibilityState ===
+      "visible"
+    ) {
+
+      /*
+         Returning to the app only reloads
+         published JSON.
+
+         It does NOT unnecessarily trigger
+         GitHub Actions.
+      */
+
+      refreshPublishedData();
+
+    }
+
+  }
+);
+
+
+/* =========================================================
+   INITIAL LOAD
+   ========================================================= */
+
+refreshPublishedData();
+
+</script>
+
+</body>
+</html>
