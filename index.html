@@ -208,6 +208,10 @@ button:active::after {
   width: 50px;
   height: 50px;
 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
   border: none;
   border-radius: var(--shape-full);
 
@@ -219,6 +223,14 @@ button:active::after {
   box-shadow: var(--el1);
 
   transition: background .2s var(--ease-standard), transform .15s var(--ease-standard), box-shadow .2s var(--ease-standard);
+}
+
+.iconbtn svg {
+  display: block;
+  width: 24px;
+  height: 24px;
+
+  transform-origin: 50% 50%;
 }
 
 .iconbtn:active {
@@ -356,9 +368,18 @@ button:active::after {
 
 .pulldown .pulldownicon {
   display: inline-flex;
-  font-size: 15px;
+  align-items: center;
+  justify-content: center;
 
   transition: transform .15s var(--ease-standard);
+}
+
+.pulldown .pulldownicon svg {
+  display: block;
+  width: 16px;
+  height: 16px;
+
+  transform-origin: 50% 50%;
 }
 
 .pulldown.ready .pulldownicon {
@@ -1227,7 +1248,12 @@ footer {
   id="pulldown"
   aria-hidden="true"
 >
-  <span class="pulldownicon" id="pulldownIcon">↻</span>
+  <span class="pulldownicon" id="pulldownIcon">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M21 12a9 9 0 1 1-2.64-6.36"/>
+      <polyline points="21 3 21 9 15 9"/>
+    </svg>
+  </span>
   <span id="pulldownText">Pull to refresh</span>
 </div>
 
@@ -1250,7 +1276,10 @@ footer {
     aria-label="Fetch latest rate"
     type="button"
   >
-    ↻
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M21 12a9 9 0 1 1-2.64-6.36"/>
+      <polyline points="21 3 21 9 15 9"/>
+    </svg>
   </button>
 
 </header>
