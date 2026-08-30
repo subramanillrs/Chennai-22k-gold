@@ -160,21 +160,30 @@ button, input, select {
 }
 
 /* =========================================================
-   TOPBAR & STATUS
+   TOPBAR & STATUS (FLUSH LEFT-ALIGNED WITH APP GRID)
    ========================================================= */
 .topbar {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   gap: 8px;
-  padding: 2px 0 4px;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+}
+
+.brand-text {
+  padding: 0;
+  margin: 0;
 }
 
 .brand-text h1 {
   font-size: 26px;
   font-weight: 800;
   letter-spacing: -0.035em;
-  line-height: 1.1;
+  line-height: 1.15;
+  margin: 0;
+  padding: 0;
 }
 
 .status-indicator {
@@ -190,6 +199,7 @@ button, input, select {
   color: var(--text-secondary);
   box-shadow: var(--shadow-sm);
   white-space: nowrap;
+  margin: 0;
 }
 
 .dot {
@@ -225,6 +235,7 @@ button, input, select {
   display: flex;
   flex-direction: column;
   gap: 16px;
+  width: 100%;
 }
 
 .hero-top {
@@ -366,6 +377,7 @@ button, input, select {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
+  width: 100%;
 }
 
 .stat-card {
@@ -419,6 +431,7 @@ button, input, select {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  width: 100%;
 }
 
 .section-head {
@@ -426,6 +439,8 @@ button, input, select {
   align-items: baseline;
   justify-content: space-between;
   padding: 0;
+  margin: 0;
+  width: 100%;
 }
 
 .section-head h3 {
@@ -446,12 +461,14 @@ button, input, select {
   border-radius: var(--radius-md);
   padding: 16px;
   box-shadow: var(--shadow-card);
+  width: 100%;
 }
 
 .session-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 10px;
+  width: 100%;
 }
 
 .session-box {
@@ -539,6 +556,7 @@ button, input, select {
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 8px;
   margin-bottom: 16px;
+  width: 100%;
 }
 
 .metric-card {
@@ -597,6 +615,7 @@ button, input, select {
   margin-top: 10px;
   padding-top: 8px;
   border-top: 1px dashed var(--border-subtle);
+  width: 100%;
 }
 
 /* =========================================================
@@ -609,6 +628,7 @@ button, input, select {
   scrollbar-width: none;
   padding-bottom: 4px;
   margin-bottom: 14px;
+  width: 100%;
 }
 .chip-container::-webkit-scrollbar { display: none; }
 
@@ -639,6 +659,7 @@ button, input, select {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 14px 12px;
+  width: 100%;
 }
 
 .calc-field {
@@ -688,6 +709,7 @@ select.calc-input {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  width: 100%;
 }
 
 .receipt-title {
@@ -763,6 +785,7 @@ select.calc-input {
   border-radius: var(--radius-xs);
   font-size: 12.5px;
   line-height: 1.5;
+  width: 100%;
 }
 
 .compare-result strong {
@@ -783,6 +806,7 @@ select.calc-input {
   overflow-y: auto;
   padding: 0;
   border: 1px solid var(--border-subtle);
+  width: 100%;
 }
 
 .history-table {
@@ -823,6 +847,7 @@ select.calc-input {
   border-bottom: none;
 }
 
+/* Explicit Proportional Widths */
 .history-table th:nth-child(1), .history-table td:nth-child(1) {
   text-align: left;
   width: 34%;
@@ -968,6 +993,7 @@ footer {
 
 <div class="app">
 
+  <!-- Pull down refresh visual -->
   <div class="pulldown" id="pulldown" aria-hidden="true">
     <span class="pulldownicon" id="pulldownIcon">
       <svg class="icon-idle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="14" height="14">
@@ -980,6 +1006,7 @@ footer {
     <span id="pulldownText">Pull to refresh</span>
   </div>
 
+  <!-- Header with Title and Status Directly Below It (Flush Left) -->
   <header class="topbar">
     <div class="brand-text">
       <h1>Gold 22k rate</h1>
@@ -990,8 +1017,10 @@ footer {
     </div>
   </header>
 
+  <!-- Hidden legacy trigger for worker compatibility -->
   <div hidden><button id="fetchNow"><span id="fetchNowText">Fetch</span></button></div>
 
+  <!-- Hero Overview (With Share Action) -->
   <section class="hero">
     <div class="hero-top">
       <span class="hero-label">1 Sovereign (8 Grams)</span>
@@ -1026,6 +1055,7 @@ footer {
     </div>
   </section>
 
+  <!-- Strictly Uniform 3-Column Quick Stats -->
   <section class="quick-grid">
     <div class="stat-card">
       <span class="label">Session</span>
@@ -1044,6 +1074,7 @@ footer {
     </div>
   </section>
 
+  <!-- 2-Column Intraday Sessions -->
   <section class="section">
     <div class="section-head">
       <h3>Intraday Sessions</h3>
@@ -1063,6 +1094,7 @@ footer {
     </div>
   </section>
 
+  <!-- Historical Chart Section (Interactive Scrubbing) -->
   <section class="section">
     <div class="section-head">
       <h3>Price History Trend</h3>
@@ -1106,6 +1138,7 @@ footer {
     </div>
   </section>
 
+  <!-- Last Observed Movement -->
   <section class="section">
     <div class="section-head">
       <h3>Last Rate Movement</h3>
@@ -1119,6 +1152,7 @@ footer {
     </div>
   </section>
 
+  <!-- Historical Compare Utility -->
   <section class="section">
     <div class="section-head">
       <h3>Compare Historical Dates</h3>
@@ -1138,6 +1172,7 @@ footer {
     </div>
   </section>
 
+  <!-- Enhanced Purchase Calculator (With Quick Chips) -->
   <section class="section">
     <div class="section-head">
       <h3>Jewelry Purchase Calculator</h3>
@@ -1183,6 +1218,7 @@ footer {
         </div>
       </div>
 
+      <!-- Itemized Receipt Card -->
       <div class="receipt-box">
         <div class="receipt-title">Itemized Cost Breakdown</div>
         <div class="receipt-line">
@@ -1210,6 +1246,7 @@ footer {
     </div>
   </section>
 
+  <!-- Strictly Balanced 3-Column History Table -->
   <section class="section">
     <div class="section-head">
       <h3>Historical Log</h3>
@@ -1238,6 +1275,7 @@ footer {
 
 </div>
 
+<!-- Floating Action Button -->
 <div class="fab-anchor">
   <button class="fab-btn" id="refresh" aria-label="Fetch latest rate" type="button">
     <span class="fab-icon">
@@ -1252,6 +1290,7 @@ footer {
   </button>
 </div>
 
+<!-- Themed Matching Toast Notification -->
 <div class="toast" id="toast"></div>
 
 <script>
@@ -1305,27 +1344,6 @@ const timeText = s => {
 
 const esc = s => String(s ?? "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;");
 
-function animateCount(elem, start, end, isCurrency = true) {
-  if (!Number.isFinite(end)) {
-    elem.textContent = isCurrency ? "₹—" : "—";
-    return;
-  }
-  const duration = 400;
-  const startTime = performance.now();
-  const diff = end - start;
-
-  function step(now) {
-    const elapsed = now - startTime;
-    const progress = Math.min(elapsed / duration, 1);
-    const ease = 1 - Math.pow(1 - progress, 3);
-    const current = start + diff * ease;
-    elem.textContent = isCurrency ? money(current) : Math.round(current).toString();
-    if (progress < 1) requestAnimationFrame(step);
-    else elem.textContent = isCurrency ? money(end) : end.toString();
-  }
-  requestAnimationFrame(step);
-}
-
 function setStatus(text, offline = false) {
   $("statusText").textContent = text;
   $("status").classList.toggle("offline", offline);
@@ -1358,7 +1376,7 @@ function normalize(array) {
 }
 
 /* =========================================================
-   RENDER ENGINE
+   RENDER ENGINE (INSTANT STATIC RENDERING)
    ========================================================= */
 function renderLive(d) {
   if (!d) return;
@@ -1367,9 +1385,8 @@ function renderLive(d) {
   const rate = Number(d.rate_22k);
   const rate8 = Number.isFinite(Number(d.rate_8g)) ? Number(d.rate_8g) : rate * 8;
 
-  animateCount($("hero8"), 0, rate8, true);
-  animateCount($("hero1"), 0, rate, true);
-
+  $("hero8").textContent = money(rate8);
+  $("hero1").textContent = money(rate);
   $("today").textContent = dateText(d.date);
   $("todayTime").textContent = timeText(d.time);
   $("session").textContent = d.session || "—";
@@ -1524,7 +1541,6 @@ function drawChart() {
   const activeY = py(values[activeIndex]);
 
   if (scrubIndex >= 0) {
-    // Crosshair line
     ctx.strokeStyle = colorGold;
     ctx.lineWidth = 1;
     ctx.setLineDash([4, 4]);
@@ -1534,7 +1550,6 @@ function drawChart() {
     ctx.stroke();
     ctx.setLineDash([]);
 
-    // Floating Tooltip Tag
     const tooltipText = `${dateText(data[activeIndex].date)}: ${money(values[activeIndex])}/g`;
     ctx.font = "bold 11px var(--font-display)";
     const tagW = ctx.measureText(tooltipText).width + 16;
@@ -1561,7 +1576,6 @@ function drawChart() {
     ctx.fillText(tooltipText, tagX + tagW / 2, tagY + 16);
   }
 
-  // Active Point
   ctx.fillStyle = colorGold;
   ctx.beginPath();
   ctx.arc(activeX, activeY, scrubIndex >= 0 ? 6 : 4.5, 0, Math.PI * 2);
@@ -1592,7 +1606,7 @@ function drawChart() {
   $("periodLow").textContent = money(min0);
 }
 
-/* Setup Scrub Gesture on Canvas */
+/* Scrub Gesture */
 (function setupChartScrub() {
   const canvas = $("chart");
   if (!canvas) return;
@@ -1684,7 +1698,6 @@ function calculate() {
   }
 }
 
-// Preset Chip Clicks
 document.querySelectorAll("#weightChips .chip").forEach(chip => {
   chip.onclick = () => {
     haptic(10);
