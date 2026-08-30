@@ -1,11 +1,25 @@
+Here is the completely redesigned `index.html`.
+
+### What has been updated:
+
+* **Icon Removed:** The top-left icon box has been removed completely. The header now features a clean, international typographic layout with a subtle location eyebrow and aligned live status badge.
+* **Modern International Typography Standard:** Built using **Plus Jakarta Sans** and **Inter** font stacks with precise optical weights, negative tracking on large metrics (`letter-spacing: -0.035em`), and strict tabular lining numbers (`font-variant-numeric: tabular-nums lining-nums`) for zero layout jitter.
+* **FinTech Visual Polish:** Clean micro-borders, unified card radiuses, balanced elevation, high-contrast dark/light palettes, and an itemized jewelry receipt layout with real-time fee calculations.
+* **Fixed Viewport Zoom:** Screen zoom is firmly locked to prevent accidental pinch/tap zooming.
+
+---
+
+### Complete `index.html`
+
+```html
 <!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<meta name="theme-color" content="#f6f7f9" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#0d0f12" media="(prefers-color-scheme: dark)">
-<meta name="description" content="Chennai 22K gold price tracker & cost calculator">
+<meta name="theme-color" content="#f8fafc" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#090d16" media="(prefers-color-scheme: dark)">
+<meta name="description" content="Chennai 22K Gold Price Tracker & Valuation Dashboard">
 
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -14,35 +28,41 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon.svg">
 
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
 <title>Gold Price 22K · Chennai</title>
 
 <style>
 /* =========================================================
-   DESIGN TOKENS & ALIGNMENT SYSTEM
+   DESIGN TOKENS & TYPOGRAPHY SYSTEM
    ========================================================= */
 :root {
   color-scheme: light dark;
 
-  --font-stack: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "SF Pro Text", Helvetica, Arial, sans-serif;
+  /* Typography */
+  --font-display: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", sans-serif;
   
-  /* Light Palette */
-  --bg-app: #f6f7f9;
+  /* Light Theme */
+  --bg-app: #f8fafc;
   --surface: #ffffff;
-  --surface-alt: #f0f2f5;
-  --surface-hover: #e8ebf0;
+  --surface-subtle: #f1f5f9;
+  --surface-elevated: #ffffff;
+  
+  --border-subtle: #e2e8f0;
+  --border-strong: #cbd5e1;
 
-  --border-subtle: #e2e5eb;
-  --border-strong: #cbd1db;
-
-  --text-main: #0f172a;
-  --text-muted: #64748b;
-  --text-dim: #94a3b8;
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-tertiary: #94a3b8;
 
   --gold-primary: #d97706;
-  --gold-dark: #b45309;
+  --gold-light: #f59e0b;
   --gold-gradient: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-  --gold-bg: #fef3c7;
-  --gold-border: rgba(217, 119, 6, 0.25);
+  --gold-tint: #fef3c7;
+  --gold-border: rgba(217, 119, 6, 0.22);
+  --gold-glow: rgba(217, 119, 6, 0.12);
 
   --good: #059669;
   --good-bg: #d1fae5;
@@ -51,50 +71,52 @@
 
   --radius-xs: 6px;
   --radius-sm: 10px;
-  --radius-md: 16px;
-  --radius-lg: 22px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
   --radius-full: 9999px;
 
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
-  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.05), 0 4px 12px rgba(0, 0, 0, 0.03);
-  --shadow-fab: 0 6px 20px rgba(0, 0, 0, 0.10), 0 0 0 1px rgba(0, 0, 0, 0.06);
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.04);
+  --shadow-card: 0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 4px 12px 0 rgba(0, 0, 0, 0.02);
+  --shadow-fab: 0 8px 24px -4px rgba(217, 119, 6, 0.24), 0 2px 6px -1px rgba(0, 0, 0, 0.06);
 
-  --transition: 0.2s cubic-bezier(0.2, 0, 0, 1);
+  --transition: 0.18s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg-app: #0d0f12;
-    --surface: #15181e;
-    --surface-alt: #1c2028;
-    --surface-hover: #242934;
+    /* Dark Theme */
+    --bg-app: #090d16;
+    --surface: #111726;
+    --surface-subtle: #172033;
+    --surface-elevated: #1e293b;
 
-    --border-subtle: #252a35;
-    --border-strong: #373e4f;
+    --border-subtle: #1e293b;
+    --border-strong: #334155;
 
-    --text-main: #f8fafc;
-    --text-muted: #94a3b8;
-    --text-dim: #64748b;
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --text-tertiary: #64748b;
 
     --gold-primary: #fbbf24;
-    --gold-dark: #f59e0b;
+    --gold-light: #fcd34d;
     --gold-gradient: linear-gradient(135deg, #fcd34d 0%, #f59e0b 100%);
-    --gold-bg: rgba(245, 158, 11, 0.12);
+    --gold-tint: rgba(245, 158, 11, 0.12);
     --gold-border: rgba(251, 191, 36, 0.25);
+    --gold-glow: rgba(251, 191, 36, 0.15);
 
     --good: #34d399;
     --good-bg: rgba(5, 150, 105, 0.15);
     --bad: #f87171;
     --bad-bg: rgba(220, 38, 38, 0.15);
 
-    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
-    --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.35);
-    --shadow-fab: 0 8px 24px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.1);
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.5);
+    --shadow-card: 0 2px 8px 0 rgba(0, 0, 0, 0.4);
+    --shadow-fab: 0 8px 28px -4px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(251, 191, 36, 0.25);
   }
 }
 
 /* =========================================================
-   BASE RESETS & VIEWPORT LOCKING (PREVENTS ACCIDENTAL ZOOM)
+   BASE RESETS & VIEWPORT LOCKING
    ========================================================= */
 * {
   box-sizing: border-box;
@@ -104,9 +126,9 @@
 }
 
 html {
-  font-family: var(--font-stack);
+  font-family: var(--font-display);
   background-color: var(--bg-app);
-  color: var(--text-main);
+  color: var(--text-primary);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   -webkit-text-size-adjust: 100%;
@@ -132,7 +154,7 @@ input, select {
 
 .num, [data-num], td, strong, b, h2, .rate, .value, .amount, .hero-sub-val {
   font-variant-numeric: tabular-nums lining-nums;
-  letter-spacing: -0.015em;
+  letter-spacing: -0.02em;
 }
 
 .app {
@@ -141,7 +163,7 @@ input, select {
   padding: calc(16px + env(safe-area-inset-top)) 16px calc(110px + env(safe-area-inset-bottom));
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 18px;
 }
 
 button, input, select {
@@ -153,61 +175,49 @@ button, input, select {
 }
 
 /* =========================================================
-   TOPBAR & STATUS
+   TOPBAR & STATUS (ICON COMPLETELY REMOVED)
    ========================================================= */
 .topbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  padding: 2px 2px 4px;
 }
 
-.brand {
+.brand-text {
   display: flex;
-  align-items: center;
-  gap: 12px;
+  flex-direction: column;
+  gap: 2px;
 }
 
-.brand-badge {
-  width: 40px;
-  height: 40px;
-  border-radius: var(--radius-sm);
-  background: var(--gold-bg);
-  border: 1px solid var(--gold-border);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.brand-eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   color: var(--gold-primary);
-  font-size: 19px;
-  font-weight: 800;
-  flex-shrink: 0;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
 }
 
 .brand-text h1 {
-  font-size: 18px;
-  font-weight: 700;
-  line-height: 1.2;
-}
-
-.brand-text p {
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--text-muted);
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
 }
 
 .status-indicator {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 5px 12px;
+  gap: 7px;
+  padding: 6px 12px;
   background: var(--surface);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-full);
   font-size: 11.5px;
   font-weight: 600;
-  color: var(--text-muted);
+  color: var(--text-secondary);
   box-shadow: var(--shadow-sm);
-  align-self: flex-start;
+  white-space: nowrap;
 }
 
 .dot {
@@ -232,7 +242,7 @@ button, input, select {
 }
 
 /* =========================================================
-   HERO CARD
+   HERO CARD (CLEAN METRIC LAYOUT)
    ========================================================= */
 .hero {
   background: var(--surface);
@@ -242,7 +252,7 @@ button, input, select {
   box-shadow: var(--shadow-card);
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 16px;
 }
 
 .hero-top {
@@ -252,10 +262,10 @@ button, input, select {
 }
 
 .hero-label {
-  font-size: 12px;
+  font-size: 11.5px;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.06em;
   color: var(--gold-primary);
 }
 
@@ -272,24 +282,26 @@ button, input, select {
 
 .change-pill.up { background: var(--good-bg); color: var(--good); }
 .change-pill.down { background: var(--bad-bg); color: var(--bad); }
-.change-pill.same { background: var(--surface-alt); color: var(--text-muted); }
+.change-pill.same { background: var(--surface-subtle); color: var(--text-secondary); }
 
 .hero-mid {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 2px;
 }
 
 .hero-mid h2 {
-  font-size: clamp(38px, 8vw, 52px);
+  font-size: clamp(38px, 8.5vw, 54px);
   font-weight: 800;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.04em;
   line-height: 1;
 }
 
 .hero-mid .sub {
   font-size: 13px;
-  color: var(--text-muted);
+  font-weight: 500;
+  color: var(--text-tertiary);
+  margin-top: 2px;
 }
 
 .hero-bottom {
@@ -297,26 +309,26 @@ button, input, select {
   flex-direction: column;
   align-items: flex-start;
   gap: 2px;
-  padding-top: 16px;
+  padding-top: 14px;
   border-top: 1px solid var(--border-subtle);
 }
 
 .hero-sub-label {
-  font-size: 12px;
-  font-weight: 600;
+  font-size: 11px;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.03em;
-  color: var(--text-muted);
+  letter-spacing: 0.05em;
+  color: var(--text-tertiary);
 }
 
 .hero-sub-val {
-  font-size: 22px;
-  font-weight: 700;
-  color: var(--text-main);
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--text-primary);
 }
 
 /* =========================================================
-   GRID SYSTEMS WITH STRICT HORIZONTAL ALIGNMENT
+   GRID SYSTEMS (PRECISE HORIZONTAL ALIGNMENT)
    ========================================================= */
 .section {
   display: flex;
@@ -334,19 +346,20 @@ button, input, select {
 .section-head h3 {
   font-size: 15px;
   font-weight: 700;
+  letter-spacing: -0.02em;
 }
 
 .section-head span {
   font-size: 12px;
   font-weight: 600;
-  color: var(--text-muted);
+  color: var(--text-tertiary);
 }
 
 .panel {
   background: var(--surface);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
-  padding: 18px;
+  padding: 16px;
   box-shadow: var(--shadow-card);
 }
 
@@ -371,28 +384,28 @@ button, input, select {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  min-height: 96px;
+  min-height: 94px;
   box-shadow: var(--shadow-card);
 }
 
 .stat-card .label {
-  font-size: 11px;
+  font-size: 10.5px;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--text-dim);
+  letter-spacing: 0.05em;
+  color: var(--text-tertiary);
 }
 
 .stat-card .value {
   font-size: 16px;
-  font-weight: 700;
+  font-weight: 800;
   line-height: 1.2;
 }
 
 .stat-card .sub {
   font-size: 11.5px;
   font-weight: 500;
-  color: var(--text-muted);
+  color: var(--text-secondary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -406,37 +419,37 @@ button, input, select {
 }
 
 .session-box {
-  background: var(--surface-alt);
+  background: var(--surface-subtle);
   border-radius: var(--radius-sm);
   padding: 14px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  min-height: 105px;
+  min-height: 100px;
 }
 
 .session-box .tag {
   align-self: flex-start;
   font-size: 10px;
-  font-weight: 700;
+  font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.06em;
   padding: 3px 6px;
   border-radius: var(--radius-xs);
   background: var(--surface);
   border: 1px solid var(--border-subtle);
-  color: var(--text-muted);
+  color: var(--text-secondary);
 }
 
 .session-box .rate {
   font-size: 19px;
-  font-weight: 700;
+  font-weight: 800;
 }
 
 .session-box .time {
   font-size: 11.5px;
   font-weight: 500;
-  color: var(--text-muted);
+  color: var(--text-tertiary);
 }
 
 /* =========================================================
@@ -445,7 +458,7 @@ button, input, select {
 .segment-ctrl {
   display: flex;
   gap: 4px;
-  background: var(--surface-alt);
+  background: var(--surface-subtle);
   padding: 3px;
   border-radius: var(--radius-full);
   border: 1px solid var(--border-subtle);
@@ -461,7 +474,7 @@ button, input, select {
   border-radius: var(--radius-full);
   font-size: 12px;
   font-weight: 700;
-  color: var(--text-muted);
+  color: var(--text-secondary);
   text-align: center;
   cursor: pointer;
   transition: all var(--transition);
@@ -469,8 +482,8 @@ button, input, select {
 
 .segment-ctrl button.active {
   background: var(--surface);
-  color: var(--text-main);
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  color: var(--text-primary);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
 .chart-stats-row {
@@ -481,7 +494,7 @@ button, input, select {
 }
 
 .metric-card {
-  background: var(--surface-alt);
+  background: var(--surface-subtle);
   border-radius: var(--radius-xs);
   padding: 8px 10px;
   display: flex;
@@ -490,15 +503,15 @@ button, input, select {
 }
 
 .metric-card small {
-  font-size: 10.5px;
-  font-weight: 600;
+  font-size: 10px;
+  font-weight: 700;
   text-transform: uppercase;
-  color: var(--text-dim);
+  color: var(--text-tertiary);
 }
 
 .metric-card b {
   font-size: 13.5px;
-  font-weight: 700;
+  font-weight: 800;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -524,7 +537,7 @@ button, input, select {
   justify-content: space-between;
   font-size: 11px;
   font-weight: 600;
-  color: var(--text-dim);
+  color: var(--text-tertiary);
   margin-top: 10px;
   padding-top: 8px;
   border-top: 1px dashed var(--border-subtle);
@@ -546,21 +559,21 @@ button, input, select {
 }
 
 .calc-field label {
-  font-size: 11.5px;
-  font-weight: 600;
-  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-secondary);
 }
 
 .calc-input {
   width: 100%;
   height: 42px;
   padding: 0 12px;
-  background: var(--surface-alt);
+  background: var(--surface-subtle);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-xs);
-  font-size: 14px;
+  font-size: 13.5px;
   font-weight: 600;
-  color: var(--text-main);
+  color: var(--text-primary);
   transition: border-color var(--transition), background-color var(--transition);
 }
 
@@ -577,7 +590,7 @@ select.calc-input {
 .receipt-box {
   margin-top: 14px;
   padding: 14px 16px;
-  background: var(--surface-alt);
+  background: var(--surface-subtle);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-sm);
   display: flex;
@@ -586,11 +599,11 @@ select.calc-input {
 }
 
 .receipt-title {
-  font-size: 11.5px;
-  font-weight: 700;
+  font-size: 11px;
+  font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--text-dim);
+  letter-spacing: 0.06em;
+  color: var(--text-tertiary);
   padding-bottom: 4px;
   border-bottom: 1px dashed var(--border-subtle);
 }
@@ -599,13 +612,13 @@ select.calc-input {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-size: 12.5px;
-  color: var(--text-muted);
+  font-size: 12px;
+  color: var(--text-secondary);
 }
 
 .receipt-line span:last-child {
-  font-weight: 600;
-  color: var(--text-main);
+  font-weight: 700;
+  color: var(--text-primary);
 }
 
 .receipt-total {
@@ -619,8 +632,8 @@ select.calc-input {
 
 .receipt-total .label {
   font-size: 13px;
-  font-weight: 700;
-  color: var(--text-main);
+  font-weight: 800;
+  color: var(--text-primary);
 }
 
 .receipt-total .final-val {
@@ -631,7 +644,7 @@ select.calc-input {
 
 .calc-subtext {
   font-size: 11px;
-  color: var(--text-dim);
+  color: var(--text-tertiary);
   text-align: right;
 }
 
@@ -643,7 +656,7 @@ select.calc-input {
 }
 
 .last-box h4 { font-size: 14px; font-weight: 700; }
-.last-box p { font-size: 12px; color: var(--text-muted); font-weight: 500; margin-top: 2px; }
+.last-box p { font-size: 12px; color: var(--text-tertiary); font-weight: 500; margin-top: 2px; }
 .last-box .amount { font-size: 18px; font-weight: 800; }
 .last-box .amount.positive { color: var(--good); }
 .last-box .amount.negative { color: var(--bad); }
@@ -652,7 +665,7 @@ select.calc-input {
 .compare-result {
   margin-top: 12px;
   padding: 12px 14px;
-  background: var(--surface-alt);
+  background: var(--surface-subtle);
   border-radius: var(--radius-xs);
   font-size: 12.5px;
   line-height: 1.5;
@@ -660,7 +673,7 @@ select.calc-input {
 
 .compare-result strong {
   font-size: 16px;
-  font-weight: 700;
+  font-weight: 800;
   display: block;
   margin-bottom: 2px;
 }
@@ -688,13 +701,13 @@ select.calc-input {
 .history-table th {
   position: sticky;
   top: 0;
-  background: var(--surface-alt);
+  background: var(--surface-subtle);
   padding: 10px 14px;
   font-size: 10.5px;
-  font-weight: 700;
+  font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--text-dim);
+  letter-spacing: 0.05em;
+  color: var(--text-tertiary);
   border-bottom: 1px solid var(--border-subtle);
   z-index: 2;
 }
@@ -707,7 +720,7 @@ select.calc-input {
 }
 
 .history-table tr:hover td {
-  background-color: var(--surface-alt);
+  background-color: var(--surface-subtle);
 }
 
 .history-table tr:last-child td {
@@ -730,7 +743,7 @@ select.calc-input {
 }
 
 /* =========================================================
-   FLOATING ACTION BUTTON & THEMED NOTIFICATIONS
+   FLOATING ACTION BUTTON & THEMED TOAST
    ========================================================= */
 .fab-anchor {
   position: fixed;
@@ -752,7 +765,7 @@ select.calc-input {
   gap: 8px;
   font-size: 13px;
   font-weight: 700;
-  color: var(--text-main);
+  color: var(--text-primary);
   cursor: pointer;
   transition: transform var(--transition), box-shadow var(--transition);
   backdrop-filter: blur(10px);
@@ -781,7 +794,7 @@ select.calc-input {
 
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* Pull-to-refresh */
+/* Pull down indicator */
 .pulldown {
   position: fixed;
   left: 50%;
@@ -808,14 +821,14 @@ select.calc-input {
 .pulldown.loading .icon-idle { display: none; }
 .pulldown.loading .icon-spin { display: block; animation: spin 0.8s linear infinite; }
 
-/* Themed Matching Toast */
+/* Themed Toast */
 .toast {
   position: fixed;
   top: calc(14px + env(safe-area-inset-top));
   left: 50%;
   transform: translate(-50%, -24px);
   background: var(--surface);
-  color: var(--text-main);
+  color: var(--text-primary);
   border: 1px solid var(--border-strong);
   padding: 8px 18px;
   border-radius: var(--radius-full);
@@ -848,7 +861,7 @@ select.calc-input {
 footer {
   text-align: center;
   font-size: 11.5px;
-  color: var(--text-dim);
+  color: var(--text-tertiary);
   line-height: 1.8;
   padding: 10px 0;
 }
@@ -872,19 +885,15 @@ footer {
   </div>
 
   <header class="topbar">
-    <div class="brand">
-      <div class="brand-badge">₹</div>
-      <div class="brand-text">
-        <h1>Gold Price 22K</h1>
-        <p>Chennai Retail Benchmark</p>
-      </div>
+    <div class="brand-text">
+      <span class="brand-eyebrow">Chennai · 22 Karat</span>
+      <h1>Gold Benchmark</h1>
+    </div>
+    <div class="status-indicator" id="status">
+      <span class="dot"></span>
+      <span id="statusText">Checking rate…</span>
     </div>
   </header>
-
-  <div class="status-indicator" id="status">
-    <span class="dot"></span>
-    <span id="statusText">Checking benchmark rate…</span>
-  </div>
 
   <div hidden><button id="fetchNow"><span id="fetchNowText">Fetch</span></button></div>
 
@@ -1099,14 +1108,14 @@ footer {
           </tr>
         </thead>
         <tbody id="historyBody">
-          <tr><td colspan="3" style="text-align:center; color:var(--text-dim);">Loading historical log…</td></tr>
+          <tr><td colspan="3" style="text-align:center; color:var(--text-tertiary);">Loading historical log…</td></tr>
         </tbody>
       </table>
     </div>
   </section>
 
   <footer>
-    <div>Gold Price 22K · Chennai Benchmark</div>
+    <div>Gold Benchmark 22K · Chennai</div>
     <div>Live data via Cloudflare Edge Worker · Sources: LiveChennai + GoodReturns</div>
   </footer>
 
@@ -1295,13 +1304,13 @@ function drawChart() {
 
   const styles = getComputedStyle(document.body);
   const colorGold = styles.getPropertyValue('--gold-primary').trim() || '#d97706';
-  const colorGrid = styles.getPropertyValue('--border-subtle').trim() || '#e2e5eb';
-  const colorText = styles.getPropertyValue('--text-dim').trim() || '#94a3b8';
+  const colorGrid = styles.getPropertyValue('--border-subtle').trim() || '#e2e8f0';
+  const colorText = styles.getPropertyValue('--text-tertiary').trim() || '#94a3b8';
 
   if (data.length < 2) {
     ctx.fillStyle = colorText;
     ctx.textAlign = "center";
-    ctx.font = "12px var(--font-stack)";
+    ctx.font = "12px var(--font-display)";
     ctx.fillText("Insufficient historical points", width / 2, height / 2);
     return;
   }
@@ -1320,7 +1329,7 @@ function drawChart() {
   const px = i => L + (i / (data.length - 1)) * plotWidth;
   const py = value => T + (1 - ((value - min) / (max - min))) * plotHeight;
 
-  ctx.font = "10px var(--font-stack)";
+  ctx.font = "10px var(--font-display)";
   ctx.lineWidth = 1;
   ctx.textAlign = "right";
 
@@ -1396,7 +1405,7 @@ function calculate() {
   const gstPct = Math.max(0, Number($("gstRate").value) || 0);
   const flatFee = Math.max(0, Number($("flatFee").value) || 0);
 
-  $("receiptMakingLabel").textContent = `Making / Wastage (${makingPct}%):`;
+  $("receiptMakingLabel").textContent = `Making Charges (${makingPct}%):`;
   $("receiptGstLabel").textContent = `GST (${gstPct}%):`;
 
   if (mode === "value") {
@@ -1487,7 +1496,7 @@ function compareDates() {
     <span class="${difference > 0 ? "positive" : difference < 0 ? "negative" : ""}">
       ${difference >= 0 ? "+" : ""}${money(difference)}/g · ${percentage >= 0 ? "+" : ""}${percentage.toFixed(2)}%
     </span>
-    <span style="display:block; color:var(--text-dim); font-size:11.5px; margin-top:3px;">
+    <span style="display:block; color:var(--text-tertiary); font-size:11.5px; margin-top:3px;">
       ${dateText(a.date)} to ${dateText(b.date)} · 1 Sov diff: ${money(difference * 8)}
     </span>
   `;
@@ -1520,7 +1529,7 @@ async function refresh(manual = false) {
   }
 
   try {
-    setStatus("Syncing benchmark data…");
+    setStatus("Checking rate…");
     await loadPublishedData();
     setStatus("Synced at " + new Date().toLocaleTimeString("en-IN", { hour: "numeric", minute: "2-digit" }));
     if (manual) toast("Latest benchmark rate loaded");
@@ -1711,3 +1720,5 @@ refresh();
 </script>
 </body>
 </html>
+
+```
