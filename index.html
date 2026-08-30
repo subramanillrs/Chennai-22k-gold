@@ -1695,9 +1695,13 @@ window.addEventListener("pageshow", () => refresh());
 window.addEventListener("resize", drawChart);
 window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { drawChart(); });
 
+// Auto-Updating Service Worker Registration
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("sw.js").catch(e => console.warn("Service worker register skipped:", e));
+    navigator.serviceWorker
+      .register("sw.js?v=" + Date.now())
+      .then((reg) => reg.update())
+      .catch((e) => console.warn("Service worker register skipped:", e));
   });
 }
 
