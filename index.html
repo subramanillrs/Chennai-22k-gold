@@ -22,7 +22,7 @@
 
 <style>
 /* =========================================================
-   DESIGN TOKENS & SPECULAR OBSIDIAN SYSTEM (STRIPE / LINEAR)
+   DESIGN TOKENS & SPECULAR OBSIDIAN SYSTEM
    ========================================================= */
 :root {
   color-scheme: light dark;
@@ -72,7 +72,6 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    /* Obsidian OLED Dark Theme */
     --bg-app: #06080c;
     --surface: #0e121a;
     --surface-subtle: #141a24;
@@ -225,7 +224,7 @@ button, input, select {
 }
 
 /* =========================================================
-   IMPORTANT PARSER WARNING SIGN
+   PARSER WARNING BANNER
    ========================================================= */
 .warning-banner {
   display: flex;
@@ -371,6 +370,7 @@ button, input, select {
   margin-top: 2px;
 }
 
+/* 2-Column Split: Exact Uniform Font Sizes & Baselines */
 .hero-details-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -412,6 +412,7 @@ button, input, select {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  display: block;
 }
 
 .hero-sub-sub {
@@ -425,88 +426,11 @@ button, input, select {
   overflow: hidden;
   text-overflow: ellipsis;
   font-variant-numeric: tabular-nums lining-nums;
+  display: block;
 }
 
 /* =========================================================
-   1. DYNAMIC RANGE BAR (APPLE STOCKS STYLE)
-   ========================================================= */
-.range-card {
-  background: var(--surface);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-md);
-  padding: 16px;
-  box-shadow: var(--shadow-card), var(--specular);
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  width: 100%;
-}
-
-.range-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-}
-
-.range-head span {
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--text-tertiary);
-}
-
-.range-head b {
-  font-size: 12.5px;
-  font-weight: 800;
-  color: var(--gold-primary);
-}
-
-.range-track-wrap {
-  position: relative;
-  width: 100%;
-  height: 10px;
-  background: var(--surface-subtle);
-  border-radius: var(--radius-full);
-  overflow: visible;
-  display: flex;
-  align-items: center;
-}
-
-.range-track-fill {
-  position: absolute;
-  left: 0;
-  top: 0;
-  height: 100%;
-  width: 0%;
-  border-radius: var(--radius-full);
-  background: var(--gold-gradient);
-  transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.range-marker {
-  position: absolute;
-  width: 16px;
-  height: 16px;
-  background: var(--surface);
-  border: 3.5px solid var(--gold-primary);
-  border-radius: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
-  transition: left 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.range-labels {
-  display: flex;
-  justify-content: space-between;
-  font-size: 11.5px;
-  font-weight: 700;
-  color: var(--text-secondary);
-}
-
-/* =========================================================
-   2. MULTI-HORIZON RETURN MATRIX (BLOOMBERG / REVOLUT STYLE)
+   MULTI-HORIZON RETURN MATRIX
    ========================================================= */
 .horizon-grid {
   display: grid;
@@ -549,7 +473,7 @@ button, input, select {
 }
 
 /* =========================================================
-   3. MOVING AVERAGE SENTIMENT (TRADINGVIEW STYLE)
+   MOVING AVERAGE SENTIMENT BANNER
    ========================================================= */
 .sentiment-banner {
   background: var(--surface);
@@ -1069,7 +993,6 @@ select.calc-input {
   border-bottom: none;
 }
 
-/* Explicit Proportional Widths */
 .history-table th:nth-child(1), .history-table td:nth-child(1) {
   text-align: left;
   width: 34%;
@@ -1292,24 +1215,7 @@ footer {
     </div>
   </section>
 
-  <!-- 1. Apple Stocks Dynamic Range Bar -->
-  <section class="range-card">
-    <div class="range-head">
-      <span>3-Year Valuation Range</span>
-      <b id="rangePercent">0% of 3Y Range</b>
-    </div>
-    <div class="range-track-wrap">
-      <div class="range-track-fill" id="rangeFill"></div>
-      <div class="range-marker" id="rangeMarker" style="left: 0%;"></div>
-    </div>
-    <div class="range-labels">
-      <span id="rangeMin">Floor: ₹—</span>
-      <span id="rangeCurrent">Current: ₹—</span>
-      <span id="rangeMax">Peak: ₹—</span>
-    </div>
-  </section>
-
-  <!-- 2. Bloomberg / Revolut Multi-Horizon Return Matrix -->
+  <!-- Multi-Horizon Return Matrix -->
   <section class="section">
     <div class="section-head">
       <h3>Multi-Horizon Performance</h3>
@@ -1343,7 +1249,7 @@ footer {
     </div>
   </section>
 
-  <!-- 3. TradingView Moving Average Sentiment Banner -->
+  <!-- Moving Average Sentiment Banner -->
   <section class="sentiment-banner">
     <div class="sentiment-left">
       <span>30-Day Moving Average (SMA)</span>
@@ -1784,28 +1690,14 @@ function renderToday() {
 }
 
 /* =========================================================
-   FINTECH VALUATION METRICS (RANGE, HORIZONS & SMA)
+   FINTECH VALUATION METRICS (HORIZONS & SMA)
    ========================================================= */
 function updateFintechMetrics() {
   if (!history.length || !live) return;
   const currentRate = Number(live.rate_22k);
   const values = history.map(item => Number(item.rate_22k));
-  const high = Math.max(...values);
-  const low = Math.min(...values);
 
-  // 1. Apple Style Dynamic Range Bar
-  const rangeSpan = high - low;
-  const currentOffset = Math.max(0, currentRate - low);
-  const percent = rangeSpan > 0 ? Math.min(100, Math.max(0, (currentOffset / rangeSpan) * 100)) : 50;
-
-  $("rangeFill").style.width = percent.toFixed(1) + "%";
-  $("rangeMarker").style.left = percent.toFixed(1) + "%";
-  $("rangePercent").textContent = percent.toFixed(1) + "% of 3Y Range";
-  $("rangeMin").textContent = "Floor: " + money(low);
-  $("rangeCurrent").textContent = "Current: " + money(currentRate);
-  $("rangeMax").textContent = "Peak: " + money(high);
-
-  // 2. Bloomberg Style Return Matrix
+  // 1. Bloomberg Style Return Matrix
   const calcReturn = (days) => {
     if (history.length < 2) return null;
     const targetIdx = Math.max(0, history.length - 1 - days);
@@ -1836,7 +1728,7 @@ function updateFintechMetrics() {
     }
   });
 
-  // 3. TradingView Moving Average Sentiment (SMA 30)
+  // 2. TradingView Moving Average Sentiment (SMA 30)
   const smaPeriod = Math.min(30, history.length);
   const recentSlice = values.slice(-smaPeriod);
   const sma = recentSlice.reduce((a, b) => a + b, 0) / smaPeriod;
@@ -2422,7 +2314,6 @@ window.addEventListener("pageshow", () => refresh());
 window.addEventListener("resize", () => { updateFintechMetrics(); drawChart(); });
 window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { drawChart(); });
 
-// Auto-Updating Service Worker Registration
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
     navigator.serviceWorker
