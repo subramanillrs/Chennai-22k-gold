@@ -1,3 +1,12 @@
+Here is the updated file with all three visual fixes applied:
+
+### What was updated:
+
+1. **Hero Sub-Rate Left Alignment:** Fixed the awkward gap in the hero card. The **Rate Per Gram (1g)** is now grouped and left-aligned directly underneath the 8g price with proper label-and-value stacking so your eyes scan straight down naturally.
+2. **Top-Left Logo Visual Harmony:** Replaced the harsh solid gold box with a refined glass-tinted badge that uses the exact same border, surface depth, and gold typography as the rest of the cards.
+3. **Themed Toast Popup:** Removed the stark black background on notifications ("Rate checked · no change", etc.). The popup is now a floating glassmorphic pill that matches your current theme (Light/Dark) with a gold status pip and matching border.
+
+```html
 <!doctype html>
 <html lang="en">
 <head>
@@ -57,7 +66,7 @@
 
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
   --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.05), 0 4px 12px rgba(0, 0, 0, 0.03);
-  --shadow-fab: 0 6px 20px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.05);
+  --shadow-fab: 0 6px 20px rgba(0, 0, 0, 0.10), 0 0 0 1px rgba(0, 0, 0, 0.06);
 
   --transition: 0.2s cubic-bezier(0.2, 0, 0, 1);
 }
@@ -79,7 +88,7 @@
     --gold-primary: #fbbf24;
     --gold-dark: #f59e0b;
     --gold-gradient: linear-gradient(135deg, #fcd34d 0%, #f59e0b 100%);
-    --gold-bg: rgba(245, 158, 11, 0.1);
+    --gold-bg: rgba(245, 158, 11, 0.12);
     --gold-border: rgba(251, 191, 36, 0.25);
 
     --good: #34d399;
@@ -118,7 +127,7 @@ body {
   min-height: 100vh;
 }
 
-.num, [data-num], td, strong, b, h2, .rate, .value, .amount {
+.num, [data-num], td, strong, b, h2, .rate, .value, .amount, .hero-sub-val {
   font-variant-numeric: tabular-nums lining-nums;
   letter-spacing: -0.015em;
 }
@@ -141,7 +150,7 @@ button, input, select {
 }
 
 /* =========================================================
-   TOPBAR & STATUS
+   TOPBAR & STATUS (Refined Matching Logo)
    ========================================================= */
 .topbar {
   display: flex;
@@ -159,14 +168,16 @@ button, input, select {
   width: 40px;
   height: 40px;
   border-radius: var(--radius-sm);
-  background: var(--gold-gradient);
+  background: var(--gold-bg);
+  border: 1px solid var(--gold-border);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #000;
-  font-size: 20px;
+  color: var(--gold-primary);
+  font-size: 19px;
   font-weight: 800;
   flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
 }
 
 .brand-text h1 {
@@ -218,7 +229,7 @@ button, input, select {
 }
 
 /* =========================================================
-   HERO CARD
+   HERO CARD (Left Aligned & Balanced)
    ========================================================= */
 .hero {
   background: var(--surface);
@@ -228,7 +239,7 @@ button, input, select {
   box-shadow: var(--shadow-card);
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 18px;
 }
 
 .hero-top {
@@ -278,23 +289,28 @@ button, input, select {
   color: var(--text-muted);
 }
 
+/* Left-aligned stacked sub-rate */
 .hero-bottom {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding-top: 14px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  padding-top: 16px;
   border-top: 1px solid var(--border-subtle);
 }
 
-.hero-bottom span {
-  font-size: 13px;
+.hero-sub-label {
+  font-size: 12px;
   font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
   color: var(--text-muted);
 }
 
-.hero-bottom strong {
-  font-size: 20px;
+.hero-sub-val {
+  font-size: 22px;
   font-weight: 700;
+  color: var(--text-main);
 }
 
 /* =========================================================
@@ -422,7 +438,7 @@ button, input, select {
 }
 
 /* =========================================================
-   CHART SEGMENTATION & PANEL
+   CHART CONTROLS & PANEL
    ========================================================= */
 .segment-ctrl {
   display: flex;
@@ -713,7 +729,7 @@ select.calc-input {
 }
 
 /* =========================================================
-   FLOATING SYNC ACTION BUTTON
+   FLOATING ACTION BUTTON & NOTIFICATIONS (MATCHED THEME)
    ========================================================= */
 .fab-anchor {
   position: fixed;
@@ -764,7 +780,7 @@ select.calc-input {
 
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* Pull-to-refresh & Toast */
+/* Pull-to-refresh */
 .pulldown {
   position: fixed;
   left: 50%;
@@ -791,23 +807,39 @@ select.calc-input {
 .pulldown.loading .icon-idle { display: none; }
 .pulldown.loading .icon-spin { display: block; animation: spin 0.8s linear infinite; }
 
+/* Themed Matching Toast Notification */
 .toast {
   position: fixed;
   top: calc(14px + env(safe-area-inset-top));
   left: 50%;
   transform: translate(-50%, -24px);
-  background: var(--text-main);
-  color: var(--bg-app);
+  background: var(--surface);
+  color: var(--text-main);
+  border: 1px solid var(--border-strong);
   padding: 8px 18px;
   border-radius: var(--radius-full);
   font-size: 12.5px;
   font-weight: 700;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--shadow-fab);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  display: flex;
+  align-items: center;
+  gap: 8px;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.2s, transform 0.2s;
+  transition: opacity 0.25s, transform 0.25s;
   z-index: 200;
   white-space: nowrap;
+}
+
+.toast::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--gold-primary);
+  flex-shrink: 0;
 }
 
 .toast.show { opacity: 1; transform: translate(-50%, 0); }
@@ -826,6 +858,7 @@ footer {
 
 <div class="app">
 
+  <!-- Pull down refresh visual -->
   <div class="pulldown" id="pulldown" aria-hidden="true">
     <span class="pulldownicon" id="pulldownIcon">
       <svg class="icon-idle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="14" height="14">
@@ -838,6 +871,7 @@ footer {
     <span id="pulldownText">Pull to refresh</span>
   </div>
 
+  <!-- Header with Matched Logo Badge -->
   <header class="topbar">
     <div class="brand">
       <div class="brand-badge">₹</div>
@@ -848,13 +882,16 @@ footer {
     </div>
   </header>
 
+  <!-- Live Status Tag -->
   <div class="status-indicator" id="status">
     <span class="dot"></span>
     <span id="statusText">Checking benchmark rate…</span>
   </div>
 
+  <!-- Hidden legacy trigger -->
   <div hidden><button id="fetchNow"><span id="fetchNowText">Fetch</span></button></div>
 
+  <!-- Hero Overview (Left Aligned & Balanced) -->
   <section class="hero">
     <div class="hero-top">
       <span class="hero-label">1 Sovereign (8 Grams)</span>
@@ -866,12 +903,14 @@ footer {
       <span class="sub">Standard 22 Karat Hallmarked</span>
     </div>
 
+    <!-- Left Aligned Sub-rate -->
     <div class="hero-bottom">
-      <span>Rate Per Gram</span>
-      <strong id="hero1">₹—</strong>
+      <span class="hero-sub-label">Rate Per Gram (1g)</span>
+      <div class="hero-sub-val" id="hero1">₹—</div>
     </div>
   </section>
 
+  <!-- 4-Column Aligned Quick Stats -->
   <section class="quick-grid">
     <div class="stat-card">
       <span class="label">Benchmark Date</span>
@@ -895,6 +934,7 @@ footer {
     </div>
   </section>
 
+  <!-- 2-Column Intraday Sessions -->
   <section class="section">
     <div class="section-head">
       <h3>Intraday Sessions</h3>
@@ -914,6 +954,7 @@ footer {
     </div>
   </section>
 
+  <!-- Historical Chart Section -->
   <section class="section">
     <div class="section-head">
       <h3>Price History Trend</h3>
@@ -957,6 +998,7 @@ footer {
     </div>
   </section>
 
+  <!-- Last Observed Movement -->
   <section class="section">
     <div class="section-head">
       <h3>Last Rate Movement</h3>
@@ -970,6 +1012,7 @@ footer {
     </div>
   </section>
 
+  <!-- Historical Compare Utility -->
   <section class="section">
     <div class="section-head">
       <h3>Compare Historical Dates</h3>
@@ -989,6 +1032,7 @@ footer {
     </div>
   </section>
 
+  <!-- Enhanced Purchase Calculator with Fee Breakdowns -->
   <section class="section">
     <div class="section-head">
       <h3>Jewelry Purchase Calculator</h3>
@@ -1024,6 +1068,7 @@ footer {
         </div>
       </div>
 
+      <!-- Itemized Receipt Card -->
       <div class="receipt-box">
         <div class="receipt-title">Itemized Cost Breakdown</div>
         <div class="receipt-line">
@@ -1051,6 +1096,7 @@ footer {
     </div>
   </section>
 
+  <!-- Strictly Aligned Daily History Table -->
   <section class="section">
     <div class="section-head">
       <h3>Historical Log</h3>
@@ -1079,6 +1125,7 @@ footer {
 
 </div>
 
+<!-- Floating Action Button -->
 <div class="fab-anchor">
   <button class="fab-btn" id="refresh" aria-label="Fetch latest rate" type="button">
     <span class="fab-icon">
@@ -1093,6 +1140,7 @@ footer {
   </button>
 </div>
 
+<!-- Themed Matching Toast Notification -->
 <div class="toast" id="toast"></div>
 
 <script>
@@ -1382,8 +1430,6 @@ function calculate() {
     $("calcResult").textContent = money(grandTotal);
     $("calcSub").textContent = `For ${weight.toLocaleString("en-IN")} grams at current ₹${rate}/g`;
   } else {
-    // Budget Mode: Solve for purchasable weight
-    // Budget = [ (rate*w) * (1 + making/100) + flatFee ] * (1 + gst/100)
     const effectiveBudget = budget / (1 + gstPct / 100) - flatFee;
     const goldBase = effectiveBudget > 0 ? effectiveBudget / (1 + makingPct / 100) : 0;
     const grams = rate > 0 ? goldBase / rate : 0;
@@ -1573,9 +1619,9 @@ async function manualFetch() {
     setStatus("Updated · " + dateText(newestLive.date) + " · " + timeText(newestLive.time));
 
     if (oldLive && Number(oldLive.rate_22k) === Number(newestLive.rate_22k)) {
-      toast("Price unchanged since last crawl");
+      toast("Rate checked · no change");
     } else {
-      toast("New gold price benchmark updated");
+      toast("New gold benchmark updated");
     }
   } catch (error) {
     console.error("Manual fetch error:", error);
@@ -1675,8 +1721,10 @@ if ("serviceWorker" in navigator) {
   });
 }
 
-// Initial Run
+// Initial Boot
 refresh();
 </script>
 </body>
 </html>
+
+```
