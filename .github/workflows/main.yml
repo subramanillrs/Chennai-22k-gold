@@ -57,14 +57,15 @@ jobs:
           echo "CHENNAI 22K GOLD RATE MONITOR"
           echo "============================================================"
           echo "Event: $GITHUB_EVENT_NAME"
+          echo ""
           echo "Starting update_gold.py..."
           echo ""
           echo "Scheduled runs:"
-          echo "AM  : 08:30 - 11:30 IST"
-          echo "PM  : 17:00 - 20:00 IST"
+          echo "AM : 08:30 IST"
+          echo "PM : 17:00 IST"
           echo ""
-          echo "During the monitoring window the program checks"
-          echo "LiveChennai + GoodReturns every 10 seconds."
+          echo "During the monitoring window:"
+          echo "LiveChennai + GoodReturns are checked every 10 seconds."
           echo "============================================================"
 
           python update_gold.py
@@ -105,9 +106,7 @@ jobs:
           echo "CURRENT LIVE DATA"
           echo "============================================================"
 
-          if [ -f data/live.json ]; then
-            cat data/live.json
-          fi
+          cat data/live.json
 
       # ----------------------------------------------------
       # SHOW MONITORING WINDOW
