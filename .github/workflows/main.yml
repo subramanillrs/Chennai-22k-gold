@@ -1,165 +1,2516 @@
-name: Monitor and Update Chennai 22K Gold
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 
-on:
-  workflow_dispatch:
-    inputs:
-      force_fetch:
-        description: "Force immediate gold-price fetch"
-        required: false
-        default: "false"
-        type: string
+  <meta name="theme-color" content="#111827">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Gold Price 22K">
 
-  schedule:
-    # 08:30 AM IST = 03:00 UTC
-    - cron: "0 3 * * *"
+  <meta name="description"
+        content="Chennai 22K Gold Price with live updates and historical data">
 
-    # 05:00 PM IST = 11:30 UTC
-    - cron: "30 11 * * *"
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icon.svg">
 
-permissions:
-  contents: write
+  <title>Gold Price 22K — Chennai</title>
 
-jobs:
-  update:
-    runs-on: ubuntu-latest
-    timeout-minutes: 210
+  <style>
+    :root {
+      --bg: #f4f6f8;
+      --card: #ffffff;
+      --text: #111827;
+      --muted: #6b7280;
+      --border: #e5e7eb;
+      --gold: #b7791f;
+      --green: #16803c;
+      --red: #c62828;
+      --blue: #2563eb;
+      --shadow: 0 8px 30px rgba(0,0,0,.07);
+      --radius: 20px;
+    }
 
-    steps:
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
 
-      # ----------------------------------------------------
-      # CHECKOUT
-      # ----------------------------------------------------
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+    html {
+      scroll-behavior: smooth;
+    }
 
-      # ----------------------------------------------------
-      # PYTHON
-      # ----------------------------------------------------
-      - name: Set up Python
-        uses: actions/setup-python@v6
-        with:
-          python-version: "3.12"
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Roboto,
+        Helvetica,
+        Arial,
+        sans-serif;
+    }
 
-      # ----------------------------------------------------
-      # DEPENDENCIES
-      # ----------------------------------------------------
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install requests beautifulsoup4
+    .app {
+      width: min(100%, 900px);
+      margin: 0 auto;
+      padding:
+        max(18px, env(safe-area-inset-top))
+        16px
+        max(30px, env(safe-area-inset-bottom));
+    }
 
-      # ----------------------------------------------------
-      # DETERMINE FETCH MODE
-      # ----------------------------------------------------
-      - name: Determine fetch mode
-        env:
-          EVENT_NAME: ${{ github.event_name }}
-          FORCE_INPUT: ${{ inputs.force_fetch }}
-        run: |
-          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
-            echo "FORCE_FETCH=true" >> "$GITHUB_ENV"
-          else
-            echo "FORCE_FETCH=false" >> "$GITHUB_ENV"
-          fi
+    .header {
+      padding: 14px 4px 18px;
+    }
 
-          echo "Event: $EVENT_NAME"
-          echo "Force fetch input: $FORCE_INPUT"
+    .header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
 
-      # ----------------------------------------------------
-      # START GOLD MONITOR
-      # ----------------------------------------------------
-      - name: Monitor and update Chennai 22K rate
-        env:
-          GITHUB_ACTIONS: "true"
-          GITHUB_EVENT_NAME: ${{ github.event_name }}
-          FORCE_FETCH: ${{ env.FORCE_FETCH }}
-        run: |
-          echo "============================================================"
-          echo "CHENNAI 22K GOLD RATE MONITOR"
-          echo "============================================================"
-          echo "Event: $GITHUB_EVENT_NAME"
-          echo "FORCE_FETCH: $FORCE_FETCH"
-          echo ""
-          echo "Starting update_gold.py..."
-          echo ""
-          echo "Scheduled runs:"
-          echo "AM : 08:30 IST"
-          echo "PM : 17:00 IST"
-          echo ""
-          echo "During monitoring:"
-          echo "LiveChennai + GoodReturns checked every 10 seconds."
-          echo "============================================================"
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+    }
 
-          python update_gold.py
+    .brand-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      background: #111827;
+      color: #f7c948;
+      font-size: 23px;
+      box-shadow: var(--shadow);
+    }
 
-      # ----------------------------------------------------
-      # VERIFY DATA
-      # ----------------------------------------------------
-      - name: Verify generated data
-        run: |
-          echo "Checking generated data files..."
+    .brand h1 {
+      margin: 0;
+      font-size: 21px;
+      font-weight: 800;
+      letter-spacing: -.4px;
+    }
 
-          if [ -f data/live.json ]; then
-            echo "live.json: OK"
-          else
-            echo "ERROR: live.json missing"
-            exit 1
-          fi
+    .brand p {
+      margin: 2px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
 
-          if [ -f data/history.json ]; then
-            echo "history.json: OK"
-          else
-            echo "history.json missing - creating empty file"
-            echo "[]" > data/history.json
-          fi
+    .refresh-button {
+      margin-left: auto;
+      border: 0;
+      width: 43px;
+      height: 43px;
+      border-radius: 14px;
+      background: white;
+      box-shadow: var(--shadow);
+      font-size: 20px;
+      cursor: pointer;
+      transition: transform .4s ease, opacity .2s;
+    }
 
-          if [ -f data/monitoring_windows.json ]; then
-            echo "monitoring_windows.json: OK"
-          else
-            echo "monitoring_windows.json not generated"
-          fi
+    .refresh-button:disabled {
+      opacity: .5;
+      cursor: wait;
+    }
 
-      # ----------------------------------------------------
-      # SHOW LIVE DATA
-      # ----------------------------------------------------
-      - name: Show current live data
-        run: |
-          echo "============================================================"
-          echo "CURRENT LIVE DATA"
-          echo "============================================================"
+    .status {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      margin-top: 13px;
+      font-size: 12px;
+      color: var(--muted);
+    }
 
-          cat data/live.json
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--green);
+    }
 
-      # ----------------------------------------------------
-      # SHOW MONITORING WINDOW
-      # ----------------------------------------------------
-      - name: Show monitoring window
-        run: |
-          echo "============================================================"
-          echo "MONITORING WINDOW"
-          echo "============================================================"
+    .status.offline .status-dot {
+      background: var(--red);
+    }
 
-          if [ -f data/monitoring_windows.json ]; then
-            cat data/monitoring_windows.json
-          fi
+    .status.busy .status-dot {
+      background: var(--blue);
+      animation: pulse 1s infinite;
+    }
 
-      # ----------------------------------------------------
-      # SAVE UPDATED DATA
-      # ----------------------------------------------------
-      - name: Save updated data
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+    @keyframes pulse {
+      50% {
+        opacity: .35;
+      }
+    }
 
-          git add data/live.json
-          git add data/history.json
-          git add data/monitoring_windows.json
+    .hero {
+      background:
+        linear-gradient(
+          145deg,
+          #fffdf6 0%,
+          #fff8e4 55%,
+          #fff1c5 100%
+        );
+      border: 1px solid #f1dfaa;
+      border-radius: 26px;
+      padding: 25px 22px;
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+    }
 
-          if git diff --cached --quiet; then
-            echo "No data changes to commit."
-          else
-            git commit -m "Update Chennai 22K gold rate"
-            git push
-          fi
+    .hero::after {
+      content: "22K";
+      position: absolute;
+      right: -10px;
+      bottom: -32px;
+      font-size: 150px;
+      font-weight: 900;
+      color: rgba(183,121,31,.055);
+      pointer-events: none;
+    }
+
+    .hero-label {
+      color: #76541a;
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .8px;
+    }
+
+    .hero-price {
+      margin-top: 5px;
+      font-size: clamp(42px, 11vw, 72px);
+      line-height: 1;
+      font-weight: 900;
+      letter-spacing: -2.5px;
+      color: #16120a;
+    }
+
+    .hero-unit {
+      margin-top: 7px;
+      color: #806328;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .eight-gram {
+      margin-top: 21px;
+      padding-top: 18px;
+      border-top: 1px solid rgba(183,121,31,.2);
+    }
+
+    .eight-gram-label {
+      color: #806328;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .eight-gram-price {
+      margin-top: 2px;
+      font-size: clamp(30px, 8vw, 48px);
+      line-height: 1.1;
+      font-weight: 900;
+      color: #17120a;
+      letter-spacing: -1px;
+    }
+
+    .change {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      margin-top: 16px;
+      padding: 7px 11px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .change.up {
+      color: var(--green);
+      background: #eaf8ef;
+    }
+
+    .change.down {
+      color: var(--red);
+      background: #fdecec;
+    }
+
+    .change.same {
+      color: var(--muted);
+      background: #f0f1f3;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 17px;
+      box-shadow: var(--shadow);
+    }
+
+    .card-label {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+    }
+
+    .card-value {
+      margin-top: 6px;
+      font-size: 18px;
+      font-weight: 850;
+    }
+
+    .card-small {
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .section {
+      margin-top: 24px;
+    }
+
+    .section-title {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      margin-bottom: 11px;
+    }
+
+    .section-title h2 {
+      margin: 0;
+      font-size: 19px;
+      letter-spacing: -.3px;
+    }
+
+    .section-title span {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .ranges {
+      display: flex;
+      gap: 7px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+
+    .range {
+      flex: 0 0 auto;
+      border: 1px solid var(--border);
+      background: white;
+      color: var(--muted);
+      border-radius: 999px;
+      padding: 8px 13px;
+      font-size: 12px;
+      font-weight: 750;
+      cursor: pointer;
+    }
+
+    .range.active {
+      background: #111827;
+      color: white;
+      border-color: #111827;
+    }
+
+    .chart-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px;
+      box-shadow: var(--shadow);
+    }
+
+    .chart-wrap {
+      width: 100%;
+      height: 300px;
+      position: relative;
+    }
+
+    canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .chart-info {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 10px;
+      padding: 0 3px;
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .last-change {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px;
+      box-shadow: var(--shadow);
+    }
+
+    .last-change-main {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+    }
+
+    .last-change-date {
+      font-size: 15px;
+      font-weight: 800;
+    }
+
+    .last-change-time {
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 4px;
+    }
+
+    .last-change-amount {
+      font-size: 20px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .last-change-amount.up {
+      color: var(--green);
+    }
+
+    .last-change-amount.down {
+      color: var(--red);
+    }
+
+    .history-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .history-scroll {
+      max-height: 430px;
+      overflow-y: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    th {
+      position: sticky;
+      top: 0;
+      background: #f8f9fa;
+      color: var(--muted);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .4px;
+      text-align: left;
+      padding: 12px 14px;
+      z-index: 2;
+    }
+
+    td {
+      padding: 12px 14px;
+      border-top: 1px solid #f0f1f2;
+      font-weight: 600;
+    }
+
+    td:last-child,
+    th:last-child {
+      text-align: right;
+    }
+
+    footer {
+      padding: 25px 5px 10px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.6;
+    }
+
+    footer a {
+      color: inherit;
+    }
+
+    .loading {
+      color: var(--muted);
+      text-align: center;
+      padding: 30px;
+    }
+
+    @media (max-width: 480px) {
+      .app {
+        padding-left: 12px;
+        padding-right: 12px;
+      }
+
+      .hero {
+        padding: 23px 18px;
+      }
+
+      .grid {
+        gap: 9px;
+      }
+
+      .card {
+        padding: 14px;
+      }
+
+      .chart-wrap {
+        height: 255px;
+      }
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0b0f14;
+        --card: #121820;
+        --text: #f3f4f6;
+        --muted: #9ca3af;
+        --border: #26303b;
+        --shadow: 0 8px 30px rgba(0,0,0,.25);
+      }
+
+      .brand-icon {
+        background: #f4c95d;
+        color: #111827;
+      }
+
+      .refresh-button,
+      .range,
+      .chart-card,
+      .last-change,
+      .history-card {
+        background: var(--card);
+        color: var(--text);
+      }
+
+      .hero {
+        background:
+          linear-gradient(
+            145deg,
+            #211b0d,
+            #19150b
+          );
+        border-color: #554316;
+      }
+
+      .hero-price,
+      .eight-gram-price {
+        color: #fff7dc;
+      }
+
+      .hero-label,
+      .hero-unit,
+      .eight-gram-label {
+        color: #d9b75d;
+      }
+
+      th {
+        background: #171d24;
+      }
+
+      td {
+        border-color: #242c35;
+      }
+
+      .range {
+        border-color: var(--border);
+      }
+
+      .range.active {
+        background: #f3f4f6;
+        color: #111827;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="app">
+
+  <header class="header">
+
+    <div class="header-row">
+
+      <div class="brand">
+
+        <div class="brand-icon">₹</div>
+
+        <div>
+          <h1>Gold Price 22K</h1>
+          <p>Chennai · 22 Karat</p>
+        </div>
+
+      </div>
+
+      <button
+        class="refresh-button"
+        id="refreshButton"
+        aria-label="Refresh">
+        ↻
+      </button>
+
+    </div>
+
+    <div class="status" id="status">
+      <span class="status-dot"></span>
+      <span id="statusText">Loading latest rate…</span>
+    </div>
+
+  </header>
+
+
+  <section class="hero">
+
+    <div class="hero-label">
+      Chennai 22K Gold
+    </div>
+
+    <div
+      class="hero-price"
+      id="pricePerGram">
+      ₹—
+    </div>
+
+    <div class="hero-unit">
+      per gram
+    </div>
+
+    <div class="eight-gram">
+
+      <div class="eight-gram-label">
+        8 gram rate
+      </div>
+
+      <div
+        class="eight-gram-price"
+        id="price8Gram">
+        ₹—
+      </div>
+
+    </div>
+
+    <div
+      class="change same"
+      id="changeBadge">
+      No change
+    </div>
+
+  </section>
+
+
+  <section class="grid">
+
+    <div class="card">
+      <div class="card-label">
+        Last Updated
+      </div>
+
+      <div
+        class="card-value"
+        id="updatedDate">
+        —
+      </div>
+
+      <div
+        class="card-small"
+        id="updatedTime">
+        —
+      </div>
+    </div>
+
+
+    <div class="card">
+      <div class="card-label">
+        Session
+      </div>
+
+      <div
+        class="card-value"
+        id="session">
+        —
+      </div>
+
+      <div class="card-small">
+        Chennai / IST
+      </div>
+    </div>
+
+
+    <div class="card">
+      <div class="card-label">
+        History
+      </div>
+
+      <div
+        class="card-value"
+        id="historyCount">
+        —
+      </div>
+
+      <div class="card-small">
+        daily records
+      </div>
+    </div>
+
+
+    <div class="card">
+      <div class="card-label">
+        Data Source
+      </div>
+
+      <div class="card-value">
+        LiveChennai
+      </div>
+
+      <div class="card-small">
+        22K standard gold
+      </div>
+    </div>
+
+  </section>
+
+
+  <section class="section">
+
+    <div class="section-title">
+      <h2>Last Rate Change</h2>
+    </div>
+
+    <div class="last-change">
+
+      <div
+        class="last-change-main"
+        id="lastChangeContent">
+
+        <div>
+          <div class="last-change-date">
+            No recorded change
+          </div>
+
+          <div class="last-change-time">
+            —
+          </div>
+        </div>
+
+        <div class="last-change-amount">
+          —
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <section class="section">
+
+    <div class="section-title">
+
+      <h2>Gold Price History</h2>
+
+      <span id="chartRecordCount">
+        —
+      </span>
+
+    </div>
+
+
+    <div class="ranges">
+
+      <button class="range active" data-range="30">
+        30D
+      </button>
+
+      <button class="range" data-range="90">
+        3M
+      </button>
+
+      <button class="range" data-range="180">
+        6M
+      </button>
+
+      <button class="range" data-range="365">
+        1Y
+      </button>
+
+      <button class="range" data-range="1095">
+        3Y
+      </button>
+
+      <button class="range" data-range="all">
+        ALL
+      </button>
+
+    </div>
+
+
+    <div class="chart-card">
+
+      <div class="chart-wrap">
+        <canvas id="goldChart"></canvas>
+      </div>
+
+      <div class="chart-info">
+
+        <span id="chartStart">
+          —
+        </span>
+
+        <span id="chartEnd">
+          —
+        </span>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <section class="section">
+
+    <div class="section-title">
+
+      <h2>Daily History</h2>
+
+      <span id="tableCount">
+        —
+      </span>
+
+    </div>
+
+
+    <div class="history-card">
+
+      <div class="history-scroll">
+
+        <table>
+
+          <thead>
+
+            <tr>
+              <th>Date</th>
+              <th>22K / gram</th>
+              <th>8 gram</th>
+            </tr>
+
+          </thead>
+
+          <tbody id="historyBody">
+
+            <tr>
+              <td colspan="3" class="loading">
+                Loading historical data…
+              </td>
+            </tr>
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <footer>
+
+    <div>
+      Gold Price 22K · Chennai
+    </div>
+
+    <div>
+      Data updated automatically through GitHub Actions.
+    </div>
+
+    <div>
+      Source:
+      <a
+        href="https://www.livechennai.com/gold_silverrate.asp"
+        target="_blank"
+        rel="noopener">
+        LiveChennai
+      </a>
+    </div>
+
+  </footer>
+
+</div>
+
+
+<script>
+
+  /* =========================================================
+     DATA
+     ========================================================= */
+
+  const LIVE_URL = "data/live.json";
+
+  const HISTORY_URL = "data/history.json";
+
+  /*
+   * IMPORTANT:
+   * This is your existing Cloudflare Worker.
+   *
+   * Browser
+   *    ↓
+   * Cloudflare Worker
+   *    ↓
+   * GitHub Actions
+   *    ↓
+   * update_gold.py
+   *    ↓
+   * data/live.json
+   */
+
+  const WORKER_URL =
+    "https://gold-price-fetch.subramanilrs.workers.dev";
+
+
+  let liveData = null;
+
+  let historyData = [];
+
+  let selectedRange = 30;
+
+  let refreshInProgress = false;
+
+
+  /* =========================================================
+     HELPERS
+     ========================================================= */
+
+  function money(value) {
+
+    if (
+      value === null ||
+      value === undefined ||
+      Number.isNaN(Number(value))
+    ) {
+      return "₹—";
+    }
+
+    return "₹" +
+      Number(value).toLocaleString("en-IN");
+  }
+
+
+  function formatDate(value) {
+
+    if (!value) {
+      return "—";
+    }
+
+    const d =
+      new Date(value + "T00:00:00");
+
+    if (Number.isNaN(d.getTime())) {
+      return value;
+    }
+
+    return d.toLocaleDateString(
+      "en-IN",
+      {
+        day: "2-digit",
+        month: "short",
+        year: "numeric"
+      }
+    );
+  }
+
+
+  function formatTime(value) {
+
+    if (!value) {
+      return "—";
+    }
+
+    const parts =
+      String(value).split(":");
+
+    if (parts.length < 2) {
+      return value;
+    }
+
+    let hour =
+      Number(parts[0]);
+
+    const minute =
+      parts[1];
+
+    const suffix =
+      hour >= 12 ? "PM" : "AM";
+
+    hour =
+      hour % 12;
+
+    if (hour === 0) {
+      hour = 12;
+    }
+
+    return `${hour}:${minute} ${suffix}`;
+  }
+
+
+  function escapeHtml(value) {
+
+    return String(value)
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
+
+  /* =========================================================
+     STATUS
+     ========================================================= */
+
+  function setStatus(
+    text,
+    offline = false,
+    busy = false
+  ) {
+
+    const status =
+      document.getElementById("status");
+
+    const statusText =
+      document.getElementById("statusText");
+
+    statusText.textContent = text;
+
+    status.classList.toggle(
+      "offline",
+      offline
+    );
+
+    status.classList.toggle(
+      "busy",
+      busy
+    );
+  }
+
+
+  /* =========================================================
+     LOAD JSON
+     ========================================================= */
+
+  async function loadJson(url) {
+
+    const response =
+      await fetch(
+        url + "?v=" + Date.now(),
+        {
+          cache: "no-store"
+        }
+      );
+
+    if (!response.ok) {
+
+      throw new Error(
+        `HTTP ${response.status}`
+      );
+    }
+
+    return response.json();
+  }
+
+
+  /* =========================================================
+     DISPLAY LIVE DATA
+     ========================================================= */
+
+  function displayLive(data) {
+
+    liveData = data;
+
+    const rate =
+      Number(data.rate_22k);
+
+    let rate8 =
+      Number(data.rate_8g);
+
+    if (
+      !Number.isFinite(rate8) &&
+      Number.isFinite(rate)
+    ) {
+      rate8 = rate * 8;
+    }
+
+
+    document.getElementById(
+      "pricePerGram"
+    ).textContent =
+      money(rate);
+
+
+    document.getElementById(
+      "price8Gram"
+    ).textContent =
+      money(rate8);
+
+
+    document.getElementById(
+      "updatedDate"
+    ).textContent =
+      formatDate(data.date);
+
+
+    document.getElementById(
+      "updatedTime"
+    ).textContent =
+      formatTime(data.time);
+
+
+    document.getElementById(
+      "session"
+    ).textContent =
+      data.session ||
+      inferSession(data.time) ||
+      "—";
+
+
+    let change =
+      Number(data.change);
+
+    if (!Number.isFinite(change)) {
+
+      change =
+        Number(data.rate_change);
+
+    }
+
+    if (!Number.isFinite(change)) {
+      change = 0;
+    }
+
+
+    const badge =
+      document.getElementById(
+        "changeBadge"
+      );
+
+    badge.className =
+      "change";
+
+
+    if (change > 0) {
+
+      badge.classList.add("up");
+
+      badge.textContent =
+        `▲ ${money(change)} / gram`;
+
+    } else if (change < 0) {
+
+      badge.classList.add("down");
+
+      badge.textContent =
+        `▼ ${money(Math.abs(change))} / gram`;
+
+    } else {
+
+      badge.classList.add("same");
+
+      badge.textContent =
+        "No rate change";
+    }
+
+
+    displayLastChange(
+      data.last_change
+    );
+  }
+
+
+  function inferSession(time) {
+
+    if (!time) {
+      return "";
+    }
+
+    const hour =
+      Number(
+        String(time).split(":")[0]
+      );
+
+    if (!Number.isFinite(hour)) {
+      return "";
+    }
+
+    if (hour >= 8 && hour < 12) {
+      return "AM";
+    }
+
+    if (hour >= 17 && hour < 20) {
+      return "PM";
+    }
+
+    return "";
+  }
+
+
+  /* =========================================================
+     LAST CHANGE
+     ========================================================= */
+
+  function displayLastChange(change) {
+
+    const container =
+      document.getElementById(
+        "lastChangeContent"
+      );
+
+
+    if (!change) {
+
+      container.innerHTML = `
+
+        <div>
+
+          <div class="last-change-date">
+            No recorded change
+          </div>
+
+          <div class="last-change-time">
+            Waiting for the first detected rate change
+          </div>
+
+        </div>
+
+        <div class="last-change-amount">
+          —
+        </div>
+
+      `;
+
+      return;
+    }
+
+
+    const amount =
+      Number(change.change || 0);
+
+
+    const direction =
+      amount > 0
+        ? "up"
+        : amount < 0
+          ? "down"
+          : "";
+
+
+    const symbol =
+      amount > 0
+        ? "▲"
+        : amount < 0
+          ? "▼"
+          : "•";
+
+
+    container.innerHTML = `
+
+      <div>
+
+        <div class="last-change-date">
+
+          ${escapeHtml(
+            formatDate(change.date)
+          )}
+
+        </div>
+
+        <div class="last-change-time">
+
+          ${escapeHtml(
+            formatTime(change.time)
+          )}
+
+          ·
+
+          ${escapeHtml(
+            change.session || ""
+          )}
+
+        </div>
+
+      </div>
+
+      <div class="last-change-amount ${direction}">
+
+        ${symbol}
+
+        ${money(Math.abs(amount))}
+
+      </div>
+
+    `;
+  }
+
+
+  /* =========================================================
+     HISTORY
+     ========================================================= */
+
+  function normalizeHistory(data) {
+
+    let records = [];
+
+    if (Array.isArray(data)) {
+
+      records = data;
+
+    } else if (
+      data &&
+      Array.isArray(data.records)
+    ) {
+
+      records = data.records;
+
+    } else if (
+      data &&
+      Array.isArray(data.history)
+    ) {
+
+      records = data.history;
+
+    } else if (
+      data &&
+      Array.isArray(data.data)
+    ) {
+
+      records = data.data;
+
+    } else if (
+      data &&
+      Array.isArray(data.prices)
+    ) {
+
+      records = data.prices;
+    }
+
+
+    return records
+
+      .filter(item => {
+
+        return (
+          item &&
+          item.date &&
+          Number.isFinite(
+            Number(item.rate_22k)
+          )
+        );
+
+      })
+
+      .map(item => ({
+
+        ...item,
+
+        rate_22k:
+          Number(item.rate_22k)
+
+      }))
+
+      .sort(
+        (a, b) =>
+          a.date.localeCompare(b.date)
+      );
+  }
+
+
+  function displayHistory() {
+
+    document.getElementById(
+      "historyCount"
+    ).textContent =
+      historyData.length.toLocaleString(
+        "en-IN"
+      );
+
+
+    document.getElementById(
+      "tableCount"
+    ).textContent =
+      `${historyData.length.toLocaleString("en-IN")} records`;
+
+
+    drawChart();
+
+
+    const body =
+      document.getElementById(
+        "historyBody"
+      );
+
+
+    const rows =
+      [...historyData]
+        .reverse()
+        .slice(0, 250);
+
+
+    if (!rows.length) {
+
+      body.innerHTML = `
+
+        <tr>
+
+          <td
+            colspan="3"
+            class="loading">
+
+            No historical data available.
+
+          </td>
+
+        </tr>
+
+      `;
+
+      return;
+    }
+
+
+    body.innerHTML =
+      rows.map(item => {
+
+        const rate =
+          Number(item.rate_22k);
+
+        return `
+
+          <tr>
+
+            <td>
+
+              ${escapeHtml(
+                formatDate(item.date)
+              )}
+
+            </td>
+
+            <td>
+
+              ${money(rate)}
+
+            </td>
+
+            <td>
+
+              ${money(rate * 8)}
+
+            </td>
+
+          </tr>
+
+        `;
+
+      }).join("");
+  }
+
+
+  /* =========================================================
+     CHART
+     ========================================================= */
+
+  function getChartData() {
+
+    if (!historyData.length) {
+      return [];
+    }
+
+
+    if (selectedRange === "all") {
+      return historyData;
+    }
+
+
+    const count =
+      Number(selectedRange);
+
+
+    if (
+      !Number.isFinite(count) ||
+      count <= 0
+    ) {
+
+      return historyData;
+    }
+
+
+    return historyData.slice(
+      Math.max(
+        0,
+        historyData.length - count
+      )
+    );
+  }
+
+
+  function drawChart() {
+
+    const canvas =
+      document.getElementById(
+        "goldChart"
+      );
+
+
+    const wrapper =
+      canvas.parentElement;
+
+
+    const width =
+      wrapper.clientWidth;
+
+
+    const height =
+      wrapper.clientHeight;
+
+
+    if (
+      width <= 0 ||
+      height <= 0
+    ) {
+
+      return;
+    }
+
+
+    const dpr =
+      window.devicePixelRatio || 1;
+
+
+    canvas.width =
+      Math.round(width * dpr);
+
+
+    canvas.height =
+      Math.round(height * dpr);
+
+
+    const ctx =
+      canvas.getContext("2d");
+
+
+    ctx.setTransform(
+      dpr,
+      0,
+      0,
+      dpr,
+      0,
+      0
+    );
+
+
+    ctx.clearRect(
+      0,
+      0,
+      width,
+      height
+    );
+
+
+    const data =
+      getChartData();
+
+
+    if (data.length < 2) {
+
+      ctx.font =
+        "13px -apple-system, sans-serif";
+
+      ctx.fillStyle =
+        "#6b7280";
+
+      ctx.textAlign =
+        "center";
+
+      ctx.fillText(
+        "Not enough historical data",
+        width / 2,
+        height / 2
+      );
+
+      document.getElementById(
+        "chartRecordCount"
+      ).textContent =
+        `${data.length} days`;
+
+      return;
+    }
+
+
+    const values =
+      data.map(
+        item =>
+          Number(item.rate_22k)
+      );
+
+
+    let min =
+      Math.min(...values);
+
+
+    let max =
+      Math.max(...values);
+
+
+    const padding =
+      Math.max(
+        100,
+        (max - min) * 0.12
+      );
+
+
+    min -= padding;
+    max += padding;
+
+
+    const left = 46;
+    const right = 12;
+    const top = 18;
+    const bottom = 30;
+
+
+    const plotWidth =
+      width - left - right;
+
+
+    const plotHeight =
+      height - top - bottom;
+
+
+    function x(index) {
+
+      return (
+        left +
+        (
+          index /
+          (data.length - 1)
+        ) *
+        plotWidth
+      );
+    }
+
+
+    function y(value) {
+
+      return (
+        top +
+        (
+          1 -
+          (
+            (value - min) /
+            (max - min)
+          )
+        ) *
+        plotHeight
+      );
+    }
+
+
+    /* GRID */
+
+    ctx.lineWidth = 1;
+
+
+    for (
+      let i = 0;
+      i <= 4;
+      i++
+    ) {
+
+      const gy =
+        top +
+        (plotHeight / 4) * i;
+
+
+      ctx.beginPath();
+
+
+      ctx.moveTo(
+        left,
+        gy
+      );
+
+
+      ctx.lineTo(
+        width - right,
+        gy
+      );
+
+
+      ctx.strokeStyle =
+        "rgba(128,128,128,.16)";
+
+
+      ctx.stroke();
+
+
+      const value =
+        max -
+        (
+          (max - min) / 4
+        ) * i;
+
+
+      ctx.font =
+        "10px -apple-system, sans-serif";
+
+
+      ctx.fillStyle =
+        "#8a8f98";
+
+
+      ctx.textAlign =
+        "right";
+
+
+      ctx.fillText(
+        "₹" +
+        Math.round(value)
+          .toLocaleString("en-IN"),
+        left - 6,
+        gy + 3
+      );
+    }
+
+
+    /* AREA */
+
+    ctx.beginPath();
+
+
+    ctx.moveTo(
+      x(0),
+      y(values[0])
+    );
+
+
+    for (
+      let i = 1;
+      i < values.length;
+      i++
+    ) {
+
+      ctx.lineTo(
+        x(i),
+        y(values[i])
+      );
+    }
+
+
+    ctx.lineTo(
+      x(values.length - 1),
+      height - bottom
+    );
+
+
+    ctx.lineTo(
+      x(0),
+      height - bottom
+    );
+
+
+    ctx.closePath();
+
+
+    const gradient =
+      ctx.createLinearGradient(
+        0,
+        top,
+        0,
+        height
+      );
+
+
+    gradient.addColorStop(
+      0,
+      "rgba(183,121,31,.22)"
+    );
+
+
+    gradient.addColorStop(
+      1,
+      "rgba(183,121,31,.02)"
+    );
+
+
+    ctx.fillStyle =
+      gradient;
+
+
+    ctx.fill();
+
+
+    /* LINE */
+
+    ctx.beginPath();
+
+
+    ctx.moveTo(
+      x(0),
+      y(values[0])
+    );
+
+
+    for (
+      let i = 1;
+      i < values.length;
+      i++
+    ) {
+
+      ctx.lineTo(
+        x(i),
+        y(values[i])
+      );
+    }
+
+
+    ctx.strokeStyle =
+      "#b7791f";
+
+
+    ctx.lineWidth =
+      2.5;
+
+
+    ctx.lineJoin =
+      "round";
+
+
+    ctx.lineCap =
+      "round";
+
+
+    ctx.stroke();
+
+
+    /* END DOT */
+
+    const last =
+      values.length - 1;
+
+
+    ctx.beginPath();
+
+
+    ctx.arc(
+      x(last),
+      y(values[last]),
+      4,
+      0,
+      Math.PI * 2
+    );
+
+
+    ctx.fillStyle =
+      "#b7791f";
+
+
+    ctx.fill();
+
+
+    document.getElementById(
+      "chartStart"
+    ).textContent =
+      formatDate(
+        data[0].date
+      );
+
+
+    document.getElementById(
+      "chartEnd"
+    ).textContent =
+      formatDate(
+        data[data.length - 1].date
+      );
+
+
+    document.getElementById(
+      "chartRecordCount"
+    ).textContent =
+      `${data.length.toLocaleString("en-IN")} days`;
+  }
+
+
+  /* =========================================================
+     LOAD CURRENT DATA ONLY
+     ========================================================= */
+
+  async function loadCurrentData() {
+
+    const live =
+      await loadJson(
+        LIVE_URL
+      );
+
+
+    const history =
+      await loadJson(
+        HISTORY_URL
+      );
+
+
+    displayLive(live);
+
+
+    historyData =
+      normalizeHistory(history);
+
+
+    displayHistory();
+
+
+    try {
+
+      localStorage.setItem(
+        "gold_live_backup",
+        JSON.stringify(live)
+      );
+
+
+      localStorage.setItem(
+        "gold_history_backup",
+        JSON.stringify(historyData)
+      );
+
+    } catch (_) {}
+  }
+
+
+  /* =========================================================
+     WORKER
+     ========================================================= */
+
+  async function triggerWorker() {
+
+    const response =
+      await fetch(
+        WORKER_URL,
+        {
+          method: "POST",
+
+          headers: {
+            "Content-Type":
+              "application/json"
+          },
+
+          cache: "no-store"
+        }
+      );
+
+
+    let result = null;
+
+
+    try {
+      result =
+        await response.json();
+    } catch (_) {}
+
+
+    if (!response.ok) {
+
+      throw new Error(
+        result?.error ||
+        `Worker HTTP ${response.status}`
+      );
+    }
+
+
+    if (
+      result &&
+      result.ok === false
+    ) {
+
+      throw new Error(
+        result.error ||
+        "Cloudflare Worker rejected request"
+      );
+    }
+
+
+    return result;
+  }
+
+
+  /* =========================================================
+     WAIT FOR GITHUB ACTIONS DATA
+     ========================================================= */
+
+  async function waitForUpdatedData(
+    oldTimestamp,
+    oldRate
+  ) {
+
+    const timeoutMs =
+      4 * 60 * 1000;
+
+    const pollMs =
+      5000;
+
+    const started =
+      Date.now();
+
+
+    while (
+      Date.now() - started <
+      timeoutMs
+    ) {
+
+      await new Promise(
+        resolve =>
+          setTimeout(
+            resolve,
+            pollMs
+          )
+      );
+
+
+      try {
+
+        const live =
+          await loadJson(
+            LIVE_URL
+          );
+
+
+        const timestampChanged =
+          live.timestamp &&
+          live.timestamp !== oldTimestamp;
+
+
+        const rateChanged =
+          Number.isFinite(
+            Number(live.rate_22k)
+          ) &&
+          Number(live.rate_22k) !==
+            Number(oldRate);
+
+
+        /*
+         * A new timestamp means GitHub has
+         * generated a fresh live.json.
+         *
+         * A changed rate is also accepted.
+         */
+
+        if (
+          timestampChanged ||
+          rateChanged
+        ) {
+
+          const history =
+            await loadJson(
+              HISTORY_URL
+            );
+
+
+          return {
+            live,
+            history
+          };
+        }
+
+
+        setStatus(
+          "Waiting for latest rate…",
+          false,
+          true
+        );
+
+      } catch (error) {
+
+        console.warn(
+          "Waiting for updated data:",
+          error
+        );
+      }
+    }
+
+
+    throw new Error(
+      "Timed out waiting for GitHub Actions update"
+    );
+  }
+
+
+  /* =========================================================
+     FETCH LATEST RATE
+     ========================================================= */
+
+  async function fetchLatestRate() {
+
+    if (refreshInProgress) {
+      return;
+    }
+
+
+    refreshInProgress = true;
+
+
+    const button =
+      document.getElementById(
+        "refreshButton"
+      );
+
+
+    const oldTimestamp =
+      liveData?.timestamp ||
+      "";
+
+
+    const oldRate =
+      liveData?.rate_22k;
+
+
+    button.disabled = true;
+
+
+    button.style.transform =
+      "rotate(360deg)";
+
+
+    setStatus(
+      "Requesting latest gold rate…",
+      false,
+      true
+    );
+
+
+    try {
+
+      /*
+       * STEP 1
+       *
+       * Call Cloudflare Worker.
+       */
+
+      await triggerWorker();
+
+
+      setStatus(
+        "GitHub Actions updating rate…",
+        false,
+        true
+      );
+
+
+      /*
+       * STEP 2
+       *
+       * Wait until update_gold.py has
+       * produced a new live.json.
+       */
+
+      const updated =
+        await waitForUpdatedData(
+          oldTimestamp,
+          oldRate
+        );
+
+
+      /*
+       * STEP 3
+       *
+       * Display the new data.
+       */
+
+      displayLive(
+        updated.live
+      );
+
+
+      historyData =
+        normalizeHistory(
+          updated.history
+        );
+
+
+      displayHistory();
+
+
+      try {
+
+        localStorage.setItem(
+          "gold_live_backup",
+          JSON.stringify(
+            updated.live
+          )
+        );
+
+
+        localStorage.setItem(
+          "gold_history_backup",
+          JSON.stringify(
+            historyData
+          )
+        );
+
+      } catch (_) {}
+
+
+      const rate =
+        Number(
+          updated.live.rate_22k
+        );
+
+
+      setStatus(
+        `Latest rate loaded · ${money(rate)}/g`,
+        false,
+        false
+      );
+
+
+    } catch (error) {
+
+      console.error(
+        "Fetch latest rate:",
+        error
+      );
+
+
+      /*
+       * Worker may have succeeded but GitHub
+       * can take time. Show existing data instead
+       * of destroying the current display.
+       */
+
+      try {
+
+        await loadCurrentData();
+
+
+        setStatus(
+          "Update requested · showing latest saved data",
+          false,
+          false
+        );
+
+      } catch (_) {
+
+        setStatus(
+          error.message ||
+          "Unable to update rate",
+          true,
+          false
+        );
+      }
+
+    } finally {
+
+      refreshInProgress = false;
+
+
+      button.disabled = false;
+
+
+      setTimeout(() => {
+
+        button.style.transform = "";
+
+      }, 450);
+    }
+  }
+
+
+  /* =========================================================
+     REFRESH CURRENT JSON
+     ========================================================= */
+
+  async function refreshData(
+    manual = false
+  ) {
+
+    if (manual) {
+
+      /*
+       * Manual button = REAL FETCH.
+       *
+       * It triggers:
+       *
+       * Browser
+       * → Cloudflare Worker
+       * → GitHub Actions
+       * → update_gold.py
+       * → live.json
+       */
+
+      await fetchLatestRate();
+
+      return;
+    }
+
+
+    /*
+     * Automatic app loading only reads JSON.
+     *
+     * It DOES NOT trigger GitHub Actions.
+     */
+
+    try {
+
+      setStatus(
+        "Loading latest saved rate…"
+      );
+
+
+      await loadCurrentData();
+
+
+      const rate =
+        Number(
+          liveData?.rate_22k
+        );
+
+
+      setStatus(
+        `Updated · ${money(rate)}/g`
+      );
+
+
+    } catch (error) {
+
+      console.error(error);
+
+
+      /*
+       * Offline/local backup
+       */
+
+      try {
+
+        const backupLive =
+          JSON.parse(
+            localStorage.getItem(
+              "gold_live_backup"
+            )
+          );
+
+
+        const backupHistory =
+          JSON.parse(
+            localStorage.getItem(
+              "gold_history_backup"
+            )
+          );
+
+
+        if (backupLive) {
+
+          displayLive(
+            backupLive
+          );
+        }
+
+
+        if (
+          Array.isArray(
+            backupHistory
+          )
+        ) {
+
+          historyData =
+            backupHistory;
+
+          displayHistory();
+        }
+
+
+        setStatus(
+          "Offline · showing saved data",
+          true
+        );
+
+
+      } catch (_) {
+
+        setStatus(
+          "Unable to load data",
+          true
+        );
+      }
+    }
+  }
+
+
+  /* =========================================================
+     RANGE BUTTONS
+     ========================================================= */
+
+  document
+    .querySelectorAll(".range")
+    .forEach(button => {
+
+      button.addEventListener(
+        "click",
+        () => {
+
+          document
+            .querySelectorAll(".range")
+            .forEach(item => {
+
+              item.classList.remove(
+                "active"
+              );
+
+            });
+
+
+          button.classList.add(
+            "active"
+          );
+
+
+          selectedRange =
+            button.dataset.range === "all"
+              ? "all"
+              : Number(
+                  button.dataset.range
+                );
+
+
+          drawChart();
+        }
+      );
+
+    });
+
+
+  /* =========================================================
+     REFRESH BUTTON
+     ========================================================= */
+
+  document
+    .getElementById(
+      "refreshButton"
+    )
+    .addEventListener(
+      "click",
+      () => {
+
+        fetchLatestRate();
+
+      }
+    );
+
+
+  /* =========================================================
+     REFRESH WHEN APP BECOMES VISIBLE
+     ========================================================= */
+
+  document.addEventListener(
+    "visibilitychange",
+    () => {
+
+      if (
+        document.visibilityState ===
+        "visible"
+      ) {
+
+        refreshData(false);
+
+      }
+
+    }
+  );
+
+
+  window.addEventListener(
+    "pageshow",
+    () => {
+
+      refreshData(false);
+
+    }
+  );
+
+
+  window.addEventListener(
+    "resize",
+    () => {
+
+      drawChart();
+
+    }
+  );
+
+
+  /* =========================================================
+     SERVICE WORKER
+     ========================================================= */
+
+  if (
+    "serviceWorker" in navigator
+  ) {
+
+    window.addEventListener(
+      "load",
+      () => {
+
+        navigator.serviceWorker
+          .register(
+            "sw.js"
+          )
+          .catch(
+            error =>
+              console.warn(
+                "Service worker:",
+                error
+              )
+          );
+
+      }
+    );
+  }
+
+
+  /* =========================================================
+     START
+     ========================================================= */
+
+  refreshData(false);
+
+</script>
+
+</body>
+</html>
