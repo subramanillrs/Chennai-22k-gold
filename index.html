@@ -233,6 +233,19 @@ button:active::after {
   transform-origin: 50% 50%;
 }
 
+.iconbtn .icon-spin {
+  display: none;
+}
+
+.iconbtn.fetching .icon-idle {
+  display: none;
+}
+
+.iconbtn.fetching .icon-spin {
+  display: block;
+  animation: spin .8s linear infinite;
+}
+
 .iconbtn:active {
   transform: scale(.92);
 }
@@ -246,7 +259,6 @@ button:active::after {
 }
 
 .iconbtn.fetching {
-  animation: spin .75s linear infinite;
   pointer-events: none;
 }
 
@@ -382,13 +394,26 @@ button:active::after {
   transform-origin: 50% 50%;
 }
 
+.pulldown .icon-spin {
+  display: none;
+}
+
 .pulldown.ready .pulldownicon {
   transform: rotate(180deg);
   color: var(--inverse-primary);
 }
 
 .pulldown.loading .pulldownicon {
-  animation: spin .75s linear infinite;
+  transform: none;
+}
+
+.pulldown.loading .icon-idle {
+  display: none;
+}
+
+.pulldown.loading .icon-spin {
+  display: block;
+  animation: spin .8s linear infinite;
 }
 
 /* =========================================================
@@ -1249,9 +1274,12 @@ footer {
   aria-hidden="true"
 >
   <span class="pulldownicon" id="pulldownIcon">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+    <svg class="icon-idle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
       <path d="M21 12a9 9 0 1 1-2.64-6.36"/>
       <polyline points="21 3 21 9 15 9"/>
+    </svg>
+    <svg class="icon-spin" viewBox="0 0 24 24" fill="none">
+      <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-dasharray="34 22"/>
     </svg>
   </span>
   <span id="pulldownText">Pull to refresh</span>
@@ -1276,9 +1304,12 @@ footer {
     aria-label="Fetch latest rate"
     type="button"
   >
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+    <svg class="icon-idle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
       <path d="M21 12a9 9 0 1 1-2.64-6.36"/>
       <polyline points="21 3 21 9 15 9"/>
+    </svg>
+    <svg class="icon-spin" viewBox="0 0 24 24" fill="none">
+      <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-dasharray="34 22"/>
     </svg>
   </button>
 
