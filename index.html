@@ -4,7 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 
-<meta name="theme-color" content="#15130f">
+<meta name="theme-color" content="#fffbff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#15130e" media="(prefers-color-scheme: dark)">
 <meta name="description" content="Chennai 22K gold price tracker">
 
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -20,46 +21,64 @@
 :root {
   color-scheme: light;
 
-  --bg: #f4f3ef;
-  --surface: #ffffff;
-  --surface2: #f7f6f2;
-  --surface3: #edece6;
+  /* ---- Material shape scale ---- */
+  --shape-xs: 8px;
+  --shape-sm: 12px;
+  --shape-md: 16px;
+  --shape-lg: 20px;
+  --shape-xl: 28px;
+  --shape-full: 999px;
 
-  --text: #17181b;
-  --muted: #6b6d76;
-  --line: #e6e4dd;
+  /* ---- Motion ---- */
+  --ease-standard: cubic-bezier(.2,0,0,1);
+  --ease-emphasized: cubic-bezier(.3,0,.1,1);
 
-  --gold: #a9781f;
-  --gold-light: #f6e6ad;
-  --gold-bg: #fbf3de;
+  /* ---- Surfaces (tonal, warm-neutral) ---- */
+  --bg: #fffbff;
+  --surface: #fffbff;
+  --surface-dim: #e0d9cd;
+  --surface-bright: #fffbff;
+  --surface-container-lowest: #ffffff;
+  --surface-container-low: #faf3e7;
+  --surface-container: #f4ede1;
+  --surface-container-high: #eee7db;
+  --surface-container-highest: #e8e1d6;
 
-  --good: #12805a;
-  --good-bg: #e4f6ee;
+  --outline: #837567;
+  --outline-variant: #d5c7b6;
 
-  --bad: #c0332a;
-  --bad-bg: #fbeae8;
+  --on-surface: #1d1b16;
+  --on-surface-variant: #4d4639;
 
-  --ink: #14151a;
-  --accent: #d3a13a;
-  --accent2: #f0c869;
+  /* ---- Primary (gold) ---- */
+  --primary: #7c5900;
+  --on-primary: #ffffff;
+  --primary-container: #ffdea0;
+  --on-primary-container: #271900;
 
-  --shadow-sm:
-    0 1px 2px rgba(20,20,20,.04),
-    0 1px 1px rgba(20,20,20,.03);
+  /* ---- Secondary ---- */
+  --secondary-container: #efe0c3;
+  --on-secondary-container: #4c4526;
 
-  --shadow:
-    0 1px 2px rgba(20,20,20,.04),
-    0 10px 24px -8px rgba(20,20,20,.10);
+  /* ---- Tertiary / inverse (used for dark hero + FAB) ---- */
+  --inverse-surface: #322f27;
+  --inverse-on-surface: #f6efe4;
+  --inverse-primary: #ffbf5f;
 
-  --shadow-lg:
-    0 8px 20px -6px rgba(20,20,20,.14),
-    0 24px 48px -16px rgba(20,20,20,.14);
+  /* ---- Semantic ---- */
+  --good: #2e6e4e;
+  --good-container: #b6f2cc;
+  --on-good-container: #002110;
 
-  --radius-sm: 14px;
-  --radius: 20px;
-  --radius-lg: 28px;
+  --bad: #ba1a1a;
+  --bad-container: #ffdad6;
+  --on-bad-container: #410002;
 
-  --ease: cubic-bezier(.22,1,.36,1);
+  /* ---- Elevation (subtle, M3-style) ---- */
+  --el1: 0 1px 2px rgba(29,27,22,.10), 0 1px 3px 1px rgba(29,27,22,.06);
+  --el2: 0 1px 2px rgba(29,27,22,.12), 0 2px 6px 2px rgba(29,27,22,.08);
+  --el3: 0 1px 3px rgba(29,27,22,.14), 0 4px 8px 3px rgba(29,27,22,.10);
+  --el4: 0 2px 3px rgba(29,27,22,.16), 0 6px 10px 4px rgba(29,27,22,.10);
 }
 
 * {
@@ -69,23 +88,21 @@
 
 html {
   scroll-behavior: smooth;
+  overscroll-behavior-y: contain;
 }
 
 body {
   margin: 0;
   background: var(--bg);
-  background-image:
-    radial-gradient(700px 320px at 12% -8%, rgba(211,161,58,.10), transparent 60%),
-    radial-gradient(600px 300px at 100% 0%, rgba(211,161,58,.06), transparent 55%);
-  background-attachment: fixed;
-  color: var(--text);
+  color: var(--on-surface);
+  overscroll-behavior-y: contain;
 
   font-family:
+    "Google Sans Text",
+    Roboto,
     -apple-system,
     BlinkMacSystemFont,
-    "SF Pro Text",
     "Segoe UI",
-    Roboto,
     system-ui,
     sans-serif;
 
@@ -104,6 +121,23 @@ button {
   cursor: pointer;
   -webkit-appearance: none;
   appearance: none;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Shared Material "state layer" press feedback */
+button::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: currentColor;
+  opacity: 0;
+  transition: opacity .12s var(--ease-standard);
+  pointer-events: none;
+}
+
+button:active::after {
+  opacity: .10;
 }
 
 .app {
@@ -112,9 +146,9 @@ button {
   margin: auto;
 
   padding:
-    calc(10px + env(safe-area-inset-top))
+    calc(12px + env(safe-area-inset-top))
     16px
-    calc(40px + env(safe-area-inset-bottom));
+    calc(96px + env(safe-area-inset-bottom));
 }
 
 /* =========================================================
@@ -122,7 +156,7 @@ button {
    ========================================================= */
 
 .topbar {
-  min-height: 60px;
+  min-height: 64px;
 
   display: flex;
   align-items: center;
@@ -132,63 +166,59 @@ button {
 .brand {
   display: flex;
   align-items: center;
-  gap: 13px;
+  gap: 14px;
 }
 
 .logo {
-  width: 44px;
-  height: 44px;
+  width: 42px;
+  height: 42px;
 
-  border-radius: 13px;
+  border-radius: var(--shape-md);
 
   display: grid;
   place-items: center;
 
-  background: linear-gradient(155deg, #24211a 0%, #14130f 100%);
-  color: var(--accent2);
+  background: var(--primary-container);
+  color: var(--on-primary-container);
 
-  font-size: 19px;
-  font-weight: 800;
-
-  box-shadow:
-    0 1px 1px rgba(0,0,0,.2),
-    0 6px 14px -4px rgba(20,15,5,.35);
+  font-size: 18px;
+  font-weight: 700;
 }
 
 .brand h1 {
   margin: 0;
 
-  font-size: 18px;
-  line-height: 1.15;
-  font-weight: 750;
+  font-size: 17px;
+  line-height: 1.25;
+  font-weight: 600;
 
-  letter-spacing: -.3px;
+  letter-spacing: 0;
 }
 
 .brand p {
-  margin: 3px 0 0;
+  margin: 2px 0 0;
 
-  color: var(--muted);
+  color: var(--on-surface-variant);
 
-  font-size: 12px;
+  font-size: 12.5px;
   font-weight: 500;
 }
 
 .iconbtn {
-  width: 44px;
-  height: 44px;
+  width: 50px;
+  height: 50px;
 
-  border: 1px solid var(--line);
-  border-radius: 50%;
+  border: none;
+  border-radius: var(--shape-full);
 
-  background: var(--surface);
-  color: var(--text);
+  background: var(--primary-container);
+  color: var(--on-primary-container);
 
-  box-shadow: var(--shadow-sm);
+  font-size: 21px;
 
-  font-size: 19px;
+  box-shadow: var(--el1);
 
-  transition: transform .18s var(--ease), box-shadow .18s var(--ease), border-color .18s var(--ease);
+  transition: background .2s var(--ease-standard), transform .15s var(--ease-standard), box-shadow .2s var(--ease-standard);
 }
 
 .iconbtn:active {
@@ -196,12 +226,36 @@ button {
 }
 
 .iconbtn:hover {
-  border-color: var(--accent);
-  box-shadow: var(--shadow);
+  box-shadow: var(--el2);
 }
 
 .iconbtn.spin {
-  animation: spin .5s var(--ease);
+  animation: spin .5s var(--ease-emphasized);
+}
+
+.iconbtn.fetching {
+  animation: spin .75s linear infinite;
+  pointer-events: none;
+}
+
+.fab {
+  position: fixed;
+
+  right: 20px;
+  bottom: calc(20px + env(safe-area-inset-bottom));
+
+  width: 60px;
+  height: 60px;
+
+  font-size: 24px;
+
+  box-shadow: var(--el3);
+
+  z-index: 30;
+}
+
+.fab:hover {
+  box-shadow: var(--el4);
 }
 
 @keyframes spin {
@@ -221,15 +275,15 @@ button {
 
   margin: 14px 4px 14px;
 
-  color: var(--muted);
+  color: var(--on-surface-variant);
 
-  font-size: 12px;
+  font-size: 12.5px;
   font-weight: 500;
 }
 
 .dot {
-  width: 7px;
-  height: 7px;
+  width: 8px;
+  height: 8px;
 
   flex: none;
 
@@ -237,8 +291,7 @@ button {
 
   background: var(--good);
 
-  box-shadow:
-    0 0 0 4px rgba(18,128,90,.12);
+  box-shadow: 0 0 0 4px var(--good-container);
 
   animation: pulse 2.4s ease-in-out infinite;
 }
@@ -248,16 +301,13 @@ button {
     opacity: 1;
   }
   50% {
-    opacity: .45;
+    opacity: .4;
   }
 }
 
 .offline .dot {
   background: var(--bad);
-
-  box-shadow:
-    0 0 0 4px rgba(192,51,42,.12);
-
+  box-shadow: 0 0 0 4px var(--bad-container);
   animation: none;
 }
 
@@ -277,25 +327,23 @@ button {
   align-items: center;
   gap: 8px;
 
-  padding: 9px 16px;
+  padding: 10px 18px;
 
-  border-radius: 999px;
+  border-radius: var(--shape-full);
 
-  background: var(--surface);
-  border: 1px solid var(--line);
+  background: var(--inverse-surface);
+  color: var(--inverse-on-surface);
 
-  box-shadow: var(--shadow);
+  box-shadow: var(--el3);
 
-  color: var(--muted);
-
-  font-size: 12px;
-  font-weight: 750;
+  font-size: 12.5px;
+  font-weight: 600;
 
   opacity: 0;
 
   pointer-events: none;
 
-  transition: transform .2s var(--ease), opacity .2s var(--ease);
+  transition: transform .2s var(--ease-emphasized), opacity .2s var(--ease-standard);
 
   z-index: 21;
 
@@ -310,12 +358,12 @@ button {
   display: inline-flex;
   font-size: 15px;
 
-  transition: transform .15s var(--ease);
+  transition: transform .15s var(--ease-standard);
 }
 
 .pulldown.ready .pulldownicon {
   transform: rotate(180deg);
-  color: var(--accent);
+  color: var(--inverse-primary);
 }
 
 .pulldown.loading .pulldownicon {
@@ -330,28 +378,13 @@ button {
   position: relative;
   overflow: hidden;
 
-  padding: 30px 28px;
+  padding: 28px 24px;
 
-  border-radius: var(--radius-lg);
+  border-radius: var(--shape-xl);
 
-  background:
-    radial-gradient(120% 140% at 0% 0%, #2c2717 0%, #1a170f 46%, #100e0a 100%);
+  background: var(--inverse-surface);
 
-  border: 1px solid #3a3117;
-
-  box-shadow: var(--shadow-lg);
-}
-
-.hero::before {
-  content: "";
-
-  position: absolute;
-  inset: 0;
-
-  background:
-    radial-gradient(320px 200px at 88% -10%, rgba(240,200,105,.16), transparent 60%);
-
-  pointer-events: none;
+  box-shadow: var(--el2);
 }
 
 .hero::after {
@@ -359,16 +392,16 @@ button {
 
   position: absolute;
 
-  right: -12px;
-  bottom: -50px;
+  right: -10px;
+  bottom: -46px;
 
-  font-size: 155px;
+  font-size: 145px;
   line-height: 1;
 
-  font-weight: 800;
+  font-weight: 700;
   font-style: italic;
 
-  color: rgba(240,200,105,.05);
+  color: rgba(255,255,255,.035);
 
   pointer-events: none;
 }
@@ -377,13 +410,13 @@ button {
   position: relative;
   z-index: 1;
 
-  color: var(--accent2);
+  color: var(--inverse-primary);
 
-  font-size: 11px;
-  font-weight: 750;
+  font-size: 11.5px;
+  font-weight: 700;
 
   text-transform: uppercase;
-  letter-spacing: 1.2px;
+  letter-spacing: 1.1px;
 }
 
 .hero h2 {
@@ -392,14 +425,14 @@ button {
 
   margin: 10px 0 0;
 
-  font-size: clamp(44px,12vw,74px);
-  line-height: .98;
+  font-size: clamp(42px,11.5vw,68px);
+  line-height: 1;
 
-  letter-spacing: -3px;
+  letter-spacing: -1.5px;
 
-  font-weight: 750;
+  font-weight: 600;
 
-  color: #fbf6e8;
+  color: var(--inverse-on-surface);
 
   font-variant-numeric: tabular-nums;
 }
@@ -410,32 +443,32 @@ button {
 
   margin-top: 8px;
 
-  color: rgba(251,246,232,.5);
+  color: rgba(246,239,228,.55);
 
   font-size: 12.5px;
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .sovereign {
   position: relative;
   z-index: 1;
 
-  margin-top: 22px;
+  margin-top: 20px;
   padding-top: 18px;
 
-  border-top: 1px solid rgba(240,200,105,.16);
+  border-top: 1px solid rgba(246,239,228,.14);
 }
 
 .sovereign label {
   display: block;
 
-  color: rgba(251,246,232,.55);
+  color: rgba(246,239,228,.55);
 
   font-size: 11px;
-  font-weight: 750;
+  font-weight: 700;
 
   text-transform: uppercase;
-  letter-spacing: .8px;
+  letter-spacing: .7px;
 }
 
 .sovereign strong {
@@ -443,13 +476,13 @@ button {
 
   margin-top: 4px;
 
-  font-size: clamp(30px,8vw,46px);
+  font-size: clamp(28px,7.5vw,42px);
 
-  letter-spacing: -1.5px;
+  letter-spacing: -.8px;
 
-  font-weight: 700;
+  font-weight: 600;
 
-  color: #fbf6e8;
+  color: var(--inverse-on-surface);
 
   font-variant-numeric: tabular-nums;
 }
@@ -464,31 +497,29 @@ button {
   margin-top: 16px;
   padding: 8px 14px;
 
-  border-radius: 999px;
+  border-radius: var(--shape-full);
 
-  font-size: 12px;
-  font-weight: 750;
-
-  backdrop-filter: blur(6px);
+  font-size: 12.5px;
+  font-weight: 700;
 }
 
 .up {
-  color: #63e6a8;
-  background: rgba(18,128,90,.22);
+  color: var(--on-good-container);
+  background: var(--good-container);
 }
 
 .down {
-  color: #ff9d94;
-  background: rgba(192,51,42,.22);
+  color: var(--on-bad-container);
+  background: var(--bad-container);
 }
 
 .same {
-  color: rgba(251,246,232,.6);
-  background: rgba(255,255,255,.08);
+  color: rgba(246,239,228,.7);
+  background: rgba(246,239,228,.12);
 }
 
 /* =========================================================
-   FETCH
+   FETCH  (Material filled button)
    ========================================================= */
 
 .fetchrow {
@@ -497,47 +528,41 @@ button {
 
 .fetchbtn {
   width: 100%;
-  min-height: 54px;
+  min-height: 56px;
 
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 9px;
+  gap: 10px;
 
   border: 0;
-  border-radius: 17px;
+  border-radius: var(--shape-full);
 
-  background: linear-gradient(135deg, #24211a 0%, #14130f 100%);
-  color: #fbf6e8;
+  background: var(--primary);
+  color: var(--on-primary);
 
-  font-size: 14px;
-  font-weight: 750;
-  letter-spacing: -.1px;
+  font-size: 14.5px;
+  font-weight: 600;
+  letter-spacing: .1px;
 
-  box-shadow: var(--shadow);
+  box-shadow: var(--el1);
 
   transition:
-    transform .16s var(--ease),
-    opacity .16s var(--ease),
-    box-shadow .16s var(--ease);
-}
-
-.fetchbtn:active {
-  transform: scale(.98);
+    box-shadow .2s var(--ease-standard),
+    opacity .2s var(--ease-standard);
 }
 
 .fetchbtn:hover {
-  box-shadow: var(--shadow-lg);
+  box-shadow: var(--el2);
 }
 
 .fetchbtn:disabled {
-  opacity: .55;
+  opacity: .6;
   cursor: wait;
 }
 
 .fetchicon {
   font-size: 19px;
-  color: var(--accent2);
 }
 
 .fetching .fetchicon {
@@ -545,14 +570,14 @@ button {
 }
 
 .fetchnote {
-  margin: 9px 6px 0;
+  margin: 10px 8px 0;
 
-  color: var(--muted);
+  color: var(--on-surface-variant);
 
   text-align: center;
 
-  font-size: 11px;
-  line-height: 1.45;
+  font-size: 11.5px;
+  line-height: 1.5;
 }
 
 /* =========================================================
@@ -570,39 +595,30 @@ button {
 .card {
   padding: 16px;
 
-  background: var(--surface);
+  background: var(--surface-container-low);
 
-  border: 1px solid var(--line);
+  border-radius: var(--shape-lg);
 
-  border-radius: var(--radius-sm);
-
-  box-shadow: var(--shadow-sm);
-
-  transition: box-shadow .18s var(--ease), transform .18s var(--ease);
-}
-
-.card:hover {
-  box-shadow: var(--shadow);
-  transform: translateY(-1px);
+  transition: background .2s var(--ease-standard);
 }
 
 .label {
-  color: var(--muted);
+  color: var(--on-surface-variant);
 
   font-size: 10.5px;
-  font-weight: 750;
+  font-weight: 700;
 
   text-transform: uppercase;
-  letter-spacing: .7px;
+  letter-spacing: .6px;
 }
 
 .value {
   margin-top: 7px;
 
   font-size: 18px;
-  font-weight: 750;
+  font-weight: 700;
 
-  letter-spacing: -.2px;
+  letter-spacing: -.1px;
 
   font-variant-numeric: tabular-nums;
 }
@@ -610,9 +626,9 @@ button {
 .sub {
   margin-top: 4px;
 
-  color: var(--muted);
+  color: var(--on-surface-variant);
 
-  font-size: 11px;
+  font-size: 11.5px;
 }
 
 /* =========================================================
@@ -620,7 +636,7 @@ button {
    ========================================================= */
 
 .section {
-  margin-top: 30px;
+  margin-top: 32px;
 }
 
 .sectionhead {
@@ -636,29 +652,33 @@ button {
 .sectionhead h3 {
   margin: 0;
 
-  font-size: 18px;
-  font-weight: 750;
+  font-size: 17px;
+  font-weight: 600;
 
-  letter-spacing: -.3px;
+  letter-spacing: 0;
 }
 
 .sectionhead span {
-  color: var(--muted);
+  color: var(--on-surface-variant);
   font-size: 11.5px;
   font-weight: 500;
 }
 
 /* =========================================================
-   SEGMENTS
+   SEGMENTS  (Material segmented button)
    ========================================================= */
 
 .segment {
   display: flex;
-  gap: 6px;
+  gap: 4px;
 
   overflow: auto;
 
-  padding: 2px 0 6px;
+  padding: 4px;
+  margin: 2px 0 8px;
+
+  background: var(--surface-container);
+  border-radius: var(--shape-full);
 
   scrollbar-width: none;
 }
@@ -670,25 +690,25 @@ button {
 .segment button {
   white-space: nowrap;
 
-  padding: 9px 15px;
+  padding: 9px 16px;
 
-  border: 1px solid var(--line);
-  border-radius: 999px;
+  border: none;
+  border-radius: var(--shape-full);
 
-  background: var(--surface);
+  background: transparent;
 
-  color: var(--muted);
+  color: var(--on-surface-variant);
 
-  font-size: 12px;
-  font-weight: 750;
+  font-size: 12.5px;
+  font-weight: 600;
 
-  transition: background .15s var(--ease), color .15s var(--ease), border-color .15s var(--ease);
+  transition: background .2s var(--ease-standard), color .2s var(--ease-standard);
 }
 
 .segment button.active {
-  background: var(--ink);
-  color: #fbf6e8;
-  border-color: var(--ink);
+  background: var(--surface-container-lowest);
+  color: var(--primary);
+  box-shadow: var(--el1);
 }
 
 /* =========================================================
@@ -698,13 +718,9 @@ button {
 .panel {
   padding: 16px;
 
-  background: var(--surface);
+  background: var(--surface-container-low);
 
-  border: 1px solid var(--line);
-
-  border-radius: var(--radius);
-
-  box-shadow: var(--shadow-sm);
+  border-radius: var(--shape-lg);
 }
 
 /* =========================================================
@@ -722,14 +738,13 @@ button {
 .metric {
   padding: 13px;
 
-  border-radius: 14px;
+  border-radius: var(--shape-md);
 
-  background: var(--surface2);
-  border: 1px solid var(--line);
+  background: var(--surface-container);
 }
 
 .metric small {
-  color: var(--muted);
+  color: var(--on-surface-variant);
   font-size: 10px;
   font-weight: 600;
 }
@@ -739,10 +754,10 @@ button {
 
   margin-top: 5px;
 
-  font-size: 15.5px;
-  font-weight: 750;
+  font-size: 15px;
+  font-weight: 700;
 
-  letter-spacing: -.2px;
+  letter-spacing: -.1px;
 
   font-variant-numeric: tabular-nums;
 }
@@ -771,7 +786,7 @@ button {
 
   margin-top: 8px;
 
-  color: var(--muted);
+  color: var(--on-surface-variant);
 
   font-size: 10.5px;
   font-weight: 500;
@@ -789,31 +804,30 @@ button {
 }
 
 .session {
-  padding: 17px;
+  padding: 16px;
 
-  background: var(--surface2);
-  border: 1px solid var(--line);
+  background: var(--surface-container);
 
-  border-radius: 16px;
+  border-radius: var(--shape-md);
 }
 
 .session .tag {
-  color: var(--muted);
+  color: var(--on-surface-variant);
 
   font-size: 10px;
-  font-weight: 750;
+  font-weight: 700;
 
   text-transform: uppercase;
-  letter-spacing: .6px;
+  letter-spacing: .5px;
 }
 
 .session .rate {
   margin-top: 8px;
 
-  font-size: 20px;
-  font-weight: 800;
+  font-size: 19px;
+  font-weight: 700;
 
-  letter-spacing: -.3px;
+  letter-spacing: -.2px;
 
   font-variant-numeric: tabular-nums;
 }
@@ -821,7 +835,7 @@ button {
 .session .time {
   margin-top: 4px;
 
-  color: var(--muted);
+  color: var(--on-surface-variant);
 
   font-size: 11px;
 }
@@ -839,7 +853,7 @@ button {
 }
 
 .last .when {
-  font-weight: 700;
+  font-weight: 600;
   font-size: 13.5px;
 }
 
@@ -848,17 +862,17 @@ button {
 
   margin-top: 4px;
 
-  color: var(--muted);
+  color: var(--on-surface-variant);
 
   font-size: 11px;
   font-weight: 500;
 }
 
 .last .amount {
-  font-size: 19px;
-  font-weight: 800;
+  font-size: 18px;
+  font-weight: 700;
 
-  letter-spacing: -.3px;
+  letter-spacing: -.2px;
 
   text-align: right;
 
@@ -874,7 +888,7 @@ button {
 }
 
 /* =========================================================
-   FORMS
+   FORMS  (Material filled text field)
    ========================================================= */
 
 .formgrid {
@@ -889,37 +903,35 @@ button {
 
   margin-bottom: 7px;
 
-  color: var(--muted);
+  color: var(--on-surface-variant);
 
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .field input,
 .field select {
   width: 100%;
-  height: 48px;
+  height: 50px;
 
   padding: 0 14px;
 
-  border: 1px solid var(--line);
-  border-radius: 13px;
+  border: none;
+  border-bottom: 2px solid var(--outline-variant);
+  border-radius: var(--shape-xs) var(--shape-xs) 4px 4px;
 
-  background: var(--surface2);
-  color: var(--text);
+  background: var(--surface-container-highest);
+  color: var(--on-surface);
 
   outline: 0;
 
-  transition: border-color .15s var(--ease), box-shadow .15s var(--ease), background .15s var(--ease);
+  transition: border-color .15s var(--ease-standard), background .15s var(--ease-standard);
 }
 
 .field input:focus,
 .field select:focus {
-  border-color: var(--gold);
-  background: var(--surface);
-
-  box-shadow:
-    0 0 0 3px rgba(169,120,31,.12);
+  border-color: var(--primary);
+  background: var(--surface-container-high);
 }
 
 .result {
@@ -927,23 +939,24 @@ button {
 
   padding: 16px;
 
-  border-radius: 16px;
+  border-radius: var(--shape-md);
 
-  background: var(--surface2);
-  border: 1px solid var(--line);
+  background: var(--primary-container);
 }
 
 .result b {
-  font-size: 22px;
-  font-weight: 800;
-  letter-spacing: -.3px;
+  font-size: 21px;
+  font-weight: 700;
+  letter-spacing: -.2px;
   font-variant-numeric: tabular-nums;
+  color: var(--on-primary-container);
 }
 
 .result p {
   margin: 5px 0 0;
 
-  color: var(--muted);
+  color: var(--on-primary-container);
+  opacity: .75;
 
   font-size: 11px;
 }
@@ -964,16 +977,16 @@ button {
 
   padding: 16px;
 
-  border-radius: 16px;
+  border-radius: var(--shape-md);
 
-  background: var(--surface2);
-  border: 1px solid var(--line);
+  background: var(--secondary-container);
 }
 
 .compareResult strong {
-  font-size: 21px;
-  font-weight: 800;
-  letter-spacing: -.3px;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -.2px;
+  color: var(--on-secondary-container);
 }
 
 /* =========================================================
@@ -985,7 +998,7 @@ button {
 
   overflow: auto;
 
-  border-radius: 16px;
+  border-radius: var(--shape-md);
 }
 
 .history {
@@ -1004,15 +1017,15 @@ button {
 
   padding: 12px;
 
-  background: var(--surface2);
+  background: var(--surface-container-high);
 
-  color: var(--muted);
+  color: var(--on-surface-variant);
 
   font-size: 10px;
-  font-weight: 750;
+  font-weight: 700;
 
   text-transform: uppercase;
-  letter-spacing: .5px;
+  letter-spacing: .4px;
 
   text-align: left;
 }
@@ -1020,15 +1033,15 @@ button {
 .history td {
   padding: 12px;
 
-  border-top: 1px solid var(--line);
+  border-top: 1px solid var(--outline-variant);
 
   font-weight: 600;
 
   font-variant-numeric: tabular-nums;
 }
 
-.history tbody tr:hover td {
-  background: var(--surface2);
+.history tbody tr:active td {
+  background: var(--surface-container);
 }
 
 .history td:last-child,
@@ -1041,9 +1054,9 @@ button {
    ========================================================= */
 
 footer {
-  padding: 28px 4px 8px;
+  padding: 30px 8px 8px;
 
-  color: var(--muted);
+  color: var(--on-surface-variant);
 
   font-size: 10.5px;
 
@@ -1053,7 +1066,7 @@ footer {
 }
 
 /* =========================================================
-   TOAST
+   TOAST  (Material snackbar)
    ========================================================= */
 
 .toast {
@@ -1064,23 +1077,23 @@ footer {
 
   transform: translate(-50%,16px);
 
-  padding: 12px 18px;
+  padding: 13px 18px;
 
-  border-radius: 999px;
+  border-radius: var(--shape-xs);
 
-  background: var(--ink);
-  color: #fbf6e8;
+  background: var(--inverse-surface);
+  color: var(--inverse-on-surface);
 
-  font-size: 12px;
-  font-weight: 650;
+  font-size: 12.5px;
+  font-weight: 500;
 
-  box-shadow: var(--shadow-lg);
+  box-shadow: var(--el3);
 
   opacity: 0;
 
   pointer-events: none;
 
-  transition: opacity .25s var(--ease), transform .25s var(--ease);
+  transition: opacity .2s var(--ease-standard), transform .2s var(--ease-emphasized);
 
   z-index: 20;
 
@@ -1104,19 +1117,19 @@ footer {
   }
 
   .hero {
-    padding: 34px;
+    padding: 32px;
   }
 }
 
 @media (max-width:430px) {
 
   .app {
-    padding-left: 13px;
-    padding-right: 13px;
+    padding-left: 12px;
+    padding-right: 12px;
   }
 
   .hero {
-    padding: 24px;
+    padding: 22px;
   }
 
   .chartwrap {
@@ -1137,70 +1150,69 @@ footer {
   :root {
     color-scheme: dark;
 
-    --bg: #0b0c0e;
-    --surface: #16171a;
-    --surface2: #1c1d21;
-    --surface3: #26272c;
+    --bg: #15130e;
+    --surface: #15130e;
+    --surface-dim: #15130e;
+    --surface-bright: #3c3830;
+    --surface-container-lowest: #100e09;
+    --surface-container-low: #1d1b15;
+    --surface-container: #211e18;
+    --surface-container-high: #2c2922;
+    --surface-container-highest: #37332c;
 
-    --text: #f2f1ec;
-    --muted: #96979f;
-    --line: #2a2b30;
+    --outline: #a08d78;
+    --outline-variant: #504636;
 
-    --ink: #f2f1ec;
+    --on-surface: #e9e1d4;
+    --on-surface-variant: #d1c5b3;
 
-    --shadow-sm:
-      0 1px 2px rgba(0,0,0,.35);
+    --primary: #ffbf5f;
+    --on-primary: #422d00;
+    --primary-container: #5e4200;
+    --on-primary-container: #ffdea0;
 
-    --shadow:
-      0 2px 8px rgba(0,0,0,.28),
-      0 14px 32px -10px rgba(0,0,0,.4);
+    --secondary-container: #4c4526;
+    --on-secondary-container: #efe0c3;
 
-    --shadow-lg:
-      0 10px 24px -8px rgba(0,0,0,.5),
-      0 28px 56px -18px rgba(0,0,0,.5);
-  }
+    --inverse-surface: #e9e1d4;
+    --inverse-on-surface: #322f27;
+    --inverse-primary: #7c5900;
 
-  body {
-    background-image:
-      radial-gradient(700px 320px at 12% -8%, rgba(211,161,58,.07), transparent 60%),
-      radial-gradient(600px 300px at 100% 0%, rgba(211,161,58,.05), transparent 55%);
-  }
+    --good: #92d5ac;
+    --good-container: #0e5233;
+    --on-good-container: #b6f2cc;
 
-  .logo {
-    background: linear-gradient(155deg, #f0c869 0%, #d3a13a 100%);
-    color: #16130a;
-    box-shadow: 0 6px 14px -4px rgba(211,161,58,.35);
-  }
+    --bad: #ffb4a9;
+    --bad-container: #93000a;
+    --on-bad-container: #ffdad6;
 
-  .iconbtn {
-    background: var(--surface);
+    --el1: 0 1px 2px rgba(0,0,0,.4), 0 1px 3px 1px rgba(0,0,0,.28);
+    --el2: 0 1px 2px rgba(0,0,0,.42), 0 2px 6px 2px rgba(0,0,0,.30);
+    --el3: 0 1px 3px rgba(0,0,0,.44), 0 4px 8px 3px rgba(0,0,0,.32);
+    --el4: 0 2px 3px rgba(0,0,0,.46), 0 6px 10px 4px rgba(0,0,0,.32);
   }
 
   .hero {
-    background:
-      radial-gradient(120% 140% at 0% 0%, #211c10 0%, #17140d 46%, #100e0a 100%);
-
-    border-color: #3a3117;
+    background: var(--surface-container-high);
+    border: 1px solid var(--outline-variant);
   }
 
-  .fetchbtn {
-    background: linear-gradient(135deg, #f0c869 0%, #d3a13a 100%);
-    color: #16130a;
+  .hero .eyebrow {
+    color: var(--primary);
   }
 
-  .fetchicon {
-    color: #16130a;
+  .hero h2,
+  .sovereign strong {
+    color: var(--on-surface);
   }
 
-  .segment button.active {
-    background: var(--ink);
-    color: #16130a;
-    border-color: var(--ink);
+  .hero .unit,
+  .sovereign label {
+    color: var(--on-surface-variant);
   }
 
-  .toast {
-    background: var(--surface2);
-    border: 1px solid var(--line);
+  .sovereign {
+    border-top-color: var(--outline-variant);
   }
 }
 </style>
@@ -1233,9 +1245,9 @@ footer {
   </div>
 
   <button
-    class="iconbtn"
+    class="iconbtn fab"
     id="refresh"
-    aria-label="Refresh data"
+    aria-label="Fetch latest rate"
     type="button"
   >
     ↻
@@ -1257,9 +1269,12 @@ footer {
 
 <!-- =====================================================
      MANUAL FETCH
+     (kept in DOM, hidden — the corner refresh button is
+     now the only visible fetch trigger; manualFetch() still
+     updates this element's text/disabled state internally)
      ===================================================== -->
 
-<div class="fetchrow">
+<div class="fetchrow" hidden>
 
   <button
     class="fetchbtn"
@@ -2589,7 +2604,7 @@ function drawChart() {
   if (data.length < 2) {
 
     ctx.fillStyle =
-      "#8a8b93";
+      "#8a8073";
 
     ctx.textAlign =
       "center";
@@ -2699,7 +2714,7 @@ function drawChart() {
 
 
     ctx.strokeStyle =
-      "rgba(140,140,150,.14)";
+      "rgba(131,117,103,.16)";
 
 
     ctx.beginPath();
@@ -2729,7 +2744,7 @@ function drawChart() {
 
 
     ctx.fillStyle =
-      "#8a8b93";
+      "#8a8073";
 
 
     ctx.fillText(
@@ -2790,13 +2805,13 @@ function drawChart() {
 
   gradient.addColorStop(
     0,
-    "rgba(211,161,58,.24)"
+    "rgba(124,89,0,.22)"
   );
 
 
   gradient.addColorStop(
     1,
-    "rgba(211,161,58,.02)"
+    "rgba(124,89,0,.02)"
   );
 
 
@@ -2832,7 +2847,7 @@ function drawChart() {
 
 
   ctx.strokeStyle =
-    "#a9781f";
+    "#7c5900";
 
 
   ctx.lineWidth =
@@ -2853,7 +2868,7 @@ function drawChart() {
   /* LAST POINT */
 
   ctx.fillStyle =
-    "#a9781f";
+    "#7c5900";
 
 
   ctx.beginPath();
@@ -4020,6 +4035,18 @@ $("fetchNow").onclick =
         return;
       }
 
+      /*
+       * We're actively taking over this gesture as a
+       * custom pull-to-refresh, so stop the browser's own
+       * native swipe-to-reload from firing at the same time
+       * (that native reload was overriding our fetch flow).
+       */
+
+      if (event.cancelable) {
+
+        event.preventDefault();
+      }
+
       const pulled =
         Math.min(
           delta * .55,
@@ -4051,7 +4078,7 @@ $("fetchNow").onclick =
           ? "Release to refresh"
           : "Pull to refresh";
     },
-    { passive: true }
+    { passive: false }
   );
 
 
