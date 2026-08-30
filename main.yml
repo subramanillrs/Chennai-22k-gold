@@ -1,0 +1,176 @@
+name: Monitor and Update Chennai 22K Gold
+
+on:
+  workflow_dispatch:
+
+  schedule:
+    # 08:30 AM IST = 03:00 UTC
+    - cron: "0 3 * * *"
+
+    # 05:00 PM IST = 11:30 UTC
+    - cron: "30 11 * * *"
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 210
+
+    steps:
+
+      # ----------------------------------------------------
+      # CHECKOUT
+      # ----------------------------------------------------
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      # ----------------------------------------------------
+      # PYTHON
+      # ----------------------------------------------------
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      # ----------------------------------------------------
+      # PIP CACHE
+      # ----------------------------------------------------
+      - name: Cache pip packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-requests-bs4
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      # ----------------------------------------------------
+      # DEPENDENCIES
+      # ----------------------------------------------------
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests beautifulsoup4
+
+      # ----------------------------------------------------
+      # DETERMINE FETCH MODE
+      # ----------------------------------------------------
+      - name: Determine fetch mode
+        id: mode
+        shell: bash
+        run: |
+          echo "Event: ${{ github.event_name }}"
+
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "force_fetch=true" >> "$GITHUB_OUTPUT"
+            echo "Manual Fetch button detected."
+          else
+            echo "force_fetch=false" >> "$GITHUB_OUTPUT"
+            echo "Scheduled run detected."
+          fi
+
+      # ----------------------------------------------------
+      # MONITOR AND UPDATE
+      # ----------------------------------------------------
+      - name: Monitor and update Chennai 22K rate
+        env:
+          GITHUB_ACTIONS: "true"
+          GITHUB_EVENT_NAME: ${{ github.event_name }}
+          FORCE_FETCH: ${{ steps.mode.outputs.force_fetch }}
+        shell: bash
+        run: |
+          echo "============================================================"
+          echo "CHENNAI 22K GOLD RATE MONITOR"
+          echo "============================================================"
+          echo "Event: $GITHUB_EVENT_NAME"
+          echo "Force fetch: $FORCE_FETCH"
+          echo ""
+          echo "Starting update_gold.py..."
+          echo ""
+          echo "Scheduled runs:"
+          echo "AM : 08:30 IST"
+          echo "PM : 17:00 IST"
+          echo ""
+          echo "During monitoring:"
+          echo "LiveChennai + GoodReturns checked every 10 seconds."
+          echo "============================================================"
+
+          python update_gold.py
+
+      # ----------------------------------------------------
+      # VERIFY DATA
+      # ----------------------------------------------------
+      - name: Verify generated data
+        shell: bash
+        run: |
+          echo "============================================================"
+          echo "VERIFYING GENERATED DATA"
+          echo "============================================================"
+
+          if [ -f data/live.json ]; then
+            echo "live.json: OK"
+          else
+            echo "ERROR: data/live.json is missing"
+            exit 1
+          fi
+
+          if [ -f data/history.json ]; then
+            echo "history.json: OK"
+          else
+            echo "history.json missing - creating empty file"
+            echo "[]" > data/history.json
+          fi
+
+          if [ -f data/monitoring_windows.json ]; then
+            echo "monitoring_windows.json: OK"
+          else
+            echo "monitoring_windows.json missing - creating file"
+            echo '{}' > data/monitoring_windows.json
+          fi
+
+      # ----------------------------------------------------
+      # SHOW LIVE DATA
+      # ----------------------------------------------------
+      - name: Show current live data
+        shell: bash
+        run: |
+          echo "============================================================"
+          echo "CURRENT LIVE DATA"
+          echo "============================================================"
+
+          cat data/live.json
+
+      # ----------------------------------------------------
+      # SHOW MONITORING WINDOW
+      # ----------------------------------------------------
+      - name: Show monitoring window
+        shell: bash
+        run: |
+          echo "============================================================"
+          echo "MONITORING WINDOW"
+          echo "============================================================"
+
+          cat data/monitoring_windows.json
+
+      # ----------------------------------------------------
+      # SAVE UPDATED DATA
+      # ----------------------------------------------------
+      - name: Save updated data
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add data/live.json
+          git add data/history.json
+          git add data/monitoring_windows.json
+
+          if git diff --cached --quiet; then
+            echo "No data changes to commit."
+          else
+            git commit -m "Update Chennai 22K gold rate"
+            git push
+          fi
