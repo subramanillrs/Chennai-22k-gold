@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#f8fafc" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#090d16" media="(prefers-color-scheme: dark)">
-<meta name="description" content="Chennai 22K Gold Price Tracker & Valuation Dashboard">
+<meta name="description" content="22K Gold Price Tracker & Valuation Dashboard">
 
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -18,7 +18,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-<title>Gold 22k rate · Chennai</title>
+<title>Gold 22k rate</title>
 
 <style>
 /* =========================================================
@@ -69,6 +69,7 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
+    /* Dark Theme */
     --bg-app: #090d16;
     --surface: #111726;
     --surface-subtle: #172033;
@@ -165,36 +166,21 @@ button, input, select {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 2px 2px 4px;
-}
-
-.brand-text {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.brand-eyebrow {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--gold-primary);
-  line-height: 1.2;
+  padding: 4px 2px 6px;
 }
 
 .brand-text h1 {
-  font-size: 22px;
+  font-size: 24px;
   font-weight: 800;
-  letter-spacing: -0.03em;
-  line-height: 1.15;
+  letter-spacing: -0.035em;
+  line-height: 1.1;
 }
 
 .status-indicator {
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  padding: 6px 12px;
+  padding: 6px 14px;
   background: var(--surface);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-full);
@@ -227,7 +213,7 @@ button, input, select {
 }
 
 /* =========================================================
-   HERO CARD (INTEGRATED BENCHMARK DATE & ALIGNED COLUMNS)
+   HERO CARD (INTEGRATED EDGE-ALIGNED DETAILS)
    ========================================================= */
 .hero {
   background: var(--surface);
@@ -290,7 +276,7 @@ button, input, select {
   margin-top: 2px;
 }
 
-/* Integrated 2-Column Split inside Hero */
+/* 2-Column Split: Left & Right Aligned */
 .hero-details-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -299,10 +285,19 @@ button, input, select {
   border-top: 1px solid var(--border-subtle);
 }
 
-.hero-detail-col {
+.hero-detail-col-left {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+  text-align: left;
+  gap: 4px;
+}
+
+.hero-detail-col-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  text-align: right;
   gap: 4px;
 }
 
@@ -339,25 +334,19 @@ button, input, select {
 }
 
 /* =========================================================
-   3-COLUMN QUICK STATS (STRICTLY ALIGNED)
+   STRICTLY UNIFORM 3-COLUMN QUICK STATS
    ========================================================= */
 .quick-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
-}
-
-@media (max-width: 480px) {
-  .quick-grid {
-    grid-template-columns: 1fr 1fr 1fr;
-  }
 }
 
 .stat-card {
   background: var(--surface);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-sm);
-  padding: 14px 16px;
+  padding: 14px 14px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -507,7 +496,7 @@ button, input, select {
 
 .chart-stats-row {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 8px;
   margin-bottom: 16px;
 }
@@ -705,7 +694,7 @@ select.calc-input {
 .compare-result .negative { color: var(--bad); font-weight: 700; }
 
 /* =========================================================
-   DATA TABLE (STRICT MATHEMATICAL ALIGNMENT)
+   STRICTLY BALANCED 3-COLUMN DATA TABLE
    ========================================================= */
 .table-wrap {
   max-height: 360px;
@@ -752,19 +741,20 @@ select.calc-input {
   border-bottom: none;
 }
 
+/* Explicit Proportional Widths */
 .history-table th:nth-child(1), .history-table td:nth-child(1) {
   text-align: left;
-  width: 38%;
+  width: 34%;
 }
 
 .history-table th:nth-child(2), .history-table td:nth-child(2) {
   text-align: right;
-  width: 31%;
+  width: 33%;
 }
 
 .history-table th:nth-child(3), .history-table td:nth-child(3) {
   text-align: right;
-  width: 31%;
+  width: 33%;
 }
 
 /* =========================================================
@@ -911,7 +901,6 @@ footer {
 
   <header class="topbar">
     <div class="brand-text">
-      <span class="brand-eyebrow">Chennai · Benchmark</span>
       <h1>Gold 22k rate</h1>
     </div>
     <div class="status-indicator" id="status">
@@ -934,12 +923,12 @@ footer {
     </div>
 
     <div class="hero-details-grid">
-      <div class="hero-detail-col">
+      <div class="hero-detail-col-left">
         <span class="hero-sub-label">Rate Per Gram (1g)</span>
         <div class="hero-sub-val" id="hero1">₹—</div>
       </div>
-      <div class="hero-detail-col">
-        <span class="hero-sub-label">Benchmark Date</span>
+      <div class="hero-detail-col-right">
+        <span class="hero-sub-label">Market Date</span>
         <div class="hero-date-val">
           <span id="today">—</span>
           <small id="todayTime">—</small>
@@ -952,7 +941,7 @@ footer {
     <div class="stat-card">
       <span class="label">Session</span>
       <span class="value" id="session">—</span>
-      <span class="sub">IST Benchmark</span>
+      <span class="sub">IST Market</span>
     </div>
     <div class="stat-card">
       <span class="label">3Y Peak</span>
@@ -1144,8 +1133,8 @@ footer {
   </section>
 
   <footer>
-    <div>Gold 22k rate · Chennai</div>
-    <div>Live data via Cloudflare Edge Worker · Sources: LiveChennai + GoodReturns</div>
+    <div>Gold 22k rate · Live Tracker</div>
+    <div>Synchronized via Cloudflare Edge Worker · Sources: LiveChennai + GoodReturns</div>
   </footer>
 
 </div>
@@ -1561,7 +1550,7 @@ async function refresh(manual = false) {
     setStatus("Checking rate…");
     await loadPublishedData();
     setStatus("Synced at " + new Date().toLocaleTimeString("en-IN", { hour: "numeric", minute: "2-digit" }));
-    if (manual) toast("Latest benchmark rate loaded");
+    if (manual) toast("Latest rate loaded");
   } catch (error) {
     console.error("Refresh error:", error);
     try {
@@ -1644,12 +1633,12 @@ async function manualFetch() {
     if (oldLive && Number(oldLive.rate_22k) === Number(newestLive.rate_22k)) {
       toast("Rate checked · no change");
     } else {
-      toast("New gold benchmark updated");
+      toast("New gold rate updated");
     }
   } catch (error) {
     console.error("Manual fetch error:", error);
     setStatus("Fetch error · Cached data active", true);
-    toast("Could not update live benchmark");
+    toast("Could not update live rate");
   } finally {
     fetchBusy = false;
     button.disabled = false;
