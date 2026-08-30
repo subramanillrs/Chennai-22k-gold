@@ -137,7 +137,7 @@ input, select {
   -webkit-user-select: auto;
 }
 
-.num, [data-num], td, strong, b, h2, .rate, .value, .amount, .hero-sub-val, .hero-date-val {
+.num, [data-num], td, strong, b, h2, .rate, .value, .amount, .hero-sub-val {
   font-variant-numeric: tabular-nums lining-nums;
   letter-spacing: -0.02em;
 }
@@ -213,7 +213,7 @@ button, input, select {
 }
 
 /* =========================================================
-   HERO CARD (INTEGRATED EDGE-ALIGNED DETAILS)
+   HERO CARD (PERFECTLY LEVEL 2-COLUMN BASELINE)
    ========================================================= */
 .hero {
   background: var(--surface);
@@ -276,7 +276,7 @@ button, input, select {
   margin-top: 2px;
 }
 
-/* 2-Column Split: Left & Right Aligned */
+/* 2-Column Split: Same Starting Horizontal Baseline */
 .hero-details-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -285,20 +285,11 @@ button, input, select {
   border-top: 1px solid var(--border-subtle);
 }
 
-.hero-detail-col-left {
+.hero-detail-col {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   text-align: left;
-  gap: 4px;
-}
-
-.hero-detail-col-right {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  text-align: right;
-  gap: 4px;
 }
 
 .hero-sub-label {
@@ -307,30 +298,30 @@ button, input, select {
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--text-tertiary);
-  line-height: 1.2;
+  line-height: 14px;
+  height: 14px;
+  margin-bottom: 6px;
+  display: block;
 }
 
 .hero-sub-val {
   font-size: 20px;
   font-weight: 800;
   color: var(--text-primary);
-  line-height: 1.2;
+  line-height: 24px;
+  height: 24px;
+  margin-bottom: 2px;
 }
 
-.hero-date-val {
-  font-size: 15px;
-  font-weight: 700;
-  color: var(--text-primary);
-  line-height: 1.2;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.hero-date-val small {
+.hero-sub-sub {
   font-size: 12px;
   font-weight: 500;
   color: var(--text-secondary);
+  line-height: 16px;
+  height: 16px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* =========================================================
@@ -346,11 +337,10 @@ button, input, select {
   background: var(--surface);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-sm);
-  padding: 14px 14px;
+  padding: 14px;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  min-height: 94px;
+  align-items: flex-start;
   box-shadow: var(--shadow-card);
 }
 
@@ -360,24 +350,31 @@ button, input, select {
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--text-tertiary);
-  line-height: 1.2;
+  line-height: 14px;
+  height: 14px;
+  margin-bottom: 6px;
+  display: block;
 }
 
 .stat-card .value {
   font-size: 16px;
   font-weight: 800;
-  line-height: 1.2;
-  margin-top: 4px;
+  line-height: 20px;
+  height: 20px;
+  margin-bottom: 4px;
+  display: block;
 }
 
 .stat-card .sub {
   font-size: 11.5px;
   font-weight: 500;
   color: var(--text-secondary);
+  line-height: 16px;
+  height: 16px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  margin-top: 2px;
+  display: block;
 }
 
 /* =========================================================
@@ -425,11 +422,10 @@ button, input, select {
 .session-box {
   background: var(--surface-subtle);
   border-radius: var(--radius-sm);
-  padding: 14px 16px;
+  padding: 14px;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  min-height: 100px;
+  align-items: flex-start;
 }
 
 .session-box .tag {
@@ -443,21 +439,29 @@ button, input, select {
   background: var(--surface);
   border: 1px solid var(--border-subtle);
   color: var(--text-secondary);
-  line-height: 1.2;
+  line-height: 12px;
+  height: 18px;
+  margin-bottom: 8px;
+  display: inline-flex;
+  align-items: center;
 }
 
 .session-box .rate {
   font-size: 19px;
   font-weight: 800;
-  line-height: 1.2;
-  margin-top: 6px;
+  line-height: 22px;
+  height: 22px;
+  margin-bottom: 4px;
+  display: block;
 }
 
 .session-box .time {
   font-size: 11.5px;
   font-weight: 500;
   color: var(--text-tertiary);
-  margin-top: 2px;
+  line-height: 14px;
+  height: 14px;
+  display: block;
 }
 
 /* =========================================================
@@ -507,7 +511,7 @@ button, input, select {
   padding: 10px 12px;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  align-items: flex-start;
 }
 
 .metric-card small {
@@ -515,16 +519,21 @@ button, input, select {
   font-weight: 700;
   text-transform: uppercase;
   color: var(--text-tertiary);
-  line-height: 1.2;
+  line-height: 12px;
+  height: 12px;
+  margin-bottom: 6px;
+  display: block;
 }
 
 .metric-card b {
   font-size: 13.5px;
   font-weight: 800;
+  line-height: 18px;
+  height: 18px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  line-height: 1.2;
+  display: block;
 }
 
 .metric-card b.positive { color: var(--good); }
@@ -554,30 +563,33 @@ button, input, select {
 }
 
 /* =========================================================
-   FORMS, CALCULATOR & ITEMIZED RECEIPT
+   ALIGNED 2-COLUMN FORMS & CALCULATOR (BELOW PRICE TREND)
    ========================================================= */
 .calc-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 12px;
+  gap: 14px 12px;
 }
 
 .calc-field {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  align-items: flex-start;
 }
 
 .calc-field label {
   font-size: 11px;
   font-weight: 700;
   color: var(--text-secondary);
-  line-height: 1.2;
+  line-height: 14px;
+  height: 14px;
+  margin-bottom: 6px;
+  display: block;
 }
 
 .calc-input {
   width: 100%;
-  height: 42px;
+  height: 44px;
   padding: 0 12px;
   background: var(--surface-subtle);
   border: 1px solid var(--border-subtle);
@@ -714,7 +726,7 @@ select.calc-input {
   position: sticky;
   top: 0;
   background: var(--surface-subtle);
-  padding: 10px 16px;
+  padding: 12px 14px;
   font-size: 10.5px;
   font-weight: 800;
   text-transform: uppercase;
@@ -726,7 +738,7 @@ select.calc-input {
 }
 
 .history-table td {
-  padding: 11px 16px;
+  padding: 12px 14px;
   border-bottom: 1px solid var(--border-subtle);
   font-weight: 600;
   vertical-align: middle;
@@ -923,16 +935,15 @@ footer {
     </div>
 
     <div class="hero-details-grid">
-      <div class="hero-detail-col-left">
-        <span class="hero-sub-label">Rate Per Gram (1g)</span>
+      <div class="hero-detail-col">
+        <span class="hero-sub-label">Rate Per Gram</span>
         <div class="hero-sub-val" id="hero1">₹—</div>
+        <div class="hero-sub-sub">1 Gram Benchmark</div>
       </div>
-      <div class="hero-detail-col-right">
+      <div class="hero-detail-col">
         <span class="hero-sub-label">Market Date</span>
-        <div class="hero-date-val">
-          <span id="today">—</span>
-          <small id="todayTime">—</small>
-        </div>
+        <div class="hero-sub-val" id="today">—</div>
+        <div class="hero-sub-sub" id="todayTime">—</div>
       </div>
     </div>
   </section>
