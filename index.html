@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#f8fafc" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#090d16" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#06080c" media="(prefers-color-scheme: dark)">
 <meta name="description" content="22K Gold Price Tracker & Valuation Dashboard">
 
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -22,7 +22,7 @@
 
 <style>
 /* =========================================================
-   DESIGN TOKENS & TYPOGRAPHY SYSTEM
+   DESIGN TOKENS & SPECULAR OBSIDIAN SYSTEM (STRIPE / LINEAR)
    ========================================================= */
 :root {
   color-scheme: light dark;
@@ -37,6 +37,7 @@
   
   --border-subtle: #e2e8f0;
   --border-strong: #cbd5e1;
+  --specular: inset 0 1px 0 0 rgba(255, 255, 255, 0.9);
 
   --text-primary: #0f172a;
   --text-secondary: #475569;
@@ -61,7 +62,7 @@
   --radius-full: 9999px;
 
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.04);
-  --shadow-card: 0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 4px 12px 0 rgba(0, 0, 0, 0.02);
+  --shadow-card: 0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 4px 14px 0 rgba(0, 0, 0, 0.02);
   --shadow-fab: 0 8px 24px -4px rgba(217, 119, 6, 0.24), 0 2px 6px -1px rgba(0, 0, 0, 0.06);
 
   --transition: 0.18s cubic-bezier(0.16, 1, 0.3, 1);
@@ -69,14 +70,15 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    /* Dark Theme */
-    --bg-app: #090d16;
-    --surface: #111726;
-    --surface-subtle: #172033;
-    --surface-elevated: #1e293b;
+    /* Obsidian OLED Dark Theme */
+    --bg-app: #06080c;
+    --surface: #0e121a;
+    --surface-subtle: #141a24;
+    --surface-elevated: #1a2230;
 
-    --border-subtle: #1e293b;
-    --border-strong: #334155;
+    --border-subtle: rgba(255, 255, 255, 0.07);
+    --border-strong: rgba(255, 255, 255, 0.15);
+    --specular: inset 0 1px 0 0 rgba(255, 255, 255, 0.08);
 
     --text-primary: #f8fafc;
     --text-secondary: #94a3b8;
@@ -94,9 +96,9 @@
     --bad: #f87171;
     --bad-bg: rgba(220, 38, 38, 0.15);
 
-    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.5);
-    --shadow-card: 0 2px 8px 0 rgba(0, 0, 0, 0.4);
-    --shadow-fab: 0 8px 28px -4px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(251, 191, 36, 0.25);
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.6);
+    --shadow-card: 0 4px 20px 0 rgba(0, 0, 0, 0.5);
+    --shadow-fab: 0 8px 28px -4px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(251, 191, 36, 0.25);
   }
 }
 
@@ -148,7 +150,7 @@ input, select {
   padding: calc(16px + env(safe-area-inset-top)) 16px calc(110px + env(safe-area-inset-bottom));
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 16px;
 }
 
 button, input, select {
@@ -160,7 +162,7 @@ button, input, select {
 }
 
 /* =========================================================
-   TOPBAR & STATUS (FLUSH LEFT-ALIGNED WITH APP GRID)
+   TOPBAR & STATUS (FLUSH LEFT)
    ========================================================= */
 .topbar {
   display: flex;
@@ -170,11 +172,6 @@ button, input, select {
   padding: 0;
   margin: 0;
   width: 100%;
-}
-
-.brand-text {
-  padding: 0;
-  margin: 0;
 }
 
 .brand-text h1 {
@@ -197,7 +194,7 @@ button, input, select {
   font-size: 11.5px;
   font-weight: 600;
   color: var(--text-secondary);
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-sm), var(--specular);
   white-space: nowrap;
   margin: 0;
 }
@@ -224,18 +221,20 @@ button, input, select {
 }
 
 /* =========================================================
-   HERO CARD
+   HERO CARD (WITH BIS 916 LUXURY BADGE)
    ========================================================= */
 .hero {
   background: var(--surface);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-lg);
   padding: 22px;
-  box-shadow: var(--shadow-card);
+  box-shadow: var(--shadow-card), var(--specular);
   display: flex;
   flex-direction: column;
   gap: 16px;
   width: 100%;
+  position: relative;
+  overflow: hidden;
 }
 
 .hero-top {
@@ -244,7 +243,7 @@ button, input, select {
   justify-content: space-between;
 }
 
-.hero-actions {
+.hero-tag-group {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -257,6 +256,26 @@ button, input, select {
   letter-spacing: 0.06em;
   color: var(--gold-primary);
   line-height: 1.2;
+}
+
+.hallmark-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  background: var(--gold-tint);
+  border: 1px solid var(--gold-border);
+  border-radius: var(--radius-full);
+  font-size: 10.5px;
+  font-weight: 800;
+  color: var(--gold-primary);
+  letter-spacing: 0.04em;
+}
+
+.hero-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .share-btn {
@@ -371,6 +390,171 @@ button, input, select {
 }
 
 /* =========================================================
+   1. DYNAMIC RANGE BAR (APPLE STOCKS STYLE)
+   ========================================================= */
+.range-card {
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  box-shadow: var(--shadow-card), var(--specular);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+.range-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.range-head span {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-tertiary);
+}
+
+.range-head b {
+  font-size: 12.5px;
+  font-weight: 800;
+  color: var(--gold-primary);
+}
+
+.range-track-wrap {
+  position: relative;
+  width: 100%;
+  height: 10px;
+  background: var(--surface-subtle);
+  border-radius: var(--radius-full);
+  overflow: visible;
+  display: flex;
+  align-items: center;
+}
+
+.range-track-fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 0%;
+  border-radius: var(--radius-full);
+  background: var(--gold-gradient);
+  transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.range-marker {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  background: var(--surface);
+  border: 3.5px solid var(--gold-primary);
+  border-radius: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  transition: left 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.range-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+
+/* =========================================================
+   2. MULTI-HORIZON RETURN MATRIX (BLOOMBERG / REVOLUT STYLE)
+   ========================================================= */
+.horizon-grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 6px;
+  width: 100%;
+}
+
+@media (max-width: 480px) {
+  .horizon-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+  }
+}
+
+.horizon-box {
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xs);
+  padding: 10px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  box-shadow: var(--shadow-sm), var(--specular);
+}
+
+.horizon-box small {
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  letter-spacing: 0.05em;
+}
+
+.horizon-box b {
+  font-size: 13px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+/* =========================================================
+   3. MOVING AVERAGE SENTIMENT (TRADINGVIEW STYLE)
+   ========================================================= */
+.sentiment-banner {
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: var(--shadow-sm), var(--specular);
+}
+
+.sentiment-left {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sentiment-left span {
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-tertiary);
+}
+
+.sentiment-left b {
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.sentiment-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 12px;
+  border-radius: var(--radius-full);
+  font-size: 11.5px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+/* =========================================================
    STRICTLY UNIFORM 3-COLUMN QUICK STATS
    ========================================================= */
 .quick-grid {
@@ -388,7 +572,7 @@ button, input, select {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  box-shadow: var(--shadow-card);
+  box-shadow: var(--shadow-card), var(--specular);
 }
 
 .stat-card .label {
@@ -460,7 +644,7 @@ button, input, select {
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
   padding: 16px;
-  box-shadow: var(--shadow-card);
+  box-shadow: var(--shadow-card), var(--specular);
   width: 100%;
 }
 
@@ -847,7 +1031,6 @@ select.calc-input {
   border-bottom: none;
 }
 
-/* Explicit Proportional Widths */
 .history-table th:nth-child(1), .history-table td:nth-child(1) {
   text-align: left;
   width: 34%;
@@ -1020,10 +1203,13 @@ footer {
   <!-- Hidden legacy trigger for worker compatibility -->
   <div hidden><button id="fetchNow"><span id="fetchNowText">Fetch</span></button></div>
 
-  <!-- Hero Overview (With Share Action) -->
+  <!-- Hero Overview (With BIS 916 Hallmark & Share) -->
   <section class="hero">
     <div class="hero-top">
-      <span class="hero-label">1 Sovereign (8 Grams)</span>
+      <div class="hero-tag-group">
+        <span class="hero-label">1 Sovereign (8g)</span>
+        <span class="hallmark-badge">BIS 916 • 22K</span>
+      </div>
       <div class="hero-actions">
         <button id="shareBtn" class="share-btn" type="button" aria-label="Share current gold price">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="13" height="13">
@@ -1038,7 +1224,7 @@ footer {
 
     <div class="hero-mid">
       <h2 id="hero8">₹—</h2>
-      <span class="sub">Standard 22 Karat Hallmarked</span>
+      <span class="sub">Standard 22 Karat Hallmarked · 91.6% Purity</span>
     </div>
 
     <div class="hero-details-grid">
@@ -1053,6 +1239,66 @@ footer {
         <div class="hero-sub-sub" id="todayTime">—</div>
       </div>
     </div>
+  </section>
+
+  <!-- 1. Apple Stocks Dynamic Range Bar -->
+  <section class="range-card">
+    <div class="range-head">
+      <span>3-Year Valuation Range</span>
+      <b id="rangePercent">0% of 3Y Range</b>
+    </div>
+    <div class="range-track-wrap">
+      <div class="range-track-fill" id="rangeFill"></div>
+      <div class="range-marker" id="rangeMarker" style="left: 0%;"></div>
+    </div>
+    <div class="range-labels">
+      <span id="rangeMin">Floor: ₹—</span>
+      <span id="rangeCurrent">Current: ₹—</span>
+      <span id="rangeMax">Peak: ₹—</span>
+    </div>
+  </section>
+
+  <!-- 2. Bloomberg / Revolut Multi-Horizon Return Matrix -->
+  <section class="section">
+    <div class="section-head">
+      <h3>Multi-Horizon Performance</h3>
+      <span>Historic Returns</span>
+    </div>
+    <div class="horizon-grid">
+      <div class="horizon-box">
+        <small>1 Week</small>
+        <b id="ret1W">—</b>
+      </div>
+      <div class="horizon-box">
+        <small>1 Month</small>
+        <b id="ret1M">—</b>
+      </div>
+      <div class="horizon-box">
+        <small>3 Months</small>
+        <b id="ret3M">—</b>
+      </div>
+      <div class="horizon-box">
+        <small>6 Months</small>
+        <b id="ret6M">—</b>
+      </div>
+      <div class="horizon-box">
+        <small>1 Year</small>
+        <b id="ret1Y">—</b>
+      </div>
+      <div class="horizon-box">
+        <small>3 Years</small>
+        <b id="ret3Y">—</b>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. TradingView Moving Average Sentiment Banner -->
+  <section class="sentiment-banner">
+    <div class="sentiment-left">
+      <span>30-Day Moving Average (SMA)</span>
+      <b id="smaValue">₹—</b>
+    </div>
+    <div class="sentiment-pill same" id="smaPill">Calculating…</div>
   </section>
 
   <!-- Strictly Uniform 3-Column Quick Stats -->
@@ -1376,7 +1622,7 @@ function normalize(array) {
 }
 
 /* =========================================================
-   RENDER ENGINE (INSTANT STATIC RENDERING)
+   RENDER ENGINE
    ========================================================= */
 function renderLive(d) {
   if (!d) return;
@@ -1436,6 +1682,77 @@ function renderToday() {
   $("pmRate").textContent = pm ? money(pm.rate_22k) : "—";
   $("pmTime").textContent = pm ? timeText(pm.time) : "Not recorded";
   $("todaySummary").textContent = changes.length ? `${changes.length} change${changes.length === 1 ? '' : 's'} recorded` : "No session updates";
+}
+
+/* =========================================================
+   FINTECH VALUATION METRICS (RANGE, HORIZONS & SMA)
+   ========================================================= */
+function updateFintechMetrics() {
+  if (!history.length || !live) return;
+  const currentRate = Number(live.rate_22k);
+  const values = history.map(item => Number(item.rate_22k));
+  const high = Math.max(...values);
+  const low = Math.min(...values);
+
+  // 1. Apple Style Dynamic Range Bar
+  const rangeSpan = high - low;
+  const currentOffset = Math.max(0, currentRate - low);
+  const percent = rangeSpan > 0 ? Math.min(100, Math.max(0, (currentOffset / rangeSpan) * 100)) : 50;
+
+  $("rangeFill").style.width = percent.toFixed(1) + "%";
+  $("rangeMarker").style.left = percent.toFixed(1) + "%";
+  $("rangePercent").textContent = percent.toFixed(1) + "% of 3Y Range";
+  $("rangeMin").textContent = "Floor: " + money(low);
+  $("rangeCurrent").textContent = "Current: " + money(currentRate);
+  $("rangeMax").textContent = "Peak: " + money(high);
+
+  // 2. Bloomberg Style Return Matrix
+  const calcReturn = (days) => {
+    if (history.length < 2) return null;
+    const targetIdx = Math.max(0, history.length - 1 - days);
+    const pastVal = Number(history[targetIdx].rate_22k);
+    if (!pastVal) return null;
+    const diff = currentRate - pastVal;
+    return (diff / pastVal) * 100;
+  };
+
+  const horizons = [
+    { id: "ret1W", days: 7 },
+    { id: "ret1M", days: 30 },
+    { id: "ret3M", days: 90 },
+    { id: "ret6M", days: 180 },
+    { id: "ret1Y", days: 365 },
+    { id: "ret3Y", days: 1095 }
+  ];
+
+  horizons.forEach(h => {
+    const ret = calcReturn(h.days);
+    const elem = $(h.id);
+    if (ret === null) {
+      elem.textContent = "—";
+      elem.style.color = "var(--text-tertiary)";
+    } else {
+      elem.textContent = (ret >= 0 ? "+" : "") + ret.toFixed(1) + "%";
+      elem.style.color = ret >= 0 ? "var(--good)" : "var(--bad)";
+    }
+  });
+
+  // 3. TradingView Moving Average Sentiment (SMA 30)
+  const smaPeriod = Math.min(30, history.length);
+  const recentSlice = values.slice(-smaPeriod);
+  const sma = recentSlice.reduce((a, b) => a + b, 0) / smaPeriod;
+  const smaDiff = currentRate - sma;
+  const smaPct = (smaDiff / sma) * 100;
+
+  $("smaValue").textContent = money(sma) + " · 30D Average";
+  const pill = $("smaPill");
+  if (smaDiff >= 0) {
+    pill.className = "sentiment-pill up";
+    pill.textContent = `▲ +${money(smaDiff)} (+${smaPct.toFixed(1)}%) Bullish`;
+  } else {
+    pill.className = "sentiment-pill down";
+    pill.textContent = `▼ -${money(Math.abs(smaDiff))} (${smaPct.toFixed(1)}%) Pullback`;
+  }
 }
 
 /* =========================================================
@@ -1759,6 +2076,7 @@ function renderStats() {
   if (!$("dateB").value) $("dateB").value = history[history.length - 1]?.date || "";
 
   compareDates();
+  updateFintechMetrics();
   drawChart();
 }
 
@@ -1994,7 +2312,7 @@ $("calcMode").addEventListener("change", calculate);
 
 document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") refresh(); });
 window.addEventListener("pageshow", () => refresh());
-window.addEventListener("resize", drawChart);
+window.addEventListener("resize", () => { updateFintechMetrics(); drawChart(); });
 window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { drawChart(); });
 
 // Auto-Updating Service Worker Registration
