@@ -28,20 +28,27 @@ DATA_DIR.mkdir(parents=True, exist_ok=True)
 
 IST = ZoneInfo("Asia/Kolkata")
 
+
+# ============================================================
+# SOURCES
+# ============================================================
+
 LIVECHENNAI_URL = "https://www.livechennai.com/gold_silverrate.asp"
 GOODRETURNS_URL = "https://www.goodreturns.in/gold-rates/chennai.html"
 
 POLL_SECONDS = 10
+REQUEST_TIMEOUT = 20
 
-# Actual monitoring windows
+
+# ============================================================
+# MONITORING WINDOWS
+# ============================================================
+
 AM_START = (8, 30)
 AM_END = (11, 30)
 
 PM_START = (17, 0)
 PM_END = (20, 0)
-
-WAIT_FOR_WINDOW = True
-REQUEST_TIMEOUT = 15
 
 
 # ============================================================
@@ -54,12 +61,13 @@ SESSION.headers.update(
     {
         "User-Agent": (
             "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
-            "AppleWebKit/605.1.15 (KHTML, like Gecko) "
+            "AppleWebKit/605.1.15 "
+            "(KHTML, like Gecko) "
             "Version/18.0 Safari/605.1.15"
         ),
         "Accept": (
-            "text/html,application/xhtml+xml,application/xml;"
-            "q=0.9,*/*;q=0.8"
+            "text/html,application/xhtml+xml,"
+            "application/xml;q=0.9,*/*;q=0.8"
         ),
         "Accept-Language": "en-IN,en;q=0.9",
         "Cache-Control": "no-cache",
@@ -89,10 +97,13 @@ def clean_number(text):
 
     text = str(text)
 
-    text = text.replace(",", "")
-    text = text.replace("₹", "")
-    text = text.replace("Rs.", "")
-    text = text.replace("Rs", "")
+    text = (
+        text.replace(",", "")
+        .replace("₹", "")
+        .replace("Rs.", "")
+        .replace("Rs", "")
+        .replace("INR", "")
+    )
 
     match = re.search(r"\d+(?:\.\d+)?", text)
 
@@ -135,45 +146,210 @@ def save_json(path, data):
 
 
 # ============================================================
-# EXTRACT 22K RATE
+# VALID RATE
 # ============================================================
 
-def extract_22k_rate_from_text(text):
-    """
-    Extract a Chennai 22K gold rate from page text.
+def valid_gold_rate(value):
+    if value is None:
+        return False
 
-    We deliberately look for 22K / 22 carat context instead of
-    taking the first number on the page.
-    """
+    try:
+        value = int(value)
+    except Exception:
+        return False
 
-    if not text:
-        return None
+    return 5000 <= value <= 50000
 
-    text = re.sub(r"\s+", " ", text)
+
+# ============================================================
+# LIVECHENNAI
+#
+# CURRENT PAGE STRUCTURE:
+#
+# Date | Pure Gold (24 k) | Standard Gold (22 K)
+#      | 1 Gm | 8 Gm | 1 Gm | 8 Gm
+#
+# Example:
+# 30/August/2026 | 15824 | 126592 | 14505 | 116040
+#
+# We specifically locate the Standard Gold (22 K) column.
+# ============================================================
+
+def extract_livechennai_22k(soup):
+    tables = soup.find_all("table")
+
+    for table in tables:
+
+        rows = table.find_all("tr")
+
+        if not rows:
+            continue
+
+        header_text = " ".join(
+            row.get_text(" ", strip=True)
+            for row in rows[:5]
+        )
+
+        normalized = re.sub(
+            r"\s+",
+            " ",
+            header_text
+        ).lower()
+
+        # This is the important identification.
+        if (
+            "standard gold" in normalized
+            and "22 k" in normalized
+        ):
+
+            print(
+                "LiveChennai: Found Standard Gold (22 K) table"
+            )
+
+            # ------------------------------------------------
+            # First try to read the first data row.
+            # ------------------------------------------------
+
+            for row in rows:
+
+                cells = row.find_all(
+                    ["td", "th"]
+                )
+
+                values = []
+
+                for cell in cells:
+                    value = clean_number(
+                        cell.get_text(
+                            " ",
+                            strip=True
+                        )
+                    )
+
+                    if value is not None:
+                        values.append(value)
+
+                # A normal data row has:
+                #
+                # date
+                # 24K 1g
+                # 24K 8g
+                # 22K 1g
+                # 22K 8g
+                #
+                # The 22K 1g value is normally
+                # the third numeric value.
+
+                if len(values) >= 4:
+
+                    candidates = values[-4:]
+
+                    # Last four numeric values should be:
+                    # 24K 1g
+                    # 24K 8g
+                    # 22K 1g
+                    # 22K 8g
+
+                    candidate = candidates[2]
+
+                    if valid_gold_rate(candidate):
+
+                        print(
+                            "LiveChennai parser result:",
+                            format_rupees(candidate),
+                            "/gram"
+                        )
+
+                        return candidate
+
+            # ------------------------------------------------
+            # Fallback: inspect table text.
+            # ------------------------------------------------
+
+            table_text = table.get_text(
+                " ",
+                strip=True
+            )
+
+            # Look for a date followed by four prices.
+            matches = re.findall(
+                r"\d{1,2}/[A-Za-z]+/\d{4}"
+                r".{0,100}?"
+                r"([\d,]+)"
+                r".{0,30}?"
+                r"([\d,]+)"
+                r".{0,30}?"
+                r"([\d,]+)"
+                r".{0,30}?"
+                r"([\d,]+)",
+                table_text,
+                flags=re.IGNORECASE
+            )
+
+            for match in matches:
+
+                values = [
+                    clean_number(x)
+                    for x in match
+                ]
+
+                if len(values) == 4:
+
+                    candidate = values[2]
+
+                    if valid_gold_rate(candidate):
+
+                        print(
+                            "LiveChennai fallback parser result:",
+                            format_rupees(candidate),
+                            "/gram"
+                        )
+
+                        return candidate
+
+    # ========================================================
+    # SECOND FALLBACK
+    #
+    # Current LiveChennai page also contains:
+    #
+    # Today's 22K Rate
+    # ₹14,505
+    # ========================================================
+
+    page_text = soup.get_text(
+        " ",
+        strip=True
+    )
+
+    page_text = re.sub(
+        r"\s+",
+        " ",
+        page_text
+    )
 
     patterns = [
-        r"22K\s*(?:Gold|gold)?\s*(?:/g|per\s*gram)?\s*"
-        r"[:\-]?\s*₹?\s*([\d,]+)",
 
-        r"22K\s+Gold\s+(?:1\s*Gram|/g)\s*[:\-]?\s*"
-        r"₹?\s*([\d,]+)",
+        r"Today's\s+22K\s+Rate\s*₹?\s*([\d,]+)",
 
-        r"22K.*?(?:rate|price).*?"
-        r"₹\s*([\d,]+).*?(?:gram|g)",
+        r"Today's\s+22K\s+gold\s+rate"
+        r".{0,100}?"
+        r"₹\s*([\d,]+)",
 
-        r"22[\s-]*carat.*?"
-        r"₹\s*([\d,]+).*?(?:gram|g)",
+        r"22K\s+gold\s+rate"
+        r".{0,100}?"
+        r"₹\s*([\d,]+)",
 
-        r"Standard\s+Gold\s*\(22\s*K\).*?"
-        r"₹?\s*([\d,]+)",
+        r"22\s*carat\s+gold\s+rate"
+        r".{0,100}?"
+        r"₹\s*([\d,]+)",
     ]
 
     for pattern in patterns:
 
         match = re.search(
             pattern,
-            text,
-            flags=re.IGNORECASE | re.DOTALL
+            page_text,
+            flags=re.IGNORECASE
         )
 
         if match:
@@ -182,16 +358,18 @@ def extract_22k_rate_from_text(text):
                 match.group(1)
             )
 
-            # Chennai 22K gram prices should be sensible.
-            if value and 5000 <= value <= 50000:
+            if valid_gold_rate(value):
+
+                print(
+                    "LiveChennai text parser result:",
+                    format_rupees(value),
+                    "/gram"
+                )
+
                 return value
 
     return None
 
-
-# ============================================================
-# LIVECHENNAI FETCH
-# ============================================================
 
 def fetch_livechennai():
 
@@ -206,36 +384,36 @@ def fetch_livechennai():
 
         response.raise_for_status()
 
+        print(
+            f"LiveChennai HTTP: {response.status_code}"
+        )
+
         soup = BeautifulSoup(
             response.text,
             "html.parser"
         )
 
-        text = soup.get_text(
-            " ",
-            strip=True
-        )
-
-        rate = extract_22k_rate_from_text(
-            text
+        rate = extract_livechennai_22k(
+            soup
         )
 
         if rate:
 
             print(
-                f"LiveChennai: "
-                f"{format_rupees(rate)}/gram"
+                "LiveChennai:",
+                format_rupees(rate),
+                "/gram"
             )
 
             return {
                 "source": "LiveChennai",
-                "rate_22k": rate,
+                "rate_22k": int(rate),
                 "url": LIVECHENNAI_URL,
                 "fetched_at": now_ist().isoformat()
             }
 
         print(
-            "LiveChennai: Could not locate valid Chennai 22K rate"
+            "LiveChennai: Could not locate valid 22K rate"
         )
 
     except Exception as exc:
@@ -248,8 +426,125 @@ def fetch_livechennai():
 
 
 # ============================================================
-# GOODRETURNS FETCH
+# GOODRETURNS
 # ============================================================
+
+def extract_goodreturns_22k(soup):
+
+    # --------------------------------------------------------
+    # First inspect tables.
+    # --------------------------------------------------------
+
+    for table in soup.find_all("table"):
+
+        text = table.get_text(
+            " ",
+            strip=True
+        )
+
+        normalized = re.sub(
+            r"\s+",
+            " ",
+            text
+        ).lower()
+
+        if (
+            "22k" in normalized
+            or "22 k" in normalized
+            or "22 karat" in normalized
+        ):
+
+            rows = table.find_all("tr")
+
+            for row in rows:
+
+                cells = row.find_all(
+                    ["td", "th"]
+                )
+
+                row_text = row.get_text(
+                    " ",
+                    strip=True
+                )
+
+                if re.search(
+                    r"22\s*k|22\s*karat",
+                    row_text,
+                    re.IGNORECASE
+                ):
+
+                    numbers = []
+
+                    for cell in cells:
+
+                        value = clean_number(
+                            cell.get_text(
+                                " ",
+                                strip=True
+                            )
+                        )
+
+                        if valid_gold_rate(value):
+                            numbers.append(value)
+
+                    if numbers:
+
+                        # Prefer the first valid 22K value.
+                        for value in numbers:
+
+                            if valid_gold_rate(value):
+
+                                return value
+
+    # --------------------------------------------------------
+    # Text fallback.
+    # --------------------------------------------------------
+
+    text = soup.get_text(
+        " ",
+        strip=True
+    )
+
+    text = re.sub(
+        r"\s+",
+        " ",
+        text
+    )
+
+    patterns = [
+
+        r"22K\s+Gold\s*/g\s*₹?\s*([\d,]+)",
+
+        r"22K\s+Gold\s+/?g\s*₹?\s*([\d,]+)",
+
+        r"22K\s+Gold"
+        r".{0,80}?"
+        r"₹\s*([\d,]+)",
+
+        r"22\s*karat\s+gold"
+        r".{0,100}?"
+        r"₹\s*([\d,]+)",
+    ]
+
+    for pattern in patterns:
+
+        match = re.search(
+            pattern,
+            text,
+            flags=re.IGNORECASE
+        )
+
+        if match:
+
+            value = clean_number(
+                match.group(1)
+            )
+
+            if valid_gold_rate(value):
+                return value
+
+    return None
+
 
 def fetch_goodreturns():
 
@@ -264,36 +559,36 @@ def fetch_goodreturns():
 
         response.raise_for_status()
 
+        print(
+            f"GoodReturns HTTP: {response.status_code}"
+        )
+
         soup = BeautifulSoup(
             response.text,
             "html.parser"
         )
 
-        text = soup.get_text(
-            " ",
-            strip=True
-        )
-
-        rate = extract_22k_rate_from_text(
-            text
+        rate = extract_goodreturns_22k(
+            soup
         )
 
         if rate:
 
             print(
-                f"GoodReturns: "
-                f"{format_rupees(rate)}/gram"
+                "GoodReturns:",
+                format_rupees(rate),
+                "/gram"
             )
 
             return {
                 "source": "GoodReturns",
-                "rate_22k": rate,
+                "rate_22k": int(rate),
                 "url": GOODRETURNS_URL,
                 "fetched_at": now_ist().isoformat()
             }
 
         print(
-            "GoodReturns: Could not locate valid Chennai 22K rate"
+            "GoodReturns: Could not locate valid 22K rate"
         )
 
     except Exception as exc:
@@ -340,8 +635,24 @@ def select_rate(
         else None
     )
 
+    print("")
+
+    print(
+        "SOURCE RESULTS"
+    )
+
+    print(
+        "LiveChennai:",
+        format_rupees(live_rate)
+    )
+
+    print(
+        "GoodReturns:",
+        format_rupees(good_rate)
+    )
+
     # --------------------------------------------------------
-    # BOTH SOURCES AGREE
+    # Both sources agree.
     # --------------------------------------------------------
 
     if (
@@ -349,6 +660,10 @@ def select_rate(
         and good_rate is not None
         and live_rate == good_rate
     ):
+
+        print(
+            "Sources agree."
+        )
 
         return {
             "rate_22k": live_rate,
@@ -359,13 +674,17 @@ def select_rate(
         }
 
     # --------------------------------------------------------
-    # ONLY LIVECHENNAI AVAILABLE
+    # LiveChennai only.
     # --------------------------------------------------------
 
     if (
         live_rate is not None
         and good_rate is None
     ):
+
+        print(
+            "Only LiveChennai returned a valid rate."
+        )
 
         return {
             "rate_22k": live_rate,
@@ -376,13 +695,17 @@ def select_rate(
         }
 
     # --------------------------------------------------------
-    # ONLY GOODRETURNS AVAILABLE
+    # GoodReturns only.
     # --------------------------------------------------------
 
     if (
-        good_rate is not None
-        and live_rate is None
+        live_rate is None
+        and good_rate is not None
     ):
+
+        print(
+            "Only GoodReturns returned a valid rate."
+        )
 
         return {
             "rate_22k": good_rate,
@@ -393,7 +716,7 @@ def select_rate(
         }
 
     # --------------------------------------------------------
-    # BOTH SOURCES AVAILABLE BUT DISAGREE
+    # Both available but different.
     # --------------------------------------------------------
 
     if (
@@ -402,25 +725,29 @@ def select_rate(
         and live_rate != good_rate
     ):
 
+        print("")
         print(
-            "WARNING: Sources disagree:"
+            "WARNING: SOURCES DISAGREE"
         )
 
         print(
-            f"  LiveChennai : "
-            f"{format_rupees(live_rate)}"
+            "LiveChennai:",
+            format_rupees(live_rate)
         )
 
         print(
-            f"  GoodReturns : "
-            f"{format_rupees(good_rate)}"
+            "GoodReturns:",
+            format_rupees(good_rate)
         )
+
+        # Do not allow a suspicious difference
+        # to overwrite a known good rate.
 
         if previous_rate is not None:
 
             print(
-                f"Keeping previous rate: "
-                f"{format_rupees(previous_rate)}"
+                "Keeping previous saved rate:",
+                format_rupees(previous_rate)
             )
 
             return {
@@ -430,6 +757,9 @@ def select_rate(
                 "livechennai": live,
                 "goodreturns": good
             }
+
+        # No previous value.
+        # Prefer LiveChennai.
 
         return {
             "rate_22k": live_rate,
@@ -443,7 +773,7 @@ def select_rate(
 
 
 # ============================================================
-# READ PREVIOUS LIVE RATE
+# PREVIOUS RATE
 # ============================================================
 
 def get_previous_rate():
@@ -469,13 +799,16 @@ def get_previous_rate():
                 (int, float)
             ):
 
-                return int(value)
+                value = int(value)
+
+                if valid_gold_rate(value):
+                    return value
 
     return None
 
 
 # ============================================================
-# HISTORY NORMALIZATION
+# HISTORY
 # ============================================================
 
 def extract_history_records(data):
@@ -494,19 +827,11 @@ def extract_history_records(data):
 
             value = data.get(key)
 
-            if isinstance(
-                value,
-                list
-            ):
-
+            if isinstance(value, list):
                 return value
 
     return []
 
-
-# ============================================================
-# SAVE HISTORY
-# ============================================================
 
 def save_history(
     rate,
@@ -525,26 +850,27 @@ def save_history(
 
     current = now_ist()
 
-    record = {
-        "date": current.strftime(
-            "%Y-%m-%d"
-        ),
+    today = current.strftime(
+        "%Y-%m-%d"
+    )
 
-        "time": current.strftime(
-            "%H:%M:%S"
-        ),
+    current_time = current.strftime(
+        "%H:%M:%S"
+    )
+
+    record = {
+
+        "date": today,
+
+        "time": current_time,
 
         "timestamp": current.isoformat(),
 
         "rate_22k": int(rate),
 
-        "rate_8g": int(
-            rate * 8
-        ),
+        "rate_8g": int(rate * 8),
 
-        "changed": bool(
-            changed
-        ),
+        "changed": bool(changed),
 
         "source": selected.get(
             "source",
@@ -559,25 +885,21 @@ def save_history(
         ),
 
         "livechennai_rate": (
-            selected[
-                "livechennai"
-            ]["rate_22k"]
-            if selected.get(
-                "livechennai"
-            )
+            selected["livechennai"]["rate_22k"]
+            if selected.get("livechennai")
             else None
         ),
 
         "goodreturns_rate": (
-            selected[
-                "goodreturns"
-            ]["rate_22k"]
-            if selected.get(
-                "goodreturns"
-            )
+            selected["goodreturns"]["rate_22k"]
+            if selected.get("goodreturns")
             else None
         )
     }
+
+    # --------------------------------------------------------
+    # Avoid duplicate observations.
+    # --------------------------------------------------------
 
     duplicate = False
 
@@ -585,33 +907,24 @@ def save_history(
 
         last = records[-1]
 
-        if isinstance(
-            last,
-            dict
-        ):
-
-            last_rate = last.get(
-                "rate_22k"
-            )
-
-            last_date = last.get(
-                "date"
-            )
+        if isinstance(last, dict):
 
             if (
-                last_rate == int(rate)
-                and last_date == current.strftime(
-                    "%Y-%m-%d"
-                )
+                last.get("rate_22k")
+                == int(rate)
+                and last.get("date")
+                == today
             ):
 
                 duplicate = True
 
     if not duplicate:
 
-        records.append(
-            record
-        )
+        records.append(record)
+
+    # --------------------------------------------------------
+    # Preserve existing history structure.
+    # --------------------------------------------------------
 
     if (
         isinstance(existing, list)
@@ -625,9 +938,7 @@ def save_history(
 
     else:
 
-        output = dict(
-            existing
-        )
+        output = dict(existing)
 
         if "records" in existing:
 
@@ -656,7 +967,7 @@ def save_history(
 
 
 # ============================================================
-# SAVE LIVE DATA
+# LIVE DATA
 # ============================================================
 
 def save_live(
@@ -679,17 +990,14 @@ def save_live(
 
         previous = {}
 
-    output = dict(
-        previous
-    )
+    output = dict(previous)
 
     output.update(
         {
+
             "rate_22k": int(rate),
 
-            "rate_8g": int(
-                rate * 8
-            ),
+            "rate_8g": int(rate * 8),
 
             "date": current.strftime(
                 "%Y-%m-%d"
@@ -701,21 +1009,24 @@ def save_live(
 
             "timestamp": current.isoformat(),
 
-            "changed": bool(
-                changed
-            ),
+            "changed": bool(changed),
 
             "source": selected.get(
                 "source",
                 "Unknown"
             ),
 
+            "agreement": bool(
+                selected.get(
+                    "agreement",
+                    False
+                )
+            ),
+
             "sources": {
 
                 "livechennai": (
-                    selected[
-                        "livechennai"
-                    ]
+                    selected["livechennai"]
                     if selected.get(
                         "livechennai"
                     )
@@ -723,9 +1034,7 @@ def save_live(
                 ),
 
                 "goodreturns": (
-                    selected[
-                        "goodreturns"
-                    ]
+                    selected["goodreturns"]
                     if selected.get(
                         "goodreturns"
                     )
@@ -744,7 +1053,7 @@ def save_live(
 
 
 # ============================================================
-# MONITORING WINDOW
+# MONITORING WINDOWS
 # ============================================================
 
 def make_datetime(
@@ -796,7 +1105,9 @@ def current_window(now=None):
     )
 
     if (
-        am_start <= now < am_end
+        am_start
+        <= now
+        < am_end
     ):
 
         return {
@@ -806,7 +1117,9 @@ def current_window(now=None):
         }
 
     if (
-        pm_start <= now < pm_end
+        pm_start
+        <= now
+        < pm_end
     ):
 
         return {
@@ -841,9 +1154,7 @@ def next_window(now=None):
 
         return {
             "name": "AM",
-
             "start": am_start,
-
             "end": make_datetime(
                 today,
                 AM_END[0],
@@ -855,9 +1166,7 @@ def next_window(now=None):
 
         return {
             "name": "PM",
-
             "start": pm_start,
-
             "end": make_datetime(
                 today,
                 PM_END[0],
@@ -865,21 +1174,17 @@ def next_window(now=None):
             )
         }
 
-    tomorrow = (
-        today + timedelta(
-            days=1
-        )
+    tomorrow = today + timedelta(
+        days=1
     )
 
     return {
         "name": "AM",
-
         "start": make_datetime(
             tomorrow,
             AM_START[0],
             AM_START[1]
         ),
-
         "end": make_datetime(
             tomorrow,
             AM_END[0],
@@ -888,19 +1193,13 @@ def next_window(now=None):
     }
 
 
-# ============================================================
-# SAVE MONITORING WINDOW
-# ============================================================
-
 def save_window_info(window):
 
     data = {
 
         "timezone": "Asia/Kolkata",
 
-        "updated_at": (
-            now_ist().isoformat()
-        ),
+        "updated_at": now_ist().isoformat(),
 
         "windows": {
 
@@ -921,9 +1220,7 @@ def save_window_info(window):
             else None
         ),
 
-        "poll_seconds": (
-            POLL_SECONDS
-        )
+        "poll_seconds": POLL_SECONDS
     }
 
     save_json(
@@ -933,71 +1230,7 @@ def save_window_info(window):
 
 
 # ============================================================
-# WAIT FOR MONITORING WINDOW
-# ============================================================
-
-def wait_until_window():
-
-    while True:
-
-        now = now_ist()
-
-        window = current_window(
-            now
-        )
-
-        if window:
-
-            save_window_info(
-                window
-            )
-
-            return window
-
-        upcoming = next_window(
-            now
-        )
-
-        wait_seconds = (
-            upcoming["start"] - now
-        ).total_seconds()
-
-        print("")
-        print(
-            "OUTSIDE MONITORING WINDOW"
-        )
-
-        print(
-            f"Current IST time: "
-            f"{now.strftime('%d-%m-%Y %H:%M:%S')}"
-        )
-
-        print(
-            f"Next {upcoming['name']} "
-            f"window starts: "
-            f"{upcoming['start'].strftime('%d-%m-%Y %H:%M:%S')}"
-        )
-
-        print(
-            f"Waiting approximately "
-            f"{int(max(0, wait_seconds))} seconds..."
-        )
-
-        sleep_for = min(
-            60,
-            max(
-                1,
-                int(wait_seconds)
-            )
-        )
-
-        time.sleep(
-            sleep_for
-        )
-
-
-# ============================================================
-# NORMAL ONE-TIME FETCH
+# NORMAL FETCH
 # ============================================================
 
 def normal_fetch():
@@ -1010,8 +1243,8 @@ def normal_fetch():
     previous_rate = get_previous_rate()
 
     print(
-        f"Previous 22K rate: "
-        f"{format_rupees(previous_rate)}"
+        "Previous 22K rate:",
+        format_rupees(previous_rate)
     )
 
     live, good = fetch_all_sources()
@@ -1030,9 +1263,7 @@ def normal_fetch():
 
         return False
 
-    rate = selected[
-        "rate_22k"
-    ]
+    rate = selected["rate_22k"]
 
     changed = (
         previous_rate is not None
@@ -1042,24 +1273,33 @@ def normal_fetch():
     print("")
 
     print(
-        f"Current 22K rate: "
-        f"{format_rupees(rate)}"
+        "Current 22K rate:",
+        format_rupees(rate)
     )
 
     print(
-        f"Previous 22K rate: "
-        f"{format_rupees(previous_rate)}"
+        "Previous 22K rate:",
+        format_rupees(previous_rate)
     )
 
     print(
-        f"Changed: {changed}"
+        "Changed:",
+        changed
     )
+
+    # --------------------------------------------------------
+    # Always update live.json.
+    # --------------------------------------------------------
 
     save_live(
         rate,
         selected,
         changed
     )
+
+    # --------------------------------------------------------
+    # Save history.
+    # --------------------------------------------------------
 
     save_history(
         rate,
@@ -1069,12 +1309,14 @@ def normal_fetch():
 
     if changed:
 
+        print("")
         print(
             "NEW PRICE DISCOVERED."
         )
 
     else:
 
+        print("")
         print(
             "PRICE UNCHANGED."
         )
@@ -1094,27 +1336,31 @@ def monitor_window(window):
     print("=" * 70)
 
     print(
-        f"Window: {window['name']}"
+        "Window:",
+        window["name"]
     )
 
     print(
-        f"Start: "
-        f"{window['start'].strftime('%d-%m-%Y %H:%M:%S')}"
+        "Start:",
+        window["start"].strftime(
+            "%d-%m-%Y %H:%M:%S"
+        )
     )
 
     print(
-        f"End: "
-        f"{window['end'].strftime('%d-%m-%Y %H:%M:%S')}"
+        "End:",
+        window["end"].strftime(
+            "%d-%m-%Y %H:%M:%S"
+        )
     )
 
     print(
-        f"Polling every "
-        f"{POLL_SECONDS} seconds."
+        f"Polling every {POLL_SECONDS} seconds."
     )
 
     print(
-        "Monitoring will stop when a NEW price is discovered "
-        "or when the window ends."
+        "Monitoring will stop after a new price "
+        "is confirmed or when the window ends."
     )
 
     print("=" * 70)
@@ -1122,8 +1368,8 @@ def monitor_window(window):
     previous_rate = get_previous_rate()
 
     print(
-        f"Previous saved 22K rate: "
-        f"{format_rupees(previous_rate)}"
+        "Previous saved 22K rate:",
+        format_rupees(previous_rate)
     )
 
     attempt = 0
@@ -1133,7 +1379,7 @@ def monitor_window(window):
         now = now_ist()
 
         # ----------------------------------------------------
-        # END OF WINDOW
+        # WINDOW END
         # ----------------------------------------------------
 
         if now >= window["end"]:
@@ -1142,11 +1388,6 @@ def monitor_window(window):
             print("=" * 70)
             print("MONITORING WINDOW ENDED")
             print("=" * 70)
-
-            print(
-                f"End time: "
-                f"{now.strftime('%d-%m-%Y %H:%M:%S')}"
-            )
 
             print(
                 "No new price was discovered."
@@ -1164,14 +1405,16 @@ def monitor_window(window):
         )
 
         print(
-            f"IST: "
-            f"{now.strftime('%d-%m-%Y %H:%M:%S')}"
+            "IST:",
+            now.strftime(
+                "%d-%m-%Y %H:%M:%S"
+            )
         )
 
         print("-" * 70)
 
         # ----------------------------------------------------
-        # FETCH BOTH SOURCES
+        # FETCH
         # ----------------------------------------------------
 
         live, good = fetch_all_sources()
@@ -1189,8 +1432,7 @@ def monitor_window(window):
             )
 
             print(
-                f"Retrying in "
-                f"{POLL_SECONDS} seconds..."
+                f"Retrying in {POLL_SECONDS} seconds..."
             )
 
             time.sleep(
@@ -1206,13 +1448,13 @@ def monitor_window(window):
         print("")
 
         print(
-            f"Selected 22K rate: "
-            f"{format_rupees(current_rate)}"
+            "Selected 22K rate:",
+            format_rupees(current_rate)
         )
 
         print(
-            f"Previous 22K rate: "
-            f"{format_rupees(previous_rate)}"
+            "Previous 22K rate:",
+            format_rupees(previous_rate)
         )
 
         # ----------------------------------------------------
@@ -1230,23 +1472,26 @@ def monitor_window(window):
             print("=" * 70)
 
             print(
-                f"OLD: "
-                f"{format_rupees(previous_rate)}"
+                "OLD:",
+                format_rupees(previous_rate)
             )
 
             print(
-                f"NEW: "
-                f"{format_rupees(current_rate)}"
+                "NEW:",
+                format_rupees(current_rate)
             )
 
             print(
-                f"CHANGE: "
-                f"{format_rupees(current_rate - previous_rate)}"
+                "CHANGE:",
+                format_rupees(
+                    current_rate
+                    - previous_rate
+                )
             )
 
             print(
-                f"Source: "
-                f"{selected['source']}"
+                "Source:",
+                selected["source"]
             )
 
             print("=" * 70)
@@ -1263,18 +1508,12 @@ def monitor_window(window):
                 True
             )
 
-            print("")
-
             print(
-                "NEW PRICE SAVED TO LIVE.JSON"
+                "NEW PRICE SAVED."
             )
 
             print(
-                "HISTORY UPDATED."
-            )
-
-            print(
-                "MONITORING STOPPED AFTER NEW PRICE."
+                "MONITORING STOPPED."
             )
 
             return True
@@ -1294,14 +1533,12 @@ def monitor_window(window):
         )
 
         # ----------------------------------------------------
-        # WAIT 10 SECONDS
+        # WAIT
         # ----------------------------------------------------
-
-        now_after_fetch = now_ist()
 
         remaining = (
             window["end"]
-            - now_after_fetch
+            - now_ist()
         ).total_seconds()
 
         if remaining <= 0:
@@ -1309,19 +1546,15 @@ def monitor_window(window):
 
         sleep_for = min(
             POLL_SECONDS,
-            int(remaining)
+            max(1, int(remaining))
         )
 
         print(
-            f"Next fetch in "
-            f"{sleep_for} seconds..."
+            f"Next fetch in {sleep_for} seconds..."
         )
 
         time.sleep(
-            max(
-                1,
-                sleep_for
-            )
+            sleep_for
         )
 
 
@@ -1357,21 +1590,21 @@ def main():
     )
 
     print(
-        f"Polling interval: "
-        f"{POLL_SECONDS} seconds"
+        f"Polling interval: {POLL_SECONDS} seconds"
     )
 
     print("=" * 70)
 
     # --------------------------------------------------------
-    # GITHUB ENVIRONMENT
+    # ENVIRONMENT
     # --------------------------------------------------------
 
     github_actions = (
         os.environ.get(
             "GITHUB_ACTIONS",
             ""
-        ).lower() == "true"
+        ).lower()
+        == "true"
     )
 
     github_event = os.environ.get(
@@ -1383,32 +1616,31 @@ def main():
         os.environ.get(
             "FORCE_FETCH",
             ""
-        ).lower() == "true"
+        ).lower()
+        == "true"
     )
 
     print(
-        f"GITHUB_ACTIONS: "
-        f"{github_actions}"
+        "GITHUB_ACTIONS:",
+        github_actions
     )
 
     print(
-        f"GITHUB_EVENT_NAME: "
-        f"{github_event or 'local'}"
+        "GITHUB_EVENT_NAME:",
+        github_event or "local"
     )
 
     print(
-        f"FORCE_FETCH: "
-        f"{force_fetch}"
+        "FORCE_FETCH:",
+        force_fetch
     )
 
-    # --------------------------------------------------------
+    # ========================================================
     # FORCE FETCH
     #
-    # App Fetch / Refresh eventually triggers GitHub with
-    # workflow_dispatch and FORCE_FETCH=true.
-    #
-    # This bypasses the monitoring window.
-    # --------------------------------------------------------
+    # Manual GitHub Fetch should work immediately.
+    # It must NOT wait for 08:30 or 17:00.
+    # ========================================================
 
     if force_fetch:
 
@@ -1429,33 +1661,23 @@ def main():
 
         success = normal_fetch()
 
-        if success:
-
-            print("")
-            print("=" * 70)
-            print("FORCED FETCH COMPLETE")
-            print("=" * 70)
-
-            return
-
         print("")
         print("=" * 70)
-        print("FORCED FETCH FAILED")
+        print(
+            "FORCED FETCH COMPLETE"
+        )
         print("=" * 70)
 
-        sys.exit(1)
+        if not success:
+            sys.exit(1)
 
-    # --------------------------------------------------------
-    # CHECK CURRENT MONITORING WINDOW
-    # --------------------------------------------------------
+        return
 
-    window = current_window(
-        now
-    )
+    # ========================================================
+    # CURRENT WINDOW
+    # ========================================================
 
-    # --------------------------------------------------------
-    # ALREADY INSIDE MONITORING WINDOW
-    # --------------------------------------------------------
+    window = current_window(now)
 
     if window:
 
@@ -1469,38 +1691,62 @@ def main():
 
         return
 
-    # --------------------------------------------------------
+    # ========================================================
     # SCHEDULED GITHUB RUN
-    #
-    # If GitHub starts shortly before a monitoring window,
-    # wait until the actual window begins.
-    # --------------------------------------------------------
+    # ========================================================
 
     if (
         github_actions
         and github_event == "schedule"
-        and WAIT_FOR_WINDOW
     ):
+
+        upcoming = next_window(now)
 
         print("")
         print(
             "Scheduled GitHub run detected."
         )
 
-        window = wait_until_window()
-
-        monitor_window(
-            window
+        print(
+            "Waiting for monitoring window."
         )
 
-        return
+        print(
+            f"Next window: {upcoming['name']}"
+        )
 
-    # --------------------------------------------------------
-    # MANUAL GITHUB RUN WITHOUT FORCE_FETCH
-    # / LOCAL RUN OUTSIDE WINDOW
-    #
-    # Do one fetch and exit.
-    # --------------------------------------------------------
+        print(
+            "Starts:",
+            upcoming["start"].strftime(
+                "%d-%m-%Y %H:%M:%S"
+            )
+        )
+
+        while True:
+
+            now = now_ist()
+
+            window = current_window(
+                now
+            )
+
+            if window:
+
+                save_window_info(
+                    window
+                )
+
+                monitor_window(
+                    window
+                )
+
+                return
+
+            time.sleep(30)
+
+    # ========================================================
+    # LOCAL / OTHER MANUAL RUN
+    # ========================================================
 
     print("")
     print(
@@ -1523,7 +1769,7 @@ def main():
 
 
 # ============================================================
-# PROGRAM ENTRY POINT
+# ENTRY POINT
 # ============================================================
 
 if __name__ == "__main__":
