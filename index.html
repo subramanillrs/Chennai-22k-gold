@@ -214,7 +214,7 @@ button, input, select {
 }
 
 /* =========================================================
-   HERO CARD (UNIFIED MATCHING FONTS IN BOTH COLUMNS)
+   HERO CARD
    ========================================================= */
 .hero {
   background: var(--surface);
@@ -233,6 +233,12 @@ button, input, select {
   justify-content: space-between;
 }
 
+.hero-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .hero-label {
   font-size: 11.5px;
   font-weight: 700;
@@ -240,6 +246,26 @@ button, input, select {
   letter-spacing: 0.06em;
   color: var(--gold-primary);
   line-height: 1.2;
+}
+
+.share-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  background: var(--surface-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-full);
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.share-btn:active {
+  transform: scale(0.95);
+  background: var(--border-subtle);
 }
 
 .change-pill {
@@ -277,7 +303,6 @@ button, input, select {
   margin-top: 2px;
 }
 
-/* 2-Column Split: Exactly Identical Typography & Baselines */
 .hero-details-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -475,7 +500,7 @@ button, input, select {
 }
 
 /* =========================================================
-   CHART CONTROLS & RANGE BUTTONS
+   CHART CONTROLS & SCRUBBING
    ========================================================= */
 .segment-ctrl {
   display: grid;
@@ -554,6 +579,7 @@ button, input, select {
   width: 100%;
   height: 220px;
   position: relative;
+  touch-action: none;
 }
 
 .chartwrap canvas {
@@ -574,8 +600,41 @@ button, input, select {
 }
 
 /* =========================================================
-   ALIGNED 2-COLUMN FORMS & CALCULATOR
+   CALCULATOR WITH QUICK CHIPS
    ========================================================= */
+.chip-container {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding-bottom: 4px;
+  margin-bottom: 14px;
+}
+.chip-container::-webkit-scrollbar { display: none; }
+
+.chip {
+  padding: 6px 12px;
+  background: var(--surface-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-full);
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all var(--transition);
+}
+
+.chip.active {
+  background: var(--gold-tint);
+  border-color: var(--gold-border);
+  color: var(--gold-primary);
+}
+
+.chip:active {
+  transform: scale(0.96);
+}
+
 .calc-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -764,7 +823,6 @@ select.calc-input {
   border-bottom: none;
 }
 
-/* Explicit Proportional Widths */
 .history-table th:nth-child(1), .history-table td:nth-child(1) {
   text-align: left;
   width: 34%;
@@ -937,7 +995,16 @@ footer {
   <section class="hero">
     <div class="hero-top">
       <span class="hero-label">1 Sovereign (8 Grams)</span>
-      <div id="change" class="change-pill same">No change</div>
+      <div class="hero-actions">
+        <button id="shareBtn" class="share-btn" type="button" aria-label="Share current gold price">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="13" height="13">
+            <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+          </svg>
+          <span>Share</span>
+        </button>
+        <div id="change" class="change-pill same">No change</div>
+      </div>
     </div>
 
     <div class="hero-mid">
@@ -1015,7 +1082,7 @@ footer {
     <div class="panel">
       <div class="chart-stats-row">
         <div class="metric-card">
-          <small>Change</small>
+          <small id="chartMetricLabel">Change</small>
           <b id="periodChange">—</b>
         </div>
         <div class="metric-card">
@@ -1076,6 +1143,16 @@ footer {
       <h3>Jewelry Purchase Calculator</h3>
     </div>
     <div class="panel">
+      <div class="chip-container" id="weightChips">
+        <button class="chip" data-val="1" type="button">1g</button>
+        <button class="chip" data-val="4" type="button">4g (Half)</button>
+        <button class="chip active" data-val="8" type="button">8g (1 Sov)</button>
+        <button class="chip" data-val="16" type="button">16g (2 Sov)</button>
+        <button class="chip" data-val="24" type="button">24g (3 Sov)</button>
+        <button class="chip" data-val="50" type="button">50g</button>
+        <button class="chip" data-val="100" type="button">100g</button>
+      </div>
+
       <div class="calc-grid">
         <div class="calc-field">
           <label>Calculation Mode</label>
@@ -1189,11 +1266,18 @@ let live = null;
 let history = [];
 let selectedRange = 30;
 let fetchBusy = false;
+let scrubIndex = -1;
 
 /* =========================================================
-   UTILITIES
+   UTILITIES & HAPTICS
    ========================================================= */
 const $ = id => document.getElementById(id);
+
+const haptic = (ms = 10) => {
+  if ("vibrate" in navigator) {
+    try { navigator.vibrate(ms); } catch (_) {}
+  }
+};
 
 const money = n => {
   const value = Number(n);
@@ -1220,6 +1304,27 @@ const timeText = s => {
 };
 
 const esc = s => String(s ?? "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;");
+
+function animateCount(elem, start, end, isCurrency = true) {
+  if (!Number.isFinite(end)) {
+    elem.textContent = isCurrency ? "₹—" : "—";
+    return;
+  }
+  const duration = 400;
+  const startTime = performance.now();
+  const diff = end - start;
+
+  function step(now) {
+    const elapsed = now - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+    const ease = 1 - Math.pow(1 - progress, 3);
+    const current = start + diff * ease;
+    elem.textContent = isCurrency ? money(current) : Math.round(current).toString();
+    if (progress < 1) requestAnimationFrame(step);
+    else elem.textContent = isCurrency ? money(end) : end.toString();
+  }
+  requestAnimationFrame(step);
+}
 
 function setStatus(text, offline = false) {
   $("statusText").textContent = text;
@@ -1262,8 +1367,9 @@ function renderLive(d) {
   const rate = Number(d.rate_22k);
   const rate8 = Number.isFinite(Number(d.rate_8g)) ? Number(d.rate_8g) : rate * 8;
 
-  $("hero8").textContent = money(rate8);
-  $("hero1").textContent = money(rate);
+  animateCount($("hero8"), 0, rate8, true);
+  animateCount($("hero1"), 0, rate, true);
+
   $("today").textContent = dateText(d.date);
   $("todayTime").textContent = timeText(d.time);
   $("session").textContent = d.session || "—";
@@ -1316,7 +1422,7 @@ function renderToday() {
 }
 
 /* =========================================================
-   CANVAS CHART ENGINE
+   CANVAS CHART ENGINE WITH INTERACTIVE TOUCH SCRUBBING
    ========================================================= */
 function chartData() {
   if (selectedRange === "all") return history;
@@ -1346,6 +1452,8 @@ function drawChart() {
   const colorGold = styles.getPropertyValue('--gold-primary').trim() || '#d97706';
   const colorGrid = styles.getPropertyValue('--border-subtle').trim() || '#e2e8f0';
   const colorText = styles.getPropertyValue('--text-tertiary').trim() || '#94a3b8';
+  const colorSurface = styles.getPropertyValue('--surface').trim() || '#ffffff';
+  const colorPrimary = styles.getPropertyValue('--text-primary').trim() || '#0f172a';
 
   if (data.length < 2) {
     ctx.fillStyle = colorText;
@@ -1400,7 +1508,7 @@ function drawChart() {
   ctx.fillStyle = gradient;
   ctx.fill();
 
-  /* Line */
+  /* Trend Line */
   ctx.beginPath();
   ctx.moveTo(px(0), py(values[0]));
   for (let i = 1; i < values.length; i++) ctx.lineTo(px(i), py(values[i]));
@@ -1410,11 +1518,57 @@ function drawChart() {
   ctx.lineCap = "round";
   ctx.stroke();
 
-  /* Current marker */
+  /* SCRUBBING OVERLAY */
+  const activeIndex = (scrubIndex >= 0 && scrubIndex < data.length) ? scrubIndex : (data.length - 1);
+  const activeX = px(activeIndex);
+  const activeY = py(values[activeIndex]);
+
+  if (scrubIndex >= 0) {
+    // Crosshair line
+    ctx.strokeStyle = colorGold;
+    ctx.lineWidth = 1;
+    ctx.setLineDash([4, 4]);
+    ctx.beginPath();
+    ctx.moveTo(activeX, T);
+    ctx.lineTo(activeX, height - B);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Floating Tooltip Tag
+    const tooltipText = `${dateText(data[activeIndex].date)}: ${money(values[activeIndex])}/g`;
+    ctx.font = "bold 11px var(--font-display)";
+    const tagW = ctx.measureText(tooltipText).width + 16;
+    const tagH = 24;
+    let tagX = activeX - tagW / 2;
+    if (tagX < L) tagX = L;
+    if (tagX + tagW > width - R) tagX = width - R - tagW;
+    const tagY = Math.max(T + 4, activeY - 32);
+
+    ctx.fillStyle = colorSurface;
+    ctx.shadowColor = "rgba(0,0,0,0.15)";
+    ctx.shadowBlur = 8;
+    ctx.beginPath();
+    ctx.roundRect(tagX, tagY, tagW, tagH, 6);
+    ctx.fill();
+    ctx.shadowColor = "transparent";
+
+    ctx.strokeStyle = colorGold;
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    ctx.fillStyle = colorPrimary;
+    ctx.textAlign = "center";
+    ctx.fillText(tooltipText, tagX + tagW / 2, tagY + 16);
+  }
+
+  // Active Point
   ctx.fillStyle = colorGold;
   ctx.beginPath();
-  ctx.arc(px(values.length - 1), py(values[values.length - 1]), 4.5, 0, Math.PI * 2);
+  ctx.arc(activeX, activeY, scrubIndex >= 0 ? 6 : 4.5, 0, Math.PI * 2);
   ctx.fill();
+  ctx.strokeStyle = colorSurface;
+  ctx.lineWidth = 2;
+  ctx.stroke();
 
   $("chartStart").textContent = dateText(data[0].date);
   $("chartEnd").textContent = dateText(data[data.length - 1].date);
@@ -1424,14 +1578,61 @@ function drawChart() {
   const delta = last - first;
   const percentage = first ? (delta / first * 100) : 0;
 
-  $("periodChange").textContent = (delta >= 0 ? "+" : "") + money(delta) + " (" + (percentage >= 0 ? "+" : "") + percentage.toFixed(1) + "%)";
-  $("periodChange").className = delta > 0 ? "positive" : delta < 0 ? "negative" : "";
+  if (scrubIndex >= 0) {
+    $("chartMetricLabel").textContent = "Selected Date";
+    $("periodChange").textContent = money(values[activeIndex]) + " /g";
+    $("periodChange").className = "";
+  } else {
+    $("chartMetricLabel").textContent = "Change";
+    $("periodChange").textContent = (delta >= 0 ? "+" : "") + money(delta) + " (" + (percentage >= 0 ? "+" : "") + percentage.toFixed(1) + "%)";
+    $("periodChange").className = delta > 0 ? "positive" : delta < 0 ? "negative" : "";
+  }
+
   $("periodHigh").textContent = money(max0);
   $("periodLow").textContent = money(min0);
 }
 
+/* Setup Scrub Gesture on Canvas */
+(function setupChartScrub() {
+  const canvas = $("chart");
+  if (!canvas) return;
+
+  function handleScrub(e) {
+    const data = chartData();
+    if (data.length < 2) return;
+    const rect = canvas.getBoundingClientRect();
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const x = clientX - rect.left;
+    const L = 46, R = 10;
+    const plotWidth = rect.width - L - R;
+    const ratio = Math.max(0, Math.min(1, (x - L) / plotWidth));
+    const idx = Math.round(ratio * (data.length - 1));
+    if (idx !== scrubIndex) {
+      scrubIndex = idx;
+      haptic(5);
+      drawChart();
+    }
+  }
+
+  function endScrub() {
+    if (scrubIndex !== -1) {
+      scrubIndex = -1;
+      drawChart();
+    }
+  }
+
+  canvas.addEventListener("touchstart", (e) => { handleScrub(e); }, { passive: true });
+  canvas.addEventListener("touchmove", (e) => { handleScrub(e); }, { passive: true });
+  canvas.addEventListener("touchend", endScrub, { passive: true });
+  canvas.addEventListener("touchcancel", endScrub, { passive: true });
+
+  canvas.addEventListener("mousemove", (e) => { if (e.buttons === 1) handleScrub(e); });
+  canvas.addEventListener("mouseup", endScrub);
+  canvas.addEventListener("mouseleave", endScrub);
+})();
+
 /* =========================================================
-   PURCHASE CALCULATOR WITH FEES
+   PURCHASE CALCULATOR WITH PRESET CHIPS & FEES
    ========================================================= */
 function calculate() {
   if (!live) return;
@@ -1482,6 +1683,38 @@ function calculate() {
     $("calcSub").textContent = `Fits budget ${money(budget)} after all taxes and charges`;
   }
 }
+
+// Preset Chip Clicks
+document.querySelectorAll("#weightChips .chip").forEach(chip => {
+  chip.onclick = () => {
+    haptic(10);
+    document.querySelectorAll("#weightChips .chip").forEach(c => c.classList.remove("active"));
+    chip.classList.add("active");
+    $("weight").value = chip.dataset.val;
+    $("calcMode").value = "value";
+    calculate();
+  };
+});
+
+/* =========================================================
+   SHARE HANDLER
+   ========================================================= */
+$("shareBtn").onclick = async () => {
+  haptic(15);
+  if (!live) return;
+  const rate1 = Number(live.rate_22k);
+  const rate8 = Number.isFinite(Number(live.rate_8g)) ? Number(live.rate_8g) : rate1 * 8;
+  const shareText = `💰 Gold 22K Rate (${dateText(live.date)})\n• 1 Gram: ${money(rate1)}\n• 1 Sovereign (8g): ${money(rate8)}\n• Session: ${live.session || "IST"}\nTrack live at: ${window.location.href}`;
+
+  if (navigator.share) {
+    try {
+      await navigator.share({ title: "Gold 22k rate", text: shareText });
+    } catch (_) {}
+  } else if (navigator.clipboard) {
+    await navigator.clipboard.writeText(shareText);
+    toast("Gold rate copied to clipboard!");
+  }
+};
 
 /* =========================================================
    STATISTICS & DATE COMPARE
@@ -1616,6 +1849,7 @@ async function waitForUpdatedData(oldTimestamp) {
 async function manualFetch() {
   if (fetchBusy) return;
   fetchBusy = true;
+  haptic(15);
 
   const button = $("refresh");
   const label = $("fabLabel");
@@ -1733,6 +1967,7 @@ $("fetchNow").onclick = manualFetch;
 
 document.querySelectorAll("#ranges button").forEach(button => {
   button.onclick = () => {
+    haptic(8);
     document.querySelectorAll("#ranges button").forEach(item => item.classList.remove("active"));
     button.classList.add("active");
     selectedRange = button.dataset.range === "all" ? "all" : Number(button.dataset.range);
