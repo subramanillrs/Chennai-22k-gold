@@ -9,7 +9,7 @@
 
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Gold 22K">
+<meta name="apple-mobile-web-app-title" content="Gold 22k rate">
 
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon.svg">
@@ -18,7 +18,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-<title>Gold Price 22K · Chennai</title>
+<title>Gold 22k rate · Chennai</title>
 
 <style>
 /* =========================================================
@@ -27,7 +27,6 @@
 :root {
   color-scheme: light dark;
 
-  /* Typography */
   --font-display: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", sans-serif;
   
   /* Light Theme */
@@ -70,7 +69,6 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    /* Dark Theme */
     --bg-app: #090d16;
     --surface: #111726;
     --surface-subtle: #172033;
@@ -138,7 +136,7 @@ input, select {
   -webkit-user-select: auto;
 }
 
-.num, [data-num], td, strong, b, h2, .rate, .value, .amount, .hero-sub-val {
+.num, [data-num], td, strong, b, h2, .rate, .value, .amount, .hero-sub-val, .hero-date-val {
   font-variant-numeric: tabular-nums lining-nums;
   letter-spacing: -0.02em;
 }
@@ -161,7 +159,7 @@ button, input, select {
 }
 
 /* =========================================================
-   TOPBAR & STATUS (ICON COMPLETELY REMOVED)
+   TOPBAR & STATUS
    ========================================================= */
 .topbar {
   display: flex;
@@ -182,6 +180,7 @@ button, input, select {
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--gold-primary);
+  line-height: 1.2;
 }
 
 .brand-text h1 {
@@ -228,13 +227,13 @@ button, input, select {
 }
 
 /* =========================================================
-   HERO CARD (CLEAN METRIC LAYOUT)
+   HERO CARD (INTEGRATED BENCHMARK DATE & ALIGNED COLUMNS)
    ========================================================= */
 .hero {
   background: var(--surface);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-lg);
-  padding: 24px;
+  padding: 22px;
   box-shadow: var(--shadow-card);
   display: flex;
   flex-direction: column;
@@ -253,6 +252,7 @@ button, input, select {
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: var(--gold-primary);
+  line-height: 1.2;
 }
 
 .change-pill {
@@ -290,13 +290,20 @@ button, input, select {
   margin-top: 2px;
 }
 
-.hero-bottom {
+/* Integrated 2-Column Split inside Hero */
+.hero-details-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.hero-detail-col {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 2px;
-  padding-top: 14px;
-  border-top: 1px solid var(--border-subtle);
+  gap: 4px;
 }
 
 .hero-sub-label {
@@ -305,16 +312,87 @@ button, input, select {
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--text-tertiary);
+  line-height: 1.2;
 }
 
 .hero-sub-val {
   font-size: 20px;
   font-weight: 800;
   color: var(--text-primary);
+  line-height: 1.2;
+}
+
+.hero-date-val {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.2;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.hero-date-val small {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
 }
 
 /* =========================================================
-   GRID SYSTEMS (PRECISE HORIZONTAL ALIGNMENT)
+   3-COLUMN QUICK STATS (STRICTLY ALIGNED)
+   ========================================================= */
+.quick-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+@media (max-width: 480px) {
+  .quick-grid {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+}
+
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 94px;
+  box-shadow: var(--shadow-card);
+}
+
+.stat-card .label {
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-tertiary);
+  line-height: 1.2;
+}
+
+.stat-card .value {
+  font-size: 16px;
+  font-weight: 800;
+  line-height: 1.2;
+  margin-top: 4px;
+}
+
+.stat-card .sub {
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 2px;
+}
+
+/* =========================================================
+   SECTIONS & INTRADAY SESSIONS
    ========================================================= */
 .section {
   display: flex;
@@ -349,55 +427,6 @@ button, input, select {
   box-shadow: var(--shadow-card);
 }
 
-/* Quick Stats 4-Grid */
-.quick-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
-}
-
-@media (min-width: 540px) {
-  .quick-grid {
-    grid-template-columns: repeat(4, 1fr);
-  }
-}
-
-.stat-card {
-  background: var(--surface);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-sm);
-  padding: 14px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  min-height: 94px;
-  box-shadow: var(--shadow-card);
-}
-
-.stat-card .label {
-  font-size: 10.5px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--text-tertiary);
-}
-
-.stat-card .value {
-  font-size: 16px;
-  font-weight: 800;
-  line-height: 1.2;
-}
-
-.stat-card .sub {
-  font-size: 11.5px;
-  font-weight: 500;
-  color: var(--text-secondary);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-/* Intraday Sessions Grid */
 .session-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -407,7 +436,7 @@ button, input, select {
 .session-box {
   background: var(--surface-subtle);
   border-radius: var(--radius-sm);
-  padding: 14px;
+  padding: 14px 16px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -425,17 +454,21 @@ button, input, select {
   background: var(--surface);
   border: 1px solid var(--border-subtle);
   color: var(--text-secondary);
+  line-height: 1.2;
 }
 
 .session-box .rate {
   font-size: 19px;
   font-weight: 800;
+  line-height: 1.2;
+  margin-top: 6px;
 }
 
 .session-box .time {
   font-size: 11.5px;
   font-weight: 500;
   color: var(--text-tertiary);
+  margin-top: 2px;
 }
 
 /* =========================================================
@@ -482,10 +515,10 @@ button, input, select {
 .metric-card {
   background: var(--surface-subtle);
   border-radius: var(--radius-xs);
-  padding: 8px 10px;
+  padding: 10px 12px;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 4px;
 }
 
 .metric-card small {
@@ -493,6 +526,7 @@ button, input, select {
   font-weight: 700;
   text-transform: uppercase;
   color: var(--text-tertiary);
+  line-height: 1.2;
 }
 
 .metric-card b {
@@ -501,6 +535,7 @@ button, input, select {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  line-height: 1.2;
 }
 
 .metric-card b.positive { color: var(--good); }
@@ -548,6 +583,7 @@ button, input, select {
   font-size: 11px;
   font-weight: 700;
   color: var(--text-secondary);
+  line-height: 1.2;
 }
 
 .calc-input {
@@ -572,7 +608,6 @@ select.calc-input {
   cursor: pointer;
 }
 
-/* Itemized Receipt Box */
 .receipt-box {
   margin-top: 14px;
   padding: 14px 16px;
@@ -592,6 +627,7 @@ select.calc-input {
   color: var(--text-tertiary);
   padding-bottom: 4px;
   border-bottom: 1px dashed var(--border-subtle);
+  line-height: 1.2;
 }
 
 .receipt-line {
@@ -639,11 +675,12 @@ select.calc-input {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  padding: 14px 16px;
 }
 
-.last-box h4 { font-size: 14px; font-weight: 700; }
-.last-box p { font-size: 12px; color: var(--text-tertiary); font-weight: 500; margin-top: 2px; }
-.last-box .amount { font-size: 18px; font-weight: 800; }
+.last-box h4 { font-size: 14px; font-weight: 700; line-height: 1.2; }
+.last-box p { font-size: 12px; color: var(--text-tertiary); font-weight: 500; margin-top: 3px; }
+.last-box .amount { font-size: 18px; font-weight: 800; line-height: 1.2; }
 .last-box .amount.positive { color: var(--good); }
 .last-box .amount.negative { color: var(--bad); }
 
@@ -668,7 +705,7 @@ select.calc-input {
 .compare-result .negative { color: var(--bad); font-weight: 700; }
 
 /* =========================================================
-   DATA TABLE
+   DATA TABLE (STRICT MATHEMATICAL ALIGNMENT)
    ========================================================= */
 .table-wrap {
   max-height: 360px;
@@ -688,7 +725,7 @@ select.calc-input {
   position: sticky;
   top: 0;
   background: var(--surface-subtle);
-  padding: 10px 14px;
+  padding: 10px 16px;
   font-size: 10.5px;
   font-weight: 800;
   text-transform: uppercase;
@@ -696,13 +733,15 @@ select.calc-input {
   color: var(--text-tertiary);
   border-bottom: 1px solid var(--border-subtle);
   z-index: 2;
+  line-height: 1.2;
 }
 
 .history-table td {
-  padding: 11px 14px;
+  padding: 11px 16px;
   border-bottom: 1px solid var(--border-subtle);
   font-weight: 600;
   vertical-align: middle;
+  line-height: 1.2;
 }
 
 .history-table tr:hover td {
@@ -872,8 +911,8 @@ footer {
 
   <header class="topbar">
     <div class="brand-text">
-      <span class="brand-eyebrow">Chennai · 22 Karat</span>
-      <h1>Gold Benchmark</h1>
+      <span class="brand-eyebrow">Chennai · Benchmark</span>
+      <h1>Gold 22k rate</h1>
     </div>
     <div class="status-indicator" id="status">
       <span class="dot"></span>
@@ -894,22 +933,26 @@ footer {
       <span class="sub">Standard 22 Karat Hallmarked</span>
     </div>
 
-    <div class="hero-bottom">
-      <span class="hero-sub-label">Rate Per Gram (1g)</span>
-      <div class="hero-sub-val" id="hero1">₹—</div>
+    <div class="hero-details-grid">
+      <div class="hero-detail-col">
+        <span class="hero-sub-label">Rate Per Gram (1g)</span>
+        <div class="hero-sub-val" id="hero1">₹—</div>
+      </div>
+      <div class="hero-detail-col">
+        <span class="hero-sub-label">Benchmark Date</span>
+        <div class="hero-date-val">
+          <span id="today">—</span>
+          <small id="todayTime">—</small>
+        </div>
+      </div>
     </div>
   </section>
 
   <section class="quick-grid">
     <div class="stat-card">
-      <span class="label">Benchmark Date</span>
-      <span class="value" id="today">—</span>
-      <span class="sub" id="todayTime">—</span>
-    </div>
-    <div class="stat-card">
       <span class="label">Session</span>
       <span class="value" id="session">—</span>
-      <span class="sub">IST Market</span>
+      <span class="sub">IST Benchmark</span>
     </div>
     <div class="stat-card">
       <span class="label">3Y Peak</span>
@@ -1101,7 +1144,7 @@ footer {
   </section>
 
   <footer>
-    <div>Gold Benchmark 22K · Chennai</div>
+    <div>Gold 22k rate · Chennai</div>
     <div>Live data via Cloudflare Edge Worker · Sources: LiveChennai + GoodReturns</div>
   </footer>
 
