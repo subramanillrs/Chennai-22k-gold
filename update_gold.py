@@ -5,6 +5,7 @@ import os
 import re
 import sys
 import time
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timedelta
 from pathlib import Path
 from zoneinfo import ZoneInfo
@@ -606,9 +607,25 @@ def fetch_goodreturns():
 
 def fetch_all_sources():
 
-    live = fetch_livechennai()
+    # --------------------------------------------------------
+    # Fetch both sources concurrently instead of one after
+    # another. Same two function calls, same return values -
+    # just started in parallel so total wait time is roughly
+    # max(livechennai, goodreturns) instead of the sum.
+    # --------------------------------------------------------
 
-    good = fetch_goodreturns()
+    with ThreadPoolExecutor(max_workers=2) as executor:
+
+        live_future = executor.submit(
+            fetch_livechennai
+        )
+
+        good_future = executor.submit(
+            fetch_goodreturns
+        )
+
+        live = live_future.result()
+        good = good_future.result()
 
     return live, good
 
