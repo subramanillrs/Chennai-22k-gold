@@ -11311,5 +11311,17 @@
       "LiveChennai",
       "GoodReturns"
     ]
+  },
+  {
+    "date": "2026-08-31",
+    "time": "00:07:10",
+    "timestamp": "2026-08-31T00:07:10.812814+05:30",
+    "rate_22k": 14505,
+    "rate_8g": 116040,
+    "changed": false,
+    "source": "LiveChennai + GoodReturns",
+    "agreement": true,
+    "livechennai_rate": 14505,
+    "goodreturns_rate": 14505
   }
 ]
