@@ -16,7 +16,6 @@ permissions:
 jobs:
   update:
     runs-on: ubuntu-latest
-
     timeout-minutes: 210
 
     steps:
@@ -46,17 +45,40 @@ jobs:
           pip install requests beautifulsoup4
 
       # ----------------------------------------------------
+      # DETERMINE RUN MODE
+      # ----------------------------------------------------
+      - name: Determine fetch mode
+        id: mode
+        shell: bash
+        run: |
+          echo "GitHub event: ${{ github.event_name }}"
+
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "force_fetch=true" >> "$GITHUB_OUTPUT"
+            echo "MODE=MANUAL" >> "$GITHUB_ENV"
+            echo "Manual fetch requested."
+            echo "The monitoring-window restriction will be bypassed."
+          else
+            echo "force_fetch=false" >> "$GITHUB_OUTPUT"
+            echo "MODE=SCHEDULED" >> "$GITHUB_ENV"
+            echo "Scheduled monitoring run."
+          fi
+
+      # ----------------------------------------------------
       # START GOLD MONITOR
       # ----------------------------------------------------
       - name: Monitor and update Chennai 22K rate
         env:
           GITHUB_ACTIONS: "true"
           GITHUB_EVENT_NAME: ${{ github.event_name }}
+          FORCE_FETCH: ${{ steps.mode.outputs.force_fetch }}
         run: |
           echo "============================================================"
           echo "CHENNAI 22K GOLD RATE MONITOR"
           echo "============================================================"
-          echo "Event: $GITHUB_EVENT_NAME"
+          echo "Event       : $GITHUB_EVENT_NAME"
+          echo "Run mode    : $MODE"
+          echo "Force fetch : $FORCE_FETCH"
           echo ""
           echo "Starting update_gold.py..."
           echo ""
@@ -64,8 +86,8 @@ jobs:
           echo "AM : 08:30 IST"
           echo "PM : 17:00 IST"
           echo ""
-          echo "During the monitoring window:"
-          echo "LiveChennai + GoodReturns are checked every 10 seconds."
+          echo "Manual Fetch / Refresh:"
+          echo "FORCE_FETCH=true"
           echo "============================================================"
 
           python update_gold.py
@@ -74,13 +96,16 @@ jobs:
       # VERIFY DATA
       # ----------------------------------------------------
       - name: Verify generated data
+        shell: bash
         run: |
-          echo "Checking generated data files..."
+          echo "============================================================"
+          echo "VERIFYING GENERATED DATA"
+          echo "============================================================"
 
           if [ -f data/live.json ]; then
             echo "live.json: OK"
           else
-            echo "ERROR: live.json missing"
+            echo "ERROR: data/live.json missing"
             exit 1
           fi
 
@@ -119,19 +144,25 @@ jobs:
 
           if [ -f data/monitoring_windows.json ]; then
             cat data/monitoring_windows.json
+          else
+            echo "No monitoring window file."
           fi
 
       # ----------------------------------------------------
       # SAVE UPDATED DATA
       # ----------------------------------------------------
       - name: Save updated data
+        shell: bash
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
           git add data/live.json
           git add data/history.json
-          git add data/monitoring_windows.json
+
+          if [ -f data/monitoring_windows.json ]; then
+            git add data/monitoring_windows.json
+          fi
 
           if git diff --cached --quiet; then
             echo "No data changes to commit."
