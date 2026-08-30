@@ -2,6 +2,12 @@ name: Monitor and Update Chennai 22K Gold
 
 on:
   workflow_dispatch:
+    inputs:
+      force_fetch:
+        description: "Force immediate gold-price fetch"
+        required: false
+        default: "false"
+        type: string
 
   schedule:
     # 08:30 AM IST = 03:00 UTC
@@ -45,24 +51,21 @@ jobs:
           pip install requests beautifulsoup4
 
       # ----------------------------------------------------
-      # DETERMINE RUN MODE
+      # DETERMINE FETCH MODE
       # ----------------------------------------------------
       - name: Determine fetch mode
-        id: mode
-        shell: bash
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          FORCE_INPUT: ${{ inputs.force_fetch }}
         run: |
-          echo "GitHub event: ${{ github.event_name }}"
-
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            echo "force_fetch=true" >> "$GITHUB_OUTPUT"
-            echo "MODE=MANUAL" >> "$GITHUB_ENV"
-            echo "Manual fetch requested."
-            echo "The monitoring-window restriction will be bypassed."
+          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
+            echo "FORCE_FETCH=true" >> "$GITHUB_ENV"
           else
-            echo "force_fetch=false" >> "$GITHUB_OUTPUT"
-            echo "MODE=SCHEDULED" >> "$GITHUB_ENV"
-            echo "Scheduled monitoring run."
+            echo "FORCE_FETCH=false" >> "$GITHUB_ENV"
           fi
+
+          echo "Event: $EVENT_NAME"
+          echo "Force fetch input: $FORCE_INPUT"
 
       # ----------------------------------------------------
       # START GOLD MONITOR
@@ -71,14 +74,13 @@ jobs:
         env:
           GITHUB_ACTIONS: "true"
           GITHUB_EVENT_NAME: ${{ github.event_name }}
-          FORCE_FETCH: ${{ steps.mode.outputs.force_fetch }}
+          FORCE_FETCH: ${{ env.FORCE_FETCH }}
         run: |
           echo "============================================================"
           echo "CHENNAI 22K GOLD RATE MONITOR"
           echo "============================================================"
-          echo "Event       : $GITHUB_EVENT_NAME"
-          echo "Run mode    : $MODE"
-          echo "Force fetch : $FORCE_FETCH"
+          echo "Event: $GITHUB_EVENT_NAME"
+          echo "FORCE_FETCH: $FORCE_FETCH"
           echo ""
           echo "Starting update_gold.py..."
           echo ""
@@ -86,8 +88,8 @@ jobs:
           echo "AM : 08:30 IST"
           echo "PM : 17:00 IST"
           echo ""
-          echo "Manual Fetch / Refresh:"
-          echo "FORCE_FETCH=true"
+          echo "During monitoring:"
+          echo "LiveChennai + GoodReturns checked every 10 seconds."
           echo "============================================================"
 
           python update_gold.py
@@ -96,16 +98,13 @@ jobs:
       # VERIFY DATA
       # ----------------------------------------------------
       - name: Verify generated data
-        shell: bash
         run: |
-          echo "============================================================"
-          echo "VERIFYING GENERATED DATA"
-          echo "============================================================"
+          echo "Checking generated data files..."
 
           if [ -f data/live.json ]; then
             echo "live.json: OK"
           else
-            echo "ERROR: data/live.json missing"
+            echo "ERROR: live.json missing"
             exit 1
           fi
 
@@ -144,25 +143,19 @@ jobs:
 
           if [ -f data/monitoring_windows.json ]; then
             cat data/monitoring_windows.json
-          else
-            echo "No monitoring window file."
           fi
 
       # ----------------------------------------------------
       # SAVE UPDATED DATA
       # ----------------------------------------------------
       - name: Save updated data
-        shell: bash
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
           git add data/live.json
           git add data/history.json
-
-          if [ -f data/monitoring_windows.json ]; then
-            git add data/monitoring_windows.json
-          fi
+          git add data/monitoring_windows.json
 
           if git diff --cached --quiet; then
             echo "No data changes to commit."
