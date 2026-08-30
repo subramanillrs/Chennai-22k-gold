@@ -54,6 +54,8 @@
   --good-bg: #d1fae5;
   --bad: #dc2626;
   --bad-bg: #fee2e2;
+  --warn: #d97706;
+  --warn-bg: #fef3c7;
 
   --radius-xs: 6px;
   --radius-sm: 10px;
@@ -95,6 +97,8 @@
     --good-bg: rgba(5, 150, 105, 0.15);
     --bad: #f87171;
     --bad-bg: rgba(220, 38, 38, 0.15);
+    --warn: #fbbf24;
+    --warn-bg: rgba(245, 158, 11, 0.15);
 
     --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.6);
     --shadow-card: 0 4px 20px 0 rgba(0, 0, 0, 0.5);
@@ -218,6 +222,60 @@ button, input, select {
   0% { transform: scale(0.95); opacity: 0.8; }
   50% { transform: scale(1.15); opacity: 1; }
   100% { transform: scale(0.95); opacity: 0.8; }
+}
+
+/* =========================================================
+   IMPORTANT PARSER WARNING SIGN
+   ========================================================= */
+.warning-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 13px 16px;
+  background: var(--bad-bg);
+  border: 1px solid var(--bad);
+  border-radius: var(--radius-md);
+  color: var(--bad);
+  box-shadow: var(--shadow-card);
+  width: 100%;
+  animation: bannerFade 0.25s ease-out;
+}
+
+.warning-banner[hidden] {
+  display: none !important;
+}
+
+.warning-icon {
+  flex-shrink: 0;
+  margin-top: 1px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.warning-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.warning-content strong {
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+}
+
+.warning-content p {
+  font-size: 11.5px;
+  font-weight: 600;
+  line-height: 1.4;
+  opacity: 0.95;
+}
+
+@keyframes bannerFade {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 /* =========================================================
@@ -1031,6 +1089,7 @@ select.calc-input {
   border-bottom: none;
 }
 
+/* Explicit Proportional Widths */
 .history-table th:nth-child(1), .history-table td:nth-child(1) {
   text-align: left;
   width: 34%;
@@ -1199,6 +1258,21 @@ footer {
       <span id="statusText">Checking rate…</span>
     </div>
   </header>
+
+  <!-- IMPORTANT PARSER WARNING SIGN BANNER -->
+  <div class="warning-banner" id="parserWarning" hidden>
+    <div class="warning-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
+        <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/>
+        <line x1="12" y1="9" x2="12" y2="13"/>
+        <line x1="12" y1="17" x2="12.01" y2="17"/>
+      </svg>
+    </div>
+    <div class="warning-content">
+      <strong id="warningTitle">Source Parsing Issue Detected</strong>
+      <p id="warningDesc">One or more benchmark sources failed to parse. Displaying last verified fallback rate.</p>
+    </div>
+  </div>
 
   <!-- Hidden legacy trigger for worker compatibility -->
   <div hidden><button id="fetchNow"><span id="fetchNowText">Fetch</span></button></div>
@@ -1604,6 +1678,54 @@ function toast(text) {
 function sleep(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
 
 /* =========================================================
+   PARSER HEALTH & WARNING CHECKER
+   ========================================================= */
+function checkParserHealth(data, networkError = false) {
+  const warningBox = $("parserWarning");
+  const title = $("warningTitle");
+  const desc = $("warningDesc");
+
+  if (networkError) {
+    title.textContent = "Offline / Connection Degraded";
+    desc.textContent = "Unable to reach benchmark catalog. Displaying device-cached data.";
+    warningBox.hidden = false;
+    return;
+  }
+
+  if (!data) {
+    warningBox.hidden = true;
+    return;
+  }
+
+  // Check if crawler payload indicates parsing failure or degraded state
+  let hasFailed = false;
+  let reasons = [];
+
+  if (data.error || data.parsing_failed) {
+    hasFailed = true;
+    reasons.push(data.error || "Source crawler parsing error");
+  }
+
+  if (Array.isArray(data.failed_sources) && data.failed_sources.length > 0) {
+    hasFailed = true;
+    reasons.push(`Failed to parse: ${data.failed_sources.join(", ")}`);
+  }
+
+  if (data.status === "degraded" || data.status === "error") {
+    hasFailed = true;
+    reasons.push("Crawler operating in degraded mode");
+  }
+
+  if (hasFailed) {
+    title.textContent = "Important: Source Parsing Warning";
+    desc.textContent = reasons.join(" · ") + ". Displaying last verified fallback benchmark.";
+    warningBox.hidden = false;
+  } else {
+    warningBox.hidden = true;
+  }
+}
+
+/* =========================================================
    JSON FETCH & DATA NORMALIZATION
    ========================================================= */
 async function getJSON(url) {
@@ -1664,6 +1786,7 @@ function renderLive(d) {
   }
 
   renderToday();
+  checkParserHealth(d);
 }
 
 function renderToday() {
@@ -2149,9 +2272,11 @@ async function refresh(manual = false) {
         calculate();
       }
       setStatus("Offline · Showing saved cache", true);
+      checkParserHealth(null, true);
     } catch (backupError) {
       console.error("Backup error:", backupError);
       setStatus("Unable to load data", true);
+      checkParserHealth(null, true);
     }
   }
 }
@@ -2202,6 +2327,11 @@ async function manualFetch() {
     });
 
     if (!response.ok) throw new Error("Worker HTTP " + response.status);
+    const workerRes = await response.json().catch(() => ({}));
+    if (workerRes && (workerRes.error || workerRes.parsing_failed)) {
+      checkParserHealth(workerRes);
+    }
+
     setStatus("Worker done · Syncing catalog…");
 
     const newestLive = await waitForUpdatedData(oldTimestamp);
@@ -2225,6 +2355,7 @@ async function manualFetch() {
   } catch (error) {
     console.error("Manual fetch error:", error);
     setStatus("Fetch error · Cached data active", true);
+    checkParserHealth({ error: "Edge Crawler parsing failure" });
     toast("Could not update live rate");
   } finally {
     fetchBusy = false;
