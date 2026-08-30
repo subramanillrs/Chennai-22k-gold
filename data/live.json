@@ -5,8 +5,8 @@
   "city": "Chennai",
   "purity": "22K",
   "date": "2026-08-30",
-  "time": "22:27:17",
-  "timestamp": "2026-08-30T22:27:17.522653+05:30",
+  "time": "22:29:18",
+  "timestamp": "2026-08-30T22:29:18.519846+05:30",
   "changed": false,
   "previous_rate_22k": 14505,
   "sources": {
@@ -14,13 +14,13 @@
       "source": "LiveChennai",
       "rate_22k": 14505,
       "url": "https://www.livechennai.com/gold_silverrate.asp",
-      "fetched_at": "2026-08-30T22:27:17.522326+05:30"
+      "fetched_at": "2026-08-30T22:29:18.519384+05:30"
     },
     "goodreturns": {
       "source": "GoodReturns",
       "rate_22k": 14505,
       "url": "https://www.goodreturns.in/gold-rates/chennai.html",
-      "fetched_at": "2026-08-30T22:27:17.236468+05:30"
+      "fetched_at": "2026-08-30T22:29:18.213635+05:30"
     }
   },
   "source_update_times": [
@@ -33,6 +33,6 @@
   "sources_agree": true,
   "last_checked_at": "2026-08-30T01:48:16.242233+05:30",
   "source": "LiveChennai + GoodReturns",
-  "last_checked": "2026-08-30T22:27:17.522653+05:30",
+  "last_checked": "2026-08-30T22:29:18.519846+05:30",
   "agreement": true
 }
