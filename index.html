@@ -279,7 +279,7 @@ button, input, select {
 }
 
 /* =========================================================
-   HERO CARD (WITH BIS 916 LUXURY BADGE)
+   HERO CARD
    ========================================================= */
 .hero {
   background: var(--surface);
@@ -301,12 +301,6 @@ button, input, select {
   justify-content: space-between;
 }
 
-.hero-tag-group {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
 .hero-label {
   font-size: 11.5px;
   font-weight: 700;
@@ -314,20 +308,6 @@ button, input, select {
   letter-spacing: 0.06em;
   color: var(--gold-primary);
   line-height: 1.2;
-}
-
-.hallmark-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 3px 8px;
-  background: var(--gold-tint);
-  border: 1px solid var(--gold-border);
-  border-radius: var(--radius-full);
-  font-size: 10.5px;
-  font-weight: 800;
-  color: var(--gold-primary);
-  letter-spacing: 0.04em;
 }
 
 .hero-actions {
@@ -1277,13 +1257,10 @@ footer {
   <!-- Hidden legacy trigger for worker compatibility -->
   <div hidden><button id="fetchNow"><span id="fetchNowText">Fetch</span></button></div>
 
-  <!-- Hero Overview (With BIS 916 Hallmark & Share) -->
+  <!-- Hero Overview (Clean Sovereign Title & Share) -->
   <section class="hero">
     <div class="hero-top">
-      <div class="hero-tag-group">
-        <span class="hero-label">1 Sovereign (8g)</span>
-        <span class="hallmark-badge">BIS 916 • 22K</span>
-      </div>
+      <span class="hero-label">1 Sovereign (8 Grams)</span>
       <div class="hero-actions">
         <button id="shareBtn" class="share-btn" type="button" aria-label="Share current gold price">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="13" height="13">
@@ -1298,7 +1275,7 @@ footer {
 
     <div class="hero-mid">
       <h2 id="hero8">₹—</h2>
-      <span class="sub">Standard 22 Karat Hallmarked · 91.6% Purity</span>
+      <span class="sub">Standard 22 Karat Hallmarked</span>
     </div>
 
     <div class="hero-details-grid">
@@ -1697,7 +1674,6 @@ function checkParserHealth(data, networkError = false) {
     return;
   }
 
-  // Check if crawler payload indicates parsing failure or degraded state
   let hasFailed = false;
   let reasons = [];
 
