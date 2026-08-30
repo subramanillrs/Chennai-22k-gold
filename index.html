@@ -17,34 +17,49 @@
 <title>Gold price 22k</title>
 
 <style>
-
 :root {
   color-scheme: light;
 
-  --bg: #f8f7f3;
+  --bg: #f4f3ef;
   --surface: #ffffff;
-  --surface2: #f1f0eb;
-  --surface3: #e9e7e0;
+  --surface2: #f7f6f2;
+  --surface3: #edece6;
 
-  --text: #191a17;
-  --muted: #72736d;
-  --line: #e1dfd8;
+  --text: #17181b;
+  --muted: #6b6d76;
+  --line: #e6e4dd;
 
-  --gold: #8a650f;
+  --gold: #a9781f;
   --gold-light: #f6e6ad;
-  --gold-bg: #fff7df;
+  --gold-bg: #fbf3de;
 
-  --good: #14754b;
-  --good-bg: #e6f5ec;
+  --good: #12805a;
+  --good-bg: #e4f6ee;
 
-  --bad: #b3261e;
-  --bad-bg: #fdecea;
+  --bad: #c0332a;
+  --bad-bg: #fbeae8;
+
+  --ink: #14151a;
+  --accent: #d3a13a;
+  --accent2: #f0c869;
+
+  --shadow-sm:
+    0 1px 2px rgba(20,20,20,.04),
+    0 1px 1px rgba(20,20,20,.03);
 
   --shadow:
-    0 2px 6px rgba(20,20,15,.06),
-    0 12px 30px rgba(20,20,15,.05);
+    0 1px 2px rgba(20,20,20,.04),
+    0 10px 24px -8px rgba(20,20,20,.10);
 
-  --radius: 26px;
+  --shadow-lg:
+    0 8px 20px -6px rgba(20,20,20,.14),
+    0 24px 48px -16px rgba(20,20,20,.14);
+
+  --radius-sm: 14px;
+  --radius: 20px;
+  --radius-lg: 28px;
+
+  --ease: cubic-bezier(.22,1,.36,1);
 }
 
 * {
@@ -59,25 +74,36 @@ html {
 body {
   margin: 0;
   background: var(--bg);
+  background-image:
+    radial-gradient(700px 320px at 12% -8%, rgba(211,161,58,.10), transparent 60%),
+    radial-gradient(600px 300px at 100% 0%, rgba(211,161,58,.06), transparent 55%);
+  background-attachment: fixed;
   color: var(--text);
 
   font-family:
-    Roboto,
-    system-ui,
     -apple-system,
     BlinkMacSystemFont,
+    "SF Pro Text",
     "Segoe UI",
+    Roboto,
+    system-ui,
     sans-serif;
+
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 button,
 input,
 select {
   font: inherit;
+  color: inherit;
 }
 
 button {
   cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
 }
 
 .app {
@@ -86,9 +112,9 @@ button {
   margin: auto;
 
   padding:
-    calc(8px + env(safe-area-inset-top))
-    15px
-    calc(35px + env(safe-area-inset-bottom));
+    calc(10px + env(safe-area-inset-top))
+    16px
+    calc(40px + env(safe-area-inset-bottom));
 }
 
 /* =========================================================
@@ -96,7 +122,7 @@ button {
    ========================================================= */
 
 .topbar {
-  min-height: 64px;
+  min-height: 60px;
 
   display: flex;
   align-items: center;
@@ -106,48 +132,51 @@ button {
 .brand {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 13px;
 }
 
 .logo {
-  width: 46px;
-  height: 46px;
+  width: 44px;
+  height: 44px;
 
-  border-radius: 16px;
+  border-radius: 13px;
 
   display: grid;
   place-items: center;
 
-  background: #201e19;
-  color: #f4c84d;
+  background: linear-gradient(155deg, #24211a 0%, #14130f 100%);
+  color: var(--accent2);
 
-  font-size: 21px;
-  font-weight: 900;
+  font-size: 19px;
+  font-weight: 800;
 
-  box-shadow: 0 4px 12px rgba(0,0,0,.08);
+  box-shadow:
+    0 1px 1px rgba(0,0,0,.2),
+    0 6px 14px -4px rgba(20,15,5,.35);
 }
 
 .brand h1 {
   margin: 0;
 
-  font-size: 21px;
-  line-height: 1.1;
-  font-weight: 850;
+  font-size: 18px;
+  line-height: 1.15;
+  font-weight: 750;
 
-  letter-spacing: -.45px;
+  letter-spacing: -.3px;
 }
 
 .brand p {
-  margin: 4px 0 0;
+  margin: 3px 0 0;
 
   color: var(--muted);
 
   font-size: 12px;
+  font-weight: 500;
 }
 
 .iconbtn {
-  width: 48px;
-  height: 48px;
+  width: 44px;
+  height: 44px;
 
   border: 1px solid var(--line);
   border-radius: 50%;
@@ -155,17 +184,24 @@ button {
   background: var(--surface);
   color: var(--text);
 
-  box-shadow: var(--shadow);
+  box-shadow: var(--shadow-sm);
 
-  font-size: 23px;
+  font-size: 19px;
+
+  transition: transform .18s var(--ease), box-shadow .18s var(--ease), border-color .18s var(--ease);
 }
 
 .iconbtn:active {
-  transform: scale(.94);
+  transform: scale(.92);
+}
+
+.iconbtn:hover {
+  border-color: var(--accent);
+  box-shadow: var(--shadow);
 }
 
 .iconbtn.spin {
-  animation: spin .55s ease;
+  animation: spin .5s var(--ease);
 }
 
 @keyframes spin {
@@ -183,16 +219,17 @@ button {
   align-items: center;
   gap: 8px;
 
-  margin: 5px 5px 13px;
+  margin: 14px 4px 14px;
 
   color: var(--muted);
 
   font-size: 12px;
+  font-weight: 500;
 }
 
 .dot {
-  width: 8px;
-  height: 8px;
+  width: 7px;
+  height: 7px;
 
   flex: none;
 
@@ -201,14 +238,88 @@ button {
   background: var(--good);
 
   box-shadow:
-    0 0 0 4px rgba(20,117,75,.09);
+    0 0 0 4px rgba(18,128,90,.12);
+
+  animation: pulse 2.4s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: .45;
+  }
 }
 
 .offline .dot {
   background: var(--bad);
 
   box-shadow:
-    0 0 0 4px rgba(179,38,30,.09);
+    0 0 0 4px rgba(192,51,42,.12);
+
+  animation: none;
+}
+
+/* =========================================================
+   PULL TO REFRESH
+   ========================================================= */
+
+.pulldown {
+  position: fixed;
+
+  left: 50%;
+  top: calc(10px + env(safe-area-inset-top));
+
+  transform: translate(-50%,-70px);
+
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  padding: 9px 16px;
+
+  border-radius: 999px;
+
+  background: var(--surface);
+  border: 1px solid var(--line);
+
+  box-shadow: var(--shadow);
+
+  color: var(--muted);
+
+  font-size: 12px;
+  font-weight: 750;
+
+  opacity: 0;
+
+  pointer-events: none;
+
+  transition: transform .2s var(--ease), opacity .2s var(--ease);
+
+  z-index: 21;
+
+  white-space: nowrap;
+}
+
+.pulldown.visible {
+  opacity: 1;
+}
+
+.pulldown .pulldownicon {
+  display: inline-flex;
+  font-size: 15px;
+
+  transition: transform .15s var(--ease);
+}
+
+.pulldown.ready .pulldownicon {
+  transform: rotate(180deg);
+  color: var(--accent);
+}
+
+.pulldown.loading .pulldownicon {
+  animation: spin .75s linear infinite;
 }
 
 /* =========================================================
@@ -219,21 +330,28 @@ button {
   position: relative;
   overflow: hidden;
 
-  padding: 28px;
+  padding: 30px 28px;
 
-  border-radius: 32px;
+  border-radius: var(--radius-lg);
 
   background:
-    linear-gradient(
-      145deg,
-      #fffef9 0%,
-      #fff8e5 55%,
-      #fff1c7 100%
-    );
+    radial-gradient(120% 140% at 0% 0%, #2c2717 0%, #1a170f 46%, #100e0a 100%);
 
-  border: 1px solid #ead7a4;
+  border: 1px solid #3a3117;
 
-  box-shadow: var(--shadow);
+  box-shadow: var(--shadow-lg);
+}
+
+.hero::before {
+  content: "";
+
+  position: absolute;
+  inset: 0;
+
+  background:
+    radial-gradient(320px 200px at 88% -10%, rgba(240,200,105,.16), transparent 60%);
+
+  pointer-events: none;
 }
 
 .hero::after {
@@ -241,15 +359,16 @@ button {
 
   position: absolute;
 
-  right: -15px;
-  bottom: -47px;
+  right: -12px;
+  bottom: -50px;
 
-  font-size: 150px;
+  font-size: 155px;
   line-height: 1;
 
-  font-weight: 900;
+  font-weight: 800;
+  font-style: italic;
 
-  color: rgba(138,101,15,.055);
+  color: rgba(240,200,105,.05);
 
   pointer-events: none;
 }
@@ -258,73 +377,81 @@ button {
   position: relative;
   z-index: 1;
 
-  color: #76520e;
+  color: var(--accent2);
 
   font-size: 11px;
-  font-weight: 850;
+  font-weight: 750;
 
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 1.2px;
 }
 
 .hero h2 {
   position: relative;
   z-index: 1;
 
-  margin: 8px 0 0;
+  margin: 10px 0 0;
 
-  font-size: clamp(46px,12vw,78px);
+  font-size: clamp(44px,12vw,74px);
   line-height: .98;
 
-  letter-spacing: -4px;
+  letter-spacing: -3px;
 
-  font-weight: 900;
+  font-weight: 750;
+
+  color: #fbf6e8;
+
+  font-variant-numeric: tabular-nums;
 }
 
 .hero .unit {
   position: relative;
   z-index: 1;
 
-  margin-top: 9px;
+  margin-top: 8px;
 
-  color: #806d45;
+  color: rgba(251,246,232,.5);
 
-  font-size: 13px;
-  font-weight: 650;
+  font-size: 12.5px;
+  font-weight: 600;
 }
 
 .sovereign {
   position: relative;
   z-index: 1;
 
-  margin-top: 21px;
+  margin-top: 22px;
   padding-top: 18px;
 
-  border-top: 1px solid rgba(138,101,15,.20);
+  border-top: 1px solid rgba(240,200,105,.16);
 }
 
 .sovereign label {
   display: block;
 
-  color: #806d45;
+  color: rgba(251,246,232,.55);
 
   font-size: 11px;
-  font-weight: 850;
+  font-weight: 750;
 
   text-transform: uppercase;
-  letter-spacing: .7px;
+  letter-spacing: .8px;
 }
 
 .sovereign strong {
   display: block;
 
-  margin-top: 3px;
+  margin-top: 4px;
 
-  font-size: clamp(32px,8vw,49px);
+  font-size: clamp(30px,8vw,46px);
 
-  letter-spacing: -2px;
+  letter-spacing: -1.5px;
 
-  font-weight: 900;
+  font-weight: 700;
+
+  color: #fbf6e8;
+
+  font-variant-numeric: tabular-nums;
 }
 
 .change {
@@ -332,29 +459,32 @@ button {
   z-index: 1;
 
   display: inline-flex;
+  align-items: center;
 
-  margin-top: 15px;
-  padding: 8px 12px;
+  margin-top: 16px;
+  padding: 8px 14px;
 
   border-radius: 999px;
 
   font-size: 12px;
-  font-weight: 850;
+  font-weight: 750;
+
+  backdrop-filter: blur(6px);
 }
 
 .up {
-  color: var(--good);
-  background: var(--good-bg);
+  color: #63e6a8;
+  background: rgba(18,128,90,.22);
 }
 
 .down {
-  color: var(--bad);
-  background: var(--bad-bg);
+  color: #ff9d94;
+  background: rgba(192,51,42,.22);
 }
 
 .same {
-  color: var(--muted);
-  background: var(--surface2);
+  color: rgba(251,246,232,.6);
+  background: rgba(255,255,255,.08);
 }
 
 /* =========================================================
@@ -362,12 +492,12 @@ button {
    ========================================================= */
 
 .fetchrow {
-  margin-top: 10px;
+  margin-top: 12px;
 }
 
 .fetchbtn {
   width: 100%;
-  min-height: 55px;
+  min-height: 54px;
 
   display: flex;
   align-items: center;
@@ -375,23 +505,29 @@ button {
   gap: 9px;
 
   border: 0;
-  border-radius: 19px;
+  border-radius: 17px;
 
-  background: #201e19;
-  color: white;
+  background: linear-gradient(135deg, #24211a 0%, #14130f 100%);
+  color: #fbf6e8;
 
   font-size: 14px;
-  font-weight: 850;
+  font-weight: 750;
+  letter-spacing: -.1px;
 
   box-shadow: var(--shadow);
 
   transition:
-    transform .15s ease,
-    opacity .15s ease;
+    transform .16s var(--ease),
+    opacity .16s var(--ease),
+    box-shadow .16s var(--ease);
 }
 
 .fetchbtn:active {
-  transform: scale(.985);
+  transform: scale(.98);
+}
+
+.fetchbtn:hover {
+  box-shadow: var(--shadow-lg);
 }
 
 .fetchbtn:disabled {
@@ -400,7 +536,8 @@ button {
 }
 
 .fetchicon {
-  font-size: 21px;
+  font-size: 19px;
+  color: var(--accent2);
 }
 
 .fetching .fetchicon {
@@ -408,14 +545,14 @@ button {
 }
 
 .fetchnote {
-  margin: 7px 5px 0;
+  margin: 9px 6px 0;
 
   color: var(--muted);
 
   text-align: center;
 
-  font-size: 10px;
-  line-height: 1.4;
+  font-size: 11px;
+  line-height: 1.45;
 }
 
 /* =========================================================
@@ -427,7 +564,7 @@ button {
   grid-template-columns: repeat(2,1fr);
   gap: 10px;
 
-  margin-top: 12px;
+  margin-top: 14px;
 }
 
 .card {
@@ -437,26 +574,37 @@ button {
 
   border: 1px solid var(--line);
 
-  border-radius: 22px;
+  border-radius: var(--radius-sm);
 
+  box-shadow: var(--shadow-sm);
+
+  transition: box-shadow .18s var(--ease), transform .18s var(--ease);
+}
+
+.card:hover {
   box-shadow: var(--shadow);
+  transform: translateY(-1px);
 }
 
 .label {
   color: var(--muted);
 
-  font-size: 10px;
-  font-weight: 850;
+  font-size: 10.5px;
+  font-weight: 750;
 
   text-transform: uppercase;
   letter-spacing: .7px;
 }
 
 .value {
-  margin-top: 6px;
+  margin-top: 7px;
 
   font-size: 18px;
-  font-weight: 850;
+  font-weight: 750;
+
+  letter-spacing: -.2px;
+
+  font-variant-numeric: tabular-nums;
 }
 
 .sub {
@@ -472,7 +620,7 @@ button {
    ========================================================= */
 
 .section {
-  margin-top: 26px;
+  margin-top: 30px;
 }
 
 .sectionhead {
@@ -482,21 +630,22 @@ button {
 
   gap: 10px;
 
-  margin: 0 3px 11px;
+  margin: 0 4px 12px;
 }
 
 .sectionhead h3 {
   margin: 0;
 
-  font-size: 19px;
-  font-weight: 800;
+  font-size: 18px;
+  font-weight: 750;
 
-  letter-spacing: -.35px;
+  letter-spacing: -.3px;
 }
 
 .sectionhead span {
   color: var(--muted);
-  font-size: 11px;
+  font-size: 11.5px;
+  font-weight: 500;
 }
 
 /* =========================================================
@@ -505,7 +654,7 @@ button {
 
 .segment {
   display: flex;
-  gap: 7px;
+  gap: 6px;
 
   overflow: auto;
 
@@ -521,7 +670,7 @@ button {
 .segment button {
   white-space: nowrap;
 
-  padding: 9px 14px;
+  padding: 9px 15px;
 
   border: 1px solid var(--line);
   border-radius: 999px;
@@ -531,13 +680,15 @@ button {
   color: var(--muted);
 
   font-size: 12px;
-  font-weight: 850;
+  font-weight: 750;
+
+  transition: background .15s var(--ease), color .15s var(--ease), border-color .15s var(--ease);
 }
 
 .segment button.active {
-  background: #201e19;
-  color: white;
-  border-color: #201e19;
+  background: var(--ink);
+  color: #fbf6e8;
+  border-color: var(--ink);
 }
 
 /* =========================================================
@@ -545,15 +696,15 @@ button {
    ========================================================= */
 
 .panel {
-  padding: 15px;
+  padding: 16px;
 
   background: var(--surface);
 
   border: 1px solid var(--line);
 
-  border-radius: 25px;
+  border-radius: var(--radius);
 
-  box-shadow: var(--shadow);
+  box-shadow: var(--shadow-sm);
 }
 
 /* =========================================================
@@ -563,30 +714,37 @@ button {
 .metricrow {
   display: grid;
   grid-template-columns: repeat(3,1fr);
-  gap: 9px;
+  gap: 8px;
 
-  margin-bottom: 12px;
+  margin-bottom: 14px;
 }
 
 .metric {
   padding: 13px;
 
-  border-radius: 18px;
+  border-radius: 14px;
 
   background: var(--surface2);
+  border: 1px solid var(--line);
 }
 
 .metric small {
   color: var(--muted);
   font-size: 10px;
+  font-weight: 600;
 }
 
 .metric b {
   display: block;
 
-  margin-top: 4px;
+  margin-top: 5px;
 
-  font-size: 16px;
+  font-size: 15.5px;
+  font-weight: 750;
+
+  letter-spacing: -.2px;
+
+  font-variant-numeric: tabular-nums;
 }
 
 /* =========================================================
@@ -594,7 +752,7 @@ button {
    ========================================================= */
 
 .chartwrap {
-  height: 285px;
+  height: 280px;
   position: relative;
 }
 
@@ -611,11 +769,12 @@ button {
   display: flex;
   justify-content: space-between;
 
-  margin-top: 6px;
+  margin-top: 8px;
 
   color: var(--muted);
 
-  font-size: 10px;
+  font-size: 10.5px;
+  font-weight: 500;
 }
 
 /* =========================================================
@@ -630,32 +789,37 @@ button {
 }
 
 .session {
-  padding: 16px;
+  padding: 17px;
 
   background: var(--surface2);
+  border: 1px solid var(--line);
 
-  border-radius: 20px;
+  border-radius: 16px;
 }
 
 .session .tag {
   color: var(--muted);
 
   font-size: 10px;
-  font-weight: 850;
+  font-weight: 750;
 
   text-transform: uppercase;
   letter-spacing: .6px;
 }
 
 .session .rate {
-  margin-top: 7px;
+  margin-top: 8px;
 
-  font-size: 21px;
-  font-weight: 900;
+  font-size: 20px;
+  font-weight: 800;
+
+  letter-spacing: -.3px;
+
+  font-variant-numeric: tabular-nums;
 }
 
 .session .time {
-  margin-top: 3px;
+  margin-top: 4px;
 
   color: var(--muted);
 
@@ -675,7 +839,8 @@ button {
 }
 
 .last .when {
-  font-weight: 800;
+  font-weight: 700;
+  font-size: 13.5px;
 }
 
 .last .when small {
@@ -686,13 +851,18 @@ button {
   color: var(--muted);
 
   font-size: 11px;
+  font-weight: 500;
 }
 
 .last .amount {
-  font-size: 20px;
-  font-weight: 900;
+  font-size: 19px;
+  font-weight: 800;
+
+  letter-spacing: -.3px;
 
   text-align: right;
+
+  font-variant-numeric: tabular-nums;
 }
 
 .positive {
@@ -717,54 +887,61 @@ button {
 .field label {
   display: block;
 
-  margin-bottom: 6px;
+  margin-bottom: 7px;
 
   color: var(--muted);
 
   font-size: 11px;
-  font-weight: 800;
+  font-weight: 700;
 }
 
 .field input,
 .field select {
   width: 100%;
-  height: 50px;
+  height: 48px;
 
-  padding: 0 13px;
+  padding: 0 14px;
 
   border: 1px solid var(--line);
-  border-radius: 16px;
+  border-radius: 13px;
 
-  background: var(--surface);
+  background: var(--surface2);
   color: var(--text);
 
   outline: 0;
+
+  transition: border-color .15s var(--ease), box-shadow .15s var(--ease), background .15s var(--ease);
 }
 
 .field input:focus,
 .field select:focus {
   border-color: var(--gold);
+  background: var(--surface);
 
   box-shadow:
-    0 0 0 3px rgba(138,101,15,.10);
+    0 0 0 3px rgba(169,120,31,.12);
 }
 
 .result {
-  margin-top: 12px;
+  margin-top: 13px;
 
-  padding: 15px;
+  padding: 16px;
 
-  border-radius: 19px;
+  border-radius: 16px;
 
   background: var(--surface2);
+  border: 1px solid var(--line);
 }
 
 .result b {
-  font-size: 23px;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -.3px;
+  font-variant-numeric: tabular-nums;
 }
 
 .result p {
-  margin: 4px 0 0;
+  margin: 5px 0 0;
 
   color: var(--muted);
 
@@ -783,17 +960,20 @@ button {
 }
 
 .compareResult {
-  margin-top: 10px;
+  margin-top: 11px;
 
-  padding: 15px;
+  padding: 16px;
 
-  border-radius: 19px;
+  border-radius: 16px;
 
   background: var(--surface2);
+  border: 1px solid var(--line);
 }
 
 .compareResult strong {
-  font-size: 22px;
+  font-size: 21px;
+  font-weight: 800;
+  letter-spacing: -.3px;
 }
 
 /* =========================================================
@@ -801,11 +981,11 @@ button {
    ========================================================= */
 
 .tablewrap {
-  max-height: 430px;
+  max-height: 420px;
 
   overflow: auto;
 
-  border-radius: 19px;
+  border-radius: 16px;
 }
 
 .history {
@@ -829,6 +1009,7 @@ button {
   color: var(--muted);
 
   font-size: 10px;
+  font-weight: 750;
 
   text-transform: uppercase;
   letter-spacing: .5px;
@@ -841,7 +1022,13 @@ button {
 
   border-top: 1px solid var(--line);
 
-  font-weight: 650;
+  font-weight: 600;
+
+  font-variant-numeric: tabular-nums;
+}
+
+.history tbody tr:hover td {
+  background: var(--surface2);
 }
 
 .history td:last-child,
@@ -854,11 +1041,11 @@ button {
    ========================================================= */
 
 footer {
-  padding: 25px 4px 8px;
+  padding: 28px 4px 8px;
 
   color: var(--muted);
 
-  font-size: 10px;
+  font-size: 10.5px;
 
   line-height: 1.7;
 
@@ -873,25 +1060,27 @@ footer {
   position: fixed;
 
   left: 50%;
-  bottom: calc(20px + env(safe-area-inset-bottom));
+  bottom: calc(22px + env(safe-area-inset-bottom));
 
-  transform: translate(-50%,20px);
+  transform: translate(-50%,16px);
 
-  padding: 11px 16px;
+  padding: 12px 18px;
 
   border-radius: 999px;
 
-  background: #201e19;
-  color: white;
+  background: var(--ink);
+  color: #fbf6e8;
 
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 650;
+
+  box-shadow: var(--shadow-lg);
 
   opacity: 0;
 
   pointer-events: none;
 
-  transition: .25s;
+  transition: opacity .25s var(--ease), transform .25s var(--ease);
 
   z-index: 20;
 
@@ -915,23 +1104,23 @@ footer {
   }
 
   .hero {
-    padding: 31px;
+    padding: 34px;
   }
 }
 
 @media (max-width:430px) {
 
   .app {
-    padding-left: 12px;
-    padding-right: 12px;
+    padding-left: 13px;
+    padding-right: 13px;
   }
 
   .hero {
-    padding: 22px;
+    padding: 24px;
   }
 
   .chartwrap {
-    height: 250px;
+    height: 245px;
   }
 
   .metric {
@@ -948,23 +1137,39 @@ footer {
   :root {
     color-scheme: dark;
 
-    --bg: #0d0e0c;
-    --surface: #171815;
-    --surface2: #22231f;
-    --surface3: #2a2b27;
+    --bg: #0b0c0e;
+    --surface: #16171a;
+    --surface2: #1c1d21;
+    --surface3: #26272c;
 
-    --text: #f5f3ed;
-    --muted: #aaa79e;
-    --line: #30312c;
+    --text: #f2f1ec;
+    --muted: #96979f;
+    --line: #2a2b30;
+
+    --ink: #f2f1ec;
+
+    --shadow-sm:
+      0 1px 2px rgba(0,0,0,.35);
 
     --shadow:
-      0 2px 8px rgba(0,0,0,.22),
-      0 14px 35px rgba(0,0,0,.18);
+      0 2px 8px rgba(0,0,0,.28),
+      0 14px 32px -10px rgba(0,0,0,.4);
+
+    --shadow-lg:
+      0 10px 24px -8px rgba(0,0,0,.5),
+      0 28px 56px -18px rgba(0,0,0,.5);
+  }
+
+  body {
+    background-image:
+      radial-gradient(700px 320px at 12% -8%, rgba(211,161,58,.07), transparent 60%),
+      radial-gradient(600px 300px at 100% 0%, rgba(211,161,58,.05), transparent 55%);
   }
 
   .logo {
-    background: #f1c653;
-    color: #191712;
+    background: linear-gradient(155deg, #f0c869 0%, #d3a13a 100%);
+    color: #16130a;
+    box-shadow: 0 6px 14px -4px rgba(211,161,58,.35);
   }
 
   .iconbtn {
@@ -973,44 +1178,46 @@ footer {
 
   .hero {
     background:
-      linear-gradient(
-        145deg,
-        #2b2618,
-        #1d1a10
-      );
+      radial-gradient(120% 140% at 0% 0%, #211c10 0%, #17140d 46%, #100e0a 100%);
 
-    border-color: #574615;
-  }
-
-  .hero .eyebrow,
-  .hero .unit,
-  .sovereign label {
-    color: #d8b967;
-  }
-
-  .segment button {
-    background: var(--surface);
-    border-color: var(--line);
-  }
-
-  .segment button.active {
-    background: #f4f1e8;
-    color: #171612;
-    border-color: #f4f1e8;
+    border-color: #3a3117;
   }
 
   .fetchbtn {
-    background: #f4f1e8;
-    color: #171612;
+    background: linear-gradient(135deg, #f0c869 0%, #d3a13a 100%);
+    color: #16130a;
+  }
+
+  .fetchicon {
+    color: #16130a;
+  }
+
+  .segment button.active {
+    background: var(--ink);
+    color: #16130a;
+    border-color: var(--ink);
+  }
+
+  .toast {
+    background: var(--surface2);
+    border: 1px solid var(--line);
   }
 }
-
 </style>
 </head>
 
 <body>
 
 <div class="app">
+
+<div
+  class="pulldown"
+  id="pulldown"
+  aria-hidden="true"
+>
+  <span class="pulldownicon" id="pulldownIcon">↻</span>
+  <span id="pulldownText">Pull to refresh</span>
+</div>
 
 <header class="topbar">
 
@@ -2382,7 +2589,7 @@ function drawChart() {
   if (data.length < 2) {
 
     ctx.fillStyle =
-      "#777";
+      "#8a8b93";
 
     ctx.textAlign =
       "center";
@@ -2492,7 +2699,7 @@ function drawChart() {
 
 
     ctx.strokeStyle =
-      "rgba(120,120,120,.15)";
+      "rgba(140,140,150,.14)";
 
 
     ctx.beginPath();
@@ -2522,7 +2729,7 @@ function drawChart() {
 
 
     ctx.fillStyle =
-      "#888";
+      "#8a8b93";
 
 
     ctx.fillText(
@@ -2583,13 +2790,13 @@ function drawChart() {
 
   gradient.addColorStop(
     0,
-    "rgba(155,107,22,.22)"
+    "rgba(211,161,58,.24)"
   );
 
 
   gradient.addColorStop(
     1,
-    "rgba(155,107,22,.02)"
+    "rgba(211,161,58,.02)"
   );
 
 
@@ -2625,7 +2832,7 @@ function drawChart() {
 
 
   ctx.strokeStyle =
-    "#9b6b16";
+    "#a9781f";
 
 
   ctx.lineWidth =
@@ -2646,7 +2853,7 @@ function drawChart() {
   /* LAST POINT */
 
   ctx.fillStyle =
-    "#9b6b16";
+    "#a9781f";
 
 
   ctx.beginPath();
@@ -3429,11 +3636,20 @@ async function manualFetch() {
     $("fetchNowText");
 
 
+  const refreshIcon =
+    $("refresh");
+
+
   button.disabled =
     true;
 
 
   button.classList.add(
+    "fetching"
+  );
+
+
+  refreshIcon.classList.add(
     "fetching"
   );
 
@@ -3672,6 +3888,11 @@ async function manualFetch() {
     );
 
 
+    refreshIcon.classList.remove(
+      "fetching"
+    );
+
+
     buttonText.textContent =
       "Fetch latest rate";
   }
@@ -3682,16 +3903,204 @@ async function manualFetch() {
    EVENT HANDLERS
    ========================================================= */
 
-/* Top refresh */
+/* Top refresh — same full fetch as the Fetch button */
 
 $("refresh").onclick =
-  () => refresh(true);
+  manualFetch;
 
 
 /* Main Fetch button */
 
 $("fetchNow").onclick =
   manualFetch;
+
+
+/* =========================================================
+   SWIPE DOWN TO REFRESH
+   (same full fetch as the Fetch button)
+   ========================================================= */
+
+(function setupPullToRefresh() {
+
+  const PULL_THRESHOLD = 68;
+  const PULL_MAX = 100;
+
+  const pulldown =
+    $("pulldown");
+
+  const pulldownText =
+    $("pulldownText");
+
+  let startY = null;
+  let dragging = false;
+  let ready = false;
+
+
+  function atTop() {
+
+    return (
+      (window.scrollY || 0) <= 0 &&
+      (document.scrollingElement
+        ? document.scrollingElement.scrollTop
+        : 0) <= 0
+    );
+  }
+
+
+  function resetPulldown() {
+
+    pulldown.classList.remove(
+      "visible",
+      "ready",
+      "loading"
+    );
+
+    pulldown.style.transform = "";
+
+    pulldownText.textContent =
+      "Pull to refresh";
+
+    startY = null;
+    dragging = false;
+    ready = false;
+  }
+
+
+  document.addEventListener(
+    "touchstart",
+    event => {
+
+      if (fetchBusy) {
+        return;
+      }
+
+      if (
+        event.target.closest(
+          ".tablewrap"
+        )
+      ) {
+        return;
+      }
+
+      if (!atTop()) {
+        return;
+      }
+
+      startY =
+        event.touches[0].clientY;
+
+      dragging = true;
+      ready = false;
+    },
+    { passive: true }
+  );
+
+
+  document.addEventListener(
+    "touchmove",
+    event => {
+
+      if (
+        !dragging ||
+        startY === null
+      ) {
+        return;
+      }
+
+      if (!atTop()) {
+        resetPulldown();
+        return;
+      }
+
+      const delta =
+        event.touches[0].clientY -
+        startY;
+
+      if (delta <= 0) {
+        return;
+      }
+
+      const pulled =
+        Math.min(
+          delta * .55,
+          PULL_MAX
+        );
+
+      pulldown.classList.add(
+        "visible"
+      );
+
+      pulldown.style.transform =
+        "translate(-50%," +
+        (
+          pulled - 70
+        ) +
+        "px)";
+
+      ready =
+        pulled >=
+        PULL_THRESHOLD * .55;
+
+      pulldown.classList.toggle(
+        "ready",
+        ready
+      );
+
+      pulldownText.textContent =
+        ready
+          ? "Release to refresh"
+          : "Pull to refresh";
+    },
+    { passive: true }
+  );
+
+
+  document.addEventListener(
+    "touchend",
+    () => {
+
+      if (!dragging) {
+        return;
+      }
+
+      if (ready && !fetchBusy) {
+
+        pulldown.classList.add(
+          "loading"
+        );
+
+        pulldown.classList.remove(
+          "ready"
+        );
+
+        pulldown.style.transform =
+          "translate(-50%,14px)";
+
+        pulldownText.textContent =
+          "Refreshing…";
+
+        manualFetch().finally(
+          resetPulldown
+        );
+
+      } else {
+
+        resetPulldown();
+      }
+
+      dragging = false;
+      startY = null;
+    },
+    { passive: true }
+  );
+
+
+  document.addEventListener(
+    "touchcancel",
+    resetPulldown,
+    { passive: true }
+  );
+})();
 
 
 /* Chart range buttons */
