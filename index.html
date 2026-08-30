@@ -160,7 +160,7 @@ button, input, select {
 }
 
 /* =========================================================
-   TOPBAR & STATUS (STATUS DIRECTLY BELOW TITLE)
+   TOPBAR & STATUS
    ========================================================= */
 .topbar {
   display: flex;
@@ -214,7 +214,7 @@ button, input, select {
 }
 
 /* =========================================================
-   HERO CARD (PERFECTLY LEVEL 2-COLUMN BASELINE)
+   HERO CARD (UNIFIED MATCHING FONTS IN BOTH COLUMNS)
    ========================================================= */
 .hero {
   background: var(--surface);
@@ -277,7 +277,7 @@ button, input, select {
   margin-top: 2px;
 }
 
-/* 2-Column Split: Same Starting Horizontal Baseline */
+/* 2-Column Split: Exactly Identical Typography & Baselines */
 .hero-details-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -294,6 +294,7 @@ button, input, select {
 }
 
 .hero-sub-label {
+  font-family: var(--font-display);
   font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
@@ -306,15 +307,22 @@ button, input, select {
 }
 
 .hero-sub-val {
-  font-size: 20px;
+  font-family: var(--font-display);
+  font-size: 18px;
   font-weight: 800;
   color: var(--text-primary);
   line-height: 24px;
   height: 24px;
   margin-bottom: 2px;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums lining-nums;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .hero-sub-sub {
+  font-family: var(--font-display);
   font-size: 12px;
   font-weight: 500;
   color: var(--text-secondary);
@@ -323,6 +331,7 @@ button, input, select {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  font-variant-numeric: tabular-nums lining-nums;
 }
 
 /* =========================================================
@@ -466,7 +475,7 @@ button, input, select {
 }
 
 /* =========================================================
-   CHART CONTROLS & RANGE BUTTONS (FLUSH 7-GRID ALIGNMENT)
+   CHART CONTROLS & RANGE BUTTONS
    ========================================================= */
 .segment-ctrl {
   display: grid;
@@ -565,7 +574,7 @@ button, input, select {
 }
 
 /* =========================================================
-   ALIGNED 2-COLUMN FORMS & CALCULATOR (BELOW PRICE TREND)
+   ALIGNED 2-COLUMN FORMS & CALCULATOR
    ========================================================= */
 .calc-grid {
   display: grid;
