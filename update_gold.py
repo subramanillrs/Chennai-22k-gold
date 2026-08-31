@@ -1,1818 +1,2789 @@
-#!/usr/bin/env python3
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#f8fafc" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#030712" media="(prefers-color-scheme: dark)">
+<meta name="description" content="22K Gold Price Tracker & Valuation Dashboard">
 
-import json
-import os
-import re
-import sys
-import time
-from concurrent.futures import ThreadPoolExecutor
-from datetime import datetime, timedelta
-from pathlib import Path
-from zoneinfo import ZoneInfo
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Gold 22k rate">
 
-import requests
-from bs4 import BeautifulSoup
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg">
 
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-# ============================================================
-# CHENNAI 22K GOLD RATE MONITOR
-# ============================================================
+<title>Gold 22k rate</title>
 
-BASE_DIR = Path(__file__).resolve().parent
-DATA_DIR = BASE_DIR / "data"
+<style>
+:root {
+  color-scheme: light dark;
+  --font-sans: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", sans-serif;
 
-LIVE_FILE = DATA_DIR / "live.json"
-HISTORY_FILE = DATA_DIR / "history.json"
-WINDOW_FILE = DATA_DIR / "monitoring_windows.json"
+  --r-xs: 6px;
+  --r-sm: 10px;
+  --r-md: 14px;
+  --r-lg: 20px;
+  --r-full: 9999px;
 
-DATA_DIR.mkdir(parents=True, exist_ok=True)
+  /* Color System */
+  --bg-app: #f8fafc;
+  --surface: #ffffff;
+  --surface-subtle: #f1f5f9;
+  --surface-elevated: #ffffff;
 
-IST = ZoneInfo("Asia/Kolkata")
+  --border-subtle: rgba(15, 23, 42, 0.08);
+  --border-strong: rgba(15, 23, 42, 0.16);
 
+  --text-main: #0f172a;
+  --text-secondary: #475569;
+  --text-tertiary: #94a3b8;
 
-# ============================================================
-# SOURCES
-# ============================================================
+  --gold-primary: #d97706;
+  --gold-light: #f59e0b;
+  --gold-tint: rgba(217, 119, 6, 0.08);
+  --gold-border: rgba(217, 119, 6, 0.22);
 
-LIVECHENNAI_URL = "https://www.livechennai.com/gold_silverrate.asp"
-GOODRETURNS_URL = "https://www.goodreturns.in/gold-rates/chennai.html"
+  --good: #059669;
+  --good-bg: #d1fae5;
+  --bad: #dc2626;
+  --bad-bg: #fee2e2;
 
-POLL_SECONDS = 10
-REQUEST_TIMEOUT = 20
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+  --shadow-card: 0 1px 3px 0 rgba(15, 23, 42, 0.04), 0 4px 12px -2px rgba(15, 23, 42, 0.02);
+  --shadow-hero: 0 10px 28px -4px rgba(15, 23, 42, 0.05), 0 2px 6px -1px rgba(15, 23, 42, 0.02);
 
+  --transition: 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+}
 
-# ============================================================
-# MONITORING WINDOWS
-# ============================================================
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-app: #030712;
+    --surface: #0b0f19;
+    --surface-subtle: #111827;
+    --surface-elevated: #182234;
 
-AM_START = (8, 30)
-AM_END = (11, 30)
+    --border-subtle: rgba(255, 255, 255, 0.08);
+    --border-strong: rgba(255, 255, 255, 0.16);
 
-PM_START = (17, 0)
-PM_END = (20, 0)
+    --text-main: #f8fafc;
+    --text-secondary: #94a3b8;
+    --text-tertiary: #64748b;
 
+    --gold-primary: #fbbf24;
+    --gold-light: #fcd34d;
+    --gold-tint: rgba(251, 191, 36, 0.1);
+    --gold-border: rgba(251, 191, 36, 0.25);
 
-# ============================================================
-# HTTP SESSION
-# ============================================================
+    --good: #34d399;
+    --good-bg: rgba(5, 150, 105, 0.15);
+    --bad: #f87171;
+    --bad-bg: rgba(220, 38, 38, 0.15);
 
-SESSION = requests.Session()
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.6);
+    --shadow-card: 0 4px 16px -2px rgba(0, 0, 0, 0.4);
+    --shadow-hero: 0 16px 40px -8px rgba(0, 0, 0, 0.7);
+  }
+}
 
-SESSION.headers.update(
-    {
-        "User-Agent": (
-            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
-            "AppleWebKit/605.1.15 "
-            "(KHTML, like Gecko) "
-            "Version/18.0 Safari/605.1.15"
-        ),
-        "Accept": (
-            "text/html,application/xhtml+xml,"
-            "application/xml;q=0.9,*/*;q=0.8"
-        ),
-        "Accept-Language": "en-IN,en;q=0.9",
-        "Cache-Control": "no-cache",
-        "Pragma": "no-cache",
+/* Manual theme override — takes precedence over OS preference so the
+   in-app toggle always wins, regardless of prefers-color-scheme. */
+html[data-theme="light"] {
+  --bg-app: #f8fafc;
+  --surface: #ffffff;
+  --surface-subtle: #f1f5f9;
+  --surface-elevated: #ffffff;
+  --border-subtle: rgba(15, 23, 42, 0.08);
+  --border-strong: rgba(15, 23, 42, 0.16);
+  --text-main: #0f172a;
+  --text-secondary: #475569;
+  --text-tertiary: #94a3b8;
+  --gold-primary: #d97706;
+  --gold-light: #f59e0b;
+  --gold-tint: rgba(217, 119, 6, 0.08);
+  --gold-border: rgba(217, 119, 6, 0.22);
+  --good: #059669;
+  --good-bg: #d1fae5;
+  --bad: #dc2626;
+  --bad-bg: #fee2e2;
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+  --shadow-card: 0 1px 3px 0 rgba(15, 23, 42, 0.04), 0 4px 12px -2px rgba(15, 23, 42, 0.02);
+  --shadow-hero: 0 10px 28px -4px rgba(15, 23, 42, 0.05), 0 2px 6px -1px rgba(15, 23, 42, 0.02);
+}
+
+html[data-theme="dark"] {
+  --bg-app: #030712;
+  --surface: #0b0f19;
+  --surface-subtle: #111827;
+  --surface-elevated: #182234;
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.16);
+  --text-main: #f8fafc;
+  --text-secondary: #94a3b8;
+  --text-tertiary: #64748b;
+  --gold-primary: #fbbf24;
+  --gold-light: #fcd34d;
+  --gold-tint: rgba(251, 191, 36, 0.1);
+  --gold-border: rgba(251, 191, 36, 0.25);
+  --good: #34d399;
+  --good-bg: rgba(5, 150, 105, 0.15);
+  --bad: #f87171;
+  --bad-bg: rgba(220, 38, 38, 0.15);
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.6);
+  --shadow-card: 0 4px 16px -2px rgba(0, 0, 0, 0.4);
+  --shadow-hero: 0 16px 40px -8px rgba(0, 0, 0, 0.7);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html {
+  font-family: var(--font-sans);
+  background-color: var(--bg-app);
+  color: var(--text-main);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+  touch-action: pan-y;
+}
+
+body {
+  display: flex;
+  justify-content: center;
+  min-height: 100vh;
+  overflow-x: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+input, select {
+  user-select: auto;
+  -webkit-user-select: auto;
+}
+
+button, input, select {
+  font-family: inherit;
+  color: inherit;
+  border: none;
+  background: none;
+  outline: none;
+}
+
+.num, td, strong, b, h2, .amount, .hero-sub-val {
+  font-variant-numeric: tabular-nums lining-nums;
+  letter-spacing: -0.02em;
+}
+
+.app {
+  width: 100%;
+  max-width: 620px;
+  padding: calc(18px + env(safe-area-inset-top)) 16px calc(36px + env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Header & Status Indicator */
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  min-height: 36px;
+}
+
+.brand-text {
+  flex-shrink: 0;
+}
+
+.brand-text h1 {
+  font-size: clamp(20px, 6vw, 26px);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  color: var(--text-main);
+  line-height: 1.1;
+  white-space: nowrap;
+}
+
+.status-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  width: 148px;
+  flex-shrink: 0;
+  height: 30px;
+  padding: 0 14px;
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-full);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  box-shadow: var(--shadow-sm);
+  white-space: nowrap;
+}
+
+.status-indicator span:last-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-full);
+  color: var(--text-secondary);
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  transition: all var(--transition);
+}
+.theme-toggle:active { transform: scale(0.92); background: var(--surface-subtle); }
+.theme-toggle svg { width: 15px; height: 15px; }
+.theme-toggle .icon-sun { display: none; }
+.theme-toggle .icon-moon { display: block; }
+html[data-theme="dark"] .theme-toggle .icon-sun { display: block; }
+html[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
+
+.dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: var(--good);
+  box-shadow: 0 0 0 2px var(--good-bg);
+  flex-shrink: 0;
+  animation: pulse-ring 2s infinite;
+}
+
+.status-indicator.offline .dot {
+  background-color: var(--bad);
+  box-shadow: 0 0 0 2px var(--bad-bg);
+  animation: none;
+}
+
+.status-indicator.syncing .dot {
+  background-color: var(--gold-primary);
+  box-shadow: 0 0 0 2px var(--gold-tint);
+  animation: spin 0.8s linear infinite;
+  border-radius: 2px;
+}
+
+@keyframes pulse-ring {
+  0% { transform: scale(0.95); opacity: 0.8; }
+  50% { transform: scale(1.15); opacity: 1; }
+  100% { transform: scale(0.95); opacity: 0.8; }
+}
+
+/* Top 3 Purity Cards - Clean & Flush */
+.purity-strip {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  width: 100%;
+}
+
+.purity-card {
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-sm);
+  padding: 10px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  box-shadow: var(--shadow-sm);
+  position: relative;
+}
+
+.purity-card::before,
+.purity-card::after {
+  display: none !important;
+  content: none !important;
+}
+
+.purity-card small {
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  letter-spacing: 0.05em;
+  line-height: 12px;
+}
+
+.purity-card b {
+  font-size: 13.5px;
+  font-weight: 800;
+  color: var(--text-main);
+  line-height: 18px;
+}
+
+/* Notice Banner */
+.warning-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  background: var(--bad-bg);
+  border: 1px solid var(--bad);
+  border-radius: var(--r-sm);
+  color: var(--bad);
+  box-shadow: var(--shadow-sm);
+  width: 100%;
+  cursor: pointer;
+}
+.warning-banner[hidden] { display: none !important; }
+.warning-content { display: flex; flex-direction: column; gap: 2px; width: 100%; }
+.warning-content strong { font-size: 12px; font-weight: 800; display: flex; justify-content: space-between; line-height: 1.2; }
+.warning-content p { font-size: 11px; font-weight: 600; line-height: 1.35; }
+.dismiss-text { font-size: 9.5px; opacity: 0.8; text-transform: uppercase; font-weight: 800; }
+
+/* Redesigned Hero Card */
+/* Redesigned Hero Card — premium focal point */
+.hero {
+  background: linear-gradient(180deg, var(--surface) 0%, var(--surface) 100%);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-lg);
+  padding: 24px 22px 22px;
+  box-shadow: var(--shadow-hero);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.hero::before {
+  content: "";
+  position: absolute;
+  top: -60%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 130%;
+  height: 220px;
+  background: radial-gradient(ellipse at center, var(--gold-tint) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: -1;
+}
+
+.hero-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  height: 28px;
+}
+
+.hero-label {
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--gold-primary);
+  line-height: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--gold-tint);
+  border: 1px solid var(--gold-border);
+  padding: 5px 10px 5px 8px;
+  border-radius: var(--r-full);
+}
+.hero-label::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--gold-primary);
+  flex-shrink: 0;
+}
+
+.share-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 28px;
+  padding: 0 12px;
+  background: var(--surface-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-full);
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--text-main);
+  cursor: pointer;
+  transition: all var(--transition);
+}
+.share-btn:active { transform: scale(0.96); background: var(--border-strong); }
+
+.hero-mid {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 6px 0 2px;
+  text-align: center;
+  width: 100%;
+}
+
+.hero-mid h2 {
+  align-self: stretch;
+  width: 100%;
+  font-size: clamp(40px, 10vw, 58px);
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  line-height: 1;
+  text-align: center;
+  background: linear-gradient(180deg, var(--text-main) 30%, var(--text-secondary) 130%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.change-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  height: 26px;
+  padding: 0 13px;
+  border-radius: var(--r-full);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+}
+.change-pill.up { background: var(--good-bg); color: var(--good); }
+.change-pill.down { background: var(--bad-bg); color: var(--bad); }
+.change-pill.same { background: var(--surface-subtle); color: var(--text-secondary); }
+.change-pill.mini { height: 18px; padding: 0 6px; font-size: 10px; }
+
+.hero-details-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  padding-top: 18px;
+  border-top: 1px dashed var(--border-subtle);
+  width: 100%;
+}
+
+.hero-detail-col {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  padding: 0 16px;
+}
+.hero-detail-col:first-child {
+  padding-left: 0;
+  border-right: 1px dashed var(--border-subtle);
+}
+.hero-detail-col:last-child {
+  padding-right: 0;
+}
+
+.hero-sub-label {
+  font-size: 10.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-tertiary);
+  line-height: 14px;
+  margin-bottom: 6px;
+}
+
+.hero-sub-val {
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--text-main);
+  line-height: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 2px;
+  white-space: nowrap;
+}
+
+.hero-sub-sub {
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  line-height: 15px;
+  white-space: nowrap;
+}
+
+/* Universal Section & Headings */
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.section-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+}
+.section-head h3 {
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  color: var(--text-main);
+}
+.section-head span {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  line-height: 1.2;
+}
+
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-md);
+  padding: 16px;
+  box-shadow: var(--shadow-card);
+  width: 100%;
+}
+
+/* Quick 3-Column Metrics */
+.quick-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  width: 100%;
+}
+
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-sm);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow-sm);
+}
+.stat-card .label {
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  letter-spacing: 0.05em;
+  line-height: 12px;
+  margin-bottom: 6px;
+}
+.stat-card .value {
+  font-size: 15px;
+  font-weight: 800;
+  line-height: 18px;
+  margin-bottom: 2px;
+}
+.stat-card .sub {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  line-height: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Balanced AM/PM Market Timeline */
+.timeline-horizontal {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  width: 100%;
+}
+
+.timeline-card {
+  background: var(--surface-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-sm);
+  padding: 13px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  overflow: hidden;
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+
+.timeline-card.is-active {
+  border-color: var(--gold-border);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.timeline-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1px;
+  min-height: 16px;
+}
+
+.timeline-card-header .lbl {
+  font-size: 10.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  letter-spacing: 0.05em;
+  line-height: 1;
+}
+
+.timeline-node {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--surface-subtle);
+  border: 2px solid var(--border-strong);
+  transition: all var(--transition);
+  flex-shrink: 0;
+}
+
+.timeline-card.is-active .timeline-node {
+  border-color: var(--gold-primary);
+  background: var(--gold-primary);
+  box-shadow: 0 0 0 3px var(--gold-tint);
+}
+
+.timeline-card b {
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--text-main);
+  line-height: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+}
+
+.timeline-card small {
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  line-height: 15px;
+  height: 15px;
+  display: flex;
+  align-items: center;
+}
+
+/* Premium Financial Terminal Chart Dashboard */
+.chart-panel {
+  padding: 18px 16px 14px 16px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.segment-ctrl {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 4px;
+  background: var(--surface-subtle);
+  padding: 3px;
+  border-radius: var(--r-full);
+  border: 1px solid var(--border-subtle);
+  width: 100%;
+}
+.segment-ctrl button {
+  height: 28px;
+  padding: 0;
+  border-radius: var(--r-full);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.segment-ctrl button.active {
+  background: var(--surface);
+  color: var(--gold-primary);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  font-weight: 800;
+}
+
+.chart-header-metrics {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  padding-bottom: 12px;
+  border-bottom: 1px dashed var(--border-subtle);
+  width: 100%;
+}
+.primary-metric span {
+  display: block;
+  font-size: 10.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  line-height: 13px;
+  margin-bottom: 3px;
+  letter-spacing: 0.05em;
+}
+.primary-metric strong {
+  font-size: 18px;
+  font-weight: 800;
+  line-height: 22px;
+}
+.primary-metric strong.positive { color: var(--good); }
+.primary-metric strong.negative { color: var(--bad); }
+
+.secondary-metrics {
+  display: flex;
+  gap: 16px;
+}
+.sec-metric {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+.sec-metric span {
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  line-height: 13px;
+  margin-bottom: 3px;
+  letter-spacing: 0.05em;
+}
+.sec-metric b {
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 22px;
+  color: var(--text-main);
+}
+
+.chartwrap {
+  width: 100%;
+  height: 220px;
+  position: relative;
+  touch-action: none;
+  margin: 4px 0 2px 0;
+}
+.chartwrap canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.chartmeta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--text-tertiary);
+  border-top: 1px dashed var(--border-subtle);
+  padding-top: 10px;
+  width: 100%;
+}
+
+/* Collapsible Units */
+details.collapsible {
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-md);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+  width: 100%;
+}
+details.collapsible summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+  width: 100%;
+}
+details.collapsible summary::-webkit-details-marker { display: none; }
+.summary-title {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  width: 100%;
+  padding-right: 12px;
+}
+.summary-title h3 {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--text-main);
+  line-height: 1.2;
+}
+.summary-title span {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  line-height: 1.2;
+}
+.chevron {
+  font-size: 10px;
+  color: var(--text-tertiary);
+  transition: transform var(--transition);
+}
+details.collapsible[open] .chevron { transform: rotate(180deg); }
+details.collapsible .collapsible-content {
+  padding: 0 16px 16px 16px;
+  border-top: 1px dashed var(--border-subtle);
+  padding-top: 12px;
+}
+
+.horizon-grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 6px;
+  width: 100%;
+}
+@media (max-width: 480px) {
+  .horizon-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+  }
+}
+.horizon-box {
+  background: var(--surface-subtle);
+  border-radius: var(--r-xs);
+  padding: 8px 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+.horizon-box small {
+  font-size: 9.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  line-height: 12px;
+}
+.horizon-box b {
+  font-size: 12.5px;
+  font-weight: 800;
+  color: var(--text-main);
+  line-height: 16px;
+}
+
+.last-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+}
+.last-box h4 {
+  font-size: 13.5px;
+  font-weight: 800;
+  line-height: 16px;
+  margin-bottom: 2px;
+}
+.last-box p {
+  font-size: 11.5px;
+  color: var(--text-secondary);
+  font-weight: 500;
+  line-height: 15px;
+}
+.last-box .amount {
+  font-size: 18px;
+  font-weight: 800;
+  text-align: right;
+  line-height: 1.2;
+}
+.last-box .amount.positive { color: var(--good); }
+.last-box .amount.negative { color: var(--bad); }
+
+/* Redesigned Net Comparison — date pickers up top, big showcase result below */
+.compare-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  width: 100%;
+}
+
+.compare-field {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.compare-field label {
+  font-size: 10.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  letter-spacing: 0.05em;
+  line-height: 14px;
+  height: 14px;
+  margin-bottom: 6px;
+  display: block;
+  white-space: nowrap;
+}
+
+.compare-result-panel {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px dashed var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.compare-result-label {
+  font-size: 10.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  letter-spacing: 0.05em;
+  line-height: 14px;
+}
+
+.compare-result-card {
+  min-height: 60px;
+  padding: 14px 16px;
+  background: var(--surface-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-sm);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+}
+
+.compare-result-top {
+  font-size: 15px;
+  font-weight: 800;
+  line-height: 1.25;
+  color: var(--text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.compare-result-sub {
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1;
+  padding: 7px 11px;
+  border-radius: var(--r-full);
+  background: var(--surface);
+  color: var(--text-secondary);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.compare-result-sub.positive { color: var(--good); background: var(--good-bg); }
+.compare-result-sub.negative { color: var(--bad); background: var(--bad-bg); }
+
+/* Jewelry Purchase Suite */
+.calc-suite {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: 100%;
+}
+
+.calc-segmented-mode {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background: var(--surface-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-full);
+  padding: 3px;
+  gap: 3px;
+  width: 100%;
+}
+
+.calc-mode-btn {
+  height: 30px;
+  border-radius: var(--r-full);
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.calc-mode-btn.active {
+  background: var(--surface);
+  color: var(--text-main);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.calc-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+}
+
+.calc-group-label {
+  font-size: 10.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-tertiary);
+  line-height: 14px;
+  height: 14px;
+  display: block;
+}
+
+.chip-container {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  width: 100%;
+  padding-bottom: 2px;
+}
+.chip-container::-webkit-scrollbar { display: none; }
+.chip {
+  height: 28px;
+  padding: 0 12px;
+  background: var(--surface-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-full);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all var(--transition);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.chip.active {
+  background: var(--gold-tint);
+  border-color: var(--gold-border);
+  color: var(--gold-primary);
+}
+.chip:active { transform: scale(0.96); }
+
+.calc-grid-form {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  width: 100%;
+}
+
+.calc-field {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.calc-field label {
+  font-size: 10.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  letter-spacing: 0.05em;
+  line-height: 14px;
+  height: 14px;
+  margin-bottom: 6px;
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.calc-input {
+  width: 100%;
+  height: 44px;
+  padding: 0 12px;
+  background: var(--surface-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-xs);
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--text-main);
+  transition: border-color var(--transition);
+  display: flex;
+  align-items: center;
+}
+.calc-input:focus {
+  background: var(--surface);
+  border-color: var(--gold-primary);
+}
+
+input[type="date"].calc-input {
+  color-scheme: light;
+  line-height: normal;
+}
+html[data-theme="dark"] input[type="date"].calc-input {
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: dark) {
+  input[type="date"].calc-input { color-scheme: dark; }
+}
+html[data-theme="light"] input[type="date"].calc-input {
+  color-scheme: light;
+}
+input[type="date"].calc-input::-webkit-date-and-time-value {
+  text-align: left;
+  margin: 0;
+}
+input[type="date"].calc-input::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  opacity: 0.65;
+  filter: none;
+}
+
+select.calc-input {
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 30px;
+}
+
+.exchange-drawer {
+  background: var(--surface-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-sm);
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+.exchange-header {
+  font-size: 11.5px;
+  font-weight: 800;
+  color: var(--text-main);
+  line-height: 1.2;
+}
+
+.receipt-card {
+  background: var(--surface-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-sm);
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.receipt-title {
+  font-size: 10.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-tertiary);
+  padding-bottom: 6px;
+  border-bottom: 1px dashed var(--border-subtle);
+  line-height: 1.2;
+}
+
+.receipt-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  line-height: 16px;
+}
+.receipt-line span:last-child {
+  font-weight: 800;
+  color: var(--text-main);
+}
+.receipt-line.deduction span:last-child { color: var(--good); }
+
+.receipt-total {
+  margin-top: 4px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border-strong);
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+.receipt-total .label {
+  font-size: 13px;
+  font-weight: 800;
+}
+.receipt-total .final-val {
+  font-size: 21px;
+  font-weight: 800;
+  color: var(--gold-primary);
+}
+
+.quote-btn {
+  width: 100%;
+  height: 40px;
+  margin-top: 4px;
+  border-radius: var(--r-xs);
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--text-main);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+.quote-btn:active {
+  transform: scale(0.98);
+  background: var(--border-subtle);
+}
+
+/* Completely Redesigned Pixel-Perfect Historical Table */
+.table-wrap {
+  max-height: 380px;
+  overflow-y: auto;
+  padding: 0;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-md);
+  width: 100%;
+  background: var(--surface);
+}
+.history-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 13px;
+  table-layout: fixed;
+}
+.history-table th {
+  position: sticky;
+  top: 0;
+  background: var(--surface-subtle);
+  padding: 10px 8px;
+  font-size: 10.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  border-bottom: 1px solid var(--border-subtle);
+  z-index: 2;
+  line-height: 1.2;
+  text-align: center;
+}
+.history-table td {
+  padding: 11px 8px;
+  border-bottom: 1px solid var(--border-subtle);
+  font-weight: 600;
+  vertical-align: middle;
+  line-height: 1.2;
+  color: var(--text-main);
+  text-align: center;
+}
+.history-table tr:last-child td {
+  border-bottom: none;
+}
+.history-table tr:hover td {
+  background-color: var(--surface-subtle);
+}
+
+.history-table th:nth-child(1), .history-table td:nth-child(1),
+.history-table th:nth-child(2), .history-table td:nth-child(2),
+.history-table th:nth-child(3), .history-table td:nth-child(3) {
+  width: 33.333%;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Pull to Refresh Widget */
+.pulldown {
+  position: fixed;
+  top: env(safe-area-inset-top);
+  left: 50%;
+  transform: translate(-50%, -70px);
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  padding: 6px 14px;
+  border-radius: var(--r-full);
+  box-shadow: var(--shadow-card);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  font-weight: 700;
+  z-index: 150;
+  opacity: 0;
+  transition: opacity 0.2s, transform 0.2s;
+}
+.pulldown .icon-idle { display: block; }
+.pulldown .icon-spin { display: none; }
+.pulldown.visible { opacity: 1; }
+.pulldown.ready { color: var(--gold-primary); }
+.pulldown.ready .pulldownicon { transform: rotate(180deg); }
+.pulldown.loading .icon-idle { display: none; }
+.pulldown.loading .icon-spin { display: block; animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.toast {
+  position: fixed;
+  top: calc(14px + env(safe-area-inset-top));
+  left: 50%;
+  transform: translate(-50%, -20px);
+  background: var(--surface);
+  color: var(--text-main);
+  border: 1px solid var(--border-subtle);
+  padding: 8px 18px;
+  border-radius: var(--r-full);
+  font-size: 12px;
+  font-weight: 700;
+  box-shadow: var(--shadow-card);
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s, transform 0.25s;
+  z-index: 200;
+}
+.toast::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--gold-primary);
+}
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+footer {
+  text-align: center;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  padding: 16px 0 8px 0;
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+  <div class="pulldown" id="pulldown" aria-hidden="true">
+    <span class="pulldownicon" id="pulldownIcon">
+      <svg class="icon-idle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="13" height="13"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><polyline points="21 3 21 9 15 9"/></svg>
+      <svg class="icon-spin" viewBox="0 0 24 24" fill="none" width="13" height="13"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="34 22"/></svg>
+    </span>
+    <span id="pulldownText">Pull to refresh</span>
+  </div>
+
+  <header class="topbar">
+    <div class="brand-text">
+      <h1>Gold 22k rate</h1>
+    </div>
+    <div class="topbar-actions">
+      <div class="status-indicator" id="status">
+        <span class="dot"></span>
+        <span id="statusText">Checking live feed…</span>
+      </div>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle dark mode">
+        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <section class="purity-strip">
+    <div class="purity-card">
+      <small>24K (99.9%)</small>
+      <b id="purity24">₹ —</b>
+    </div>
+    <div class="purity-card">
+      <small>22K (91.6%)</small>
+      <b id="purity22">₹ —</b>
+    </div>
+    <div class="purity-card">
+      <small>18K (75.0%)</small>
+      <b id="purity18">₹ —</b>
+    </div>
+  </section>
+
+  <div class="warning-banner" id="parserWarning" hidden onclick="this.hidden = true;">
+    <div class="warning-content">
+      <strong id="warningTitle">Notice <span class="dismiss-text">Tap to dismiss</span></strong>
+      <p id="warningDesc">Checking feed connection…</p>
+    </div>
+  </div>
+
+  <div hidden><button id="fetchNow"></button></div>
+
+  <!-- Redesigned Main Column (Hero) -->
+  <section class="hero" id="heroCard">
+    <div class="hero-top">
+      <span class="hero-label">1 Sovereign (8 Grams)</span>
+      <button id="shareBtn" class="share-btn" type="button" aria-label="Share">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+        <span>Share</span>
+      </button>
+    </div>
+
+    <div class="hero-mid">
+      <h2 id="hero8">₹ —</h2>
+      <div id="change8" class="change-pill same">No change</div>
+    </div>
+
+    <div class="hero-details-grid">
+      <div class="hero-detail-col">
+        <span class="hero-sub-label">Rate Per Gram</span>
+        <div class="hero-sub-val" id="hero1">₹ — <span id="change1" class="change-pill mini same"></span></div>
+        <div class="hero-sub-sub">1 Gram Benchmark</div>
+      </div>
+      <div class="hero-detail-col">
+        <span class="hero-sub-label">Market Date</span>
+        <div class="hero-sub-val" id="today">—</div>
+        <div class="hero-sub-sub" id="todayTime">—</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Quick Grid -->
+  <section class="quick-grid">
+    <div class="stat-card">
+      <span class="label">Session</span>
+      <span class="value" id="session">—</span>
+      <span class="sub">IST Market</span>
+    </div>
+    <div class="stat-card">
+      <span class="label">3Y Peak</span>
+      <span class="value" id="high">—</span>
+      <span class="sub" id="highDate">—</span>
+    </div>
+    <div class="stat-card">
+      <span class="label">3Y Floor</span>
+      <span class="value" id="low">—</span>
+      <span class="sub" id="lowDate">—</span>
+    </div>
+  </section>
+
+  <!-- Side-by-Side Left & Right Market Timeline (Identical fronts, spacing, lines; latest is active) -->
+  <section class="section">
+    <div class="section-head">
+      <h3>Today's Market Activity</h3>
+    </div>
+    <div class="panel">
+      <div class="timeline-horizontal">
+         <div class="timeline-card" id="amCard">
+            <div class="timeline-card-header">
+               <span class="lbl">Morning Fix (AM)</span>
+               <div class="timeline-node" id="amNode"></div>
+            </div>
+            <b id="amRate">Pending</b>
+            <small id="amTime">—</small>
+         </div>
+         <div class="timeline-card" id="pmCard">
+            <div class="timeline-card-header">
+               <span class="lbl">Evening Fix (PM)</span>
+               <div class="timeline-node" id="pmNode"></div>
+            </div>
+            <b id="pmRate">Pending</b>
+            <small id="pmTime">—</small>
+         </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Price History Trend Chart -->
+  <section class="section">
+    <div class="section-head">
+      <h3>Price History Trend</h3>
+      <span id="chartCount">—</span>
+    </div>
+
+    <div class="panel chart-panel">
+      <div class="segment-ctrl" id="ranges">
+        <button data-range="7">7D</button>
+        <button class="active" data-range="30">30D</button>
+        <button data-range="90">3M</button>
+        <button data-range="180">6M</button>
+        <button data-range="365">1Y</button>
+        <button data-range="1095">3Y</button>
+        <button data-range="all">ALL</button>
+      </div>
+
+      <div class="chart-header-metrics">
+        <div class="primary-metric">
+          <span id="chartMetricLabel">Period Performance</span>
+          <strong id="periodChange">—</strong>
+        </div>
+        <div class="secondary-metrics">
+          <div class="sec-metric">
+            <span>High</span>
+            <b id="periodHigh">—</b>
+          </div>
+          <div class="sec-metric">
+            <span>Low</span>
+            <b id="periodLow">—</b>
+          </div>
+        </div>
+      </div>
+
+      <div class="chartwrap">
+        <canvas id="chart"></canvas>
+      </div>
+      <div class="chartmeta">
+        <span id="chartStart">—</span>
+        <span id="chartEnd">—</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Multi-Horizon & Indicators Group -->
+  <div style="display:flex; flex-direction:column; gap: 12px;">
+    <details class="collapsible">
+      <summary><div class="summary-title"><h3>Multi-Horizon Performance</h3><span>Returns</span></div><span class="chevron">▼</span></summary>
+      <div class="collapsible-content">
+        <div class="horizon-grid">
+          <div class="horizon-box"><small>1W</small><b id="ret1W">—</b></div>
+          <div class="horizon-box"><small>1M</small><b id="ret1M">—</b></div>
+          <div class="horizon-box"><small>3M</small><b id="ret3M">—</b></div>
+          <div class="horizon-box"><small>6M</small><b id="ret6M">—</b></div>
+          <div class="horizon-box"><small>1Y</small><b id="ret1Y">—</b></div>
+          <div class="horizon-box"><small>3Y</small><b id="ret3Y">—</b></div>
+        </div>
+      </div>
+    </details>
+
+    <details class="collapsible">
+      <summary><div class="summary-title"><h3>Moving Average (SMA)</h3><span>30D Trend</span></div><span class="chevron">▼</span></summary>
+      <div class="collapsible-content">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <div><span style="font-size:10px; font-weight:800; color:var(--text-tertiary); text-transform:uppercase;">30D Average</span><br><b id="smaValue" style="font-size:15px; margin-top:2px; display:block;">₹ —</b></div>
+          <div class="change-pill same" id="smaPill">Calculating…</div>
+        </div>
+      </div>
+    </details>
+    
+    <div class="panel last-box">
+      <div>
+        <h4>Last Movement</h4>
+        <p id="lastDate">Analyzing…</p>
+        <p id="lastTime" style="font-size:11px; margin-top:1px;">—</p>
+      </div>
+      <div class="amount" id="lastAmount">—</div>
+    </div>
+  </div>
+
+  <!-- Redesigned Historical Comparison — collapsed by default, opens on tap -->
+  <details class="collapsible">
+    <summary><div class="summary-title"><h3>Compare Historical Dates</h3><span>Tap to open</span></div><span class="chevron">▼</span></summary>
+    <div class="collapsible-content">
+      <div class="compare-grid">
+        <div class="compare-field">
+          <label>Earlier Date</label>
+          <input class="calc-input" type="date" id="dateA">
+        </div>
+        <div class="compare-field">
+          <label>Later Date</label>
+          <input class="calc-input" type="date" id="dateB">
+        </div>
+      </div>
+      <div class="compare-result-panel">
+        <span class="compare-result-label">Net Comparison</span>
+        <div class="compare-result-card" id="compareResult">
+          <span class="compare-result-top">Select two dates</span>
+          <span class="compare-result-sub">—</span>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <!-- Jewelry Purchase & Exchange Suite -->
+  <section class="section">
+    <div class="section-head">
+      <h3>Jewelry Purchase & Exchange Suite</h3>
+    </div>
+    <div class="panel">
+      <div class="calc-suite">
+        
+        <!-- Calculation Mode Switcher -->
+        <div class="calc-segmented-mode">
+          <button class="calc-mode-btn active" type="button" data-mode="value">Calculate Price by Weight</button>
+          <button class="calc-mode-btn" type="button" data-mode="grams">Calculate Weight by Budget</button>
+          <select id="calcMode" hidden>
+            <option value="value" selected>Calculate Price for Weight</option>
+            <option value="grams">Calculate Weight for Budget</option>
+          </select>
+        </div>
+
+        <!-- Standard Gold Weight Presets -->
+        <div class="calc-group">
+          <span class="calc-group-label">Standard Gold Weight</span>
+          <div class="chip-container" id="weightChips">
+            <button class="chip" data-val="1" type="button">1g</button>
+            <button class="chip" data-val="4" type="button">4g (Half)</button>
+            <button class="chip active" data-val="8" type="button">8g (1 Sov)</button>
+            <button class="chip" data-val="16" type="button">16g (2 Sov)</button>
+            <button class="chip" data-val="24" type="button">24g (3 Sov)</button>
+            <button class="chip" data-val="50" type="button">50g</button>
+            <button class="chip" data-val="100" type="button">100g</button>
+          </div>
+        </div>
+
+        <!-- Category & Making Charges -->
+        <div class="calc-group">
+          <span class="calc-group-label">Jewelry Category & Making Charges</span>
+          <div class="chip-container" id="makingChips">
+            <button class="chip" data-val="3.0" type="button">Coin (3%)</button>
+            <button class="chip active" data-val="8.0" type="button">Plain Jewelry (8%)</button>
+            <button class="chip" data-val="12.0" type="button">Stone / Studded (12%)</button>
+            <button class="chip" data-val="16.0" type="button">Antique / Temple (16%)</button>
+          </div>
+        </div>
+
+        <!-- Parameter Input Grid -->
+        <div class="calc-grid-form">
+          <div class="calc-field" id="weightField">
+            <label>Gold Weight (Grams)</label>
+            <input class="calc-input" id="weight" type="number" inputmode="decimal" value="8" step="0.01">
+          </div>
+          <div class="calc-field" id="budgetField" style="display: none;">
+            <label>Total Budget (₹)</label>
+            <input class="calc-input" id="budget" type="number" inputmode="decimal" value="100000" step="100">
+          </div>
+          <div class="calc-field">
+            <label>Making Charge (%)</label>
+            <input class="calc-input" id="making" type="number" inputmode="decimal" value="8.0" step="0.1">
+          </div>
+          <div class="calc-field">
+            <label>GST on Jewelry (%)</label>
+            <input class="calc-input" id="gstRate" type="number" inputmode="decimal" value="3.0" step="0.1">
+          </div>
+          <div class="calc-field">
+            <label>Hallmarking / Fee (₹)</label>
+            <input class="calc-input" id="flatFee" type="number" inputmode="decimal" value="45" step="1">
+          </div>
+        </div>
+
+        <!-- Scrap Gold Exchange Drawer -->
+        <div class="exchange-drawer">
+          <span class="exchange-header">Old Gold Scrap Exchange (Optional)</span>
+          <div class="calc-grid-form">
+            <div class="calc-field">
+              <label>Scrap Weight (g)</label>
+              <input class="calc-input" id="oldWeight" type="number" inputmode="decimal" value="0" step="0.01">
+            </div>
+            <div class="calc-field">
+              <label>Scrap Purity</label>
+              <select class="calc-input" id="oldPurity">
+                <option value="22" selected>22K (91.6% Pure)</option>
+                <option value="18">18K (75.0% Pure)</option>
+                <option value="24">24K (99.9% Pure)</option>
+                <option value="20">84.0% Standard Melt</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Detailed Itemized Receipt Card -->
+        <div class="receipt-card">
+          <div class="receipt-title">Itemized Purchase Quotation</div>
+          <div class="receipt-line"><span>Base 22K Gold Cost:</span><span id="receiptBase">₹ 0</span></div>
+          <div class="receipt-line"><span id="receiptMakingLabel">Making Charges (8%):</span><span id="receiptMaking">₹ 0</span></div>
+          <div class="receipt-line"><span id="receiptGstLabel">GST (3%):</span><span id="receiptGst">₹ 0</span></div>
+          <div class="receipt-line"><span>Hallmarking / Flat Fees:</span><span id="receiptFee">₹ 0</span></div>
+          <div class="receipt-line deduction" id="receiptOldGoldLine" style="display:none;"><span>Old Gold Exchange Credit:</span><span id="receiptOldGold">-₹ 0</span></div>
+          
+          <div class="receipt-total">
+            <span class="label" id="receiptTotalLabel">Net Payable Amount</span>
+            <span class="final-val" id="calcResult">₹ —</span>
+          </div>
+          <div style="font-size:10.5px; font-weight:600; color:var(--text-tertiary); text-align:right; margin-top:2px;" id="calcSub">Based on live 22K rate.</div>
+
+          <button class="quote-btn" id="copyQuoteBtn" type="button">Copy Quotation Slip</button>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Redesigned Historical Log Table -->
+  <section class="section">
+    <div class="section-head">
+      <h3>Historical Log</h3>
+      <span id="historyCount">—</span>
+    </div>
+    <div class="panel table-wrap">
+      <table class="history-table">
+        <thead><tr><th>Date</th><th>Per Gram</th><th>1 Sov (8g)</th></tr></thead>
+        <tbody id="historyBody"><tr><td colspan="3" style="text-align:center; padding: 20px 0;">Loading records…</td></tr></tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer>
+    <div>Gold 22k rate · Institutional Terminal</div>
+    <div style="margin-top:2px; font-weight:500;">LiveChennai + GoodReturns Live Feeds</div>
+  </footer>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const LIVE_URL = "data/live.json";
+const HISTORY_URL = "data/history.json";
+const WORKER_URL = "https://gold-price-fetch.subramanilrs.workers.dev/";
+
+let live = null;
+let history = [];
+let selectedRange = 30;
+let fetchBusy = false;
+let scrubIndex = -1;
+
+const $ = id => document.getElementById(id);
+
+/* Theme toggle — manual override persisted in localStorage.
+   Falls back to the OS preference (handled purely by CSS media query)
+   until the user makes an explicit choice. */
+(function setupThemeToggle() {
+  const root = document.documentElement;
+  const metaLight = document.querySelector('meta[name="theme-color"][media*="light"]');
+  const metaDark = document.querySelector('meta[name="theme-color"][media*="dark"]');
+
+  function applyTheme(theme) {
+    if (theme === "light" || theme === "dark") {
+      root.setAttribute("data-theme", theme);
+    } else {
+      root.removeAttribute("data-theme");
     }
-)
-
-
-# ============================================================
-# BASIC HELPERS
-# ============================================================
-
-def now_ist():
-    return datetime.now(IST)
-
-
-def format_rupees(value):
-    if value is None:
-        return "N/A"
-
-    return f"₹{int(value):,}"
-
-
-def clean_number(text):
-    if text is None:
-        return None
-
-    text = str(text)
-
-    text = (
-        text.replace(",", "")
-        .replace("₹", "")
-        .replace("Rs.", "")
-        .replace("Rs", "")
-        .replace("INR", "")
-    )
-
-    match = re.search(r"\d+(?:\.\d+)?", text)
-
-    if not match:
-        return None
-
-    try:
-        return int(float(match.group(0)))
-    except Exception:
-        return None
-
-
-def load_json(path, default):
-    try:
-        if not path.exists():
-            return default
-
-        with open(path, "r", encoding="utf-8") as f:
-            return json.load(f)
-
-    except Exception as exc:
-        print(f"WARNING: Could not read {path}: {exc}")
-        return default
-
-
-def save_json(path, data):
-    path.parent.mkdir(parents=True, exist_ok=True)
-
-    temp = path.with_suffix(path.suffix + ".tmp")
-
-    with open(temp, "w", encoding="utf-8") as f:
-        json.dump(
-            data,
-            f,
-            ensure_ascii=False,
-            indent=2
-        )
-
-    temp.replace(path)
-
-
-# ============================================================
-# VALID RATE
-# ============================================================
-
-def valid_gold_rate(value):
-    if value is None:
-        return False
-
-    try:
-        value = int(value)
-    except Exception:
-        return False
-
-    return 5000 <= value <= 50000
-
-
-# ============================================================
-# LIVECHENNAI
-#
-# CURRENT PAGE STRUCTURE:
-#
-# Date | Pure Gold (24 k) | Standard Gold (22 K)
-#      | 1 Gm | 8 Gm | 1 Gm | 8 Gm
-#
-# Example:
-# 30/August/2026 | 15824 | 126592 | 14505 | 116040
-#
-# We specifically locate the Standard Gold (22 K) column.
-# ============================================================
-
-def extract_livechennai_22k(soup):
-    tables = soup.find_all("table")
-
-    for table in tables:
-
-        rows = table.find_all("tr")
-
-        if not rows:
-            continue
-
-        header_text = " ".join(
-            row.get_text(" ", strip=True)
-            for row in rows[:5]
-        )
-
-        normalized = re.sub(
-            r"\s+",
-            " ",
-            header_text
-        ).lower()
-
-        # This is the important identification.
-        if (
-            "standard gold" in normalized
-            and "22 k" in normalized
-        ):
-
-            print(
-                "LiveChennai: Found Standard Gold (22 K) table"
-            )
-
-            # ------------------------------------------------
-            # First try to read the first data row.
-            # ------------------------------------------------
-
-            for row in rows:
-
-                cells = row.find_all(
-                    ["td", "th"]
-                )
-
-                values = []
-
-                for cell in cells:
-                    value = clean_number(
-                        cell.get_text(
-                            " ",
-                            strip=True
-                        )
-                    )
-
-                    if value is not None:
-                        values.append(value)
-
-                # A normal data row has:
-                #
-                # date
-                # 24K 1g
-                # 24K 8g
-                # 22K 1g
-                # 22K 8g
-                #
-                # The 22K 1g value is normally
-                # the third numeric value.
-
-                if len(values) >= 4:
-
-                    candidates = values[-4:]
-
-                    # Last four numeric values should be:
-                    # 24K 1g
-                    # 24K 8g
-                    # 22K 1g
-                    # 22K 8g
-
-                    candidate = candidates[2]
-
-                    if valid_gold_rate(candidate):
-
-                        print(
-                            "LiveChennai parser result:",
-                            format_rupees(candidate),
-                            "/gram"
-                        )
-
-                        return candidate
-
-            # ------------------------------------------------
-            # Fallback: inspect table text.
-            # ------------------------------------------------
-
-            table_text = table.get_text(
-                " ",
-                strip=True
-            )
-
-            # Look for a date followed by four prices.
-            matches = re.findall(
-                r"\d{1,2}/[A-Za-z]+/\d{4}"
-                r".{0,100}?"
-                r"([\d,]+)"
-                r".{0,30}?"
-                r"([\d,]+)"
-                r".{0,30}?"
-                r"([\d,]+)"
-                r".{0,30}?"
-                r"([\d,]+)",
-                table_text,
-                flags=re.IGNORECASE
-            )
-
-            for match in matches:
-
-                values = [
-                    clean_number(x)
-                    for x in match
-                ]
-
-                if len(values) == 4:
-
-                    candidate = values[2]
-
-                    if valid_gold_rate(candidate):
-
-                        print(
-                            "LiveChennai fallback parser result:",
-                            format_rupees(candidate),
-                            "/gram"
-                        )
-
-                        return candidate
-
-    # ========================================================
-    # SECOND FALLBACK
-    #
-    # Current LiveChennai page also contains:
-    #
-    # Today's 22K Rate
-    # ₹14,505
-    # ========================================================
-
-    page_text = soup.get_text(
-        " ",
-        strip=True
-    )
-
-    page_text = re.sub(
-        r"\s+",
-        " ",
-        page_text
-    )
-
-    patterns = [
-
-        r"Today's\s+22K\s+Rate\s*₹?\s*([\d,]+)",
-
-        r"Today's\s+22K\s+gold\s+rate"
-        r".{0,100}?"
-        r"₹\s*([\d,]+)",
-
-        r"22K\s+gold\s+rate"
-        r".{0,100}?"
-        r"₹\s*([\d,]+)",
-
-        r"22\s*carat\s+gold\s+rate"
-        r".{0,100}?"
-        r"₹\s*([\d,]+)",
-    ]
-
-    for pattern in patterns:
-
-        match = re.search(
-            pattern,
-            page_text,
-            flags=re.IGNORECASE
-        )
-
-        if match:
-
-            value = clean_number(
-                match.group(1)
-            )
-
-            if valid_gold_rate(value):
-
-                print(
-                    "LiveChennai text parser result:",
-                    format_rupees(value),
-                    "/gram"
-                )
-
-                return value
-
-    return None
-
-
-def fetch_livechennai():
-
-    print("Checking LiveChennai...")
-
-    try:
-
-        response = SESSION.get(
-            LIVECHENNAI_URL,
-            timeout=REQUEST_TIMEOUT
-        )
-
-        response.raise_for_status()
-
-        print(
-            f"LiveChennai HTTP: {response.status_code}"
-        )
-
-        soup = BeautifulSoup(
-            response.text,
-            "html.parser"
-        )
-
-        rate = extract_livechennai_22k(
-            soup
-        )
-
-        if rate:
-
-            print(
-                "LiveChennai:",
-                format_rupees(rate),
-                "/gram"
-            )
-
-            return {
-                "source": "LiveChennai",
-                "rate_22k": int(rate),
-                "url": LIVECHENNAI_URL,
-                "fetched_at": now_ist().isoformat()
-            }
-
-        print(
-            "LiveChennai: Could not locate valid 22K rate"
-        )
-
-    except Exception as exc:
-
-        print(
-            f"LiveChennai failed: {exc}"
-        )
-
-    return None
-
-
-# ============================================================
-# GOODRETURNS
-# ============================================================
-
-def extract_goodreturns_22k(soup):
-
-    # --------------------------------------------------------
-    # First inspect tables.
-    # --------------------------------------------------------
-
-    for table in soup.find_all("table"):
-
-        text = table.get_text(
-            " ",
-            strip=True
-        )
-
-        normalized = re.sub(
-            r"\s+",
-            " ",
-            text
-        ).lower()
-
-        if (
-            "22k" in normalized
-            or "22 k" in normalized
-            or "22 karat" in normalized
-        ):
-
-            rows = table.find_all("tr")
-
-            for row in rows:
-
-                cells = row.find_all(
-                    ["td", "th"]
-                )
-
-                row_text = row.get_text(
-                    " ",
-                    strip=True
-                )
-
-                if re.search(
-                    r"22\s*k|22\s*karat",
-                    row_text,
-                    re.IGNORECASE
-                ):
-
-                    numbers = []
-
-                    for cell in cells:
-
-                        value = clean_number(
-                            cell.get_text(
-                                " ",
-                                strip=True
-                            )
-                        )
-
-                        if valid_gold_rate(value):
-                            numbers.append(value)
-
-                    if numbers:
-
-                        # Prefer the first valid 22K value.
-                        for value in numbers:
-
-                            if valid_gold_rate(value):
-
-                                return value
-
-    # --------------------------------------------------------
-    # Text fallback.
-    # --------------------------------------------------------
-
-    text = soup.get_text(
-        " ",
-        strip=True
-    )
-
-    text = re.sub(
-        r"\s+",
-        " ",
-        text
-    )
-
-    patterns = [
-
-        r"22K\s+Gold\s*/g\s*₹?\s*([\d,]+)",
-
-        r"22K\s+Gold\s+/?g\s*₹?\s*([\d,]+)",
-
-        r"22K\s+Gold"
-        r".{0,80}?"
-        r"₹\s*([\d,]+)",
-
-        r"22\s*karat\s+gold"
-        r".{0,100}?"
-        r"₹\s*([\d,]+)",
-    ]
-
-    for pattern in patterns:
-
-        match = re.search(
-            pattern,
-            text,
-            flags=re.IGNORECASE
-        )
-
-        if match:
-
-            value = clean_number(
-                match.group(1)
-            )
-
-            if valid_gold_rate(value):
-                return value
-
-    return None
-
-
-def fetch_goodreturns():
-
-    print("Checking GoodReturns...")
-
-    try:
-
-        response = SESSION.get(
-            GOODRETURNS_URL,
-            timeout=REQUEST_TIMEOUT
-        )
-
-        response.raise_for_status()
-
-        print(
-            f"GoodReturns HTTP: {response.status_code}"
-        )
-
-        soup = BeautifulSoup(
-            response.text,
-            "html.parser"
-        )
-
-        rate = extract_goodreturns_22k(
-            soup
-        )
-
-        if rate:
-
-            print(
-                "GoodReturns:",
-                format_rupees(rate),
-                "/gram"
-            )
-
-            return {
-                "source": "GoodReturns",
-                "rate_22k": int(rate),
-                "url": GOODRETURNS_URL,
-                "fetched_at": now_ist().isoformat()
-            }
-
-        print(
-            "GoodReturns: Could not locate valid 22K rate"
-        )
-
-    except Exception as exc:
-
-        print(
-            f"GoodReturns failed: {exc}"
-        )
-
-    return None
-
-
-# ============================================================
-# FETCH BOTH SOURCES
-# ============================================================
-
-def fetch_all_sources():
-
-    # --------------------------------------------------------
-    # Fetch both sources concurrently instead of one after
-    # another. Same two function calls, same return values -
-    # just started in parallel so total wait time is roughly
-    # max(livechennai, goodreturns) instead of the sum.
-    # --------------------------------------------------------
-
-    with ThreadPoolExecutor(max_workers=2) as executor:
-
-        live_future = executor.submit(
-            fetch_livechennai
-        )
-
-        good_future = executor.submit(
-            fetch_goodreturns
-        )
-
-        live = live_future.result()
-        good = good_future.result()
-
-    return live, good
-
-
-# ============================================================
-# SELECT BEST RATE
-# ============================================================
-
-def select_rate(
-    live,
-    good,
-    previous_rate=None
-):
-
-    live_rate = (
-        live["rate_22k"]
-        if live
-        else None
-    )
-
-    good_rate = (
-        good["rate_22k"]
-        if good
-        else None
-    )
-
-    print("")
-
-    print(
-        "SOURCE RESULTS"
-    )
-
-    print(
-        "LiveChennai:",
-        format_rupees(live_rate)
-    )
-
-    print(
-        "GoodReturns:",
-        format_rupees(good_rate)
-    )
-
-    # --------------------------------------------------------
-    # Both sources agree.
-    # --------------------------------------------------------
-
-    if (
-        live_rate is not None
-        and good_rate is not None
-        and live_rate == good_rate
-    ):
-
-        print(
-            "Sources agree."
-        )
-
-        return {
-            "rate_22k": live_rate,
-            "agreement": True,
-            "source": "LiveChennai + GoodReturns",
-            "livechennai": live,
-            "goodreturns": good
+    const isDark = theme === "dark" || (!theme && window.matchMedia("(prefers-color-scheme: dark)").matches);
+    const color = isDark ? "#030712" : "#f8fafc";
+    if (metaLight) metaLight.setAttribute("content", color);
+    if (metaDark) metaDark.setAttribute("content", color);
+    if (typeof drawChart === "function") requestAnimationFrame(drawChart);
+  }
+
+  const saved = localStorage.getItem("gold_theme");
+  applyTheme(saved);
+
+  $("themeToggle").onclick = () => {
+    haptic(8);
+    const current = root.getAttribute("data-theme") ||
+      (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    const next = current === "dark" ? "light" : "dark";
+    localStorage.setItem("gold_theme", next);
+    applyTheme(next);
+  };
+})();
+
+let audioCtx = null;
+function playTick(freq = 800, duration = 0.015) {
+  try {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = "sine";
+    osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+    gain.gain.setValueAtTime(0.03, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start();
+    osc.stop(audioCtx.currentTime + duration);
+  } catch(e) {}
+}
+
+const haptic = (ms = 10, freq = 800) => {
+  if ("vibrate" in navigator) { try { navigator.vibrate(ms); } catch (_) {} }
+  playTick(freq);
+};
+
+const money = n => Number.isFinite(Number(n)) ? "₹ " + Math.round(Number(n)).toLocaleString("en-IN") : "₹ —";
+
+const dateText = s => {
+  if (!s) return "—";
+  const d = new Date(String(s) + "T00:00:00");
+  return isNaN(d.getTime()) ? String(s) : d.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
+};
+
+const timeText = s => {
+  if (!s) return "—";
+  const parts = String(s).split(":");
+  if (parts.length < 2) return String(s);
+  let hour = Number(parts[0]);
+  if (!Number.isFinite(hour)) return String(s);
+  const ap = hour >= 12 ? "PM" : "AM";
+  hour = hour % 12 || 12;
+  return hour + ":" + parts[1] + " " + ap;
+};
+
+const esc = s => String(s ?? "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;");
+
+function setStatus(text, offline = false, syncing = false) {
+  $("statusText").textContent = text;
+  $("status").classList.toggle("offline", offline);
+  $("status").classList.toggle("syncing", syncing);
+}
+
+function toast(text) {
+  $("toast").textContent = text;
+  $("toast").classList.add("show");
+  setTimeout(() => $("toast").classList.remove("show"), 2200);
+}
+
+function sleep(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
+
+function checkParserHealth(data, networkError = false) {
+  const warningBox = $("parserWarning");
+  if (!warningBox) return;
+
+  if (networkError && !navigator.onLine) {
+    $("warningTitle").innerHTML = `Offline Mode <span class="dismiss-text">Tap to dismiss</span>`;
+    $("warningDesc").textContent = "Device offline. Displaying saved market records.";
+    warningBox.hidden = false;
+    return;
+  }
+  
+  if (!data) {
+    warningBox.hidden = true;
+    return;
+  }
+
+  let hasFailed = false, reasons = [];
+  if (data.error || data.parsing_failed) { hasFailed = true; reasons.push(data.error || "Parser feed issue"); }
+  if (Array.isArray(data.failed_sources) && data.failed_sources.length > 0) { hasFailed = true; reasons.push(`Failed: ${data.failed_sources.join(", ")}`); }
+  if (data.status === "degraded") { hasFailed = true; reasons.push("Operating in fallback mode"); }
+
+  if (hasFailed) {
+    $("warningTitle").innerHTML = `Source Notice <span class="dismiss-text">Tap to dismiss</span>`;
+    $("warningDesc").textContent = reasons.join(" · ") + ". Displaying last verified benchmark.";
+    warningBox.hidden = false;
+  } else {
+    warningBox.hidden = true;
+  }
+}
+
+async function getJSON(url) {
+  const response = await fetch(url + (url.includes("?") ? "&" : "?") + "v=" + Date.now(), { cache: "no-store" });
+  if (!response.ok) throw new Error("HTTP " + response.status);
+  return response.json();
+}
+
+function normalize(array) {
+  return Array.isArray(array) ? array.filter(i => i && i.date && Number.isFinite(Number(i.rate_22k))).map(i => ({ ...i, rate_22k: Number(i.rate_22k) })) : [];
+}
+
+function computeLastMovement() {
+  if (!history || history.length < 1 || !live) return;
+  let fullData = [...history];
+  if (fullData[fullData.length - 1].date !== live.date) fullData.push(live);
+  else fullData[fullData.length - 1] = live;
+
+  let lastChangeItem = null, oldRate = null;
+  for (let i = fullData.length - 1; i > 0; i--) {
+    let r1 = Number(fullData[i].rate_22k), r0 = Number(fullData[i - 1].rate_22k);
+    if (r1 !== r0) { lastChangeItem = fullData[i]; oldRate = r0; break; }
+  }
+
+  if (lastChangeItem && oldRate) {
+    let amount = Number(lastChangeItem.rate_22k) - oldRate;
+    $("lastDate").textContent = "Price shifted on " + dateText(lastChangeItem.date);
+    $("lastAmount").textContent = (amount > 0 ? "▲ " : "▼ ") + money(Math.abs(amount));
+    $("lastAmount").className = "amount " + (amount > 0 ? "positive" : "negative");
+    $("lastTime").textContent = "Previous rate was " + money(oldRate);
+  } else {
+    $("lastDate").textContent = "No recent shifts";
+    $("lastTime").textContent = "Market is flat";
+    $("lastAmount").textContent = "—";
+    $("lastAmount").className = "amount";
+  }
+}
+
+function renderLive(d) {
+  if (!d) return;
+  live = d;
+  const rate = Number(d.rate_22k);
+  const rate8 = Number.isFinite(Number(d.rate_8g)) ? Number(d.rate_8g) : rate * 8;
+
+  $("hero8").textContent = money(rate8);
+  $("hero1").innerHTML = `${money(rate)} <span id="change1" class="change-pill mini same"></span>`;
+  $("today").textContent = dateText(d.date);
+  const isFreshToday = d.date === todayLocalDateStr();
+  $("todayTime").textContent = timeText(d.time) + (isFreshToday ? "" : " · Previous Close");
+
+  // International-standard rule: a "session" is only real when the SOURCE says
+  // so (via d.session, or the timestamp on the data itself). We never infer a
+  // fresh AM session purely from the client's current wall-clock time — that's
+  // what caused the AM card to light up at 1 AM using yesterday's PM figure.
+  // Until the source actually publishes a new fix, we keep showing the last
+  // known session (PM = previous close), the same way a stock ticker shows
+  // "previous close" outside market hours instead of guessing a new session.
+  let currentSession = d.session;
+  if (!currentSession) {
+    if (d.time) {
+      const hr = parseInt(String(d.time).split(":")[0], 10);
+      currentSession = hr < 14 ? "AM" : "PM";
+    } else {
+      currentSession = "PM";
+    }
+  }
+  $("session").textContent = currentSession + " Fix";
+
+  $("purity22").textContent = money(rate) + "/g";
+  $("purity24").textContent = money(Math.round(rate * (24 / 22))) + "/g";
+  $("purity18").textContent = money(Math.round(rate * (18 / 22))) + "/g";
+
+  let change1 = Number(d.change);
+  if (!Number.isFinite(change1)) change1 = Number.isFinite(Number(d.previous_rate_22k)) ? rate - Number(d.previous_rate_22k) : 0;
+  const change8 = change1 * 8;
+
+  $("change1").textContent = change1 > 0 ? "+" + money(change1) : change1 < 0 ? "-" + money(Math.abs(change1)) : "Flat";
+  $("change1").className = "change-pill mini " + (change1 > 0 ? "up" : change1 < 0 ? "down" : "same");
+  
+  $("change8").textContent = change8 > 0 ? "▲ +" + money(change8) + " Today" : change8 < 0 ? "▼ -" + money(Math.abs(change8)) + " Today" : "No change";
+  $("change8").className = "change-pill " + (change8 > 0 ? "up" : change8 < 0 ? "down" : "same");
+
+  renderTodayTimeline();
+}
+
+function todayLocalDateStr() {
+  const d0 = new Date();
+  const y = d0.getFullYear(), m = String(d0.getMonth() + 1).padStart(2, "0"), day = String(d0.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+
+function renderTodayTimeline() {
+  if (!live) return;
+  const today = live.date;
+
+  // If the most recent published rate isn't actually dated today, then by
+  // definition NEITHER of today's fixes has happened yet — the hero card can
+  // still show that rate as the last available price, but the "Today's
+  // Market Activity" panel should read Pending/Pending rather than lighting
+  // up a fix (AM or PM) that belongs to a previous day.
+  const isFreshToday = today === todayLocalDateStr();
+  if (!isFreshToday) {
+    $("amRate").textContent = "Pending";
+    $("amTime").textContent = "—";
+    $("pmRate").textContent = "Pending";
+    $("pmTime").textContent = "—";
+    $("amCard").classList.remove("is-active");
+    $("pmCard").classList.remove("is-active");
+    return;
+  }
+
+  let am = null, pm = null;
+
+  // 1. Direct structured properties
+  if (live.am_rate || live.amRate || live.morning_rate || live.rate_am) {
+    am = {
+      rate_22k: Number(live.am_rate || live.amRate || live.morning_rate || live.rate_am),
+      time: live.am_time || live.amTime || "10:30"
+    };
+  }
+  if (live.pm_rate || live.pmRate || live.evening_rate || live.rate_pm) {
+    pm = {
+      rate_22k: Number(live.pm_rate || live.pmRate || live.evening_rate || live.rate_pm),
+      time: live.pm_time || live.pmTime || "17:00"
+    };
+  }
+
+  // 2. Intraday array
+  if (Array.isArray(live.intraday)) {
+    const amEntry = live.intraday.find(i => (i.date === today || !i.date) && (i.session === "AM" || String(i.session).toUpperCase().includes("AM") || String(i.session).toUpperCase().includes("MORNING")));
+    if (amEntry && amEntry.rate_22k) am = { rate_22k: Number(amEntry.rate_22k), time: amEntry.time || "10:30" };
+    
+    const pmEntry = live.intraday.find(i => (i.date === today || !i.date) && (i.session === "PM" || String(i.session).toUpperCase().includes("PM") || String(i.session).toUpperCase().includes("EVENING")));
+    if (pmEntry && pmEntry.rate_22k) pm = { rate_22k: Number(pmEntry.rate_22k), time: pmEntry.time || "17:00" };
+  }
+
+  // 3. LocalStorage cache fallback
+  try {
+    const cached = JSON.parse(localStorage.getItem("gold_live_backup"));
+    if (cached && cached.date === today) {
+      if (!am && (cached.session === "AM" || cached.am_rate || cached.amRate)) {
+        am = { rate_22k: Number(cached.am_rate || cached.amRate || cached.rate_22k), time: cached.am_time || cached.time || "10:30" };
+      }
+      if (!pm && (cached.session === "PM" || cached.pm_rate || cached.pmRate)) {
+        pm = { rate_22k: Number(cached.pm_rate || cached.pmRate || cached.rate_22k), time: cached.pm_time || cached.time || "17:00" };
+      }
+      if (Array.isArray(cached.intraday)) {
+        if (!am) {
+          const cAm = cached.intraday.find(i => (i.date === today || !i.date) && (i.session === "AM" || String(i.session).toUpperCase().includes("AM")));
+          if (cAm && cAm.rate_22k) am = { rate_22k: Number(cAm.rate_22k), time: cAm.time || "10:30" };
         }
-
-    # --------------------------------------------------------
-    # LiveChennai only.
-    # --------------------------------------------------------
-
-    if (
-        live_rate is not None
-        and good_rate is None
-    ):
-
-        print(
-            "Only LiveChennai returned a valid rate."
-        )
-
-        return {
-            "rate_22k": live_rate,
-            "agreement": False,
-            "source": "LiveChennai",
-            "livechennai": live,
-            "goodreturns": good
+        if (!pm) {
+          const cPm = cached.intraday.find(i => (i.date === today || !i.date) && (i.session === "PM" || String(i.session).toUpperCase().includes("PM")));
+          if (cPm && cPm.rate_22k) pm = { rate_22k: Number(cPm.rate_22k), time: cPm.time || "17:00" };
         }
+      }
+    }
+  } catch(e) {}
 
-    # --------------------------------------------------------
-    # GoodReturns only.
-    # --------------------------------------------------------
+  // 4. Session & time attribution
+  const sessionUpper = String(live.session || "").toUpperCase();
+  const timeHour = live.time ? parseInt(String(live.time).split(":")[0], 10) : null;
 
-    if (
-        live_rate is None
-        and good_rate is not None
-    ):
+  if (!am && (sessionUpper === "AM" || sessionUpper.includes("MORNING"))) {
+    am = { rate_22k: Number(live.rate_22k), time: live.time || "10:30" };
+  }
+  if (!pm && (sessionUpper === "PM" || sessionUpper.includes("EVENING"))) {
+    pm = { rate_22k: Number(live.rate_22k), time: live.time || "17:00" };
+  }
 
-        print(
-            "Only GoodReturns returned a valid rate."
-        )
+  // 5. If PM is published, derive opening AM if available
+  if (pm && !am) {
+    if (live.morning_rate || live.opening_rate || live.previous_rate_22k) {
+      am = { rate_22k: Number(live.morning_rate || live.opening_rate || live.previous_rate_22k), time: "10:30" };
+    }
+  }
 
-        return {
-            "rate_22k": good_rate,
-            "agreement": False,
-            "source": "GoodReturns",
-            "livechennai": live,
-            "goodreturns": good
-        }
+  // 6. Time-based heuristic — anchored ONLY to the data's own timestamp
+  // (live.time), never to the client's current wall-clock. We already know
+  // live.date === today at this point, so this purely decides whether
+  // today's single published rate so far is the AM or PM fix.
+  if (!am && !pm && live.rate_22k) {
+    if (timeHour !== null && timeHour < 14) {
+      am = { rate_22k: Number(live.rate_22k), time: live.time || "10:30" };
+    } else {
+      pm = { rate_22k: Number(live.rate_22k), time: live.time || "17:00" };
+      if (live.previous_rate_22k) {
+        am = { rate_22k: Number(live.previous_rate_22k), time: "10:30" };
+      }
+    }
+  }
 
-    # --------------------------------------------------------
-    # Both available but different.
-    # --------------------------------------------------------
+  $("amRate").textContent = am && Number.isFinite(am.rate_22k) ? money(am.rate_22k) : "Pending";
+  $("amTime").textContent = am ? timeText(am.time) : "—";
 
-    if (
-        live_rate is not None
-        and good_rate is not None
-        and live_rate != good_rate
-    ):
+  $("pmRate").textContent = pm && Number.isFinite(pm.rate_22k) ? money(pm.rate_22k) : "Pending";
+  $("pmTime").textContent = pm ? timeText(pm.time) : "—";
 
-        print("")
-        print(
-            "WARNING: SOURCES DISAGREE"
-        )
+  // Light up ONLY the single latest active fix
+  const isPmActive = Boolean(pm && Number.isFinite(pm.rate_22k));
+  const isAmActive = Boolean(am && Number.isFinite(am.rate_22k) && !isPmActive);
 
-        print(
-            "LiveChennai:",
-            format_rupees(live_rate)
-        )
+  $("amCard").classList.toggle("is-active", isAmActive);
+  $("pmCard").classList.toggle("is-active", isPmActive);
+}
 
-        print(
-            "GoodReturns:",
-            format_rupees(good_rate)
-        )
+function updateFintechMetrics() {
+  if (!history.length || !live) return;
+  const currentRate = Number(live.rate_22k), values = history.map(i => Number(i.rate_22k));
 
-        # Do not allow a suspicious difference
-        # to overwrite a known good rate.
+  const calcReturn = (days) => {
+    if (history.length < 2) return null;
+    const pastVal = Number(history[Math.max(0, history.length - 1 - days)].rate_22k);
+    return pastVal ? ((currentRate - pastVal) / pastVal) * 100 : null;
+  };
 
-        if previous_rate is not None:
+  [{ id: "ret1W", d: 7 }, { id: "ret1M", d: 30 }, { id: "ret3M", d: 90 }, { id: "ret6M", d: 180 }, { id: "ret1Y", d: 365 }, { id: "ret3Y", d: 1095 }].forEach(h => {
+    const ret = calcReturn(h.d);
+    $(h.id).textContent = ret === null ? "—" : (ret >= 0 ? "+" : "") + ret.toFixed(1) + "%";
+  });
 
-            print(
-                "Keeping previous saved rate:",
-                format_rupees(previous_rate)
-            )
+  const smaPeriod = Math.min(30, history.length);
+  const sma = values.slice(-smaPeriod).reduce((a, b) => a + b, 0) / smaPeriod;
+  const smaDiff = currentRate - sma, smaPct = (smaDiff / sma) * 100;
 
-            return {
-                "rate_22k": previous_rate,
-                "agreement": False,
-                "source": "Previous rate - sources disagree",
-                "livechennai": live,
-                "goodreturns": good
-            }
+  $("smaValue").textContent = money(sma);
+  $("smaPill").className = "change-pill " + (smaDiff >= 0 ? "up" : "down");
+  $("smaPill").textContent = (smaDiff >= 0 ? "▲ +" : "▼ -") + money(Math.abs(smaDiff)) + ` (${smaPct.toFixed(1)}%)`;
+}
 
-        # No previous value.
-        # Prefer LiveChennai.
+function drawSpline(ctx, pts) {
+  if (pts.length < 2) return;
+  ctx.beginPath();
+  ctx.moveTo(pts[0].x, pts[0].y);
+  for (let i = 0; i < pts.length - 1; i++) {
+    const p0 = pts[i === 0 ? i : i - 1];
+    const p1 = pts[i];
+    const p2 = pts[i + 1];
+    const p3 = pts[i + 2 < pts.length ? i + 2 : i + 1];
+    ctx.bezierCurveTo(
+      p1.x + (p2.x - p0.x) / 6,
+      p1.y + (p2.y - p0.y) / 6,
+      p2.x - (p3.x - p1.x) / 6,
+      p2.y - (p3.y - p1.y) / 6,
+      p2.x,
+      p2.y
+    );
+  }
+}
 
-        return {
-            "rate_22k": live_rate,
-            "agreement": False,
-            "source": "LiveChennai - sources disagree",
-            "livechennai": live,
-            "goodreturns": good
-        }
+/* Premium Financial Terminal Chart */
+function drawChart() {
+  const canvas = $("chart");
+  if (!canvas) return;
+  const width = canvas.parentElement.clientWidth, height = canvas.parentElement.clientHeight, dpr = window.devicePixelRatio || 1;
+  if (!width || !height) return;
+  canvas.width = Math.round(width * dpr); canvas.height = Math.round(height * dpr);
+  const ctx = canvas.getContext("2d");
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, width, height);
 
-    return None
+  const data = selectedRange === "all" ? history : history.slice(Math.max(0, history.length - Number(selectedRange)));
+  $("chartCount").textContent = data.length.toLocaleString() + " records";
 
+  const styles = getComputedStyle(document.body);
+  const colorGold = styles.getPropertyValue('--gold-primary').trim() || '#d97706';
+  const colorTextTertiary = styles.getPropertyValue('--text-tertiary').trim() || '#94a3b8';
+  const colorTextMain = styles.getPropertyValue('--text-main').trim() || '#0f172a';
 
-# ============================================================
-# PREVIOUS RATE
-# ============================================================
+  if (data.length < 2) return;
 
-def get_previous_rate():
+  const values = data.map(i => Number(i.rate_22k));
+  const min0 = Math.min(...values), max0 = Math.max(...values);
+  const pad = Math.max(60, (max0 - min0) * 0.16);
+  const min = min0 - pad, max = max0 + pad;
 
-    data = load_json(
-        LIVE_FILE,
-        {}
-    )
+  const L = 52, R = 12, T = 16, B = 22;
+  const plotW = width - L - R, plotH = height - T - B;
 
-    if isinstance(data, dict):
+  const py = val => T + (1 - ((val - min) / (max - min))) * plotH;
+  const points = values.map((val, i) => ({ x: L + (i / (values.length - 1)) * plotW, y: py(val) }));
 
-        for key in (
-            "rate_22k",
-            "gold_22k",
-            "rate",
-            "price_22k"
-        ):
+  // Horizontal Grid Lines & Y-Axis Scale
+  ctx.font = "600 10px var(--font-sans)";
+  ctx.textAlign = "right";
+  ctx.lineWidth = 1;
 
-            value = data.get(key)
+  for (let i = 0; i <= 4; i++) {
+    const gy = T + (plotH * i / 4);
+    ctx.strokeStyle = "rgba(148, 163, 184, 0.12)";
+    ctx.setLineDash([]);
+    ctx.beginPath();
+    ctx.moveTo(L, gy);
+    ctx.lineTo(width - R, gy);
+    ctx.stroke();
 
-            if isinstance(
-                value,
-                (int, float)
-            ):
+    const gridVal = max - ((max - min) * i / 4);
+    ctx.fillStyle = colorTextTertiary;
+    ctx.fillText(Math.round(gridVal).toLocaleString("en-IN"), L - 8, gy + 3.5);
+  }
 
-                value = int(value)
+  // Smooth Area Gradient
+  drawSpline(ctx, points);
+  ctx.lineTo(points[points.length - 1].x, height - B);
+  ctx.lineTo(points[0].x, height - B);
+  ctx.closePath();
+  const fillGrad = ctx.createLinearGradient(0, T, 0, height - B);
+  fillGrad.addColorStop(0, "rgba(217, 119, 6, 0.22)");
+  fillGrad.addColorStop(0.7, "rgba(217, 119, 6, 0.04)");
+  fillGrad.addColorStop(1, "rgba(217, 119, 6, 0)");
+  ctx.fillStyle = fillGrad;
+  ctx.fill();
 
-                if valid_gold_rate(value):
-                    return value
+  // Glow Stroke
+  drawSpline(ctx, points);
+  ctx.strokeStyle = colorGold;
+  ctx.lineWidth = 2.4;
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
+  ctx.stroke();
 
-    return None
+  // Active or Latest Indicator Point
+  const activeIdx = (scrubIndex >= 0 && scrubIndex < data.length) ? scrubIndex : data.length - 1;
+  const activePt = points[activeIdx];
 
+  if (scrubIndex >= 0) {
+    ctx.strokeStyle = colorGold;
+    ctx.lineWidth = 1.2;
+    ctx.setLineDash([4, 4]);
+    ctx.beginPath();
+    ctx.moveTo(activePt.x, T);
+    ctx.lineTo(activePt.x, height - B);
+    ctx.stroke();
+    ctx.setLineDash([]);
 
-# ============================================================
-# HISTORY
-# ============================================================
+    const badgeText = `${dateText(data[activeIdx].date)}: ${money(values[activeIdx])}/g`;
+    ctx.font = "800 11px var(--font-sans)";
+    ctx.fillStyle = colorTextMain;
+    ctx.textAlign = "right";
+    ctx.fillText(badgeText, width - R, T + 10);
+  }
 
-def extract_history_records(data):
+  ctx.fillStyle = colorGold;
+  ctx.beginPath();
+  ctx.arc(activePt.x, activePt.y, scrubIndex >= 0 ? 5.5 : 4, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = styles.getPropertyValue('--surface').trim() || '#ffffff';
+  ctx.lineWidth = 2;
+  ctx.stroke();
 
-    if isinstance(data, list):
-        return data
+  $("chartStart").textContent = "From: " + dateText(data[0].date);
+  $("chartEnd").textContent = "To: " + dateText(data[data.length - 1].date);
+  
+  const delta = values[values.length - 1] - values[0];
+  const pct = values[0] ? (delta / values[0] * 100) : 0;
 
-    if isinstance(data, dict):
+  if (scrubIndex >= 0) {
+    $("chartMetricLabel").textContent = "Selected Benchmark";
+    $("periodChange").textContent = money(values[activeIdx]) + "/g";
+    $("periodChange").className = "";
+  } else {
+    $("chartMetricLabel").textContent = "Period Performance";
+    $("periodChange").textContent = (delta >= 0 ? "+" : "") + money(delta) + ` (${(pct >= 0 ? "+" : "")}${pct.toFixed(1)}%)`;
+    $("periodChange").className = delta > 0 ? "positive" : delta < 0 ? "negative" : "";
+  }
+  $("periodHigh").textContent = money(max0);
+  $("periodLow").textContent = money(min0);
+}
 
-        for key in (
-            "records",
-            "history",
-            "data",
-            "prices"
-        ):
+(function setupChartScrub() {
+  const canvas = $("chart");
+  if (!canvas) return;
+  const handle = e => {
+    const data = selectedRange === "all" ? history : history.slice(Math.max(0, history.length - Number(selectedRange)));
+    if (data.length < 2) return;
+    const r = canvas.getBoundingClientRect();
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const x = clientX - r.left;
+    const L = 52, plotW = r.width - L - 12;
+    const ratio = Math.max(0, Math.min(1, (x - L) / plotW));
+    const idx = Math.round(ratio * (data.length - 1));
+    if (idx !== scrubIndex) {
+      scrubIndex = idx;
+      haptic(5, 1200);
+      drawChart();
+    }
+  };
+  const end = () => {
+    if (scrubIndex !== -1) {
+      scrubIndex = -1;
+      drawChart();
+    }
+  };
+  canvas.addEventListener("touchstart", handle, { passive: true });
+  canvas.addEventListener("touchmove", handle, { passive: true });
+  canvas.addEventListener("touchend", end);
+  canvas.addEventListener("mousemove", e => { if (e.buttons === 1) handle(e); });
+  canvas.addEventListener("mouseup", end);
+  canvas.addEventListener("mouseleave", end);
+})();
 
-            value = data.get(key)
+/* Valuation Suite Logic */
+function calculate() {
+  if (!live) return;
+  const rate = Number(live.rate_22k);
+  if (!rate) return;
 
-            if isinstance(value, list):
-                return value
+  const mode = $("calcMode").value;
+  const weight = Math.max(0, Number($("weight").value) || 0);
+  const budget = Math.max(0, Number($("budget").value) || 0);
+  const makingPct = Math.max(0, Number($("making").value) || 0);
+  const gstPct = Math.max(0, Number($("gstRate").value) || 0);
+  const flatFee = Math.max(0, Number($("flatFee").value) || 0);
+  const oldWeight = Math.max(0, Number($("oldWeight").value) || 0);
+  const oldPurity = Number($("oldPurity").value) || 22;
+  const oldGoldCredit = oldWeight > 0 ? (oldWeight * (rate * (oldPurity / 22))) : 0;
 
-    return []
+  if (mode === "value") {
+    $("weightField").style.display = "flex";
+    $("budgetField").style.display = "none";
+  } else {
+    $("weightField").style.display = "none";
+    $("budgetField").style.display = "flex";
+  }
 
+  $("receiptMakingLabel").textContent = `Making Charges (${makingPct}%):`;
+  $("receiptGstLabel").textContent = `GST (${gstPct}%):`;
+  $("receiptOldGoldLine").style.display = oldGoldCredit > 0 ? "flex" : "none";
+  if (oldGoldCredit > 0) $("receiptOldGold").textContent = "- " + money(oldGoldCredit);
 
-def save_history(
-    rate,
-    selected,
-    changed
-):
+  if (mode === "value") {
+    const goldVal = rate * weight;
+    const makeAmt = goldVal * (makingPct / 100);
+    const sub = goldVal + makeAmt + flatFee;
+    const gstAmt = sub * (gstPct / 100);
+    const grandTotal = Math.max(0, sub + gstAmt - oldGoldCredit);
 
-    existing = load_json(
-        HISTORY_FILE,
-        []
-    )
+    $("receiptBase").textContent = money(goldVal);
+    $("receiptMaking").textContent = money(makeAmt);
+    $("receiptGst").textContent = money(gstAmt);
+    $("receiptFee").textContent = money(flatFee);
+    $("receiptTotalLabel").textContent = "Net Payable Amount";
+    $("calcResult").textContent = money(grandTotal);
+    $("calcSub").textContent = `For ${weight.toLocaleString("en-IN")}g gold at ₹ ${rate.toLocaleString("en-IN")}/g benchmark`;
+  } else {
+    const effB = (budget + oldGoldCredit) / (1 + gstPct / 100) - flatFee;
+    const goldBase = effB > 0 ? effB / (1 + makingPct / 100) : 0;
+    const grams = rate > 0 ? goldBase / rate : 0;
+    const makeAmt = goldBase * (makingPct / 100);
+    const sub = goldBase + makeAmt + flatFee;
+    const gstAmt = sub * (gstPct / 100);
 
-    records = extract_history_records(
-        existing
-    )
+    $("receiptBase").textContent = money(goldBase);
+    $("receiptMaking").textContent = money(makeAmt);
+    $("receiptGst").textContent = money(gstAmt);
+    $("receiptFee").textContent = money(flatFee);
+    $("receiptTotalLabel").textContent = "Purchasable Gold Weight";
+    $("calcResult").textContent = grams.toFixed(3) + " g";
+    $("calcSub").textContent = `Fits budget ${money(budget)} after all taxes & deductions`;
+  }
+}
 
-    current = now_ist()
+document.querySelectorAll(".calc-mode-btn").forEach(btn => {
+  btn.onclick = () => {
+    haptic(10);
+    document.querySelectorAll(".calc-mode-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    $("calcMode").value = btn.dataset.mode;
+    calculate();
+  };
+});
 
-    today = current.strftime(
-        "%Y-%m-%d"
-    )
+document.querySelectorAll("#weightChips .chip").forEach(c => c.onclick = () => {
+  haptic(10);
+  document.querySelectorAll("#weightChips .chip").forEach(x => x.classList.remove("active"));
+  c.classList.add("active");
+  $("weight").value = c.dataset.val;
+  $("calcMode").value = "value";
+  document.querySelectorAll(".calc-mode-btn").forEach(b => b.classList.toggle("active", b.dataset.mode === "value"));
+  calculate();
+});
 
-    current_time = current.strftime(
-        "%H:%M:%S"
-    )
+document.querySelectorAll("#makingChips .chip").forEach(c => c.onclick = () => {
+  haptic(10);
+  document.querySelectorAll("#makingChips .chip").forEach(x => x.classList.remove("active"));
+  c.classList.add("active");
+  $("making").value = c.dataset.val;
+  calculate();
+});
 
-    record = {
+/* Theme-Adaptive Canvas Snapshot Generator */
+function generateShareCardBlob() {
+  return new Promise((resolve) => {
+    if (!live) return resolve(null);
+    const isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const cvs = document.createElement("canvas"), ctx = cvs.getContext("2d"), w = 1080, h = 1350;
+    cvs.width = w; cvs.height = h;
+    const r1 = Number(live.rate_22k), r8 = r1 * 8, c1 = Number(live.change) || 0, c8 = c1 * 8;
 
-        "date": today,
+    // Adaptive Theme Palette
+    const bgApp = isDark ? "#030712" : "#f8fafc";
+    const bgSurface = isDark ? "#0b0f19" : "#ffffff";
+    const borderCard = isDark ? "rgba(255, 255, 255, 0.08)" : "rgba(15, 23, 42, 0.08)";
+    const textMain = isDark ? "#f8fafc" : "#0f172a";
+    const textSec = isDark ? "#94a3b8" : "#475569";
+    const textTert = isDark ? "#64748b" : "#94a3b8";
+    const goldColor = isDark ? "#fbbf24" : "#d97706";
+    const goodColor = isDark ? "#34d399" : "#059669";
+    const badColor = isDark ? "#f87171" : "#dc2626";
 
-        "time": current_time,
+    // 1. Base Canvas Fill
+    ctx.fillStyle = bgApp;
+    ctx.fillRect(0, 0, w, h);
 
-        "timestamp": current.isoformat(),
+    // Subtle Gold Ambient Glow
+    const gl = ctx.createRadialGradient(w/2, 340, 40, w/2, 340, 480);
+    gl.addColorStop(0, isDark ? "rgba(251, 191, 36, 0.12)" : "rgba(217, 119, 6, 0.08)");
+    gl.addColorStop(1, isDark ? "rgba(3, 7, 18, 0)" : "rgba(248, 250, 252, 0)");
+    ctx.fillStyle = gl;
+    ctx.fillRect(0, 0, w, h);
 
-        "rate_22k": int(rate),
+    // Outer Frame
+    ctx.strokeStyle = borderCard;
+    ctx.lineWidth = 2;
+    ctx.strokeRect(36, 36, w - 72, h - 72);
 
-        "rate_8g": int(rate * 8),
+    // 2. Top Header Bar
+    ctx.fillStyle = bgSurface;
+    ctx.beginPath();
+    ctx.roundRect(72, 72, w - 144, 76, 38);
+    ctx.fill();
+    ctx.strokeStyle = borderCard;
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
 
-        "changed": bool(changed),
+    ctx.fillStyle = goldColor;
+    ctx.font = "800 24px 'Plus Jakarta Sans'";
+    ctx.textAlign = "left";
+    ctx.fillText("GOLD 22K RATE", 104, 119);
 
-        "source": selected.get(
-            "source",
-            "Unknown"
-        ),
+    ctx.fillStyle = textSec;
+    ctx.font = "700 20px 'Plus Jakarta Sans'";
+    ctx.textAlign = "right";
+    ctx.fillText(`${dateText(live.date)} · ${$("session").textContent}`, w - 104, 118);
 
-        "agreement": bool(
-            selected.get(
-                "agreement",
-                False
-            )
-        ),
+    // 3. Main Hero Sovereign Card
+    ctx.fillStyle = bgSurface;
+    ctx.beginPath();
+    ctx.roundRect(72, 172, w - 144, 380, 24);
+    ctx.fill();
+    ctx.strokeStyle = borderCard;
+    ctx.stroke();
 
-        "livechennai_rate": (
-            selected["livechennai"]["rate_22k"]
-            if selected.get("livechennai")
-            else None
-        ),
+    ctx.fillStyle = goldColor;
+    ctx.font = "800 22px 'Plus Jakarta Sans'";
+    ctx.textAlign = "center";
+    ctx.fillText("1 SOVEREIGN (8 GRAMS) 22K", w/2, 230);
 
-        "goodreturns_rate": (
-            selected["goodreturns"]["rate_22k"]
-            if selected.get("goodreturns")
-            else None
-        )
+    ctx.fillStyle = textMain;
+    ctx.font = "800 92px 'Plus Jakarta Sans'";
+    ctx.fillText(money(r8), w/2, 345);
+
+    ctx.font = "700 26px 'Plus Jakarta Sans'";
+    if (c8 > 0) {
+      ctx.fillStyle = goodColor;
+      ctx.fillText(`▲ +${money(c8)} Today`, w/2, 420);
+    } else if (c8 < 0) {
+      ctx.fillStyle = badColor;
+      ctx.fillText(`▼ -${money(Math.abs(c8))} Today`, w/2, 420);
+    } else {
+      ctx.fillStyle = textSec;
+      ctx.fillText("• Flat Market Today", w/2, 420);
     }
 
-    # --------------------------------------------------------
-    # Avoid duplicate observations.
-    # --------------------------------------------------------
-
-    duplicate = False
-
-    if records:
-
-        last = records[-1]
-
-        if isinstance(last, dict):
-
-            if (
-                last.get("rate_22k")
-                == int(rate)
-                and last.get("date")
-                == today
-            ):
-
-                duplicate = True
-
-    if not duplicate:
-
-        records.append(record)
-
-    # --------------------------------------------------------
-    # Preserve existing history structure.
-    # --------------------------------------------------------
-
-    if (
-        isinstance(existing, list)
-        or not isinstance(existing, dict)
-    ):
-
-        save_json(
-            HISTORY_FILE,
-            records
-        )
-
-    else:
-
-        output = dict(existing)
-
-        if "records" in existing:
-
-            output["records"] = records
-
-        elif "history" in existing:
-
-            output["history"] = records
-
-        elif "data" in existing:
-
-            output["data"] = records
-
-        elif "prices" in existing:
-
-            output["prices"] = records
-
-        else:
-
-            output["records"] = records
-
-        save_json(
-            HISTORY_FILE,
-            output
-        )
-
-
-# ============================================================
-# LIVE DATA
-# ============================================================
-
-def save_live(
-    rate,
-    selected,
-    changed
-):
-
-    current = now_ist()
-
-    previous = load_json(
-        LIVE_FILE,
-        {}
-    )
-
-    if not isinstance(
-        previous,
-        dict
-    ):
-
-        previous = {}
-
-    output = dict(previous)
-
-    output.update(
-        {
-
-            "rate_22k": int(rate),
-
-            "rate_8g": int(rate * 8),
-
-            "date": current.strftime(
-                "%Y-%m-%d"
-            ),
-
-            "time": current.strftime(
-                "%H:%M:%S"
-            ),
-
-            "timestamp": current.isoformat(),
-
-            "changed": bool(changed),
-
-            "source": selected.get(
-                "source",
-                "Unknown"
-            ),
-
-            "agreement": bool(
-                selected.get(
-                    "agreement",
-                    False
-                )
-            ),
-
-            "sources": {
-
-                "livechennai": (
-                    selected["livechennai"]
-                    if selected.get(
-                        "livechennai"
-                    )
-                    else None
-                ),
-
-                "goodreturns": (
-                    selected["goodreturns"]
-                    if selected.get(
-                        "goodreturns"
-                    )
-                    else None
-                )
-            },
-
-            "last_checked": current.isoformat()
-        }
-    )
-
-    save_json(
-        LIVE_FILE,
-        output
-    )
-
-
-# ============================================================
-# MONITORING WINDOWS
-# ============================================================
-
-def make_datetime(
-    day,
-    hour,
-    minute
-):
-
-    return datetime(
-        day.year,
-        day.month,
-        day.day,
-        hour,
-        minute,
-        0,
-        tzinfo=IST
-    )
-
-
-def current_window(now=None):
-
-    if now is None:
-        now = now_ist()
-
-    today = now.date()
-
-    am_start = make_datetime(
-        today,
-        AM_START[0],
-        AM_START[1]
-    )
-
-    am_end = make_datetime(
-        today,
-        AM_END[0],
-        AM_END[1]
-    )
-
-    pm_start = make_datetime(
-        today,
-        PM_START[0],
-        PM_START[1]
-    )
-
-    pm_end = make_datetime(
-        today,
-        PM_END[0],
-        PM_END[1]
-    )
-
-    if (
-        am_start
-        <= now
-        < am_end
-    ):
-
-        return {
-            "name": "AM",
-            "start": am_start,
-            "end": am_end
-        }
-
-    if (
-        pm_start
-        <= now
-        < pm_end
-    ):
-
-        return {
-            "name": "PM",
-            "start": pm_start,
-            "end": pm_end
-        }
-
-    return None
-
-
-def next_window(now=None):
-
-    if now is None:
-        now = now_ist()
-
-    today = now.date()
-
-    am_start = make_datetime(
-        today,
-        AM_START[0],
-        AM_START[1]
-    )
-
-    pm_start = make_datetime(
-        today,
-        PM_START[0],
-        PM_START[1]
-    )
-
-    if now < am_start:
-
-        return {
-            "name": "AM",
-            "start": am_start,
-            "end": make_datetime(
-                today,
-                AM_END[0],
-                AM_END[1]
-            )
-        }
-
-    if now < pm_start:
-
-        return {
-            "name": "PM",
-            "start": pm_start,
-            "end": make_datetime(
-                today,
-                PM_END[0],
-                PM_END[1]
-            )
-        }
-
-    tomorrow = today + timedelta(
-        days=1
-    )
-
-    return {
-        "name": "AM",
-        "start": make_datetime(
-            tomorrow,
-            AM_START[0],
-            AM_START[1]
-        ),
-        "end": make_datetime(
-            tomorrow,
-            AM_END[0],
-            AM_END[1]
-        )
+    ctx.fillStyle = borderCard;
+    ctx.fillRect(72, 460, w - 144, 1.5);
+
+    ctx.fillStyle = textSec;
+    ctx.font = "700 20px 'Plus Jakarta Sans'";
+    ctx.textAlign = "left";
+    ctx.fillText(`Rate Per Gram: ${money(r1)}/g`, 108, 514);
+
+    ctx.textAlign = "right";
+    ctx.fillText(`Standard 22K 91.6% Pure`, w - 108, 514);
+
+    // 4. Three Purity Columns
+    const gy = 576, cw = (w - 144 - 24) / 3;
+    const purities = [
+      { l: "24K (99.9%)", v: money(Math.round(r1 * (24 / 22))), s: "Fine Gold" },
+      { l: "22K (91.6%)", v: money(r1), s: "Jewelry Standard" },
+      { l: "18K (75.0%)", v: money(Math.round(r1 * (18 / 22))), s: "Hallmarked" }
+    ];
+
+    purities.forEach((item, i) => {
+      const x = 72 + i * (cw + 12);
+      ctx.fillStyle = bgSurface;
+      ctx.beginPath();
+      ctx.roundRect(x, gy, cw, 220, 16);
+      ctx.fill();
+      ctx.strokeStyle = borderCard;
+      ctx.stroke();
+
+      ctx.fillStyle = textTert;
+      ctx.font = "800 18px 'Plus Jakarta Sans'";
+      ctx.textAlign = "center";
+      ctx.fillText(item.l, x + cw/2, gy + 52);
+
+      ctx.fillStyle = textMain;
+      ctx.font = "800 38px 'Plus Jakarta Sans'";
+      ctx.fillText(item.v, x + cw/2, gy + 120);
+
+      ctx.fillStyle = goldColor;
+      ctx.font = "600 19px 'Plus Jakarta Sans'";
+      ctx.fillText(item.s, x + cw/2, gy + 172);
+    });
+
+    // 5. Timeline Fix Cards
+    const ty = 820, tw = (w - 144 - 16) / 2;
+    
+    // AM Box
+    ctx.fillStyle = bgSurface;
+    ctx.beginPath();
+    ctx.roundRect(72, ty, tw, 200, 16);
+    ctx.fill();
+    ctx.strokeStyle = $("amCard").classList.contains("is-active") ? goldColor : borderCard;
+    ctx.lineWidth = $("amCard").classList.contains("is-active") ? 2 : 1;
+    ctx.stroke();
+
+    ctx.fillStyle = textTert;
+    ctx.font = "800 19px 'Plus Jakarta Sans'";
+    ctx.textAlign = "left";
+    ctx.fillText("MORNING FIX (AM)", 100, ty + 48);
+
+    ctx.fillStyle = textMain;
+    ctx.font = "800 34px 'Plus Jakarta Sans'";
+    ctx.fillText($("amRate").textContent, 100, ty + 110);
+
+    ctx.fillStyle = textTert;
+    ctx.font = "600 19px 'Plus Jakarta Sans'";
+    ctx.fillText($("amTime").textContent, 100, ty + 158);
+
+    // PM Box
+    const px = 72 + tw + 16;
+    ctx.fillStyle = bgSurface;
+    ctx.beginPath();
+    ctx.roundRect(px, ty, tw, 200, 16);
+    ctx.fill();
+    ctx.strokeStyle = $("pmCard").classList.contains("is-active") ? goldColor : borderCard;
+    ctx.lineWidth = $("pmCard").classList.contains("is-active") ? 2 : 1;
+    ctx.stroke();
+
+    ctx.fillStyle = textTert;
+    ctx.font = "800 19px 'Plus Jakarta Sans'";
+    ctx.textAlign = "left";
+    ctx.fillText("EVENING FIX (PM)", px + 28, ty + 48);
+
+    ctx.fillStyle = textMain;
+    ctx.font = "800 34px 'Plus Jakarta Sans'";
+    ctx.fillText($("pmRate").textContent, px + 28, ty + 110);
+
+    ctx.fillStyle = textTert;
+    ctx.font = "600 19px 'Plus Jakarta Sans'";
+    ctx.fillText($("pmTime").textContent, px + 28, ty + 158);
+
+    // 6. Footer
+    ctx.fillStyle = textTert;
+    ctx.font = "700 20px 'Plus Jakarta Sans'";
+    ctx.textAlign = "center";
+    ctx.fillText("Gold 22k Terminal · LiveChennai + GoodReturns Feed", w/2, 1180);
+
+    cvs.toBlob(resolve, "image/png");
+  });
+}
+
+$("shareBtn").onclick = async () => {
+  haptic(15);
+  if (!live) return;
+  const shareText = `💰 Gold 22K Rate (${dateText(live.date)})\n• 1 Gram: ${money(live.rate_22k)}\n• 1 Sovereign: ${money(live.rate_8g || live.rate_22k*8)}\nTrack live at: ${window.location.href}`;
+  try {
+    toast("Generating snapshot…");
+    const blob = await generateShareCardBlob();
+    if (blob && navigator.canShare && navigator.canShare({ files: [new File([blob], "gold.png", { type: "image/png" })] })) {
+      await navigator.share({ title: "Gold 22k", text: shareText, files: [new File([blob], `gold-${live.date}.png`, { type: "image/png" })] });
+    } else if (navigator.share) {
+      await navigator.share({ title: "Gold 22k", text: shareText });
+    } else {
+      navigator.clipboard?.writeText(shareText);
+      toast("Copied to clipboard!");
     }
-
-
-def save_window_info(window):
-
-    data = {
-
-        "timezone": "Asia/Kolkata",
-
-        "updated_at": now_ist().isoformat(),
-
-        "windows": {
-
-            "AM": {
-                "start": "08:30",
-                "end": "11:30"
-            },
-
-            "PM": {
-                "start": "17:00",
-                "end": "20:00"
-            }
-        },
-
-        "active_window": (
-            window["name"]
-            if window
-            else None
-        ),
-
-        "poll_seconds": POLL_SECONDS
+  } catch(e) {
+    if (e.name !== "AbortError") {
+      navigator.clipboard?.writeText(shareText);
+      toast("Copied text!");
     }
-
-    save_json(
-        WINDOW_FILE,
-        data
-    )
-
-
-# ============================================================
-# NORMAL FETCH
-# ============================================================
-
-def normal_fetch():
-
-    print("")
-    print("=" * 70)
-    print("NORMAL FETCH")
-    print("=" * 70)
-
-    previous_rate = get_previous_rate()
-
-    print(
-        "Previous 22K rate:",
-        format_rupees(previous_rate)
-    )
-
-    live, good = fetch_all_sources()
-
-    selected = select_rate(
-        live,
-        good,
-        previous_rate
-    )
-
-    if selected is None:
-
-        print(
-            "ERROR: No valid 22K rate found."
-        )
-
-        return False
-
-    rate = selected["rate_22k"]
-
-    changed = (
-        previous_rate is not None
-        and rate != previous_rate
-    )
-
-    print("")
-
-    print(
-        "Current 22K rate:",
-        format_rupees(rate)
-    )
-
-    print(
-        "Previous 22K rate:",
-        format_rupees(previous_rate)
-    )
-
-    print(
-        "Changed:",
-        changed
-    )
-
-    # --------------------------------------------------------
-    # Always update live.json.
-    # --------------------------------------------------------
-
-    save_live(
-        rate,
-        selected,
-        changed
-    )
-
-    # --------------------------------------------------------
-    # Save history.
-    # --------------------------------------------------------
-
-    save_history(
-        rate,
-        selected,
-        changed
-    )
-
-    if changed:
-
-        print("")
-        print(
-            "NEW PRICE DISCOVERED."
-        )
-
-    else:
-
-        print("")
-        print(
-            "PRICE UNCHANGED."
-        )
-
-    return True
-
-
-# ============================================================
-# FULL 10-SECOND MONITOR
-# ============================================================
-
-def monitor_window(window):
-
-    print("")
-    print("=" * 70)
-    print("FULL-WINDOW 10-SECOND MONITOR")
-    print("=" * 70)
-
-    print(
-        "Window:",
-        window["name"]
-    )
-
-    print(
-        "Start:",
-        window["start"].strftime(
-            "%d-%m-%Y %H:%M:%S"
-        )
-    )
-
-    print(
-        "End:",
-        window["end"].strftime(
-            "%d-%m-%Y %H:%M:%S"
-        )
-    )
-
-    print(
-        f"Polling every {POLL_SECONDS} seconds."
-    )
-
-    print(
-        "Monitoring will stop after a new price "
-        "is confirmed or when the window ends."
-    )
-
-    print("=" * 70)
-
-    previous_rate = get_previous_rate()
-
-    print(
-        "Previous saved 22K rate:",
-        format_rupees(previous_rate)
-    )
-
-    attempt = 0
-
-    while True:
-
-        now = now_ist()
-
-        # ----------------------------------------------------
-        # WINDOW END
-        # ----------------------------------------------------
-
-        if now >= window["end"]:
-
-            print("")
-            print("=" * 70)
-            print("MONITORING WINDOW ENDED")
-            print("=" * 70)
-
-            print(
-                "No new price was discovered."
-            )
-
-            return False
-
-        attempt += 1
-
-        print("")
-        print("-" * 70)
-
-        print(
-            f"FETCH #{attempt}"
-        )
-
-        print(
-            "IST:",
-            now.strftime(
-                "%d-%m-%Y %H:%M:%S"
-            )
-        )
-
-        print("-" * 70)
-
-        # ----------------------------------------------------
-        # FETCH
-        # ----------------------------------------------------
-
-        live, good = fetch_all_sources()
-
-        selected = select_rate(
-            live,
-            good,
-            previous_rate
-        )
-
-        if selected is None:
-
-            print(
-                "No valid rate returned."
-            )
-
-            print(
-                f"Retrying in {POLL_SECONDS} seconds..."
-            )
-
-            time.sleep(
-                POLL_SECONDS
-            )
-
-            continue
-
-        current_rate = selected[
-            "rate_22k"
-        ]
-
-        print("")
-
-        print(
-            "Selected 22K rate:",
-            format_rupees(current_rate)
-        )
-
-        print(
-            "Previous 22K rate:",
-            format_rupees(previous_rate)
-        )
-
-        # ----------------------------------------------------
-        # NEW PRICE
-        # ----------------------------------------------------
-
-        if (
-            previous_rate is not None
-            and current_rate != previous_rate
-        ):
-
-            print("")
-            print("=" * 70)
-            print("NEW GOLD PRICE DISCOVERED")
-            print("=" * 70)
-
-            print(
-                "OLD:",
-                format_rupees(previous_rate)
-            )
-
-            print(
-                "NEW:",
-                format_rupees(current_rate)
-            )
-
-            print(
-                "CHANGE:",
-                format_rupees(
-                    current_rate
-                    - previous_rate
-                )
-            )
-
-            print(
-                "Source:",
-                selected["source"]
-            )
-
-            print("=" * 70)
-
-            save_live(
-                current_rate,
-                selected,
-                True
-            )
-
-            save_history(
-                current_rate,
-                selected,
-                True
-            )
-
-            print(
-                "NEW PRICE SAVED."
-            )
-
-            print(
-                "MONITORING STOPPED."
-            )
-
-            return True
-
-        # ----------------------------------------------------
-        # SAME PRICE
-        # ----------------------------------------------------
-
-        print(
-            "No price change."
-        )
-
-        save_live(
-            current_rate,
-            selected,
-            False
-        )
-
-        # ----------------------------------------------------
-        # WAIT
-        # ----------------------------------------------------
-
-        remaining = (
-            window["end"]
-            - now_ist()
-        ).total_seconds()
-
-        if remaining <= 0:
-            continue
-
-        sleep_for = min(
-            POLL_SECONDS,
-            max(1, int(remaining))
-        )
-
-        print(
-            f"Next fetch in {sleep_for} seconds..."
-        )
-
-        time.sleep(
-            sleep_for
-        )
-
-
-# ============================================================
-# MAIN
-# ============================================================
-
-def main():
-
-    print("")
-    print("=" * 70)
-    print("CHENNAI 22K GOLD RATE")
-    print("FULL-WINDOW ADAPTIVE MONITOR")
-    print("=" * 70)
-
-    now = now_ist()
-
-    print(
-        "IST:",
-        now.strftime(
-            "%d-%m-%Y %H:%M:%S"
-        )
-    )
-
-    print(
-        "LiveChennai:",
-        LIVECHENNAI_URL
-    )
-
-    print(
-        "GoodReturns:",
-        GOODRETURNS_URL
-    )
-
-    print(
-        f"Polling interval: {POLL_SECONDS} seconds"
-    )
-
-    print("=" * 70)
-
-    # --------------------------------------------------------
-    # ENVIRONMENT
-    # --------------------------------------------------------
-
-    github_actions = (
-        os.environ.get(
-            "GITHUB_ACTIONS",
-            ""
-        ).lower()
-        == "true"
-    )
-
-    github_event = os.environ.get(
-        "GITHUB_EVENT_NAME",
-        ""
-    )
-
-    force_fetch = (
-        os.environ.get(
-            "FORCE_FETCH",
-            ""
-        ).lower()
-        == "true"
-    )
-
-    print(
-        "GITHUB_ACTIONS:",
-        github_actions
-    )
-
-    print(
-        "GITHUB_EVENT_NAME:",
-        github_event or "local"
-    )
-
-    print(
-        "FORCE_FETCH:",
-        force_fetch
-    )
-
-    # ========================================================
-    # FORCE FETCH
-    #
-    # Manual GitHub Fetch should work immediately.
-    # It must NOT wait for 08:30 or 17:00.
-    # ========================================================
-
-    if force_fetch:
-
-        print("")
-        print("=" * 70)
-        print("FORCED FETCH REQUEST")
-        print("=" * 70)
-
-        print(
-            "Monitoring-window restriction bypassed."
-        )
-
-        print(
-            "Fetching LiveChennai + GoodReturns immediately."
-        )
-
-        print("=" * 70)
-
-        success = normal_fetch()
-
-        print("")
-        print("=" * 70)
-        print(
-            "FORCED FETCH COMPLETE"
-        )
-        print("=" * 70)
-
-        if not success:
-            sys.exit(1)
-
-        return
-
-    # ========================================================
-    # CURRENT WINDOW
-    # ========================================================
-
-    window = current_window(now)
-
-    if window:
-
-        save_window_info(
-            window
-        )
-
-        monitor_window(
-            window
-        )
-
-        return
-
-    # ========================================================
-    # SCHEDULED GITHUB RUN
-    # ========================================================
-
-    if (
-        github_actions
-        and github_event == "schedule"
-    ):
-
-        upcoming = next_window(now)
-
-        print("")
-        print(
-            "Scheduled GitHub run detected."
-        )
-
-        print(
-            "Waiting for monitoring window."
-        )
-
-        print(
-            f"Next window: {upcoming['name']}"
-        )
-
-        print(
-            "Starts:",
-            upcoming["start"].strftime(
-                "%d-%m-%Y %H:%M:%S"
-            )
-        )
-
-        while True:
-
-            now = now_ist()
-
-            window = current_window(
-                now
-            )
-
-            if window:
-
-                save_window_info(
-                    window
-                )
-
-                monitor_window(
-                    window
-                )
-
-                return
-
-            time.sleep(30)
-
-    # ========================================================
-    # LOCAL / OTHER MANUAL RUN
-    # ========================================================
-
-    print("")
-    print(
-        "Outside monitoring window."
-    )
-
-    print(
-        "Performing one normal fetch."
-    )
-
-    success = normal_fetch()
-
-    if not success:
-        sys.exit(1)
-
-    print("")
-    print("=" * 70)
-    print("UPDATE COMPLETE")
-    print("=" * 70)
-
-
-# ============================================================
-# ENTRY POINT
-# ============================================================
-
-if __name__ == "__main__":
-
-    try:
-
-        main()
-
-    except KeyboardInterrupt:
-
-        print("")
-        print(
-            "Monitoring interrupted."
-        )
-
-        sys.exit(1)
-
-    except Exception as exc:
-
-        print("")
-        print("=" * 70)
-        print("FATAL ERROR")
-        print("=" * 70)
-
-        print(
-            repr(exc)
-        )
-
-        sys.exit(1)
+  }
+};
+
+$("copyQuoteBtn").onclick = async () => {
+  haptic(15);
+  if (!live) return;
+  const txt = `📜 GOLD PURCHASE ESTIMATE\nDate: ${dateText(live.date)}\n----------------------\n• Base Rate: ${money(live.rate_22k)}/g\n• Weight: ${$("weight").value}g\n• Making (${$("making").value}%): ${$("receiptMaking").textContent}\n• GST (${$("gstRate").value}%): ${$("receiptGst").textContent}\n• Exchange: ${$("receiptOldGold").textContent}\n----------------------\nNET TOTAL: ${$("calcResult").textContent}`;
+  navigator.clipboard?.writeText(txt);
+  toast("Quotation Copied!");
+};
+
+function renderStats() {
+  if (!history.length) return;
+  const vals = history.map(i => Number(i.rate_22k)), hi = Math.max(...vals), lo = Math.min(...vals);
+  $("high").textContent = money(hi);
+  $("low").textContent = money(lo);
+  $("highDate").textContent = dateText(history.find(i => Number(i.rate_22k) === hi)?.date);
+  $("lowDate").textContent = dateText(history.find(i => Number(i.rate_22k) === lo)?.date);
+  $("historyCount").textContent = history.length.toLocaleString("en-IN") + " records";
+
+  $("historyBody").innerHTML = [...history].reverse().slice(0, 300).map(i => `<tr><td>${esc(dateText(i.date))}</td><td>${money(i.rate_22k)}</td><td>${money(i.rate_22k*8)}</td></tr>`).join("");
+  if (!$("dateA").value) $("dateA").value = history[0]?.date || "";
+  if (!$("dateB").value) $("dateB").value = history[history.length-1]?.date || "";
+
+  compareDates();
+  updateFintechMetrics();
+  computeLastMovement();
+  drawChart();
+}
+
+function compareDates() {
+  const a = history.find(i => i.date === $("dateA").value), b = history.find(i => i.date === $("dateB").value);
+  if (!a || !b) {
+    $("compareResult").innerHTML = `<span class="compare-result-top">Select valid dates</span><span class="compare-result-sub">—</span>`;
+    return;
+  }
+  const diff = b.rate_22k - a.rate_22k, pct = a.rate_22k ? (diff/a.rate_22k*100) : 0;
+  const isPos = diff > 0, isNeg = diff < 0;
+  
+  $("compareResult").innerHTML = `
+    <span class="compare-result-top">${money(a.rate_22k)} → ${money(b.rate_22k)}</span>
+    <span class="compare-result-sub ${isPos ? 'positive' : isNeg ? 'negative' : ''}">
+      ${diff >= 0 ? '+' : ''}${money(diff)}/g (${diff >= 0 ? '+' : ''}${pct.toFixed(2)}%)
+    </span>
+  `;
+}
+
+async function loadPublishedData() {
+  const [latest, historical] = await Promise.all([getJSON(LIVE_URL), getJSON(HISTORY_URL)]);
+  history = normalize(historical);
+  renderLive(latest);
+  renderStats();
+  calculate();
+  localStorage.setItem("gold_live_backup", JSON.stringify(latest));
+  localStorage.setItem("gold_history_backup", JSON.stringify(history));
+  return latest;
+}
+
+async function manualFetch() {
+  if (fetchBusy) return;
+  fetchBusy = true;
+  haptic(15);
+  setStatus("Connecting to Edge Worker…", false, true);
+  try {
+    const oldTs = live ? (live.last_checked_at || live.date+"|"+live.time) : "";
+    await fetch(WORKER_URL, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ force: true }) });
+    setStatus("Parsing live benchmark sources…", false, true);
+    let latest = await getJSON(LIVE_URL);
+    for (let i = 0; i < 8 && (latest.last_checked_at || latest.date + "|" + latest.time) === oldTs; i++) {
+      await sleep(1500);
+      latest = await getJSON(LIVE_URL);
+    }
+    history = normalize(await getJSON(HISTORY_URL));
+    renderLive(latest);
+    renderStats();
+    calculate();
+    localStorage.setItem("gold_live_backup", JSON.stringify(latest));
+    localStorage.setItem("gold_history_backup", JSON.stringify(history));
+    setStatus("Synced at " + timeText(latest.time));
+    toast("Market Synced");
+  } catch(e) { 
+    setStatus("Using offline cache", true, false); 
+    checkParserHealth({ error: "Live sync failed. Showing cached data." }); 
+    toast("Sync Failed"); 
+  }
+  finally { 
+    fetchBusy = false; 
+  }
+}
+
+$("fetchNow").onclick = manualFetch;
+document.querySelectorAll("#ranges button").forEach(b => b.onclick = () => {
+  haptic(8);
+  document.querySelectorAll("#ranges button").forEach(x => x.classList.remove("active"));
+  b.classList.add("active");
+  selectedRange = b.dataset.range === "all" ? "all" : Number(b.dataset.range);
+  drawChart();
+});
+["dateA", "dateB"].forEach(id => $(id).addEventListener("change", compareDates));
+["weight", "budget", "making", "gstRate", "flatFee", "oldWeight", "oldPurity"].forEach(id => $(id).addEventListener("input", calculate));
+
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") loadPublishedData().catch(()=>{}); });
+window.addEventListener("pageshow", () => { loadPublishedData().catch(()=>{}); });
+window.addEventListener("resize", drawChart);
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', drawChart);
+
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker
+      .register("sw.js?v=" + Date.now())
+      .then((reg) => reg.update())
+      .catch((e) => console.warn("Service worker register skipped:", e));
+  });
+}
+
+(function setupPullToRefresh() {
+  const PULL_THRESHOLD = 64, PULL_MAX = 90;
+  const pulldown = $("pulldown"), pulldownText = $("pulldownText");
+  let startY = null, dragging = false, ready = false;
+
+  function atTop() { return (window.scrollY || 0) <= 0 && (document.scrollingElement ? document.scrollingElement.scrollTop : 0) <= 0; }
+  
+  function resetPulldown() {
+    pulldown.classList.remove("visible", "ready", "loading");
+    pulldown.style.transform = "";
+    pulldownText.textContent = "Pull to refresh";
+    startY = null; dragging = false; ready = false;
+  }
+
+  document.addEventListener("touchstart", event => {
+    if (fetchBusy || event.target.closest(".table-wrap") || !atTop()) return;
+    startY = event.touches[0].clientY;
+    dragging = true; ready = false;
+  }, { passive: true });
+
+  document.addEventListener("touchmove", event => {
+    if (!dragging || startY === null) return;
+    if (!atTop()) { resetPulldown(); return; }
+    
+    const delta = event.touches[0].clientY - startY;
+    if (delta <= 0) return;
+    if (event.cancelable) event.preventDefault();
+    
+    const pulled = Math.min(delta * 0.5, PULL_MAX);
+    pulldown.classList.add("visible");
+    pulldown.style.transform = `translate(-50%, ${pulled - 70}px)`;
+    ready = pulled >= PULL_THRESHOLD * 0.5;
+    
+    pulldown.classList.toggle("ready", ready);
+    pulldownText.textContent = ready ? "Release to sync" : "Pull to refresh";
+    setStatus(ready ? "Release to sync market" : "Pulling to refresh…", false, true);
+  }, { passive: false });
+
+  document.addEventListener("touchend", () => {
+    if (!dragging) return;
+    if (ready && !fetchBusy) {
+      pulldown.classList.add("loading");
+      pulldown.classList.remove("ready");
+      pulldown.style.transform = "translate(-50%, 14px)";
+      pulldownText.textContent = "Syncing…";
+      manualFetch().finally(resetPulldown);
+    } else {
+      resetPulldown();
+      setStatus("Synced at " + (live ? timeText(live.time) : "live"));
+    }
+    dragging = false; startY = null;
+  }, { passive: true });
+
+  document.addEventListener("touchcancel", resetPulldown, { passive: true });
+})();
+
+(async function init() {
+  try { 
+    setStatus("Checking live feed…", false, true);
+    await loadPublishedData(); 
+    setStatus("Synced at " + (live ? timeText(live.time) : "live")); 
+  }
+  catch(e) {
+    try {
+      const savedHistory = JSON.parse(localStorage.getItem("gold_history_backup") || "[]");
+      const savedLive = JSON.parse(localStorage.getItem("gold_live_backup") || "null");
+      if (Array.isArray(savedHistory) && savedHistory.length > 0) {
+        history = normalize(savedHistory);
+      }
+      if (savedLive) {
+        renderLive(savedLive);
+      }
+      if (history.length) renderStats();
+      calculate();
+      setStatus("Cached data loaded");
+    } catch(err) {
+      setStatus("Offline", true);
+    }
+  }
+})();
+</script>
+</body>
+</html>
