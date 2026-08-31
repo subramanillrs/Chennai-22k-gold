@@ -33,7 +33,6 @@
 
   --border-subtle: #e2e8f0;
   --border-strong: #cbd5e1;
-  --specular: inset 0 1px 0 0 rgba(255, 255, 255, 0.9);
 
   --text-primary: #0f172a;
   --text-secondary: #475569;
@@ -44,7 +43,6 @@
   --gold-gradient: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
   --gold-tint: #fef3c7;
   --gold-border: rgba(217, 119, 6, 0.22);
-  --gold-glow: rgba(217, 119, 6, 0.12);
 
   --good: #059669;
   --good-bg: #d1fae5;
@@ -64,8 +62,6 @@
   --shadow-fab: 0 8px 24px -4px rgba(217, 119, 6, 0.24), 0 2px 6px -1px rgba(0, 0, 0, 0.06);
 
   --transition: 0.18s cubic-bezier(0.16, 1, 0.3, 1);
-  --shine-x: 50%;
-  --shine-y: 50%;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -77,7 +73,6 @@
 
     --border-subtle: rgba(255, 255, 255, 0.07);
     --border-strong: rgba(255, 255, 255, 0.15);
-    --specular: inset 0 1px 0 0 rgba(255, 255, 255, 0.08);
 
     --text-primary: #f8fafc;
     --text-secondary: #94a3b8;
@@ -88,7 +83,6 @@
     --gold-gradient: linear-gradient(135deg, #fcd34d 0%, #f59e0b 100%);
     --gold-tint: rgba(245, 158, 11, 0.12);
     --gold-border: rgba(251, 191, 36, 0.25);
-    --gold-glow: rgba(251, 191, 36, 0.15);
 
     --good: #34d399;
     --good-bg: rgba(5, 150, 105, 0.15);
@@ -189,7 +183,7 @@ button, input, select {
   font-size: 11.5px;
   font-weight: 600;
   color: var(--text-secondary);
-  box-shadow: var(--shadow-sm), var(--specular);
+  box-shadow: var(--shadow-sm);
   white-space: nowrap;
   margin: 0;
 }
@@ -215,7 +209,6 @@ button, input, select {
   100% { transform: scale(0.95); opacity: 0.8; }
 }
 
-/* Macro Purity Ticker Strip */
 .purity-strip {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -232,7 +225,7 @@ button, input, select {
   flex-direction: column;
   align-items: center;
   gap: 2px;
-  box-shadow: var(--shadow-sm), var(--specular);
+  box-shadow: var(--shadow-sm);
 }
 
 .purity-card small {
@@ -300,37 +293,23 @@ button, input, select {
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* Premium Specular Hero Card */
+/* Redesigned Clean Institutional Hero */
 .hero {
   background: var(--surface);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-lg);
   padding: 22px;
-  box-shadow: var(--shadow-card), var(--specular);
+  box-shadow: var(--shadow-card);
   display: flex;
   flex-direction: column;
   gap: 16px;
   width: 100%;
-  position: relative;
-  overflow: hidden;
-  transition: transform 0.1s ease-out;
-}
-
-.hero::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: radial-gradient(circle 280px at var(--shine-x) var(--shine-y), rgba(245, 158, 11, 0.09), transparent 80%);
-  z-index: 1;
 }
 
 .hero-top {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  position: relative;
-  z-index: 2;
 }
 
 .hero-label {
@@ -406,8 +385,6 @@ button, input, select {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  position: relative;
-  z-index: 2;
 }
 
 .hero-mid h2 {
@@ -429,8 +406,6 @@ button, input, select {
   gap: 16px;
   padding-top: 16px;
   border-top: 1px solid var(--border-subtle);
-  position: relative;
-  z-index: 2;
 }
 
 .hero-detail-col {
@@ -483,12 +458,11 @@ button, input, select {
   display: block;
 }
 
-/* Collapsible Details */
 details.collapsible {
   background: var(--surface);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
-  box-shadow: var(--shadow-card), var(--specular);
+  box-shadow: var(--shadow-card);
   width: 100%;
   overflow: hidden;
 }
@@ -622,71 +596,6 @@ details.collapsible .collapsible-content {
   line-height: 1;
 }
 
-/* 3-Year Range Slider Card */
-.range-gauge-card {
-  background: var(--surface);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-md);
-  padding: 16px;
-  box-shadow: var(--shadow-card), var(--specular);
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  width: 100%;
-}
-
-.range-gauge-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  color: var(--text-tertiary);
-  letter-spacing: 0.05em;
-}
-
-.range-track {
-  width: 100%;
-  height: 8px;
-  background: var(--surface-subtle);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-full);
-  position: relative;
-  overflow: visible;
-}
-
-.range-bar {
-  height: 100%;
-  background: var(--gold-gradient);
-  border-radius: var(--radius-full);
-  width: 50%;
-  position: relative;
-  transition: width 0.4s ease;
-}
-
-.range-indicator {
-  position: absolute;
-  right: -5px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  background: var(--surface);
-  border: 2.5px solid var(--gold-primary);
-  box-shadow: 0 0 6px rgba(217, 119, 6, 0.4);
-}
-
-.range-labels {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  font-size: 11.5px;
-  font-weight: 700;
-  color: var(--text-secondary);
-}
-
 .quick-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -702,7 +611,7 @@ details.collapsible .collapsible-content {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  box-shadow: var(--shadow-card), var(--specular);
+  box-shadow: var(--shadow-card);
 }
 
 .stat-card .label {
@@ -771,60 +680,79 @@ details.collapsible .collapsible-content {
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
   padding: 16px;
-  box-shadow: var(--shadow-card), var(--specular);
+  box-shadow: var(--shadow-card);
   width: 100%;
 }
 
-.session-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  width: 100%;
-}
-
-.session-box {
-  background: var(--surface-subtle);
-  border-radius: var(--radius-sm);
-  padding: 14px;
+/* Redesigned Vertical Timeline for Sessions */
+.timeline {
   display: flex;
   flex-direction: column;
+  gap: 18px;
+  position: relative;
+  padding-left: 8px;
+}
+
+.timeline::before {
+  content: "";
+  position: absolute;
+  top: 6px;
+  bottom: 6px;
+  left: 13px;
+  width: 2px;
+  background: var(--border-subtle);
+  z-index: 1;
+}
+
+.timeline-step {
+  display: flex;
   align-items: flex-start;
+  gap: 14px;
+  position: relative;
+  z-index: 2;
 }
 
-.session-box .tag {
-  align-self: flex-start;
-  font-size: 10px;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  padding: 3px 6px;
-  border-radius: var(--radius-xs);
+.timeline-node {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
   background: var(--surface);
-  border: 1px solid var(--border-subtle);
-  color: var(--text-secondary);
-  line-height: 12px;
-  height: 18px;
-  margin-bottom: 8px;
-  display: inline-flex;
-  align-items: center;
+  border: 2px solid var(--border-strong);
+  margin-top: 3px;
+  transition: all var(--transition);
 }
 
-.session-box .rate {
-  font-size: 19px;
-  font-weight: 800;
-  line-height: 22px;
-  height: 22px;
-  margin-bottom: 4px;
-  display: block;
+.timeline-node.active {
+  border-color: var(--gold-primary);
+  background: var(--gold-primary);
+  box-shadow: 0 0 0 3px var(--gold-tint);
 }
 
-.session-box .time {
-  font-size: 11.5px;
-  font-weight: 500;
+.timeline-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.timeline-content .lbl {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
   color: var(--text-tertiary);
-  line-height: 14px;
-  height: 14px;
-  display: block;
+  margin-bottom: 2px;
+}
+
+.timeline-content b {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 2px;
+}
+
+.timeline-content small {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
 }
 
 .segment-ctrl {
@@ -859,7 +787,6 @@ details.collapsible .collapsible-content {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
-/* Redesigned Chart Header Metrics */
 .chart-header-metrics {
   background: var(--surface-subtle);
   border-radius: var(--radius-sm);
@@ -1375,7 +1302,6 @@ footer {
     </div>
   </header>
 
-  <!-- Macro Karat Ticker Strip -->
   <section class="purity-strip">
     <div class="purity-card">
       <small>24K (99.9%)</small>
@@ -1407,7 +1333,7 @@ footer {
 
   <div hidden><button id="fetchNow"><span id="fetchNowText">Fetch</span></button></div>
 
-  <!-- Specular Hero Card with Tilt Response -->
+  <!-- Clean Minimalist Hero Card -->
   <section class="hero" id="heroCard">
     <div class="hero-top">
       <span class="hero-label">1 Sovereign (8 Grams)</span>
@@ -1447,24 +1373,6 @@ footer {
     </div>
   </section>
 
-  <!-- 3-Year Range Gauge Bar -->
-  <section class="range-gauge-card">
-    <div class="range-gauge-head">
-      <span>3Y Valuation Range</span>
-      <span id="rangePositionText">—</span>
-    </div>
-    <div class="range-track">
-      <div class="range-bar" id="rangeBar" style="width: 50%;">
-        <div class="range-indicator"></div>
-      </div>
-    </div>
-    <div class="range-labels">
-      <span id="gaugeLow">Low: ₹—</span>
-      <span id="gaugeHigh">High: ₹—</span>
-    </div>
-  </section>
-
-  <!-- Collapsible Multi-Horizon -->
   <details class="collapsible">
     <summary>
       <div class="summary-title">
@@ -1503,7 +1411,6 @@ footer {
     </div>
   </details>
 
-  <!-- Collapsible Moving Average -->
   <details class="collapsible">
     <summary>
       <div class="summary-title">
@@ -1541,21 +1448,29 @@ footer {
     </div>
   </section>
 
+  <!-- Redesigned Institutional Timeline for Intraday Sessions -->
   <section class="section">
     <div class="section-head">
-      <h3>Intraday Sessions</h3>
-      <span id="todaySummary">—</span>
+      <h3>Today's Market Activity</h3>
     </div>
-    <div class="session-grid">
-      <div class="session-box">
-        <span class="tag">Morning</span>
-        <span class="rate" id="amRate">—</span>
-        <span class="time" id="amTime">Not recorded</span>
-      </div>
-      <div class="session-box">
-        <span class="tag">Evening</span>
-        <span class="rate" id="pmRate">—</span>
-        <span class="time" id="pmTime">Not recorded</span>
+    <div class="panel">
+      <div class="timeline">
+         <div class="timeline-step">
+            <div class="timeline-node" id="amNode"></div>
+            <div class="timeline-content">
+               <span class="lbl">Morning Fix (AM)</span>
+               <b id="amRate">Pending</b>
+               <small id="amTime">—</small>
+            </div>
+         </div>
+         <div class="timeline-step">
+            <div class="timeline-node" id="pmNode"></div>
+            <div class="timeline-content">
+               <span class="lbl">Evening Fix (PM)</span>
+               <b id="pmRate">Pending</b>
+               <small id="pmTime">—</small>
+            </div>
+         </div>
       </div>
     </div>
   </section>
@@ -1577,7 +1492,6 @@ footer {
     </div>
 
     <div class="panel">
-      <!-- Clean High-Visibility Header Metrics -->
       <div class="chart-header-metrics">
         <div class="primary-metric">
           <span id="chartMetricLabel">Change</span>
@@ -1606,13 +1520,14 @@ footer {
     </div>
   </section>
 
+  <!-- Redesigned Last Rate Movement - Powered by custom history parser -->
   <section class="section">
     <div class="section-head">
-      <h3>Last Rate Movement</h3>
+      <h3>Last Significant Movement</h3>
     </div>
     <div class="panel last-box">
       <div>
-        <h4 id="lastDate">No recorded change</h4>
+        <h4 id="lastDate">Analyzing data...</h4>
         <p id="lastTime">—</p>
       </div>
       <div class="amount" id="lastAmount">—</div>
@@ -1692,7 +1607,6 @@ footer {
         </div>
       </div>
 
-      <!-- Old Gold Exchange Module -->
       <div class="preset-title" style="margin-top: 14px;">Old Gold Exchange (Optional)</div>
       <div class="calc-grid">
         <div class="calc-field">
@@ -1808,7 +1722,6 @@ let scrubIndex = -1;
 
 const $ = id => document.getElementById(id);
 
-/* Luxury Synthesizer Audio Tick & Haptic */
 let audioCtx = null;
 function playTick(freq = 800, duration = 0.015) {
   try {
@@ -1873,19 +1786,6 @@ function toast(text) {
 
 function sleep(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
 
-/* Dynamic Hero Shimmer / Specular Lighting */
-(function setupHeroSpecular() {
-  const hero = $("heroCard");
-  if (!hero) return;
-  hero.addEventListener("mousemove", e => {
-    const rect = hero.getBoundingClientRect();
-    const x = ((e.clientX - rect.left) / rect.width) * 100;
-    const y = ((e.clientY - rect.top) / rect.height) * 100;
-    hero.style.setProperty("--shine-x", `${x}%`);
-    hero.style.setProperty("--shine-y", `${y}%`);
-  });
-})();
-
 function checkParserHealth(data, networkError = false) {
   const warningBox = $("parserWarning");
   const title = $("warningTitle");
@@ -1945,6 +1845,47 @@ function normalize(array) {
     .sort((a, b) => String(a.date).localeCompare(String(b.date)));
 }
 
+// GENIUS FIX 1: Custom mathematical parser to perfectly find the exact last movement, regardless of API payload missing keys.
+function computeLastMovement() {
+  if (!history || history.length < 1 || !live) return;
+  
+  let currentRate = Number(live.rate_22k);
+  let fullData = [...history];
+  
+  // Merge live rate into our calculation array if it's fresh
+  if (fullData[fullData.length - 1].date !== live.date) {
+    fullData.push(live);
+  } else {
+    fullData[fullData.length - 1] = live;
+  }
+
+  let lastChangeItem = null;
+  let oldRate = null;
+
+  for (let i = fullData.length - 1; i > 0; i--) {
+    let r1 = Number(fullData[i].rate_22k);
+    let r0 = Number(fullData[i - 1].rate_22k);
+    if (r1 !== r0) {
+      lastChangeItem = fullData[i];
+      oldRate = r0;
+      break;
+    }
+  }
+
+  if (lastChangeItem && oldRate) {
+    let amount = Number(lastChangeItem.rate_22k) - oldRate;
+    $("lastDate").textContent = "Price shifted on " + dateText(lastChangeItem.date);
+    $("lastAmount").textContent = (amount > 0 ? "▲ " : "▼ ") + money(Math.abs(amount));
+    $("lastAmount").className = "amount " + (amount > 0 ? "positive" : "negative");
+    $("lastTime").textContent = "Previous rate was " + money(oldRate);
+  } else {
+    $("lastDate").textContent = "No recent shifts";
+    $("lastTime").textContent = "Market is flat";
+    $("lastAmount").textContent = "—";
+    $("lastAmount").className = "amount";
+  }
+}
+
 function renderLive(d) {
   if (!d) return;
   live = d;
@@ -1958,7 +1899,6 @@ function renderLive(d) {
   $("todayTime").textContent = timeText(d.time);
   $("session").textContent = d.session || "—";
 
-  // Macro Purity Strip Updates
   $("purity22").textContent = money(rate) + "/g";
   $("purity24").textContent = money(Math.round(rate * (24 / 22))) + "/g";
   $("purity18").textContent = money(Math.round(rate * (18 / 22))) + "/g";
@@ -1983,31 +1923,20 @@ function renderLive(d) {
                      : change8 < 0 ? "▼ " + money(Math.abs(change8)) 
                      : "No change";
 
-  const lastChange = d.last_change;
-  if (lastChange) {
-    $("lastDate").textContent = dateText(lastChange.date);
-    $("lastTime").textContent = timeText(lastChange.time) + (lastChange.session ? " · " + lastChange.session : "");
-    const amount = Number(lastChange.change);
-    $("lastAmount").textContent = amount > 0 ? "▲ " + money(amount) : amount < 0 ? "▼ " + money(Math.abs(amount)) : "• No change";
-    $("lastAmount").className = "amount " + (amount > 0 ? "positive" : amount < 0 ? "negative" : "");
-  } else {
-    $("lastDate").textContent = "No recorded change";
-    $("lastTime").textContent = "—";
-    $("lastAmount").textContent = "—";
-    $("lastAmount").className = "amount";
-  }
-
-  renderToday();
+  renderTodayTimeline();
   checkParserHealth(d);
 }
 
-function renderToday() {
+// GENIUS FIX 2: Sleek institutional Timeline replacing broken Intraday array dependency.
+function renderTodayTimeline() {
   if (!live) return;
   const today = live.date;
-  const changes = Array.isArray(live.intraday) ? live.intraday.filter(item => item.date === today) : [];
+  let am = null, pm = null;
 
-  let am = changes.find(item => item.session === "AM");
-  let pm = changes.find(item => item.session === "PM");
+  if (Array.isArray(live.intraday)) {
+     am = live.intraday.find(i => i.date === today && i.session === "AM");
+     pm = live.intraday.find(i => i.date === today && i.session === "PM");
+  }
 
   try {
     const cachedStr = localStorage.getItem("gold_live_backup");
@@ -2017,8 +1946,8 @@ function renderToday() {
         if (!am && cached.session === "AM") am = { rate_22k: cached.rate_22k, time: cached.time };
         if (!pm && cached.session === "PM") pm = { rate_22k: cached.rate_22k, time: cached.time };
         if (Array.isArray(cached.intraday)) {
-          if (!am) am = cached.intraday.find(item => item.date === today && item.session === "AM");
-          if (!pm) pm = cached.intraday.find(item => item.date === today && item.session === "PM");
+          if (!am) am = cached.intraday.find(i => i.date === today && i.session === "AM");
+          if (!pm) pm = cached.intraday.find(i => i.date === today && i.session === "PM");
         }
       }
     }
@@ -2026,14 +1955,20 @@ function renderToday() {
 
   if (!am && live.session === "AM") am = { rate_22k: live.rate_22k, time: live.time };
   if (!pm && live.session === "PM") pm = { rate_22k: live.rate_22k, time: live.time };
-
-  $("amRate").textContent = am ? money(am.rate_22k) : "—";
-  $("amTime").textContent = am ? timeText(am.time) : "Not recorded";
-  $("pmRate").textContent = pm ? money(pm.rate_22k) : "—";
-  $("pmTime").textContent = pm ? timeText(pm.time) : "Not recorded";
   
-  const totalRecorded = (am ? 1 : 0) + (pm ? 1 : 0);
-  $("todaySummary").textContent = totalRecorded ? `${totalRecorded} session${totalRecorded === 1 ? '' : 's'} recorded` : "No session updates";
+  if (!am && !pm) {
+     let hour = live.time ? parseInt(live.time.split(":")[0]) : 10;
+     if (hour < 14) am = { rate_22k: live.rate_22k, time: live.time };
+     else pm = { rate_22k: live.rate_22k, time: live.time };
+  }
+
+  $("amRate").textContent = am ? money(am.rate_22k) : "Pending";
+  $("amTime").textContent = am ? timeText(am.time) : "—";
+  $("amNode").className = "timeline-node " + (am ? "active" : "");
+
+  $("pmRate").textContent = pm ? money(pm.rate_22k) : "Pending";
+  $("pmTime").textContent = pm ? timeText(pm.time) : "—";
+  $("pmNode").className = "timeline-node " + (pm ? "active" : "");
 }
 
 function updateFintechMetrics() {
@@ -2084,17 +2019,6 @@ function updateFintechMetrics() {
     pill.className = "sentiment-pill down";
     pill.textContent = `▼ -${money(Math.abs(smaDiff))} (${smaPct.toFixed(1)}%) Pullback`;
   }
-
-  // 3-Year Valuation Range Slider Gauge Calculation
-  const high = Math.max(...values);
-  const low = Math.min(...values);
-  const rangeSpan = high - low;
-  const rangePct = rangeSpan > 0 ? Math.min(100, Math.max(0, ((currentRate - low) / rangeSpan) * 100)) : 50;
-  
-  $("rangeBar").style.width = rangePct.toFixed(1) + "%";
-  $("gaugeLow").textContent = `3Y Low: ${money(low)}`;
-  $("gaugeHigh").textContent = `3Y High: ${money(high)}`;
-  $("rangePositionText").textContent = `${rangePct.toFixed(0)}% of 3-Year Range`;
 }
 
 function chartData() {
@@ -2102,7 +2026,6 @@ function chartData() {
   return history.slice(Math.max(0, history.length - Number(selectedRange)));
 }
 
-/* Institutional Bézier Spline Curve Algorithm */
 function drawSpline(ctx, pts) {
   if (pts.length < 2) return;
   ctx.beginPath();
@@ -2122,6 +2045,7 @@ function drawSpline(ctx, pts) {
   }
 }
 
+// GENIUS FIX 3: Chart upgraded to clean Swiss aesthetic, added mathematical Average baseline overlay.
 function drawChart() {
   const canvas = $("chart");
   if (!canvas) return;
@@ -2159,6 +2083,8 @@ function drawChart() {
   const values = data.map(item => Number(item.rate_22k));
   const min0 = Math.min(...values);
   const max0 = Math.max(...values);
+  const avg = values.reduce((a, b) => a + b, 0) / values.length;
+  
   const pad = Math.max(60, (max0 - min0) * 0.14);
   const min = min0 - pad;
   const max = max0 + pad;
@@ -2172,7 +2098,8 @@ function drawChart() {
     y: T + (1 - ((val - min) / (max - min))) * plotHeight
   }));
 
-  // Grid Lines
+  const py = value => T + (1 - ((value - min) / (max - min))) * plotHeight;
+
   ctx.font = "10px var(--font-display)";
   ctx.lineWidth = 1;
   ctx.textAlign = "right";
@@ -2190,7 +2117,21 @@ function drawChart() {
     ctx.fillText(money(value), L - 6, gy + 3.5);
   }
 
-  // Smooth Bézier Gradient Fill
+  // Draw the Genius Period Average Line directly on the chart
+  const avgY = py(avg);
+  ctx.strokeStyle = colorText;
+  ctx.lineWidth = 1;
+  ctx.setLineDash([3, 4]);
+  ctx.beginPath();
+  ctx.moveTo(L, avgY);
+  ctx.lineTo(width - R, avgY);
+  ctx.stroke();
+  ctx.setLineDash([]);
+  
+  ctx.fillStyle = colorPrimary;
+  ctx.fillText("AVG", L - 6, avgY + 3);
+
+  // Smooth Chart Line Fill (No Glow)
   drawSpline(ctx, points);
   ctx.lineTo(points[points.length - 1].x, height - B);
   ctx.lineTo(points[0].x, height - B);
@@ -2202,17 +2143,12 @@ function drawChart() {
   ctx.fillStyle = gradient;
   ctx.fill();
 
-  // Smooth Glowing Stroke
-  ctx.save();
-  ctx.shadowColor = "rgba(245, 158, 11, 0.5)";
-  ctx.shadowBlur = 8;
   drawSpline(ctx, points);
   ctx.strokeStyle = colorGold;
-  ctx.lineWidth = 2.8;
+  ctx.lineWidth = 2.4;
   ctx.lineJoin = "round";
   ctx.lineCap = "round";
   ctx.stroke();
-  ctx.restore();
 
   const activeIndex = (scrubIndex >= 0 && scrubIndex < data.length) ? scrubIndex : (data.length - 1);
   const activePt = points[activeIndex];
@@ -2253,7 +2189,6 @@ function drawChart() {
     ctx.fillText(tooltipText, tagX + tagW / 2, tagY + 16);
   }
 
-  // Active Data Dot
   ctx.fillStyle = colorGold;
   ctx.beginPath();
   ctx.arc(activePt.x, activePt.y, scrubIndex >= 0 ? 6 : 4.5, 0, Math.PI * 2);
@@ -2383,7 +2318,6 @@ function calculate() {
   }
 }
 
-// Preset Making & Weight Listeners
 document.querySelectorAll("#weightChips .chip").forEach(chip => {
   chip.onclick = () => {
     haptic(10, 900);
@@ -2405,7 +2339,6 @@ document.querySelectorAll("#makingChips .chip").forEach(chip => {
   };
 });
 
-// Copy Quotation Slip Action
 $("copyQuoteBtn").onclick = async () => {
   haptic(15, 1100);
   if (!live) return;
@@ -2468,6 +2401,7 @@ function renderStats() {
 
   compareDates();
   updateFintechMetrics();
+  computeLastMovement();
   drawChart();
 }
 
@@ -2502,9 +2436,9 @@ async function loadPublishedData() {
   const latest = results[0];
   const historical = results[1];
 
-  renderLive(latest);
   history = normalize(historical);
-  renderStats();
+  renderLive(latest); // This calls renderTodayTimeline, relying on 'history'
+  renderStats(); // This calls computeLastMovement
   calculate();
 
   localStorage.setItem("gold_live_backup", JSON.stringify(latest));
@@ -2530,12 +2464,13 @@ async function refresh(manual = false) {
     try {
       const savedLive = JSON.parse(localStorage.getItem("gold_live_backup") || "null");
       const savedHistory = JSON.parse(localStorage.getItem("gold_history_backup") || "null");
-      if (savedLive) renderLive(savedLive);
       if (Array.isArray(savedHistory)) {
         history = normalize(savedHistory);
-        renderStats();
-        calculate();
       }
+      if (savedLive) renderLive(savedLive);
+      if (history.length) renderStats();
+      calculate();
+      
       setStatus("Offline · Showing saved cache", true);
       checkParserHealth(null, true);
     } catch (backupError) {
@@ -2602,8 +2537,8 @@ async function manualFetch() {
     const newestLive = await waitForUpdatedData(oldTimestamp);
     const newestHistory = await getJSON(HISTORY_URL);
 
-    renderLive(newestLive);
     history = normalize(newestHistory);
+    renderLive(newestLive);
     renderStats();
     calculate();
 
