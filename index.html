@@ -201,18 +201,25 @@ button, input, select {
   min-height: 36px;
 }
 
+.brand-text {
+  flex-shrink: 0;
+}
+
 .brand-text h1 {
-  font-size: 26px;
+  font-size: clamp(20px, 6vw, 26px);
   font-weight: 800;
   letter-spacing: -0.04em;
   color: var(--text-main);
   line-height: 1.1;
+  white-space: nowrap;
 }
 
 .status-indicator {
   display: inline-flex;
   align-items: center;
   gap: 7px;
+  width: 148px;
+  flex-shrink: 0;
   height: 30px;
   padding: 0 14px;
   background: var(--surface);
@@ -223,7 +230,6 @@ button, input, select {
   color: var(--text-secondary);
   box-shadow: var(--shadow-sm);
   white-space: nowrap;
-  max-width: 60%;
 }
 
 .status-indicator span:last-child {
@@ -442,13 +448,17 @@ html[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
   gap: 12px;
   padding: 6px 0 2px;
   text-align: center;
+  width: 100%;
 }
 
 .hero-mid h2 {
+  align-self: stretch;
+  width: 100%;
   font-size: clamp(40px, 10vw, 58px);
   font-weight: 800;
   letter-spacing: -0.035em;
   line-height: 1;
+  text-align: center;
   background: linear-gradient(180deg, var(--text-main) 30%, var(--text-secondary) 130%);
   -webkit-background-clip: text;
   background-clip: text;
@@ -963,8 +973,8 @@ details.collapsible .collapsible-content {
 .compare-result-card {
   min-height: 60px;
   padding: 14px 16px;
-  background: var(--gold-tint);
-  border: 1px solid var(--gold-border);
+  background: var(--surface-subtle);
+  border: 1px solid var(--border-subtle);
   border-radius: var(--r-sm);
   display: flex;
   align-items: center;
@@ -1126,11 +1136,35 @@ details.collapsible .collapsible-content {
   font-weight: 700;
   color: var(--text-main);
   transition: border-color var(--transition);
-  line-height: 44px;
+  display: flex;
+  align-items: center;
 }
 .calc-input:focus {
   background: var(--surface);
   border-color: var(--gold-primary);
+}
+
+input[type="date"].calc-input {
+  color-scheme: light;
+  line-height: normal;
+}
+html[data-theme="dark"] input[type="date"].calc-input {
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: dark) {
+  input[type="date"].calc-input { color-scheme: dark; }
+}
+html[data-theme="light"] input[type="date"].calc-input {
+  color-scheme: light;
+}
+input[type="date"].calc-input::-webkit-date-and-time-value {
+  text-align: left;
+  margin: 0;
+}
+input[type="date"].calc-input::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  opacity: 0.65;
+  filter: none;
 }
 
 select.calc-input {
@@ -1259,7 +1293,7 @@ select.calc-input {
   position: sticky;
   top: 0;
   background: var(--surface-subtle);
-  padding: 10px 14px;
+  padding: 10px 8px;
   font-size: 10.5px;
   font-weight: 800;
   text-transform: uppercase;
@@ -1267,14 +1301,16 @@ select.calc-input {
   border-bottom: 1px solid var(--border-subtle);
   z-index: 2;
   line-height: 1.2;
+  text-align: center;
 }
 .history-table td {
-  padding: 11px 14px;
+  padding: 11px 8px;
   border-bottom: 1px solid var(--border-subtle);
   font-weight: 600;
   vertical-align: middle;
   line-height: 1.2;
   color: var(--text-main);
+  text-align: center;
 }
 .history-table tr:last-child td {
   border-bottom: none;
@@ -1283,20 +1319,14 @@ select.calc-input {
   background-color: var(--surface-subtle);
 }
 
-.history-table th:nth-child(1), .history-table td:nth-child(1) {
-  width: 33.34%;
-  text-align: left;
-  white-space: nowrap;
-}
-.history-table th:nth-child(2), .history-table td:nth-child(2) {
-  width: 33.33%;
-  text-align: right;
-  white-space: nowrap;
-}
+.history-table th:nth-child(1), .history-table td:nth-child(1),
+.history-table th:nth-child(2), .history-table td:nth-child(2),
 .history-table th:nth-child(3), .history-table td:nth-child(3) {
-  width: 33.33%;
-  text-align: right;
+  width: 33.333%;
+  text-align: center;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* Pull to Refresh Widget */
@@ -1576,12 +1606,10 @@ footer {
     </div>
   </div>
 
-  <!-- Redesigned 3-Column Historical Comparison -->
-  <section class="section">
-    <div class="section-head">
-      <h3>Compare Historical Dates</h3>
-    </div>
-    <div class="panel">
+  <!-- Redesigned Historical Comparison — collapsed by default, opens on tap -->
+  <details class="collapsible">
+    <summary><div class="summary-title"><h3>Compare Historical Dates</h3><span>Tap to open</span></div><span class="chevron">▼</span></summary>
+    <div class="collapsible-content">
       <div class="compare-grid">
         <div class="compare-field">
           <label>Earlier Date</label>
@@ -1600,7 +1628,7 @@ footer {
         </div>
       </div>
     </div>
-  </section>
+  </details>
 
   <!-- Jewelry Purchase & Exchange Suite -->
   <section class="section">
