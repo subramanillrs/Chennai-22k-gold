@@ -213,7 +213,7 @@ button, input, select {
   100% { transform: scale(0.95); opacity: 0.8; }
 }
 
-/* Purity Strip */
+/* Purity Strip (No top line or top accent) */
 .purity-strip {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -224,6 +224,7 @@ button, input, select {
 .purity-card {
   background: var(--surface);
   border: 1px solid var(--border-subtle);
+  border-top: 1px solid var(--border-subtle);
   border-radius: var(--r-sm);
   padding: 10px 8px;
   display: flex;
@@ -232,6 +233,13 @@ button, input, select {
   justify-content: center;
   gap: 3px;
   box-shadow: var(--shadow-sm);
+  position: relative;
+}
+
+.purity-card::before,
+.purity-card::after {
+  display: none !important;
+  content: none !important;
 }
 
 .purity-card small {
@@ -334,9 +342,14 @@ button, input, select {
 .hero-mid h2 {
   font-size: clamp(38px, 9vw, 54px);
   font-weight: 800;
-  letter-spacing: -0.045em;
+  letter-spacing: -0.03em;
   line-height: 1;
   color: var(--text-main);
+}
+
+.currency-sym {
+  margin-right: 0.24em;
+  font-weight: 700;
 }
 
 .change-pill {
@@ -383,10 +396,11 @@ button, input, select {
 }
 
 .hero-sub-val {
-  font-size: 17px;
+  font-size: 16px;
   font-weight: 800;
   color: var(--text-main);
   line-height: 22px;
+  height: 22px;
   display: flex;
   align-items: center;
   gap: 6px;
@@ -545,11 +559,19 @@ button, input, select {
   line-height: 1.2;
 }
 
-/* Chart Dashboard */
+/* Premium Financial Terminal Chart Dashboard */
+.chart-panel {
+  padding: 18px 16px 14px 16px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
 .segment-ctrl {
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
-  gap: 3px;
+  gap: 4px;
   background: var(--surface-subtle);
   padding: 3px;
   border-radius: var(--r-full);
@@ -557,7 +579,7 @@ button, input, select {
   width: 100%;
 }
 .segment-ctrl button {
-  height: 26px;
+  height: 28px;
   padding: 0;
   border-radius: var(--r-full);
   font-size: 11px;
@@ -571,8 +593,9 @@ button, input, select {
 }
 .segment-ctrl button.active {
   background: var(--surface);
-  color: var(--text-main);
-  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  color: var(--gold-primary);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  font-weight: 800;
 }
 
 .chart-header-metrics {
@@ -591,11 +614,12 @@ button, input, select {
   color: var(--text-tertiary);
   line-height: 13px;
   margin-bottom: 3px;
+  letter-spacing: 0.05em;
 }
 .primary-metric strong {
-  font-size: 17px;
+  font-size: 18px;
   font-weight: 800;
-  line-height: 20px;
+  line-height: 22px;
 }
 .primary-metric strong.positive { color: var(--good); }
 .primary-metric strong.negative { color: var(--bad); }
@@ -616,19 +640,21 @@ button, input, select {
   color: var(--text-tertiary);
   line-height: 13px;
   margin-bottom: 3px;
+  letter-spacing: 0.05em;
 }
 .sec-metric b {
-  font-size: 13.5px;
+  font-size: 14px;
   font-weight: 700;
-  line-height: 20px;
+  line-height: 22px;
+  color: var(--text-main);
 }
 
 .chartwrap {
   width: 100%;
-  height: 210px;
+  height: 220px;
   position: relative;
   touch-action: none;
-  margin: 12px 0 8px 0;
+  margin: 4px 0 2px 0;
 }
 .chartwrap canvas {
   width: 100%;
@@ -640,10 +666,10 @@ button, input, select {
   display: flex;
   justify-content: space-between;
   font-size: 10.5px;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--text-tertiary);
   border-top: 1px dashed var(--border-subtle);
-  padding-top: 8px;
+  padding-top: 10px;
   width: 100%;
 }
 
@@ -760,7 +786,7 @@ details.collapsible .collapsible-content {
 .last-box .amount.positive { color: var(--good); }
 .last-box .amount.negative { color: var(--bad); }
 
-/* Pixel-Precision Redesigned Jewelry Purchase Suite */
+/* Jewelry Purchase Suite */
 .calc-suite {
   display: flex;
   flex-direction: column;
@@ -1019,7 +1045,7 @@ select.calc-input {
 .compare-result .positive { color: var(--good); font-weight: 700; }
 .compare-result .negative { color: var(--bad); font-weight: 700; }
 
-/* Historical Table */
+/* Historical Table Pixel-Wise Layout Fix */
 .table-wrap {
   max-height: 360px;
   overflow-y: auto;
@@ -1031,25 +1057,24 @@ select.calc-input {
 .history-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 12.5px;
+  font-size: 13px;
   table-layout: fixed;
 }
 .history-table th {
   position: sticky;
   top: 0;
   background: var(--surface-subtle);
-  padding: 10px 14px;
+  padding: 10px 12px;
   font-size: 10px;
   font-weight: 800;
   text-transform: uppercase;
   color: var(--text-tertiary);
   border-bottom: 1px solid var(--border-subtle);
   z-index: 2;
-  text-align: left;
   line-height: 1.2;
 }
 .history-table td {
-  padding: 11px 14px;
+  padding: 11px 12px;
   border-bottom: 1px solid var(--border-subtle);
   font-weight: 600;
   vertical-align: middle;
@@ -1059,13 +1084,19 @@ select.calc-input {
   background-color: var(--surface-subtle);
 }
 .history-table th:nth-child(1), .history-table td:nth-child(1) {
-  width: 38%;
+  width: 34%;
+  text-align: left;
   white-space: nowrap;
 }
-.history-table th:nth-child(2), .history-table td:nth-child(2),
-.history-table th:nth-child(3), .history-table td:nth-child(3) {
+.history-table th:nth-child(2), .history-table td:nth-child(2) {
+  width: 32%;
   text-align: right;
-  width: 31%;
+  white-space: nowrap;
+}
+.history-table th:nth-child(3), .history-table td:nth-child(3) {
+  width: 34%;
+  text-align: right;
+  white-space: nowrap;
 }
 
 /* Pull to Refresh Widget */
@@ -1194,14 +1225,14 @@ footer {
     </div>
 
     <div class="hero-mid">
-      <h2 id="hero8">₹—</h2>
+      <h2 id="hero8">₹ —</h2>
       <div id="change8" class="change-pill same">No change</div>
     </div>
 
     <div class="hero-details-grid">
       <div class="hero-detail-col">
         <span class="hero-sub-label">Rate Per Gram</span>
-        <div class="hero-sub-val" id="hero1">₹— <span id="change1" class="change-pill mini same"></span></div>
+        <div class="hero-sub-val" id="hero1">₹ — <span id="change1" class="change-pill mini same"></span></div>
         <div class="hero-sub-sub">1 Gram Benchmark</div>
       </div>
       <div class="hero-detail-col">
@@ -1265,20 +1296,20 @@ footer {
       <span id="chartCount">—</span>
     </div>
 
-    <div class="segment-ctrl" id="ranges">
-      <button data-range="7">7D</button>
-      <button class="active" data-range="30">30D</button>
-      <button data-range="90">3M</button>
-      <button data-range="180">6M</button>
-      <button data-range="365">1Y</button>
-      <button data-range="1095">3Y</button>
-      <button data-range="all">ALL</button>
-    </div>
+    <div class="panel chart-panel">
+      <div class="segment-ctrl" id="ranges">
+        <button data-range="7">7D</button>
+        <button class="active" data-range="30">30D</button>
+        <button data-range="90">3M</button>
+        <button data-range="180">6M</button>
+        <button data-range="365">1Y</button>
+        <button data-range="1095">3Y</button>
+        <button data-range="all">ALL</button>
+      </div>
 
-    <div class="panel">
       <div class="chart-header-metrics">
         <div class="primary-metric">
-          <span id="chartMetricLabel">Change</span>
+          <span id="chartMetricLabel">Period Performance</span>
           <strong id="periodChange">—</strong>
         </div>
         <div class="secondary-metrics">
@@ -1352,7 +1383,7 @@ footer {
     </div>
   </section>
 
-  <!-- Completely Redesigned Jewelry Valuation Suite -->
+  <!-- Jewelry Valuation Suite -->
   <section class="section">
     <div class="section-head">
       <h3>Jewelry Purchase & Exchange Suite</h3>
@@ -1370,7 +1401,7 @@ footer {
           </select>
         </div>
 
-        <!-- Standard Gold Weight Presets (1g, 4g, 8g...) -->
+        <!-- Standard Gold Weight Presets -->
         <div class="calc-group">
           <span class="calc-group-label">Standard Gold Weight</span>
           <div class="chip-container" id="weightChips">
@@ -1384,7 +1415,7 @@ footer {
           </div>
         </div>
 
-        <!-- Category & Making Charges (Coin, Plain, Stone, Antique) -->
+        <!-- Category & Making Charges -->
         <div class="calc-group">
           <span class="calc-group-label">Jewelry Category & Making Charges</span>
           <div class="chip-container" id="makingChips">
@@ -1520,7 +1551,7 @@ const haptic = (ms = 10, freq = 800) => {
   playTick(freq);
 };
 
-const money = n => Number.isFinite(Number(n)) ? "₹" + Math.round(Number(n)).toLocaleString("en-IN") : "₹—";
+const money = n => Number.isFinite(Number(n)) ? "₹ " + Math.round(Number(n)).toLocaleString("en-IN") : "₹ —";
 
 const dateText = s => {
   if (!s) return "—";
@@ -1632,7 +1663,6 @@ function renderLive(d) {
   $("today").textContent = dateText(d.date);
   $("todayTime").textContent = timeText(d.time);
   
-  // Intelligent Session Display Fix
   let currentSession = d.session;
   if (!currentSession && d.time) {
     const hr = parseInt(d.time.split(":")[0]);
@@ -1665,35 +1695,87 @@ function renderTodayTimeline() {
   const today = live.date;
   let am = null, pm = null;
 
-  if (Array.isArray(live.intraday)) {
-     am = live.intraday.find(i => i.date === today && i.session === "AM");
-     pm = live.intraday.find(i => i.date === today && i.session === "PM");
+  // 1. Check direct structured properties on live feed
+  if (live.am_rate || live.amRate || live.morning_rate || live.rate_am) {
+    am = {
+      rate_22k: Number(live.am_rate || live.amRate || live.morning_rate || live.rate_am),
+      time: live.am_time || live.amTime || "10:30"
+    };
+  }
+  if (live.pm_rate || live.pmRate || live.evening_rate || live.rate_pm) {
+    pm = {
+      rate_22k: Number(live.pm_rate || live.pmRate || live.evening_rate || live.rate_pm),
+      time: live.pm_time || live.pmTime || "17:00"
+    };
   }
 
+  // 2. Check intraday array
+  if (Array.isArray(live.intraday)) {
+    const amEntry = live.intraday.find(i => (i.date === today || !i.date) && (i.session === "AM" || String(i.session).toUpperCase().includes("AM") || String(i.session).toUpperCase().includes("MORNING")));
+    if (amEntry && amEntry.rate_22k) am = { rate_22k: Number(amEntry.rate_22k), time: amEntry.time || "10:30" };
+    
+    const pmEntry = live.intraday.find(i => (i.date === today || !i.date) && (i.session === "PM" || String(i.session).toUpperCase().includes("PM") || String(i.session).toUpperCase().includes("EVENING")));
+    if (pmEntry && pmEntry.rate_22k) pm = { rate_22k: Number(pmEntry.rate_22k), time: pmEntry.time || "17:00" };
+  }
+
+  // 3. Fallback to LocalStorage cache
   try {
     const cached = JSON.parse(localStorage.getItem("gold_live_backup"));
     if (cached && cached.date === today) {
-      if (!am && cached.session === "AM") am = { rate_22k: cached.rate_22k, time: cached.time };
-      if (!pm && cached.session === "PM") pm = { rate_22k: cached.rate_22k, time: cached.time };
+      if (!am && (cached.session === "AM" || cached.am_rate || cached.amRate)) {
+        am = { rate_22k: Number(cached.am_rate || cached.amRate || cached.rate_22k), time: cached.am_time || cached.time || "10:30" };
+      }
+      if (!pm && (cached.session === "PM" || cached.pm_rate || cached.pmRate)) {
+        pm = { rate_22k: Number(cached.pm_rate || cached.pmRate || cached.rate_22k), time: cached.pm_time || cached.time || "17:00" };
+      }
       if (Array.isArray(cached.intraday)) {
-        if (!am) am = cached.intraday.find(i => i.date === today && i.session === "AM");
-        if (!pm) pm = cached.intraday.find(i => i.date === today && i.session === "PM");
+        if (!am) {
+          const cAm = cached.intraday.find(i => (i.date === today || !i.date) && (i.session === "AM" || String(i.session).toUpperCase().includes("AM")));
+          if (cAm && cAm.rate_22k) am = { rate_22k: Number(cAm.rate_22k), time: cAm.time || "10:30" };
+        }
+        if (!pm) {
+          const cPm = cached.intraday.find(i => (i.date === today || !i.date) && (i.session === "PM" || String(i.session).toUpperCase().includes("PM")));
+          if (cPm && cPm.rate_22k) pm = { rate_22k: Number(cPm.rate_22k), time: cPm.time || "17:00" };
+        }
       }
     }
   } catch(e) {}
 
-  if (!am && live.session === "AM") am = { rate_22k: live.rate_22k, time: live.time };
-  if (!pm && live.session === "PM") pm = { rate_22k: live.rate_22k, time: live.time };
-  if (!am && !pm) {
-     let hr = live.time ? parseInt(live.time.split(":")[0]) : 10;
-     hr < 14 ? am = { rate_22k: live.rate_22k, time: live.time } : pm = { rate_22k: live.rate_22k, time: live.time };
+  // 4. Session & Time-based resolution
+  const sessionUpper = String(live.session || "").toUpperCase();
+  const timeHour = live.time ? parseInt(String(live.time).split(":")[0], 10) : new Date().getHours();
+
+  if (!am && (sessionUpper === "AM" || sessionUpper.includes("MORNING"))) {
+    am = { rate_22k: Number(live.rate_22k), time: live.time || "10:30" };
+  }
+  if (!pm && (sessionUpper === "PM" || sessionUpper.includes("EVENING"))) {
+    pm = { rate_22k: Number(live.rate_22k), time: live.time || "17:00" };
   }
 
-  $("amRate").textContent = am ? money(am.rate_22k) : "Pending";
+  // 5. If PM is published, derive Morning rate if previous_rate_22k or opening_rate exists
+  if (pm && !am) {
+    if (live.morning_rate || live.opening_rate || live.previous_rate_22k) {
+      am = { rate_22k: Number(live.morning_rate || live.opening_rate || live.previous_rate_22k), time: "10:30" };
+    }
+  }
+
+  // 6. Time-based attribution fallback
+  if (!am && !pm && live.rate_22k) {
+    if (timeHour < 14) {
+      am = { rate_22k: Number(live.rate_22k), time: live.time || "10:30" };
+    } else {
+      pm = { rate_22k: Number(live.rate_22k), time: live.time || "17:00" };
+      if (live.previous_rate_22k) {
+        am = { rate_22k: Number(live.previous_rate_22k), time: "10:30" };
+      }
+    }
+  }
+
+  $("amRate").textContent = am && Number.isFinite(am.rate_22k) ? money(am.rate_22k) : "Pending";
   $("amTime").textContent = am ? timeText(am.time) : "—";
   $("amNode").className = "timeline-node " + (am ? "active" : "");
 
-  $("pmRate").textContent = pm ? money(pm.rate_22k) : "Pending";
+  $("pmRate").textContent = pm && Number.isFinite(pm.rate_22k) ? money(pm.rate_22k) : "Pending";
   $("pmTime").textContent = pm ? timeText(pm.time) : "—";
   $("pmNode").className = "timeline-node " + (pm ? "active" : "");
 }
@@ -1724,97 +1806,177 @@ function updateFintechMetrics() {
 
 function drawSpline(ctx, pts) {
   if (pts.length < 2) return;
-  ctx.beginPath(); ctx.moveTo(pts[0].x, pts[0].y);
+  ctx.beginPath();
+  ctx.moveTo(pts[0].x, pts[0].y);
   for (let i = 0; i < pts.length - 1; i++) {
-    const p0 = pts[i === 0 ? i : i - 1], p1 = pts[i], p2 = pts[i + 1], p3 = pts[i + 2 < pts.length ? i + 2 : i + 1];
-    ctx.bezierCurveTo(p1.x + (p2.x - p0.x) / 6, p1.y + (p2.y - p0.y) / 6, p2.x - (p3.x - p1.x) / 6, p2.y - (p3.y - p1.y) / 6, p2.x, p2.y);
+    const p0 = pts[i === 0 ? i : i - 1];
+    const p1 = pts[i];
+    const p2 = pts[i + 1];
+    const p3 = pts[i + 2 < pts.length ? i + 2 : i + 1];
+    ctx.bezierCurveTo(
+      p1.x + (p2.x - p0.x) / 6,
+      p1.y + (p2.y - p0.y) / 6,
+      p2.x - (p3.x - p1.x) / 6,
+      p2.y - (p3.y - p1.y) / 6,
+      p2.x,
+      p2.y
+    );
   }
 }
 
+/* Premium Financial Terminal Chart */
 function drawChart() {
-  const canvas = $("chart"); if (!canvas) return;
+  const canvas = $("chart");
+  if (!canvas) return;
   const width = canvas.parentElement.clientWidth, height = canvas.parentElement.clientHeight, dpr = window.devicePixelRatio || 1;
   if (!width || !height) return;
   canvas.width = Math.round(width * dpr); canvas.height = Math.round(height * dpr);
-  const ctx = canvas.getContext("2d"); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, width, height);
+  const ctx = canvas.getContext("2d");
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, width, height);
 
   const data = selectedRange === "all" ? history : history.slice(Math.max(0, history.length - Number(selectedRange)));
-  $("chartCount").textContent = data.length.toLocaleString() + " days";
+  $("chartCount").textContent = data.length.toLocaleString() + " records";
 
   const styles = getComputedStyle(document.body);
   const colorGold = styles.getPropertyValue('--gold-primary').trim() || '#d97706';
-  const colorGrid = styles.getPropertyValue('--border-strong').trim() || 'rgba(0,0,0,0.1)';
-  const colorText = styles.getPropertyValue('--text-tertiary').trim() || '#94a3b8';
-  const colorPrimary = styles.getPropertyValue('--text-main').trim() || '#0f172a';
+  const colorTextTertiary = styles.getPropertyValue('--text-tertiary').trim() || '#94a3b8';
+  const colorTextMain = styles.getPropertyValue('--text-main').trim() || '#0f172a';
 
   if (data.length < 2) return;
 
-  const values = data.map(i => Number(i.rate_22k)), min0 = Math.min(...values), max0 = Math.max(...values), avg = values.reduce((a, b) => a + b, 0) / values.length;
-  const pad = Math.max(60, (max0 - min0) * 0.14), min = min0 - pad, max = max0 + pad;
-  const L = 46, R = 10, T = 12, B = 20, plotW = width - L - R, plotH = height - T - B;
+  const values = data.map(i => Number(i.rate_22k));
+  const min0 = Math.min(...values), max0 = Math.max(...values);
+  const pad = Math.max(60, (max0 - min0) * 0.16);
+  const min = min0 - pad, max = max0 + pad;
+
+  const L = 52, R = 12, T = 16, B = 22;
+  const plotW = width - L - R, plotH = height - T - B;
 
   const py = val => T + (1 - ((val - min) / (max - min))) * plotH;
   const points = values.map((val, i) => ({ x: L + (i / (values.length - 1)) * plotW, y: py(val) }));
 
-  ctx.font = "10px var(--font-sans)"; ctx.lineWidth = 1; ctx.textAlign = "right";
+  // Horizontal Grid Lines & Y-Axis Scale
+  ctx.font = "600 10px var(--font-sans)";
+  ctx.textAlign = "right";
+  ctx.lineWidth = 1;
+
   for (let i = 0; i <= 4; i++) {
-    const gy = T + plotH * i / 4;
-    ctx.strokeStyle = colorGrid; ctx.beginPath(); ctx.moveTo(L, gy); ctx.lineTo(width - R, gy); ctx.stroke();
-    ctx.fillStyle = colorText; ctx.fillText(money(max - (max - min) * i / 4), L - 8, gy + 3);
+    const gy = T + (plotH * i / 4);
+    ctx.strokeStyle = "rgba(148, 163, 184, 0.12)";
+    ctx.setLineDash([]);
+    ctx.beginPath();
+    ctx.moveTo(L, gy);
+    ctx.lineTo(width - R, gy);
+    ctx.stroke();
+
+    const gridVal = max - ((max - min) * i / 4);
+    ctx.fillStyle = colorTextTertiary;
+    ctx.fillText(Math.round(gridVal).toLocaleString("en-IN"), L - 8, gy + 3.5);
   }
 
-  const avgY = py(avg);
-  ctx.strokeStyle = colorText; ctx.beginPath(); ctx.setLineDash([3, 4]); ctx.moveTo(L, avgY); ctx.lineTo(width - R, avgY); ctx.stroke(); ctx.setLineDash([]);
-  ctx.fillStyle = colorPrimary; ctx.fillText("AVG", L - 8, avgY + 3);
+  // Smooth Area Gradient
+  drawSpline(ctx, points);
+  ctx.lineTo(points[points.length - 1].x, height - B);
+  ctx.lineTo(points[0].x, height - B);
+  ctx.closePath();
+  const fillGrad = ctx.createLinearGradient(0, T, 0, height - B);
+  fillGrad.addColorStop(0, "rgba(217, 119, 6, 0.22)");
+  fillGrad.addColorStop(0.7, "rgba(217, 119, 6, 0.04)");
+  fillGrad.addColorStop(1, "rgba(217, 119, 6, 0)");
+  ctx.fillStyle = fillGrad;
+  ctx.fill();
 
-  drawSpline(ctx, points); ctx.lineTo(points[points.length - 1].x, height - B); ctx.lineTo(points[0].x, height - B); ctx.closePath();
-  const grad = ctx.createLinearGradient(0, T, 0, height); grad.addColorStop(0, "rgba(217, 119, 6, 0.18)"); grad.addColorStop(1, "rgba(217, 119, 6, 0)");
-  ctx.fillStyle = grad; ctx.fill();
+  // Glow Stroke
+  drawSpline(ctx, points);
+  ctx.strokeStyle = colorGold;
+  ctx.lineWidth = 2.4;
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
+  ctx.stroke();
 
-  drawSpline(ctx, points); ctx.strokeStyle = colorGold; ctx.lineWidth = 2.2; ctx.stroke();
-
+  // Active or Latest Indicator Point
   const activeIdx = (scrubIndex >= 0 && scrubIndex < data.length) ? scrubIndex : data.length - 1;
   const activePt = points[activeIdx];
 
   if (scrubIndex >= 0) {
-    ctx.strokeStyle = colorGold; ctx.lineWidth = 1; ctx.setLineDash([4, 4]);
-    ctx.beginPath(); ctx.moveTo(activePt.x, T); ctx.lineTo(activePt.x, height - B); ctx.stroke(); ctx.setLineDash([]);
-    ctx.font = "bold 11px var(--font-sans)"; ctx.fillStyle = colorPrimary;
-    ctx.fillText(`${dateText(data[activeIdx].date)}: ${money(values[activeIdx])}/g`, width - R, T + 10);
+    ctx.strokeStyle = colorGold;
+    ctx.lineWidth = 1.2;
+    ctx.setLineDash([4, 4]);
+    ctx.beginPath();
+    ctx.moveTo(activePt.x, T);
+    ctx.lineTo(activePt.x, height - B);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Callout tooltip badge
+    const badgeText = `${dateText(data[activeIdx].date)}: ${money(values[activeIdx])}/g`;
+    ctx.font = "800 11px var(--font-sans)";
+    ctx.fillStyle = colorTextMain;
+    ctx.textAlign = "right";
+    ctx.fillText(badgeText, width - R, T + 10);
   }
 
-  ctx.fillStyle = colorGold; ctx.beginPath(); ctx.arc(activePt.x, activePt.y, scrubIndex >= 0 ? 5.5 : 4, 0, Math.PI * 2); ctx.fill();
-  ctx.strokeStyle = styles.getPropertyValue('--surface').trim(); ctx.lineWidth = 2; ctx.stroke();
+  ctx.fillStyle = colorGold;
+  ctx.beginPath();
+  ctx.arc(activePt.x, activePt.y, scrubIndex >= 0 ? 5.5 : 4, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = styles.getPropertyValue('--surface').trim() || '#ffffff';
+  ctx.lineWidth = 2;
+  ctx.stroke();
 
-  $("chartStart").textContent = dateText(data[0].date); $("chartEnd").textContent = dateText(data[data.length - 1].date);
+  $("chartStart").textContent = "From: " + dateText(data[0].date);
+  $("chartEnd").textContent = "To: " + dateText(data[data.length - 1].date);
   
-  const delta = values[values.length - 1] - values[0], pct = values[0] ? (delta / values[0] * 100) : 0;
+  const delta = values[values.length - 1] - values[0];
+  const pct = values[0] ? (delta / values[0] * 100) : 0;
+
   if (scrubIndex >= 0) {
-    $("chartMetricLabel").textContent = "Selected Date"; $("periodChange").textContent = money(values[activeIdx]); $("periodChange").className = "";
+    $("chartMetricLabel").textContent = "Selected Benchmark";
+    $("periodChange").textContent = money(values[activeIdx]) + "/g";
+    $("periodChange").className = "";
   } else {
-    $("chartMetricLabel").textContent = "Period Change";
+    $("chartMetricLabel").textContent = "Period Performance";
     $("periodChange").textContent = (delta >= 0 ? "+" : "") + money(delta) + ` (${(pct >= 0 ? "+" : "")}${pct.toFixed(1)}%)`;
     $("periodChange").className = delta > 0 ? "positive" : delta < 0 ? "negative" : "";
   }
-  $("periodHigh").textContent = money(max0); $("periodLow").textContent = money(min0);
+  $("periodHigh").textContent = money(max0);
+  $("periodLow").textContent = money(min0);
 }
 
 (function setupChartScrub() {
-  const canvas = $("chart"); if (!canvas) return;
+  const canvas = $("chart");
+  if (!canvas) return;
   const handle = e => {
     const data = selectedRange === "all" ? history : history.slice(Math.max(0, history.length - Number(selectedRange)));
     if (data.length < 2) return;
-    const r = canvas.getBoundingClientRect(), x = (e.touches ? e.touches[0].clientX : e.clientX) - r.left;
-    const ratio = Math.max(0, Math.min(1, (x - 46) / (r.width - 56))), idx = Math.round(ratio * (data.length - 1));
-    if (idx !== scrubIndex) { scrubIndex = idx; haptic(5, 1200); drawChart(); }
+    const r = canvas.getBoundingClientRect();
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const x = clientX - r.left;
+    const L = 52, plotW = r.width - L - 12;
+    const ratio = Math.max(0, Math.min(1, (x - L) / plotW));
+    const idx = Math.round(ratio * (data.length - 1));
+    if (idx !== scrubIndex) {
+      scrubIndex = idx;
+      haptic(5, 1200);
+      drawChart();
+    }
   };
-  const end = () => { if (scrubIndex !== -1) { scrubIndex = -1; drawChart(); } };
-  canvas.addEventListener("touchstart", handle, { passive: true }); canvas.addEventListener("touchmove", handle, { passive: true });
-  canvas.addEventListener("touchend", end); canvas.addEventListener("mousemove", e => { if (e.buttons === 1) handle(e); });
-  canvas.addEventListener("mouseup", end); canvas.addEventListener("mouseleave", end);
+  const end = () => {
+    if (scrubIndex !== -1) {
+      scrubIndex = -1;
+      drawChart();
+    }
+  };
+  canvas.addEventListener("touchstart", handle, { passive: true });
+  canvas.addEventListener("touchmove", handle, { passive: true });
+  canvas.addEventListener("touchend", end);
+  canvas.addEventListener("mousemove", e => { if (e.buttons === 1) handle(e); });
+  canvas.addEventListener("mouseup", end);
+  canvas.addEventListener("mouseleave", end);
 })();
 
-/* Redesigned Ground-Up Calculation Logic */
+/* Valuation Suite Logic */
 function calculate() {
   if (!live) return;
   const rate = Number(live.rate_22k);
@@ -1830,7 +1992,6 @@ function calculate() {
   const oldPurity = Number($("oldPurity").value) || 22;
   const oldGoldCredit = oldWeight > 0 ? (oldWeight * (rate * (oldPurity / 22))) : 0;
 
-  // Toggle Visibility for Mode Input Fields
   if (mode === "value") {
     $("weightField").style.display = "flex";
     $("budgetField").style.display = "none";
@@ -1857,7 +2018,7 @@ function calculate() {
     $("receiptFee").textContent = money(flatFee);
     $("receiptTotalLabel").textContent = "Net Payable Amount";
     $("calcResult").textContent = money(grandTotal);
-    $("calcSub").textContent = `For ${weight.toLocaleString("en-IN")}g gold at ₹${rate}/g benchmark`;
+    $("calcSub").textContent = `For ${weight.toLocaleString("en-IN")}g gold at ₹ ${rate.toLocaleString("en-IN")}/g benchmark`;
   } else {
     const effB = (budget + oldGoldCredit) / (1 + gstPct / 100) - flatFee;
     const goldBase = effB > 0 ? effB / (1 + makingPct / 100) : 0;
@@ -1876,7 +2037,6 @@ function calculate() {
   }
 }
 
-// Mode Switcher Controls
 document.querySelectorAll(".calc-mode-btn").forEach(btn => {
   btn.onclick = () => {
     haptic(10);
@@ -1905,7 +2065,7 @@ document.querySelectorAll("#makingChips .chip").forEach(c => c.onclick = () => {
   calculate();
 });
 
-/* Visually Matching PNG Card Generator */
+/* PNG Card Generator */
 function generateShareCardBlob() {
   return new Promise((resolve) => {
     if (!live) return resolve(null);
@@ -2069,27 +2229,41 @@ function generateShareCardBlob() {
 }
 
 $("shareBtn").onclick = async () => {
-  haptic(15); if (!live) return;
+  haptic(15);
+  if (!live) return;
   const shareText = `💰 Gold 22K Rate (${dateText(live.date)})\n• 1 Gram: ${money(live.rate_22k)}\n• 1 Sovereign: ${money(live.rate_8g || live.rate_22k*8)}\nTrack live at: ${window.location.href}`;
   try {
-    toast("Generating snapshot…"); const blob = await generateShareCardBlob();
+    toast("Generating snapshot…");
+    const blob = await generateShareCardBlob();
     if (blob && navigator.canShare && navigator.canShare({ files: [new File([blob], "gold.png", { type: "image/png" })] })) {
       await navigator.share({ title: "Gold 22k", text: shareText, files: [new File([blob], `gold-${live.date}.png`, { type: "image/png" })] });
-    } else if (navigator.share) await navigator.share({ title: "Gold 22k", text: shareText });
-    else { navigator.clipboard?.writeText(shareText); toast("Copied to clipboard!"); }
-  } catch(e) { if(e.name !== "AbortError") { navigator.clipboard?.writeText(shareText); toast("Copied text!"); } }
+    } else if (navigator.share) {
+      await navigator.share({ title: "Gold 22k", text: shareText });
+    } else {
+      navigator.clipboard?.writeText(shareText);
+      toast("Copied to clipboard!");
+    }
+  } catch(e) {
+    if (e.name !== "AbortError") {
+      navigator.clipboard?.writeText(shareText);
+      toast("Copied text!");
+    }
+  }
 };
 
 $("copyQuoteBtn").onclick = async () => {
-  haptic(15); if (!live) return;
+  haptic(15);
+  if (!live) return;
   const txt = `📜 GOLD PURCHASE ESTIMATE\nDate: ${dateText(live.date)}\n----------------------\n• Base Rate: ${money(live.rate_22k)}/g\n• Weight: ${$("weight").value}g\n• Making (${$("making").value}%): ${$("receiptMaking").textContent}\n• GST (${$("gstRate").value}%): ${$("receiptGst").textContent}\n• Exchange: ${$("receiptOldGold").textContent}\n----------------------\nNET TOTAL: ${$("calcResult").textContent}`;
-  navigator.clipboard?.writeText(txt); toast("Quotation Copied!");
+  navigator.clipboard?.writeText(txt);
+  toast("Quotation Copied!");
 };
 
 function renderStats() {
   if (!history.length) return;
   const vals = history.map(i => Number(i.rate_22k)), hi = Math.max(...vals), lo = Math.min(...vals);
-  $("high").textContent = money(hi); $("low").textContent = money(lo);
+  $("high").textContent = money(hi);
+  $("low").textContent = money(lo);
   $("highDate").textContent = dateText(history.find(i => Number(i.rate_22k) === hi)?.date);
   $("lowDate").textContent = dateText(history.find(i => Number(i.rate_22k) === lo)?.date);
   $("historyCount").textContent = history.length.toLocaleString("en-IN") + " records";
@@ -2098,38 +2272,55 @@ function renderStats() {
   if (!$("dateA").value) $("dateA").value = history[0]?.date || "";
   if (!$("dateB").value) $("dateB").value = history[history.length-1]?.date || "";
 
-  compareDates(); updateFintechMetrics(); computeLastMovement(); drawChart();
+  compareDates();
+  updateFintechMetrics();
+  computeLastMovement();
+  drawChart();
 }
 
 function compareDates() {
   const a = history.find(i => i.date === $("dateA").value), b = history.find(i => i.date === $("dateB").value);
-  if (!a || !b) return $("compareResult").textContent = "Select valid dates.";
+  if (!a || !b) return $("compareResult").textContent = "Select two dates to compare values.";
   const diff = b.rate_22k - a.rate_22k, pct = a.rate_22k ? (diff/a.rate_22k*100) : 0;
   $("compareResult").innerHTML = `<strong>${money(a.rate_22k)} → ${money(b.rate_22k)}</strong><span class="${diff>0?"positive":diff<0?"negative":""}">${diff>=0?"+":""}${money(diff)}/g · ${pct>=0?"+":""}${pct.toFixed(2)}%</span>`;
 }
 
 async function loadPublishedData() {
   const [latest, historical] = await Promise.all([getJSON(LIVE_URL), getJSON(HISTORY_URL)]);
-  history = normalize(historical); renderLive(latest); renderStats(); calculate();
-  localStorage.setItem("gold_live_backup", JSON.stringify(latest)); localStorage.setItem("gold_history_backup", JSON.stringify(history));
+  history = normalize(historical);
+  renderLive(latest);
+  renderStats();
+  calculate();
+  localStorage.setItem("gold_live_backup", JSON.stringify(latest));
+  localStorage.setItem("gold_history_backup", JSON.stringify(history));
   return latest;
 }
 
 async function manualFetch() {
-  if (fetchBusy) return; fetchBusy = true; haptic(15);
+  if (fetchBusy) return;
+  fetchBusy = true;
+  haptic(15);
   setStatus("Connecting to Edge Worker…", false, true);
   try {
     const oldTs = live ? (live.last_checked_at || live.date+"|"+live.time) : "";
     await fetch(WORKER_URL, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ force: true }) });
     setStatus("Parsing live benchmark sources…", false, true);
     let latest = await getJSON(LIVE_URL);
-    for(let i=0; i<8 && (latest.last_checked_at||latest.date+"|"+latest.time)===oldTs; i++) { await sleep(1500); latest = await getJSON(LIVE_URL); }
-    history = normalize(await getJSON(HISTORY_URL)); renderLive(latest); renderStats(); calculate();
-    localStorage.setItem("gold_live_backup", JSON.stringify(latest)); localStorage.setItem("gold_history_backup", JSON.stringify(history));
-    setStatus("Synced at " + timeText(latest.time)); toast("Market Synced");
+    for (let i = 0; i < 8 && (latest.last_checked_at || latest.date + "|" + latest.time) === oldTs; i++) {
+      await sleep(1500);
+      latest = await getJSON(LIVE_URL);
+    }
+    history = normalize(await getJSON(HISTORY_URL));
+    renderLive(latest);
+    renderStats();
+    calculate();
+    localStorage.setItem("gold_live_backup", JSON.stringify(latest));
+    localStorage.setItem("gold_history_backup", JSON.stringify(history));
+    setStatus("Synced at " + timeText(latest.time));
+    toast("Market Synced");
   } catch(e) { 
     setStatus("Using offline cache", true, false); 
-    checkParserHealth({error:"Live sync failed. Showing cached data."}); 
+    checkParserHealth({ error: "Live sync failed. Showing cached data." }); 
     toast("Sync Failed"); 
   }
   finally { 
@@ -2138,7 +2329,13 @@ async function manualFetch() {
 }
 
 $("fetchNow").onclick = manualFetch;
-document.querySelectorAll("#ranges button").forEach(b => b.onclick = () => { haptic(8); document.querySelectorAll("#ranges button").forEach(x => x.classList.remove("active")); b.classList.add("active"); selectedRange = b.dataset.range === "all" ? "all" : Number(b.dataset.range); drawChart(); });
+document.querySelectorAll("#ranges button").forEach(b => b.onclick = () => {
+  haptic(8);
+  document.querySelectorAll("#ranges button").forEach(x => x.classList.remove("active"));
+  b.classList.add("active");
+  selectedRange = b.dataset.range === "all" ? "all" : Number(b.dataset.range);
+  drawChart();
+});
 ["dateA", "dateB"].forEach(id => $(id).addEventListener("change", compareDates));
 ["weight", "budget", "making", "gstRate", "flatFee", "oldWeight", "oldPurity"].forEach(id => $(id).addEventListener("input", calculate));
 
