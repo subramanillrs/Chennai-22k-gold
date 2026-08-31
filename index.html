@@ -91,6 +91,54 @@
   }
 }
 
+/* Manual theme override — takes precedence over OS preference so the
+   in-app toggle always wins, regardless of prefers-color-scheme. */
+html[data-theme="light"] {
+  --bg-app: #f8fafc;
+  --surface: #ffffff;
+  --surface-subtle: #f1f5f9;
+  --surface-elevated: #ffffff;
+  --border-subtle: rgba(15, 23, 42, 0.08);
+  --border-strong: rgba(15, 23, 42, 0.16);
+  --text-main: #0f172a;
+  --text-secondary: #475569;
+  --text-tertiary: #94a3b8;
+  --gold-primary: #d97706;
+  --gold-light: #f59e0b;
+  --gold-tint: rgba(217, 119, 6, 0.08);
+  --gold-border: rgba(217, 119, 6, 0.22);
+  --good: #059669;
+  --good-bg: #d1fae5;
+  --bad: #dc2626;
+  --bad-bg: #fee2e2;
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+  --shadow-card: 0 1px 3px 0 rgba(15, 23, 42, 0.04), 0 4px 12px -2px rgba(15, 23, 42, 0.02);
+  --shadow-hero: 0 10px 28px -4px rgba(15, 23, 42, 0.05), 0 2px 6px -1px rgba(15, 23, 42, 0.02);
+}
+
+html[data-theme="dark"] {
+  --bg-app: #030712;
+  --surface: #0b0f19;
+  --surface-subtle: #111827;
+  --surface-elevated: #182234;
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.16);
+  --text-main: #f8fafc;
+  --text-secondary: #94a3b8;
+  --text-tertiary: #64748b;
+  --gold-primary: #fbbf24;
+  --gold-light: #fcd34d;
+  --gold-tint: rgba(251, 191, 36, 0.1);
+  --gold-border: rgba(251, 191, 36, 0.25);
+  --good: #34d399;
+  --good-bg: rgba(5, 150, 105, 0.15);
+  --bad: #f87171;
+  --bad-bg: rgba(220, 38, 38, 0.15);
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.6);
+  --shadow-card: 0 4px 16px -2px rgba(0, 0, 0, 0.4);
+  --shadow-hero: 0 16px 40px -8px rgba(0, 0, 0, 0.7);
+}
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -183,6 +231,35 @@ button, input, select {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-full);
+  color: var(--text-secondary);
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  transition: all var(--transition);
+}
+.theme-toggle:active { transform: scale(0.92); background: var(--surface-subtle); }
+.theme-toggle svg { width: 15px; height: 15px; }
+.theme-toggle .icon-sun { display: none; }
+.theme-toggle .icon-moon { display: block; }
+html[data-theme="dark"] .theme-toggle .icon-sun { display: block; }
+html[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
 
 .dot {
   width: 7px;
@@ -278,17 +355,33 @@ button, input, select {
 .dismiss-text { font-size: 9.5px; opacity: 0.8; text-transform: uppercase; font-weight: 800; }
 
 /* Redesigned Hero Card */
+/* Redesigned Hero Card — premium focal point */
 .hero {
-  background: var(--surface);
+  background: linear-gradient(180deg, var(--surface) 0%, var(--surface) 100%);
   border: 1px solid var(--border-subtle);
   border-radius: var(--r-lg);
-  padding: 22px 20px;
+  padding: 24px 22px 22px;
   box-shadow: var(--shadow-hero);
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 20px;
   width: 100%;
   position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.hero::before {
+  content: "";
+  position: absolute;
+  top: -60%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 130%;
+  height: 220px;
+  background: radial-gradient(ellipse at center, var(--gold-tint) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: -1;
 }
 
 .hero-top {
@@ -300,14 +393,27 @@ button, input, select {
 }
 
 .hero-label {
-  font-size: 11.5px;
+  font-size: 11px;
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--gold-primary);
   line-height: 14px;
-  display: flex;
+  display: inline-flex;
   align-items: center;
+  gap: 6px;
+  background: var(--gold-tint);
+  border: 1px solid var(--gold-border);
+  padding: 5px 10px 5px 8px;
+  border-radius: var(--r-full);
+}
+.hero-label::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--gold-primary);
+  flex-shrink: 0;
 }
 
 .share-btn {
@@ -333,17 +439,20 @@ button, input, select {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 10px;
-  padding: 2px 0;
+  gap: 12px;
+  padding: 6px 0 2px;
   text-align: center;
 }
 
 .hero-mid h2 {
-  font-size: clamp(38px, 9vw, 54px);
+  font-size: clamp(40px, 10vw, 58px);
   font-weight: 800;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.035em;
   line-height: 1;
-  color: var(--text-main);
+  background: linear-gradient(180deg, var(--text-main) 30%, var(--text-secondary) 130%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .change-pill {
@@ -351,10 +460,10 @@ button, input, select {
   align-items: center;
   justify-content: center;
   gap: 4px;
-  height: 24px;
-  padding: 0 12px;
+  height: 26px;
+  padding: 0 13px;
   border-radius: var(--r-full);
-  font-size: 11.5px;
+  font-size: 12px;
   font-weight: 700;
   line-height: 1;
 }
@@ -366,8 +475,8 @@ button, input, select {
 .hero-details-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 14px;
-  padding-top: 16px;
+  gap: 0;
+  padding-top: 18px;
   border-top: 1px dashed var(--border-subtle);
   width: 100%;
 }
@@ -377,6 +486,14 @@ button, input, select {
   flex-direction: column;
   align-items: flex-start;
   text-align: left;
+  padding: 0 16px;
+}
+.hero-detail-col:first-child {
+  padding-left: 0;
+  border-right: 1px dashed var(--border-subtle);
+}
+.hero-detail-col:last-child {
+  padding-right: 0;
 }
 
 .hero-sub-label {
@@ -386,11 +503,11 @@ button, input, select {
   letter-spacing: 0.06em;
   color: var(--text-tertiary);
   line-height: 14px;
-  margin-bottom: 5px;
+  margin-bottom: 6px;
 }
 
 .hero-sub-val {
-  font-size: 16px;
+  font-size: 17px;
   font-weight: 800;
   color: var(--text-main);
   line-height: 22px;
@@ -797,22 +914,12 @@ details.collapsible .collapsible-content {
 .last-box .amount.positive { color: var(--good); }
 .last-box .amount.negative { color: var(--bad); }
 
-/* Redesigned 3-Column Historical Date Comparison */
+/* Redesigned Net Comparison — date pickers up top, big showcase result below */
 .compare-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr 1.15fr;
+  grid-template-columns: 1fr 1fr;
   gap: 10px;
-  align-items: flex-end;
   width: 100%;
-}
-
-@media (max-width: 480px) {
-  .compare-grid {
-    grid-template-columns: 1fr 1fr;
-  }
-  .compare-result-col {
-    grid-column: span 2;
-  }
 }
 
 .compare-field {
@@ -834,22 +941,42 @@ details.collapsible .collapsible-content {
   white-space: nowrap;
 }
 
-.compare-result-card {
-  height: 44px;
-  padding: 4px 12px;
-  background: var(--surface-subtle);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--r-xs);
+.compare-result-panel {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px dashed var(--border-subtle);
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.compare-result-label {
+  font-size: 10.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  letter-spacing: 0.05em;
+  line-height: 14px;
+}
+
+.compare-result-card {
+  min-height: 60px;
+  padding: 14px 16px;
+  background: var(--gold-tint);
+  border: 1px solid var(--gold-border);
+  border-radius: var(--r-sm);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
   width: 100%;
 }
 
 .compare-result-top {
-  font-size: 12.5px;
+  font-size: 15px;
   font-weight: 800;
-  line-height: 1.2;
+  line-height: 1.25;
   color: var(--text-main);
   white-space: nowrap;
   overflow: hidden;
@@ -857,13 +984,18 @@ details.collapsible .collapsible-content {
 }
 
 .compare-result-sub {
-  font-size: 11px;
-  font-weight: 700;
-  line-height: 1.2;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1;
+  padding: 7px 11px;
+  border-radius: var(--r-full);
+  background: var(--surface);
+  color: var(--text-secondary);
   white-space: nowrap;
+  flex-shrink: 0;
 }
-.compare-result-sub.positive { color: var(--good); }
-.compare-result-sub.negative { color: var(--bad); }
+.compare-result-sub.positive { color: var(--good); background: var(--good-bg); }
+.compare-result-sub.negative { color: var(--bad); background: var(--bad-bg); }
 
 /* Jewelry Purchase Suite */
 .calc-suite {
@@ -1152,17 +1284,17 @@ select.calc-input {
 }
 
 .history-table th:nth-child(1), .history-table td:nth-child(1) {
-  width: 38%;
+  width: 33.34%;
   text-align: left;
   white-space: nowrap;
 }
 .history-table th:nth-child(2), .history-table td:nth-child(2) {
-  width: 31%;
+  width: 33.33%;
   text-align: right;
   white-space: nowrap;
 }
 .history-table th:nth-child(3), .history-table td:nth-child(3) {
-  width: 31%;
+  width: 33.33%;
   text-align: right;
   white-space: nowrap;
 }
@@ -1252,9 +1384,15 @@ footer {
     <div class="brand-text">
       <h1>Gold 22k rate</h1>
     </div>
-    <div class="status-indicator" id="status">
-      <span class="dot"></span>
-      <span id="statusText">Checking live feed…</span>
+    <div class="topbar-actions">
+      <div class="status-indicator" id="status">
+        <span class="dot"></span>
+        <span id="statusText">Checking live feed…</span>
+      </div>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle dark mode">
+        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"/></svg>
+      </button>
     </div>
   </header>
 
@@ -1453,12 +1591,12 @@ footer {
           <label>Later Date</label>
           <input class="calc-input" type="date" id="dateB">
         </div>
-        <div class="compare-field compare-result-col">
-          <label>Net Comparison</label>
-          <div class="compare-result-card" id="compareResult">
-            <span class="compare-result-top">Select two dates</span>
-            <span class="compare-result-sub">—</span>
-          </div>
+      </div>
+      <div class="compare-result-panel">
+        <span class="compare-result-label">Net Comparison</span>
+        <div class="compare-result-card" id="compareResult">
+          <span class="compare-result-top">Select two dates</span>
+          <span class="compare-result-sub">—</span>
         </div>
       </div>
     </div>
@@ -1608,6 +1746,40 @@ let fetchBusy = false;
 let scrubIndex = -1;
 
 const $ = id => document.getElementById(id);
+
+/* Theme toggle — manual override persisted in localStorage.
+   Falls back to the OS preference (handled purely by CSS media query)
+   until the user makes an explicit choice. */
+(function setupThemeToggle() {
+  const root = document.documentElement;
+  const metaLight = document.querySelector('meta[name="theme-color"][media*="light"]');
+  const metaDark = document.querySelector('meta[name="theme-color"][media*="dark"]');
+
+  function applyTheme(theme) {
+    if (theme === "light" || theme === "dark") {
+      root.setAttribute("data-theme", theme);
+    } else {
+      root.removeAttribute("data-theme");
+    }
+    const isDark = theme === "dark" || (!theme && window.matchMedia("(prefers-color-scheme: dark)").matches);
+    const color = isDark ? "#030712" : "#f8fafc";
+    if (metaLight) metaLight.setAttribute("content", color);
+    if (metaDark) metaDark.setAttribute("content", color);
+    if (typeof drawChart === "function") requestAnimationFrame(drawChart);
+  }
+
+  const saved = localStorage.getItem("gold_theme");
+  applyTheme(saved);
+
+  $("themeToggle").onclick = () => {
+    haptic(8);
+    const current = root.getAttribute("data-theme") ||
+      (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    const next = current === "dark" ? "light" : "dark";
+    localStorage.setItem("gold_theme", next);
+    applyTheme(next);
+  };
+})();
 
 let audioCtx = null;
 function playTick(freq = 800, duration = 0.015) {
