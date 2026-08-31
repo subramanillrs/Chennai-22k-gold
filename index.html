@@ -64,6 +64,8 @@
   --shadow-fab: 0 8px 24px -4px rgba(217, 119, 6, 0.24), 0 2px 6px -1px rgba(0, 0, 0, 0.06);
 
   --transition: 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  --shine-x: 50%;
+  --shine-y: 50%;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -213,6 +215,40 @@ button, input, select {
   100% { transform: scale(0.95); opacity: 0.8; }
 }
 
+/* Macro Purity Ticker Strip */
+.purity-strip {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  width: 100%;
+}
+
+.purity-card {
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  box-shadow: var(--shadow-sm), var(--specular);
+}
+
+.purity-card small {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  letter-spacing: 0.05em;
+}
+
+.purity-card b {
+  font-size: 13.5px;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
 .warning-banner {
   display: flex;
   align-items: flex-start;
@@ -264,6 +300,7 @@ button, input, select {
   to { opacity: 1; transform: translateY(0); }
 }
 
+/* Premium Specular Hero Card */
 .hero {
   background: var(--surface);
   border: 1px solid var(--border-subtle);
@@ -276,12 +313,24 @@ button, input, select {
   width: 100%;
   position: relative;
   overflow: hidden;
+  transition: transform 0.1s ease-out;
+}
+
+.hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(circle 280px at var(--shine-x) var(--shine-y), rgba(245, 158, 11, 0.09), transparent 80%);
+  z-index: 1;
 }
 
 .hero-top {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  position: relative;
+  z-index: 2;
 }
 
 .hero-label {
@@ -336,7 +385,7 @@ button, input, select {
 
 .change-pill.mini {
   padding: 4px 8px;
-  font-size: 10px;
+  font-size: 10.5px;
 }
 
 .price-row-large {
@@ -357,6 +406,8 @@ button, input, select {
   display: flex;
   flex-direction: column;
   gap: 4px;
+  position: relative;
+  z-index: 2;
 }
 
 .hero-mid h2 {
@@ -378,6 +429,8 @@ button, input, select {
   gap: 16px;
   padding-top: 16px;
   border-top: 1px solid var(--border-subtle);
+  position: relative;
+  z-index: 2;
 }
 
 .hero-detail-col {
@@ -430,6 +483,7 @@ button, input, select {
   display: block;
 }
 
+/* Collapsible Details */
 details.collapsible {
   background: var(--surface);
   border: 1px solid var(--border-subtle);
@@ -566,6 +620,71 @@ details.collapsible .collapsible-content {
   font-size: 11.5px;
   font-weight: 800;
   line-height: 1;
+}
+
+/* 3-Year Range Slider Card */
+.range-gauge-card {
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  box-shadow: var(--shadow-card), var(--specular);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+.range-gauge-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  letter-spacing: 0.05em;
+}
+
+.range-track {
+  width: 100%;
+  height: 8px;
+  background: var(--surface-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-full);
+  position: relative;
+  overflow: visible;
+}
+
+.range-bar {
+  height: 100%;
+  background: var(--gold-gradient);
+  border-radius: var(--radius-full);
+  width: 50%;
+  position: relative;
+  transition: width 0.4s ease;
+}
+
+.range-indicator {
+  position: absolute;
+  right: -5px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 2.5px solid var(--gold-primary);
+  box-shadow: 0 0 6px rgba(217, 119, 6, 0.4);
+}
+
+.range-labels {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--text-secondary);
 }
 
 .quick-grid {
@@ -832,7 +951,7 @@ details.collapsible .collapsible-content {
   overflow-x: auto;
   scrollbar-width: none;
   padding-bottom: 4px;
-  margin-bottom: 14px;
+  margin-bottom: 12px;
   width: 100%;
 }
 .chip-container::-webkit-scrollbar { display: none; }
@@ -858,6 +977,11 @@ details.collapsible .collapsible-content {
 
 .chip:active {
   transform: scale(0.96);
+}
+
+.chip.mini {
+  padding: 4px 10px;
+  font-size: 10.5px;
 }
 
 .calc-grid {
@@ -905,6 +1029,15 @@ select.calc-input {
   cursor: pointer;
 }
 
+.preset-title {
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  margin-bottom: 6px;
+  margin-top: 6px;
+}
+
 .receipt-box {
   margin-top: 14px;
   padding: 14px 16px;
@@ -941,6 +1074,10 @@ select.calc-input {
   color: var(--text-primary);
 }
 
+.receipt-line.deduction span:last-child {
+  color: var(--good);
+}
+
 .receipt-total {
   margin-top: 4px;
   padding-top: 8px;
@@ -966,6 +1103,34 @@ select.calc-input {
   font-size: 11px;
   color: var(--text-tertiary);
   text-align: right;
+}
+
+.quote-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.quote-btn {
+  flex: 1;
+  padding: 10px;
+  border-radius: var(--radius-xs);
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.quote-btn:active {
+  transform: scale(0.98);
+  background: var(--surface-subtle);
 }
 
 .last-box {
@@ -1210,6 +1375,22 @@ footer {
     </div>
   </header>
 
+  <!-- Macro Karat Ticker Strip -->
+  <section class="purity-strip">
+    <div class="purity-card">
+      <small>24K (99.9%)</small>
+      <b id="purity24">₹—</b>
+    </div>
+    <div class="purity-card">
+      <small>22K (91.6%)</small>
+      <b id="purity22">₹—</b>
+    </div>
+    <div class="purity-card">
+      <small>18K (75.0%)</small>
+      <b id="purity18">₹—</b>
+    </div>
+  </section>
+
   <div class="warning-banner" id="parserWarning" hidden>
     <div class="warning-icon">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
@@ -1226,7 +1407,8 @@ footer {
 
   <div hidden><button id="fetchNow"><span id="fetchNowText">Fetch</span></button></div>
 
-  <section class="hero">
+  <!-- Specular Hero Card with Tilt Response -->
+  <section class="hero" id="heroCard">
     <div class="hero-top">
       <span class="hero-label">1 Sovereign (8 Grams)</span>
       <div class="hero-actions">
@@ -1265,6 +1447,24 @@ footer {
     </div>
   </section>
 
+  <!-- 3-Year Range Gauge Bar -->
+  <section class="range-gauge-card">
+    <div class="range-gauge-head">
+      <span>3Y Valuation Range</span>
+      <span id="rangePositionText">—</span>
+    </div>
+    <div class="range-track">
+      <div class="range-bar" id="rangeBar" style="width: 50%;">
+        <div class="range-indicator"></div>
+      </div>
+    </div>
+    <div class="range-labels">
+      <span id="gaugeLow">Low: ₹—</span>
+      <span id="gaugeHigh">High: ₹—</span>
+    </div>
+  </section>
+
+  <!-- Collapsible Multi-Horizon -->
   <details class="collapsible">
     <summary>
       <div class="summary-title">
@@ -1303,6 +1503,7 @@ footer {
     </div>
   </details>
 
+  <!-- Collapsible Moving Average -->
   <details class="collapsible">
     <summary>
       <div class="summary-title">
@@ -1376,7 +1577,7 @@ footer {
     </div>
 
     <div class="panel">
-      <!-- Completely Redesigned Chart Header Metrics -->
+      <!-- Clean High-Visibility Header Metrics -->
       <div class="chart-header-metrics">
         <div class="primary-metric">
           <span id="chartMetricLabel">Change</span>
@@ -1439,9 +1640,10 @@ footer {
 
   <section class="section">
     <div class="section-head">
-      <h3>Jewelry Purchase Calculator</h3>
+      <h3>Jewelry Purchase & Exchange Suite</h3>
     </div>
     <div class="panel">
+      <div class="preset-title">Select Preset Weight</div>
       <div class="chip-container" id="weightChips">
         <button class="chip" data-val="1" type="button">1g</button>
         <button class="chip" data-val="4" type="button">4g (Half)</button>
@@ -1450,6 +1652,14 @@ footer {
         <button class="chip" data-val="24" type="button">24g (3 Sov)</button>
         <button class="chip" data-val="50" type="button">50g</button>
         <button class="chip" data-val="100" type="button">100g</button>
+      </div>
+
+      <div class="preset-title">Jewelry Making Category</div>
+      <div class="chip-container" id="makingChips">
+        <button class="chip mini" data-val="3.0" type="button">Coin (3%)</button>
+        <button class="chip mini active" data-val="8.0" type="button">Plain (8%)</button>
+        <button class="chip mini" data-val="12.0" type="button">Studded (12%)</button>
+        <button class="chip mini" data-val="16.0" type="button">Antique (16%)</button>
       </div>
 
       <div class="calc-grid">
@@ -1477,13 +1687,31 @@ footer {
           <input class="calc-input" id="gstRate" type="number" inputmode="decimal" min="0" step="0.1" value="3.0">
         </div>
         <div class="calc-field">
-          <label>Hallmarking / Flat Fees (₹)</label>
+          <label>Hallmarking Fee (₹)</label>
           <input class="calc-input" id="flatFee" type="number" inputmode="decimal" min="0" step="1" value="45">
         </div>
       </div>
 
+      <!-- Old Gold Exchange Module -->
+      <div class="preset-title" style="margin-top: 14px;">Old Gold Exchange (Optional)</div>
+      <div class="calc-grid">
+        <div class="calc-field">
+          <label>Old Scrap Weight (g)</label>
+          <input class="calc-input" id="oldWeight" type="number" inputmode="decimal" min="0" step="0.01" value="0">
+        </div>
+        <div class="calc-field">
+          <label>Old Gold Purity</label>
+          <select class="calc-input" id="oldPurity">
+            <option value="22">22K (91.6% Pure)</option>
+            <option value="18">18K (75.0% Pure)</option>
+            <option value="24">24K (99.9% Pure)</option>
+            <option value="20">84.0% Standard Melt</option>
+          </select>
+        </div>
+      </div>
+
       <div class="receipt-box">
-        <div class="receipt-title">Itemized Cost Breakdown</div>
+        <div class="receipt-title">Itemized Quotation Breakdown</div>
         <div class="receipt-line">
           <span>Base 22K Gold Cost:</span>
           <span id="receiptBase">₹0</span>
@@ -1500,11 +1728,25 @@ footer {
           <span>Hallmarking / Misc Fees:</span>
           <span id="receiptFee">₹0</span>
         </div>
+        <div class="receipt-line deduction" id="receiptOldGoldLine" style="display:none;">
+          <span>Old Gold Exchange Credit:</span>
+          <span id="receiptOldGold">-₹0</span>
+        </div>
         <div class="receipt-total">
-          <span class="label" id="receiptTotalLabel">Total Estimated Price</span>
+          <span class="label" id="receiptTotalLabel">Net Payable Amount</span>
           <span class="final-val" id="calcResult">₹—</span>
         </div>
         <div class="calc-subtext" id="calcSub">Based on live 22K rate.</div>
+
+        <div class="quote-actions">
+          <button class="quote-btn" id="copyQuoteBtn" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+            </svg>
+            <span>Copy Quotation Slip</span>
+          </button>
+        </div>
       </div>
     </div>
   </section>
@@ -1531,7 +1773,7 @@ footer {
   </section>
 
   <footer>
-    <div>Gold 22k rate · Live Tracker</div>
+    <div>Gold 22k rate · Institutional Terminal</div>
     <div>Synchronized via Cloudflare Edge Worker · Sources: LiveChennai + GoodReturns</div>
   </footer>
 
@@ -1566,10 +1808,30 @@ let scrubIndex = -1;
 
 const $ = id => document.getElementById(id);
 
-const haptic = (ms = 10) => {
+/* Luxury Synthesizer Audio Tick & Haptic */
+let audioCtx = null;
+function playTick(freq = 800, duration = 0.015) {
+  try {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = "sine";
+    osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+    gain.gain.setValueAtTime(0.04, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start();
+    osc.stop(audioCtx.currentTime + duration);
+  } catch(e) {}
+}
+
+const haptic = (ms = 10, freq = 800) => {
   if ("vibrate" in navigator) {
     try { navigator.vibrate(ms); } catch (_) {}
   }
+  playTick(freq);
 };
 
 const money = n => {
@@ -1610,6 +1872,19 @@ function toast(text) {
 }
 
 function sleep(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
+
+/* Dynamic Hero Shimmer / Specular Lighting */
+(function setupHeroSpecular() {
+  const hero = $("heroCard");
+  if (!hero) return;
+  hero.addEventListener("mousemove", e => {
+    const rect = hero.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100;
+    hero.style.setProperty("--shine-x", `${x}%`);
+    hero.style.setProperty("--shine-y", `${y}%`);
+  });
+})();
 
 function checkParserHealth(data, networkError = false) {
   const warningBox = $("parserWarning");
@@ -1682,6 +1957,11 @@ function renderLive(d) {
   $("today").textContent = dateText(d.date);
   $("todayTime").textContent = timeText(d.time);
   $("session").textContent = d.session || "—";
+
+  // Macro Purity Strip Updates
+  $("purity22").textContent = money(rate) + "/g";
+  $("purity24").textContent = money(Math.round(rate * (24 / 22))) + "/g";
+  $("purity18").textContent = money(Math.round(rate * (18 / 22))) + "/g";
 
   let change1 = Number(d.change);
   if (!Number.isFinite(change1)) {
@@ -1804,11 +2084,42 @@ function updateFintechMetrics() {
     pill.className = "sentiment-pill down";
     pill.textContent = `▼ -${money(Math.abs(smaDiff))} (${smaPct.toFixed(1)}%) Pullback`;
   }
+
+  // 3-Year Valuation Range Slider Gauge Calculation
+  const high = Math.max(...values);
+  const low = Math.min(...values);
+  const rangeSpan = high - low;
+  const rangePct = rangeSpan > 0 ? Math.min(100, Math.max(0, ((currentRate - low) / rangeSpan) * 100)) : 50;
+  
+  $("rangeBar").style.width = rangePct.toFixed(1) + "%";
+  $("gaugeLow").textContent = `3Y Low: ${money(low)}`;
+  $("gaugeHigh").textContent = `3Y High: ${money(high)}`;
+  $("rangePositionText").textContent = `${rangePct.toFixed(0)}% of 3-Year Range`;
 }
 
 function chartData() {
   if (selectedRange === "all") return history;
   return history.slice(Math.max(0, history.length - Number(selectedRange)));
+}
+
+/* Institutional Bézier Spline Curve Algorithm */
+function drawSpline(ctx, pts) {
+  if (pts.length < 2) return;
+  ctx.beginPath();
+  ctx.moveTo(pts[0].x, pts[0].y);
+  for (let i = 0; i < pts.length - 1; i++) {
+    const p0 = pts[i === 0 ? i : i - 1];
+    const p1 = pts[i];
+    const p2 = pts[i + 1];
+    const p3 = pts[i + 2 < pts.length ? i + 2 : i + 1];
+
+    const cp1x = p1.x + (p2.x - p0.x) / 6;
+    const cp1y = p1.y + (p2.y - p0.y) / 6;
+    const cp2x = p2.x - (p3.x - p1.x) / 6;
+    const cp2y = p2.y - (p3.y - p1.y) / 6;
+
+    ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, p2.x, p2.y);
+  }
 }
 
 function drawChart() {
@@ -1848,17 +2159,20 @@ function drawChart() {
   const values = data.map(item => Number(item.rate_22k));
   const min0 = Math.min(...values);
   const max0 = Math.max(...values);
-  const pad = Math.max(60, (max0 - min0) * 0.12);
+  const pad = Math.max(60, (max0 - min0) * 0.14);
   const min = min0 - pad;
   const max = max0 + pad;
 
-  const L = 46, R = 10, T = 10, B = 20;
+  const L = 46, R = 10, T = 12, B = 20;
   const plotWidth = width - L - R;
   const plotHeight = height - T - B;
 
-  const px = i => L + (i / (data.length - 1)) * plotWidth;
-  const py = value => T + (1 - ((value - min) / (max - min))) * plotHeight;
+  const points = values.map((val, i) => ({
+    x: L + (i / (values.length - 1)) * plotWidth,
+    y: T + (1 - ((val - min) / (max - min))) * plotHeight
+  }));
 
+  // Grid Lines
   ctx.font = "10px var(--font-display)";
   ctx.lineWidth = 1;
   ctx.textAlign = "right";
@@ -1876,39 +2190,40 @@ function drawChart() {
     ctx.fillText(money(value), L - 6, gy + 3.5);
   }
 
-  ctx.beginPath();
-  ctx.moveTo(px(0), py(values[0]));
-  for (let i = 1; i < values.length; i++) ctx.lineTo(px(i), py(values[i]));
-  ctx.lineTo(px(values.length - 1), height - B);
-  ctx.lineTo(px(0), height - B);
+  // Smooth Bézier Gradient Fill
+  drawSpline(ctx, points);
+  ctx.lineTo(points[points.length - 1].x, height - B);
+  ctx.lineTo(points[0].x, height - B);
   ctx.closePath();
 
   const gradient = ctx.createLinearGradient(0, T, 0, height);
-  gradient.addColorStop(0, "rgba(217, 119, 6, 0.18)");
+  gradient.addColorStop(0, "rgba(217, 119, 6, 0.24)");
   gradient.addColorStop(1, "rgba(217, 119, 6, 0)");
   ctx.fillStyle = gradient;
   ctx.fill();
 
-  ctx.beginPath();
-  ctx.moveTo(px(0), py(values[0]));
-  for (let i = 1; i < values.length; i++) ctx.lineTo(px(i), py(values[i]));
+  // Smooth Glowing Stroke
+  ctx.save();
+  ctx.shadowColor = "rgba(245, 158, 11, 0.5)";
+  ctx.shadowBlur = 8;
+  drawSpline(ctx, points);
   ctx.strokeStyle = colorGold;
-  ctx.lineWidth = 2.5;
+  ctx.lineWidth = 2.8;
   ctx.lineJoin = "round";
   ctx.lineCap = "round";
   ctx.stroke();
+  ctx.restore();
 
   const activeIndex = (scrubIndex >= 0 && scrubIndex < data.length) ? scrubIndex : (data.length - 1);
-  const activeX = px(activeIndex);
-  const activeY = py(values[activeIndex]);
+  const activePt = points[activeIndex];
 
   if (scrubIndex >= 0) {
     ctx.strokeStyle = colorGold;
     ctx.lineWidth = 1;
     ctx.setLineDash([4, 4]);
     ctx.beginPath();
-    ctx.moveTo(activeX, T);
-    ctx.lineTo(activeX, height - B);
+    ctx.moveTo(activePt.x, T);
+    ctx.lineTo(activePt.x, height - B);
     ctx.stroke();
     ctx.setLineDash([]);
 
@@ -1916,10 +2231,10 @@ function drawChart() {
     ctx.font = "bold 11px var(--font-display)";
     const tagW = ctx.measureText(tooltipText).width + 16;
     const tagH = 24;
-    let tagX = activeX - tagW / 2;
+    let tagX = activePt.x - tagW / 2;
     if (tagX < L) tagX = L;
     if (tagX + tagW > width - R) tagX = width - R - tagW;
-    const tagY = Math.max(T + 4, activeY - 32);
+    const tagY = Math.max(T + 4, activePt.y - 32);
 
     ctx.fillStyle = colorSurface;
     ctx.shadowColor = "rgba(0,0,0,0.15)";
@@ -1938,9 +2253,10 @@ function drawChart() {
     ctx.fillText(tooltipText, tagX + tagW / 2, tagY + 16);
   }
 
+  // Active Data Dot
   ctx.fillStyle = colorGold;
   ctx.beginPath();
-  ctx.arc(activeX, activeY, scrubIndex >= 0 ? 6 : 4.5, 0, Math.PI * 2);
+  ctx.arc(activePt.x, activePt.y, scrubIndex >= 0 ? 6 : 4.5, 0, Math.PI * 2);
   ctx.fill();
   ctx.strokeStyle = colorSurface;
   ctx.lineWidth = 2;
@@ -1984,7 +2300,7 @@ function drawChart() {
     const idx = Math.round(ratio * (data.length - 1));
     if (idx !== scrubIndex) {
       scrubIndex = idx;
-      haptic(5);
+      haptic(5, 1200);
       drawChart();
     }
   }
@@ -2018,26 +2334,37 @@ function calculate() {
   const gstPct = Math.max(0, Number($("gstRate").value) || 0);
   const flatFee = Math.max(0, Number($("flatFee").value) || 0);
 
+  const oldWeight = Math.max(0, Number($("oldWeight").value) || 0);
+  const oldPurityKarat = Number($("oldPurity").value) || 22;
+  const oldGoldCredit = oldWeight > 0 ? (oldWeight * (rate * (oldPurityKarat / 22))) : 0;
+
   $("receiptMakingLabel").textContent = `Making Charges (${makingPct}%):`;
   $("receiptGstLabel").textContent = `GST (${gstPct}%):`;
+
+  if (oldGoldCredit > 0) {
+    $("receiptOldGoldLine").style.display = "flex";
+    $("receiptOldGold").textContent = "- " + money(oldGoldCredit);
+  } else {
+    $("receiptOldGoldLine").style.display = "none";
+  }
 
   if (mode === "value") {
     const goldValue = rate * weight;
     const makingAmount = goldValue * (makingPct / 100);
     const subtotal = goldValue + makingAmount + flatFee;
     const gstAmount = subtotal * (gstPct / 100);
-    const grandTotal = subtotal + gstAmount;
+    const grandTotal = Math.max(0, subtotal + gstAmount - oldGoldCredit);
 
     $("receiptBase").textContent = money(goldValue);
     $("receiptMaking").textContent = money(makingAmount);
     $("receiptGst").textContent = money(gstAmount);
     $("receiptFee").textContent = money(flatFee);
 
-    $("receiptTotalLabel").textContent = "Total Estimated Price";
+    $("receiptTotalLabel").textContent = "Net Payable Amount";
     $("calcResult").textContent = money(grandTotal);
-    $("calcSub").textContent = `For ${weight.toLocaleString("en-IN")} grams at current ₹${rate}/g`;
+    $("calcSub").textContent = `For ${weight.toLocaleString("en-IN")}g at ₹${rate}/g ${oldGoldCredit > 0 ? '(Exchange Deducted)' : ''}`;
   } else {
-    const effectiveBudget = budget / (1 + gstPct / 100) - flatFee;
+    const effectiveBudget = (budget + oldGoldCredit) / (1 + gstPct / 100) - flatFee;
     const goldBase = effectiveBudget > 0 ? effectiveBudget / (1 + makingPct / 100) : 0;
     const grams = rate > 0 ? goldBase / rate : 0;
 
@@ -2052,13 +2379,14 @@ function calculate() {
 
     $("receiptTotalLabel").textContent = "Purchasable Gold Weight";
     $("calcResult").textContent = grams.toFixed(3) + " g";
-    $("calcSub").textContent = `Fits budget ${money(budget)} after all taxes and charges`;
+    $("calcSub").textContent = `Fits net budget ${money(budget)} with exchange credit included`;
   }
 }
 
+// Preset Making & Weight Listeners
 document.querySelectorAll("#weightChips .chip").forEach(chip => {
   chip.onclick = () => {
-    haptic(10);
+    haptic(10, 900);
     document.querySelectorAll("#weightChips .chip").forEach(c => c.classList.remove("active"));
     chip.classList.add("active");
     $("weight").value = chip.dataset.val;
@@ -2067,8 +2395,36 @@ document.querySelectorAll("#weightChips .chip").forEach(chip => {
   };
 });
 
+document.querySelectorAll("#makingChips .chip").forEach(chip => {
+  chip.onclick = () => {
+    haptic(10, 1000);
+    document.querySelectorAll("#makingChips .chip").forEach(c => c.classList.remove("active"));
+    chip.classList.add("active");
+    $("making").value = chip.dataset.val;
+    calculate();
+  };
+});
+
+// Copy Quotation Slip Action
+$("copyQuoteBtn").onclick = async () => {
+  haptic(15, 1100);
+  if (!live) return;
+  const rate = Number(live.rate_22k);
+  const weight = $("weight").value;
+  const making = $("making").value;
+  const net = $("calcResult").textContent;
+  const date = dateText(live.date);
+
+  const quotationText = `📜 GOLD 22K PURCHASE ESTIMATE\nDate: ${date} (${live.session || 'IST'})\n---------------------------------\n• Benchmark Rate: ${money(rate)}/g\n• Weight: ${weight} grams\n• Base Gold: ${$("receiptBase").textContent}\n• Making (${making}%): ${$("receiptMaking").textContent}\n• GST (3%): ${$("receiptGst").textContent}\n• Fees: ${$("receiptFee").textContent}\n${$("oldWeight").value > 0 ? `• Old Gold Credit: ${$("receiptOldGold").textContent}\n` : ''}---------------------------------\nTOTAL ESTIMATED: ${net}\n---------------------------------\nCalculated via Gold 22k Tracker`;
+
+  if (navigator.clipboard) {
+    await navigator.clipboard.writeText(quotationText);
+    toast("Quotation Slip copied!");
+  }
+};
+
 $("shareBtn").onclick = async () => {
-  haptic(15);
+  haptic(15, 1200);
   if (!live) return;
   const rate1 = Number(live.rate_22k);
   const rate8 = Number.isFinite(Number(live.rate_8g)) ? Number(live.rate_8g) : rate1 * 8;
@@ -2214,7 +2570,7 @@ async function waitForUpdatedData(oldTimestamp) {
 async function manualFetch() {
   if (fetchBusy) return;
   fetchBusy = true;
-  haptic(15);
+  haptic(15, 800);
 
   const button = $("refresh");
   const label = $("fabLabel");
@@ -2335,7 +2691,7 @@ $("fetchNow").onclick = manualFetch;
 
 document.querySelectorAll("#ranges button").forEach(button => {
   button.onclick = () => {
-    haptic(8);
+    haptic(8, 900);
     document.querySelectorAll("#ranges button").forEach(item => item.classList.remove("active"));
     button.classList.add("active");
     selectedRange = button.dataset.range === "all" ? "all" : Number(button.dataset.range);
@@ -2344,7 +2700,7 @@ document.querySelectorAll("#ranges button").forEach(button => {
 });
 
 ["dateA", "dateB"].forEach(id => $(id).addEventListener("change", compareDates));
-["weight", "budget", "making", "gstRate", "flatFee"].forEach(id => $(id).addEventListener("input", calculate));
+["weight", "budget", "making", "gstRate", "flatFee", "oldWeight", "oldPurity"].forEach(id => $(id).addEventListener("input", calculate));
 $("calcMode").addEventListener("change", calculate);
 
 document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") refresh(); });
