@@ -25,14 +25,13 @@
   color-scheme: light dark;
   --font-sans: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", sans-serif;
 
-  /* Strict Harmonic Spatial Geometry */
   --r-xs: 6px;
   --r-sm: 10px;
   --r-md: 14px;
   --r-lg: 20px;
   --r-full: 9999px;
 
-  /* Theme Tokens */
+  /* Color System */
   --bg-app: #f8fafc;
   --surface: #ffffff;
   --surface-subtle: #f1f5f9;
@@ -484,12 +483,11 @@ button, input, select {
   text-overflow: ellipsis;
 }
 
-/* Side-by-Side (Left & Right) Timeline */
+/* Left & Right Side-by-Side Timeline */
 .timeline-horizontal {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  position: relative;
+  gap: 10px;
   width: 100%;
 }
 
@@ -501,7 +499,6 @@ button, input, select {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  position: relative;
   overflow: hidden;
 }
 
@@ -763,7 +760,7 @@ details.collapsible .collapsible-content {
 .last-box .amount.positive { color: var(--good); }
 .last-box .amount.negative { color: var(--bad); }
 
-/* Completely Redesigned Ground-Up Jewelry Purchase Suite */
+/* Pixel-Precision Redesigned Jewelry Purchase Suite */
 .calc-suite {
   display: flex;
   flex-direction: column;
@@ -779,6 +776,7 @@ details.collapsible .collapsible-content {
   border-radius: var(--r-full);
   padding: 3px;
   gap: 3px;
+  width: 100%;
 }
 
 .calc-mode-btn {
@@ -792,6 +790,7 @@ details.collapsible .collapsible-content {
   display: flex;
   align-items: center;
   justify-content: center;
+  text-align: center;
 }
 
 .calc-mode-btn.active {
@@ -800,13 +799,21 @@ details.collapsible .collapsible-content {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
-.calc-section-label {
+.calc-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+}
+
+.calc-group-label {
   font-size: 10.5px;
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: var(--text-tertiary);
-  margin-bottom: 6px;
+  line-height: 14px;
+  height: 14px;
   display: block;
 }
 
@@ -816,6 +823,7 @@ details.collapsible .collapsible-content {
   overflow-x: auto;
   scrollbar-width: none;
   width: 100%;
+  padding-bottom: 2px;
 }
 .chip-container::-webkit-scrollbar { display: none; }
 .chip {
@@ -833,6 +841,7 @@ details.collapsible .collapsible-content {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
 }
 .chip.active {
   background: var(--gold-tint);
@@ -841,17 +850,16 @@ details.collapsible .collapsible-content {
 }
 .chip:active { transform: scale(0.96); }
 
-.calc-input-block {
+.calc-grid-form {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
   width: 100%;
 }
 
 .calc-field {
   display: flex;
   flex-direction: column;
-  gap: 4px;
   width: 100%;
 }
 
@@ -861,22 +869,18 @@ details.collapsible .collapsible-content {
   text-transform: uppercase;
   color: var(--text-tertiary);
   letter-spacing: 0.05em;
-  line-height: 13px;
+  line-height: 14px;
+  height: 14px;
+  margin-bottom: 6px;
+  display: block;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.calc-input-wrapper {
-  position: relative;
-  display: flex;
-  align-items: center;
-  width: 100%;
-}
-
 .calc-input {
   width: 100%;
-  height: 42px;
+  height: 44px;
   padding: 0 12px;
   background: var(--surface-subtle);
   border: 1px solid var(--border-subtle);
@@ -885,6 +889,7 @@ details.collapsible .collapsible-content {
   font-weight: 700;
   color: var(--text-main);
   transition: border-color var(--transition);
+  line-height: 44px;
 }
 .calc-input:focus {
   background: var(--surface);
@@ -901,8 +906,7 @@ select.calc-input {
   padding-right: 30px;
 }
 
-/* Sleek Exchange Toggle Drawer */
-.exchange-toggle-box {
+.exchange-drawer {
   background: var(--surface-subtle);
   border: 1px solid var(--border-subtle);
   border-radius: var(--r-sm);
@@ -910,18 +914,14 @@ select.calc-input {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  width: 100%;
 }
 
 .exchange-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.exchange-header span {
   font-size: 11.5px;
   font-weight: 800;
   color: var(--text-main);
+  line-height: 1.2;
 }
 
 .receipt-card {
@@ -934,6 +934,7 @@ select.calc-input {
   gap: 8px;
   width: 100%;
 }
+
 .receipt-title {
   font-size: 10.5px;
   font-weight: 800;
@@ -944,6 +945,7 @@ select.calc-input {
   border-bottom: 1px dashed var(--border-subtle);
   line-height: 1.2;
 }
+
 .receipt-line {
   display: flex;
   justify-content: space-between;
@@ -979,7 +981,7 @@ select.calc-input {
 
 .quote-btn {
   width: 100%;
-  height: 38px;
+  height: 40px;
   margin-top: 4px;
   border-radius: var(--r-xs);
   background: var(--surface);
@@ -1149,7 +1151,7 @@ footer {
 
   <header class="topbar">
     <div class="brand-text">
-      <h1>Gold 22k</h1>
+      <h1>Gold 22k rate</h1>
     </div>
     <div class="status-indicator" id="status">
       <span class="dot"></span>
@@ -1342,7 +1344,7 @@ footer {
       <h3>Compare Historical Dates</h3>
     </div>
     <div class="panel">
-      <div class="calc-grid">
+      <div class="calc-grid-form">
         <div class="calc-field"><label>Earlier Date</label><input class="calc-input" type="date" id="dateA"></div>
         <div class="calc-field"><label>Later Date</label><input class="calc-input" type="date" id="dateB"></div>
       </div>
@@ -1350,7 +1352,7 @@ footer {
     </div>
   </section>
 
-  <!-- Ground-Up Redesigned Jewelry Valuation Suite -->
+  <!-- Completely Redesigned Jewelry Valuation Suite -->
   <section class="section">
     <div class="section-head">
       <h3>Jewelry Purchase & Exchange Suite</h3>
@@ -1358,7 +1360,7 @@ footer {
     <div class="panel">
       <div class="calc-suite">
         
-        <!-- Segmented Mode Control -->
+        <!-- Calculation Mode Switcher -->
         <div class="calc-segmented-mode">
           <button class="calc-mode-btn active" type="button" data-mode="value">Calculate Price by Weight</button>
           <button class="calc-mode-btn" type="button" data-mode="grams">Calculate Weight by Budget</button>
@@ -1368,37 +1370,38 @@ footer {
           </select>
         </div>
 
-        <!-- Weight Presets Section -->
-        <div>
-          <span class="calc-section-label">Select Standard Gold Weight</span>
+        <!-- Standard Gold Weight Presets (1g, 4g, 8g...) -->
+        <div class="calc-group">
+          <span class="calc-group-label">Standard Gold Weight</span>
           <div class="chip-container" id="weightChips">
+            <button class="chip" data-val="1" type="button">1g</button>
+            <button class="chip" data-val="4" type="button">4g (Half)</button>
             <button class="chip active" data-val="8" type="button">8g (1 Sov)</button>
             <button class="chip" data-val="16" type="button">16g (2 Sov)</button>
             <button class="chip" data-val="24" type="button">24g (3 Sov)</button>
             <button class="chip" data-val="50" type="button">50g</button>
             <button class="chip" data-val="100" type="button">100g</button>
-            <button class="chip" data-val="1" type="button">1g</button>
           </div>
         </div>
 
-        <!-- Making Charge Presets -->
-        <div>
-          <span class="calc-section-label">Jewelry Category & Making / Wastage</span>
+        <!-- Category & Making Charges (Coin, Plain, Stone, Antique) -->
+        <div class="calc-group">
+          <span class="calc-group-label">Jewelry Category & Making Charges</span>
           <div class="chip-container" id="makingChips">
+            <button class="chip" data-val="3.0" type="button">Coin (3%)</button>
             <button class="chip active" data-val="8.0" type="button">Plain Jewelry (8%)</button>
-            <button class="chip" data-val="12.0" type="button">Studded / Stone (12%)</button>
+            <button class="chip" data-val="12.0" type="button">Stone / Studded (12%)</button>
             <button class="chip" data-val="16.0" type="button">Antique / Temple (16%)</button>
-            <button class="chip" data-val="3.0" type="button">Gold Coin (3%)</button>
           </div>
         </div>
 
-        <!-- Primary Calculation Inputs -->
-        <div class="calc-input-block">
+        <!-- Parameter Input Grid -->
+        <div class="calc-grid-form">
           <div class="calc-field" id="weightField">
             <label>Gold Weight (Grams)</label>
             <input class="calc-input" id="weight" type="number" inputmode="decimal" value="8" step="0.01">
           </div>
-          <div class="calc-field" id="budgetField">
+          <div class="calc-field" id="budgetField" style="display: none;">
             <label>Total Budget (₹)</label>
             <input class="calc-input" id="budget" type="number" inputmode="decimal" value="100000" step="100">
           </div>
@@ -1411,23 +1414,21 @@ footer {
             <input class="calc-input" id="gstRate" type="number" inputmode="decimal" value="3.0" step="0.1">
           </div>
           <div class="calc-field">
-            <label>Hallmarking / Flat Fee (₹)</label>
+            <label>Hallmarking / Fee (₹)</label>
             <input class="calc-input" id="flatFee" type="number" inputmode="decimal" value="45" step="1">
           </div>
         </div>
 
-        <!-- Old Gold Exchange Drawer -->
-        <div class="exchange-toggle-box">
-          <div class="exchange-header">
-            <span>Old Gold Scrap Exchange (Optional)</span>
-          </div>
-          <div class="calc-input-block">
+        <!-- Scrap Gold Exchange Drawer -->
+        <div class="exchange-drawer">
+          <span class="exchange-header">Old Gold Scrap Exchange (Optional)</span>
+          <div class="calc-grid-form">
             <div class="calc-field">
-              <label>Old Gold Weight (g)</label>
+              <label>Scrap Weight (g)</label>
               <input class="calc-input" id="oldWeight" type="number" inputmode="decimal" value="0" step="0.01">
             </div>
             <div class="calc-field">
-              <label>Old Gold Karat Purity</label>
+              <label>Scrap Purity</label>
               <select class="calc-input" id="oldPurity">
                 <option value="22" selected>22K (91.6% Pure)</option>
                 <option value="18">18K (75.0% Pure)</option>
@@ -1438,7 +1439,7 @@ footer {
           </div>
         </div>
 
-        <!-- Itemized Cost Receipt -->
+        <!-- Detailed Itemized Receipt Card -->
         <div class="receipt-card">
           <div class="receipt-title">Itemized Purchase Quotation</div>
           <div class="receipt-line"><span>Base 22K Gold Cost:</span><span id="receiptBase">₹0</span></div>
@@ -1891,7 +1892,6 @@ document.querySelectorAll("#weightChips .chip").forEach(c => c.onclick = () => {
   document.querySelectorAll("#weightChips .chip").forEach(x => x.classList.remove("active"));
   c.classList.add("active");
   $("weight").value = c.dataset.val;
-  // Ensure mode is set to value
   $("calcMode").value = "value";
   document.querySelectorAll(".calc-mode-btn").forEach(b => b.classList.toggle("active", b.dataset.mode === "value"));
   calculate();
@@ -1913,23 +1913,19 @@ function generateShareCardBlob() {
     cvs.width = w; cvs.height = h;
     const r1 = Number(live.rate_22k), r8 = r1 * 8, c1 = Number(live.change) || 0, c8 = c1 * 8;
 
-    // Background Canvas
     ctx.fillStyle = "#030712";
     ctx.fillRect(0, 0, w, h);
 
-    // Subtle Radial Background Glow
     const gl = ctx.createRadialGradient(w/2, 340, 40, w/2, 340, 420);
     gl.addColorStop(0, "rgba(217, 119, 6, 0.16)");
     gl.addColorStop(1, "rgba(3, 7, 18, 0)");
     ctx.fillStyle = gl;
     ctx.fillRect(0, 0, w, h);
 
-    // Precise App-Style Outer Border
     ctx.strokeStyle = "rgba(255, 255, 255, 0.08)";
     ctx.lineWidth = 3;
     ctx.strokeRect(36, 36, w - 72, h - 72);
 
-    // Header Pill
     ctx.fillStyle = "#0b0f19";
     ctx.beginPath();
     ctx.roundRect(72, 72, w - 144, 76, 38);
@@ -1948,7 +1944,6 @@ function generateShareCardBlob() {
     ctx.textAlign = "right";
     ctx.fillText(`${dateText(live.date)} · ${$("session").textContent}`, w - 104, 118);
 
-    // Main Sovereign Hero Card
     ctx.fillStyle = "#0b0f19";
     ctx.beginPath();
     ctx.roundRect(72, 172, w - 144, 380, 24);
@@ -1965,7 +1960,6 @@ function generateShareCardBlob() {
     ctx.font = "800 96px 'Plus Jakarta Sans'";
     ctx.fillText(money(r8), w/2, 345);
 
-    // Change Pill
     ctx.font = "700 26px 'Plus Jakarta Sans'";
     if (c8 > 0) {
       ctx.fillStyle = "#34d399";
@@ -1978,7 +1972,6 @@ function generateShareCardBlob() {
       ctx.fillText("• Flat Market Today", w/2, 420);
     }
 
-    // Hero Sub Details Bar
     ctx.fillStyle = "rgba(255, 255, 255, 0.04)";
     ctx.fillRect(72, 460, w - 144, 1.5);
 
@@ -1990,7 +1983,6 @@ function generateShareCardBlob() {
     ctx.textAlign = "right";
     ctx.fillText(`Standard 22K 91.6% Pure`, w - 108, 514);
 
-    // Karat Purity Grid (3 Columns)
     const gy = 576, cw = (w - 144 - 24) / 3;
     const purities = [
       { l: "24K (99.9%)", v: money(Math.round(r1 * (24 / 22))), s: "Fine Gold" },
@@ -2021,7 +2013,6 @@ function generateShareCardBlob() {
       ctx.fillText(item.s, x + cw/2, gy + 172);
     });
 
-    // Market Timeline Split (Left & Right Boxes on Image)
     const ty = 820, tw = (w - 144 - 16) / 2;
     
     // AM Box
