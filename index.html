@@ -334,10 +334,29 @@ button, input, select {
 .change-pill.down { background: var(--bad-bg); color: var(--bad); }
 .change-pill.same { background: var(--surface-subtle); color: var(--text-secondary); }
 
+.change-pill.mini {
+  padding: 4px 8px;
+  font-size: 10px;
+}
+
+.price-row-large {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.price-row-small {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 2px;
+}
+
 .hero-mid {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 4px;
 }
 
 .hero-mid h2 {
@@ -351,7 +370,6 @@ button, input, select {
   font-size: 13px;
   font-weight: 500;
   color: var(--text-tertiary);
-  margin-top: 2px;
 }
 
 .hero-details-grid {
@@ -389,13 +407,13 @@ button, input, select {
   color: var(--text-primary);
   line-height: 24px;
   height: 24px;
-  margin-bottom: 2px;
   letter-spacing: -0.02em;
   font-variant-numeric: tabular-nums lining-nums;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   display: block;
+  margin-bottom: 0;
 }
 
 .hero-sub-sub {
@@ -412,7 +430,6 @@ button, input, select {
   display: block;
 }
 
-/* Updated Details / Collapsible Styling */
 details.collapsible {
   background: var(--surface);
   border: 1px solid var(--border-subtle);
@@ -723,51 +740,66 @@ details.collapsible .collapsible-content {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
-.chart-stats-row {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 8px;
-  margin-bottom: 16px;
-  width: 100%;
-}
-
-/* Updated Metric Card Styling for Perfect Alignment */
-.metric-card {
+/* Redesigned Chart Header Metrics */
+.chart-header-metrics {
   background: var(--surface-subtle);
-  border-radius: var(--radius-xs);
-  padding: 10px 8px;
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  text-align: center;
-  justify-content: center;
+  gap: 10px;
+  margin-bottom: 16px;
 }
 
-.metric-card small {
+.primary-metric {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px dashed var(--border-strong);
+  padding-bottom: 10px;
+}
+
+.primary-metric span {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  letter-spacing: 0.05em;
+}
+
+.primary-metric strong {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.primary-metric strong.positive { color: var(--good); }
+.primary-metric strong.negative { color: var(--bad); }
+
+.secondary-metrics {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.sec-metric {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.sec-metric span {
   font-size: 10px;
   font-weight: 700;
   text-transform: uppercase;
   color: var(--text-tertiary);
-  line-height: 12px;
-  height: 12px;
-  margin-bottom: 6px;
-  display: block;
 }
 
-.metric-card b {
-  font-size: 13px;
-  font-weight: 800;
-  line-height: 18px;
-  height: 18px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: block;
-  width: 100%;
+.sec-metric b {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--text-primary);
 }
-
-.metric-card b.positive { color: var(--good); }
-.metric-card b.negative { color: var(--bad); }
 
 .chartwrap {
   width: 100%;
@@ -1015,7 +1047,6 @@ select.calc-input {
   border-bottom: none;
 }
 
-/* Updated Table Alignments */
 .history-table th:nth-child(1), .history-table td:nth-child(1) {
   text-align: left;
   width: 36%;
@@ -1206,19 +1237,24 @@ footer {
           </svg>
           <span>Share</span>
         </button>
-        <div id="change" class="change-pill same">No change</div>
       </div>
     </div>
 
     <div class="hero-mid">
-      <h2 id="hero8">₹—</h2>
+      <div class="price-row-large">
+        <h2 id="hero8">₹—</h2>
+        <div id="change8" class="change-pill same">No change</div>
+      </div>
       <span class="sub">Standard 22 Karat Hallmarked</span>
     </div>
 
     <div class="hero-details-grid">
       <div class="hero-detail-col">
         <span class="hero-sub-label">Rate Per Gram</span>
-        <div class="hero-sub-val" id="hero1">₹—</div>
+        <div class="price-row-small">
+          <div class="hero-sub-val" id="hero1">₹—</div>
+          <div id="change1" class="change-pill mini same">No change</div>
+        </div>
         <div class="hero-sub-sub">1 Gram Benchmark</div>
       </div>
       <div class="hero-detail-col">
@@ -1229,7 +1265,6 @@ footer {
     </div>
   </section>
 
-  <!-- Changed to Collapsible -->
   <details class="collapsible">
     <summary>
       <div class="summary-title">
@@ -1268,7 +1303,6 @@ footer {
     </div>
   </details>
 
-  <!-- Changed to Collapsible -->
   <details class="collapsible">
     <summary>
       <div class="summary-title">
@@ -1342,18 +1376,21 @@ footer {
     </div>
 
     <div class="panel">
-      <div class="chart-stats-row">
-        <div class="metric-card">
-          <small id="chartMetricLabel">Change</small>
-          <b id="periodChange">—</b>
+      <!-- Completely Redesigned Chart Header Metrics -->
+      <div class="chart-header-metrics">
+        <div class="primary-metric">
+          <span id="chartMetricLabel">Change</span>
+          <strong id="periodChange">—</strong>
         </div>
-        <div class="metric-card">
-          <small>High</small>
-          <b id="periodHigh">—</b>
-        </div>
-        <div class="metric-card">
-          <small>Low</small>
-          <b id="periodLow">—</b>
+        <div class="secondary-metrics">
+          <div class="sec-metric">
+            <span>High</span>
+            <b id="periodHigh">—</b>
+          </div>
+          <div class="sec-metric">
+            <span>Low</span>
+            <b id="periodLow">—</b>
+          </div>
         </div>
       </div>
 
@@ -1646,17 +1683,25 @@ function renderLive(d) {
   $("todayTime").textContent = timeText(d.time);
   $("session").textContent = d.session || "—";
 
-  let change = Number(d.change);
-  if (!Number.isFinite(change)) {
+  let change1 = Number(d.change);
+  if (!Number.isFinite(change1)) {
     const previous = Number(d.previous_rate_22k);
-    change = Number.isFinite(previous) ? rate - previous : 0;
+    change1 = Number.isFinite(previous) ? rate - previous : 0;
   }
+  
+  const change8 = change1 * 8;
 
-  const badge = $("change");
-  badge.className = "change-pill " + (change > 0 ? "up" : change < 0 ? "down" : "same");
-  badge.textContent = change > 0 ? "▲ " + money(change) + "/g" 
-                    : change < 0 ? "▼ " + money(Math.abs(change)) + "/g" 
-                    : "No change";
+  const badge1 = $("change1");
+  badge1.className = "change-pill mini " + (change1 > 0 ? "up" : change1 < 0 ? "down" : "same");
+  badge1.textContent = change1 > 0 ? "▲ " + money(change1) 
+                     : change1 < 0 ? "▼ " + money(Math.abs(change1)) 
+                     : "No change";
+                     
+  const badge8 = $("change8");
+  badge8.className = "change-pill " + (change8 > 0 ? "up" : change8 < 0 ? "down" : "same");
+  badge8.textContent = change8 > 0 ? "▲ " + money(change8) 
+                     : change8 < 0 ? "▼ " + money(Math.abs(change8)) 
+                     : "No change";
 
   const lastChange = d.last_change;
   if (lastChange) {
@@ -1684,7 +1729,6 @@ function renderToday() {
   let am = changes.find(item => item.session === "AM");
   let pm = changes.find(item => item.session === "PM");
 
-  // Prevent data loss bug: Fetch missing sessions from local cache to persist AM data during PM refresh
   try {
     const cachedStr = localStorage.getItem("gold_live_backup");
     if (cachedStr) {
@@ -1915,7 +1959,7 @@ function drawChart() {
     $("periodChange").textContent = money(values[activeIndex]) + " /g";
     $("periodChange").className = "";
   } else {
-    $("chartMetricLabel").textContent = "Change";
+    $("chartMetricLabel").textContent = "Period Change";
     $("periodChange").textContent = (delta >= 0 ? "+" : "") + money(delta) + " (" + (percentage >= 0 ? "+" : "") + percentage.toFixed(1) + "%)";
     $("periodChange").className = delta > 0 ? "positive" : delta < 0 ? "negative" : "";
   }
