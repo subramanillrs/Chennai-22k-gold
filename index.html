@@ -21,20 +21,16 @@
 <title>Gold 22k rate</title>
 
 <style>
-/* =========================================================
-   DESIGN TOKENS & SPECULAR OBSIDIAN SYSTEM
-   ========================================================= */
 :root {
   color-scheme: light dark;
 
   --font-display: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", sans-serif;
-  
-  /* Light Theme */
+
   --bg-app: #f8fafc;
   --surface: #ffffff;
   --surface-subtle: #f1f5f9;
   --surface-elevated: #ffffff;
-  
+
   --border-subtle: #e2e8f0;
   --border-strong: #cbd5e1;
   --specular: inset 0 1px 0 0 rgba(255, 255, 255, 0.9);
@@ -105,9 +101,6 @@
   }
 }
 
-/* =========================================================
-   BASE RESETS & VIEWPORT LOCKING
-   ========================================================= */
 * {
   box-sizing: border-box;
   margin: 0;
@@ -164,9 +157,6 @@ button, input, select {
   outline: none;
 }
 
-/* =========================================================
-   TOPBAR & STATUS (FLUSH LEFT)
-   ========================================================= */
 .topbar {
   display: flex;
   flex-direction: column;
@@ -223,9 +213,6 @@ button, input, select {
   100% { transform: scale(0.95); opacity: 0.8; }
 }
 
-/* =========================================================
-   PARSER WARNING BANNER
-   ========================================================= */
 .warning-banner {
   display: flex;
   align-items: flex-start;
@@ -277,9 +264,6 @@ button, input, select {
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* =========================================================
-   HERO CARD
-   ========================================================= */
 .hero {
   background: var(--surface);
   border: 1px solid var(--border-subtle);
@@ -370,7 +354,6 @@ button, input, select {
   margin-top: 2px;
 }
 
-/* 2-Column Split: Exact Uniform Font Sizes & Baselines */
 .hero-details-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -429,9 +412,6 @@ button, input, select {
   display: block;
 }
 
-/* =========================================================
-   MULTI-HORIZON RETURN MATRIX
-   ========================================================= */
 .horizon-grid {
   display: grid;
   grid-template-columns: repeat(6, minmax(0, 1fr));
@@ -470,11 +450,9 @@ button, input, select {
   font-size: 13px;
   font-weight: 800;
   font-variant-numeric: tabular-nums;
+  color: var(--text-primary);
 }
 
-/* =========================================================
-   MOVING AVERAGE SENTIMENT BANNER
-   ========================================================= */
 .sentiment-banner {
   background: var(--surface);
   border: 1px solid var(--border-subtle);
@@ -516,9 +494,6 @@ button, input, select {
   line-height: 1;
 }
 
-/* =========================================================
-   STRICTLY UNIFORM 3-COLUMN QUICK STATS
-   ========================================================= */
 .quick-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -570,9 +545,6 @@ button, input, select {
   display: block;
 }
 
-/* =========================================================
-   SECTIONS & INTRADAY SESSIONS
-   ========================================================= */
 .section {
   display: flex;
   flex-direction: column;
@@ -662,9 +634,6 @@ button, input, select {
   display: block;
 }
 
-/* =========================================================
-   CHART CONTROLS & SCRUBBING
-   ========================================================= */
 .segment-ctrl {
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
@@ -764,9 +733,6 @@ button, input, select {
   width: 100%;
 }
 
-/* =========================================================
-   CALCULATOR WITH QUICK CHIPS
-   ========================================================= */
 .chip-container {
   display: flex;
   gap: 6px;
@@ -909,7 +875,6 @@ select.calc-input {
   text-align: right;
 }
 
-/* Last Change Box */
 .last-box {
   display: flex;
   align-items: center;
@@ -923,7 +888,6 @@ select.calc-input {
 .last-box .amount.positive { color: var(--good); }
 .last-box .amount.negative { color: var(--bad); }
 
-/* Compare Result */
 .compare-result {
   margin-top: 12px;
   padding: 12px 14px;
@@ -944,9 +908,6 @@ select.calc-input {
 .compare-result .positive { color: var(--good); font-weight: 700; }
 .compare-result .negative { color: var(--bad); font-weight: 700; }
 
-/* =========================================================
-   STRICTLY BALANCED 3-COLUMN DATA TABLE
-   ========================================================= */
 .table-wrap {
   max-height: 360px;
   overflow-y: auto;
@@ -1008,9 +969,6 @@ select.calc-input {
   width: 33%;
 }
 
-/* =========================================================
-   FLOATING ACTION BUTTON & THEMED TOAST
-   ========================================================= */
 .fab-anchor {
   position: fixed;
   bottom: calc(18px + env(safe-area-inset-bottom));
@@ -1060,7 +1018,6 @@ select.calc-input {
 
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* Pull down indicator */
 .pulldown {
   position: fixed;
   left: 50%;
@@ -1087,7 +1044,6 @@ select.calc-input {
 .pulldown.loading .icon-idle { display: none; }
 .pulldown.loading .icon-spin { display: block; animation: spin 0.8s linear infinite; }
 
-/* Themed Toast */
 .toast {
   position: fixed;
   top: calc(14px + env(safe-area-inset-top));
@@ -1138,7 +1094,6 @@ footer {
 
 <div class="app">
 
-  <!-- Pull down refresh visual -->
   <div class="pulldown" id="pulldown" aria-hidden="true">
     <span class="pulldownicon" id="pulldownIcon">
       <svg class="icon-idle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="14" height="14">
@@ -1151,7 +1106,6 @@ footer {
     <span id="pulldownText">Pull to refresh</span>
   </div>
 
-  <!-- Header with Title and Status Directly Below It (Flush Left) -->
   <header class="topbar">
     <div class="brand-text">
       <h1>Gold 22k rate</h1>
@@ -1162,7 +1116,6 @@ footer {
     </div>
   </header>
 
-  <!-- IMPORTANT PARSER WARNING SIGN BANNER -->
   <div class="warning-banner" id="parserWarning" hidden>
     <div class="warning-icon">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
@@ -1177,10 +1130,8 @@ footer {
     </div>
   </div>
 
-  <!-- Hidden legacy trigger for worker compatibility -->
   <div hidden><button id="fetchNow"><span id="fetchNowText">Fetch</span></button></div>
 
-  <!-- Hero Overview (Clean Sovereign Title & Share) -->
   <section class="hero">
     <div class="hero-top">
       <span class="hero-label">1 Sovereign (8 Grams)</span>
@@ -1215,7 +1166,6 @@ footer {
     </div>
   </section>
 
-  <!-- Multi-Horizon Return Matrix -->
   <section class="section">
     <div class="section-head">
       <h3>Multi-Horizon Performance</h3>
@@ -1249,7 +1199,6 @@ footer {
     </div>
   </section>
 
-  <!-- Moving Average Sentiment Banner -->
   <section class="sentiment-banner">
     <div class="sentiment-left">
       <span>30-Day Moving Average (SMA)</span>
@@ -1258,7 +1207,6 @@ footer {
     <div class="sentiment-pill same" id="smaPill">Calculating…</div>
   </section>
 
-  <!-- Strictly Uniform 3-Column Quick Stats -->
   <section class="quick-grid">
     <div class="stat-card">
       <span class="label">Session</span>
@@ -1277,7 +1225,6 @@ footer {
     </div>
   </section>
 
-  <!-- 2-Column Intraday Sessions -->
   <section class="section">
     <div class="section-head">
       <h3>Intraday Sessions</h3>
@@ -1297,7 +1244,6 @@ footer {
     </div>
   </section>
 
-  <!-- Historical Chart Section (Interactive Scrubbing) -->
   <section class="section">
     <div class="section-head">
       <h3>Price History Trend</h3>
@@ -1341,7 +1287,6 @@ footer {
     </div>
   </section>
 
-  <!-- Last Observed Movement -->
   <section class="section">
     <div class="section-head">
       <h3>Last Rate Movement</h3>
@@ -1355,7 +1300,6 @@ footer {
     </div>
   </section>
 
-  <!-- Historical Compare Utility -->
   <section class="section">
     <div class="section-head">
       <h3>Compare Historical Dates</h3>
@@ -1375,7 +1319,6 @@ footer {
     </div>
   </section>
 
-  <!-- Enhanced Purchase Calculator (With Quick Chips) -->
   <section class="section">
     <div class="section-head">
       <h3>Jewelry Purchase Calculator</h3>
@@ -1421,7 +1364,6 @@ footer {
         </div>
       </div>
 
-      <!-- Itemized Receipt Card -->
       <div class="receipt-box">
         <div class="receipt-title">Itemized Cost Breakdown</div>
         <div class="receipt-line">
@@ -1449,7 +1391,6 @@ footer {
     </div>
   </section>
 
-  <!-- Strictly Balanced 3-Column History Table -->
   <section class="section">
     <div class="section-head">
       <h3>Historical Log</h3>
@@ -1478,8 +1419,7 @@ footer {
 
 </div>
 
-<!-- Floating Action Button -->
-<div class="fab-anchor">
+<div class="fab-anchor" hidden>
   <button class="fab-btn" id="refresh" aria-label="Fetch latest rate" type="button">
     <span class="fab-icon">
       <svg class="icon-idle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
@@ -1493,13 +1433,9 @@ footer {
   </button>
 </div>
 
-<!-- Themed Matching Toast Notification -->
 <div class="toast" id="toast"></div>
 
 <script>
-/* =========================================================
-   CORE CONFIGURATION
-   ========================================================= */
 const LIVE_URL = "data/live.json";
 const HISTORY_URL = "data/history.json";
 const WORKER_URL = "https://gold-price-fetch.subramanilrs.workers.dev/";
@@ -1510,9 +1446,6 @@ let selectedRange = 30;
 let fetchBusy = false;
 let scrubIndex = -1;
 
-/* =========================================================
-   UTILITIES & HAPTICS
-   ========================================================= */
 const $ = id => document.getElementById(id);
 
 const haptic = (ms = 10) => {
@@ -1560,9 +1493,6 @@ function toast(text) {
 
 function sleep(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
 
-/* =========================================================
-   PARSER HEALTH & WARNING CHECKER
-   ========================================================= */
 function checkParserHealth(data, networkError = false) {
   const warningBox = $("parserWarning");
   const title = $("warningTitle");
@@ -1607,9 +1537,6 @@ function checkParserHealth(data, networkError = false) {
   }
 }
 
-/* =========================================================
-   JSON FETCH & DATA NORMALIZATION
-   ========================================================= */
 async function getJSON(url) {
   const separator = url.includes("?") ? "&" : "?";
   const response = await fetch(url + separator + "v=" + Date.now(), { cache: "no-store" });
@@ -1625,9 +1552,6 @@ function normalize(array) {
     .sort((a, b) => String(a.date).localeCompare(String(b.date)));
 }
 
-/* =========================================================
-   RENDER ENGINE
-   ========================================================= */
 function renderLive(d) {
   if (!d) return;
   live = d;
@@ -1689,15 +1613,11 @@ function renderToday() {
   $("todaySummary").textContent = changes.length ? `${changes.length} change${changes.length === 1 ? '' : 's'} recorded` : "No session updates";
 }
 
-/* =========================================================
-   FINTECH VALUATION METRICS (HORIZONS & SMA)
-   ========================================================= */
 function updateFintechMetrics() {
   if (!history.length || !live) return;
   const currentRate = Number(live.rate_22k);
   const values = history.map(item => Number(item.rate_22k));
 
-  // 1. Bloomberg Style Return Matrix
   const calcReturn = (days) => {
     if (history.length < 2) return null;
     const targetIdx = Math.max(0, history.length - 1 - days);
@@ -1721,14 +1641,11 @@ function updateFintechMetrics() {
     const elem = $(h.id);
     if (ret === null) {
       elem.textContent = "—";
-      elem.style.color = "var(--text-tertiary)";
     } else {
       elem.textContent = (ret >= 0 ? "+" : "") + ret.toFixed(1) + "%";
-      elem.style.color = ret >= 0 ? "var(--good)" : "var(--bad)";
     }
   });
 
-  // 2. TradingView Moving Average Sentiment (SMA 30)
   const smaPeriod = Math.min(30, history.length);
   const recentSlice = values.slice(-smaPeriod);
   const sma = recentSlice.reduce((a, b) => a + b, 0) / smaPeriod;
@@ -1746,9 +1663,6 @@ function updateFintechMetrics() {
   }
 }
 
-/* =========================================================
-   CANVAS CHART ENGINE WITH INTERACTIVE TOUCH SCRUBBING
-   ========================================================= */
 function chartData() {
   if (selectedRange === "all") return history;
   return history.slice(Math.max(0, history.length - Number(selectedRange)));
@@ -1819,7 +1733,6 @@ function drawChart() {
     ctx.fillText(money(value), L - 6, gy + 3.5);
   }
 
-  /* Area gradient */
   ctx.beginPath();
   ctx.moveTo(px(0), py(values[0]));
   for (let i = 1; i < values.length; i++) ctx.lineTo(px(i), py(values[i]));
@@ -1833,7 +1746,6 @@ function drawChart() {
   ctx.fillStyle = gradient;
   ctx.fill();
 
-  /* Trend Line */
   ctx.beginPath();
   ctx.moveTo(px(0), py(values[0]));
   for (let i = 1; i < values.length; i++) ctx.lineTo(px(i), py(values[i]));
@@ -1843,7 +1755,6 @@ function drawChart() {
   ctx.lineCap = "round";
   ctx.stroke();
 
-  /* SCRUBBING OVERLAY */
   const activeIndex = (scrubIndex >= 0 && scrubIndex < data.length) ? scrubIndex : (data.length - 1);
   const activeX = px(activeIndex);
   const activeY = py(values[activeIndex]);
@@ -1914,7 +1825,6 @@ function drawChart() {
   $("periodLow").textContent = money(min0);
 }
 
-/* Scrub Gesture */
 (function setupChartScrub() {
   const canvas = $("chart");
   if (!canvas) return;
@@ -1953,9 +1863,6 @@ function drawChart() {
   canvas.addEventListener("mouseleave", endScrub);
 })();
 
-/* =========================================================
-   PURCHASE CALCULATOR WITH PRESET CHIPS & FEES
-   ========================================================= */
 function calculate() {
   if (!live) return;
   const rate = Number(live.rate_22k);
@@ -2017,9 +1924,6 @@ document.querySelectorAll("#weightChips .chip").forEach(chip => {
   };
 });
 
-/* =========================================================
-   SHARE HANDLER
-   ========================================================= */
 $("shareBtn").onclick = async () => {
   haptic(15);
   if (!live) return;
@@ -2037,9 +1941,6 @@ $("shareBtn").onclick = async () => {
   }
 };
 
-/* =========================================================
-   STATISTICS & DATE COMPARE
-   ========================================================= */
 function renderStats() {
   if (!history.length) return;
   const values = history.map(item => Number(item.rate_22k));
@@ -2097,9 +1998,6 @@ function compareDates() {
   `;
 }
 
-/* =========================================================
-   DATA SYNC & NETWORK
-   ========================================================= */
 async function loadPublishedData() {
   const results = await Promise.all([getJSON(LIVE_URL), getJSON(HISTORY_URL)]);
   const latest = results[0];
@@ -2233,9 +2131,6 @@ async function manualFetch() {
   }
 }
 
-/* =========================================================
-   EVENT ATTACHMENTS
-   ========================================================= */
 $("refresh").onclick = manualFetch;
 $("fetchNow").onclick = manualFetch;
 
@@ -2323,7 +2218,6 @@ if ("serviceWorker" in navigator) {
   });
 }
 
-// Initial Run
 refresh();
 </script>
 </body>
