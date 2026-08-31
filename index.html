@@ -2,11 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<meta name="theme-color" content="#f8fafc" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#030712" media="(prefers-color-scheme: dark)">
-<meta name="description" content="22K Gold Price Tracker & Valuation Dashboard">
-
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#f4f6f8">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Gold 22k rate">
@@ -23,58 +20,56 @@
 <style>
 :root{
   color-scheme:light dark;
-  --font-sans:"Plus Jakarta Sans",-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",sans-serif;
-  --bg-app:#f4f6f8;
-  --surface:#ffffff;
-  --surface-subtle:#f7f8fa;
-  --surface-elevated:#fff;
-  --border-subtle:rgba(15,23,42,.08);
+  --font:"Plus Jakarta Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --bg:#f4f6f8;
+  --surface:#fff;
+  --subtle:#f7f8fa;
+  --elevated:#fff;
+  --border:rgba(15,23,42,.08);
   --border-strong:rgba(15,23,42,.14);
-  --text-main:#111318;
-  --text-secondary:#59616f;
-  --text-tertiary:#8b94a3;
-  --gold-primary:#b97800;
+  --text:#111318;
+  --secondary:#59616f;
+  --muted:#8b94a3;
+  --gold:#b97800;
   --gold-light:#e2a52b;
-  --gold-tint:rgba(185,120,0,.10);
+  --gold-bg:rgba(185,120,0,.10);
   --gold-border:rgba(185,120,0,.24);
   --good:#087f5b;
   --good-bg:#dff7ec;
   --bad:#c92a2a;
   --bad-bg:#ffebeb;
-  --r-xs:9px;
   --r-sm:14px;
   --r-md:18px;
-  --r-lg:26px;
-  --r-xl:32px;
-  --r-full:999px;
-  --shadow-sm:0 1px 2px rgba(15,23,42,.04);
-  --shadow-card:0 8px 24px rgba(15,23,42,.055),0 1px 3px rgba(15,23,42,.04);
-  --shadow-hero:0 18px 50px rgba(15,23,42,.09),0 2px 8px rgba(15,23,42,.04);
-  --transition:.2s cubic-bezier(.2,.8,.2,1);
+  --r-lg:24px;
+  --r-xl:30px;
+  --full:999px;
+  --shadow:0 8px 24px rgba(15,23,42,.055),0 1px 3px rgba(15,23,42,.04);
+  --shadow-lg:0 18px 50px rgba(15,23,42,.09),0 2px 8px rgba(15,23,42,.04);
+  --transition:.2s cubic-bezier(.2,.8,.2,1)
 }
 
 @media(prefers-color-scheme:dark){
- :root{
-  --bg-app:#080a0e;
+:root{
+  --bg:#080a0e;
   --surface:#101318;
-  --surface-subtle:#171b22;
-  --surface-elevated:#1d222b;
-  --border-subtle:rgba(255,255,255,.08);
+  --subtle:#171b22;
+  --elevated:#1d222b;
+  --border:rgba(255,255,255,.08);
   --border-strong:rgba(255,255,255,.15);
-  --text-main:#f5f7fa;
-  --text-secondary:#aab2bf;
-  --text-tertiary:#737d8c;
-  --gold-primary:#f0b429;
+  --text:#f5f7fa;
+  --secondary:#aab2bf;
+  --muted:#737d8c;
+  --gold:#f0b429;
   --gold-light:#ffd166;
-  --gold-tint:rgba(240,180,41,.12);
+  --gold-bg:rgba(240,180,41,.12);
   --gold-border:rgba(240,180,41,.28);
   --good:#4bd39a;
   --good-bg:rgba(8,127,91,.19);
   --bad:#ff7070;
   --bad-bg:rgba(201,42,42,.18);
-  --shadow-card:0 10px 28px rgba(0,0,0,.28);
-  --shadow-hero:0 18px 48px rgba(0,0,0,.38)
- }
+  --shadow:0 10px 28px rgba(0,0,0,.28);
+  --shadow-lg:0 18px 48px rgba(0,0,0,.38)
+}
 }
 
 *{
@@ -85,19 +80,17 @@
 }
 
 html{
- font-family:var(--font-sans);
- background:var(--bg-app);
- color:var(--text-main);
+ font-family:var(--font);
+ background:var(--bg);
+ color:var(--text);
  -webkit-font-smoothing:antialiased;
- text-rendering:optimizeLegibility;
- overflow-x:hidden;
- touch-action:pan-y
+ overflow-x:hidden
 }
 
 body{
+ min-height:100vh;
  display:flex;
  justify-content:center;
- min-height:100vh;
  overflow-x:hidden;
  user-select:none;
  -webkit-user-select:none
@@ -109,22 +102,20 @@ input,select{
 }
 
 button,input,select{
- font-family:inherit;
+ font:inherit;
  color:inherit;
- border:none;
- background:none;
  outline:none
 }
 
-.num,td,strong,b,h2,.amount,.hero-sub-val{
- font-variant-numeric:tabular-nums lining-nums;
- letter-spacing:-.02em
+button{
+ border:0;
+ background:none
 }
 
 .app{
  width:100%;
  max-width:760px;
- padding:calc(20px + env(safe-area-inset-top)) 18px calc(44px + env(safe-area-inset-bottom));
+ padding:calc(18px + env(safe-area-inset-top)) 18px calc(42px + env(safe-area-inset-bottom));
  display:flex;
  flex-direction:column;
  gap:18px
@@ -132,15 +123,14 @@ button,input,select{
 
 .topbar{
  display:flex;
- justify-content:space-between;
  align-items:center;
- width:100%;
+ justify-content:space-between;
  min-height:48px;
  position:sticky;
  top:0;
  z-index:20;
  padding:7px 2px;
- background:color-mix(in srgb,var(--bg-app) 88%,transparent);
+ background:color-mix(in srgb,var(--bg) 88%,transparent);
  backdrop-filter:blur(16px);
  -webkit-backdrop-filter:blur(16px)
 }
@@ -158,7 +148,7 @@ button,input,select{
  width:38px;
  height:38px;
  border-radius:12px;
- background:linear-gradient(145deg,var(--gold-light),var(--gold-primary));
+ background:linear-gradient(145deg,var(--gold-light),var(--gold));
  color:#fff;
  font-size:13px;
  font-weight:900;
@@ -168,8 +158,7 @@ button,input,select{
 .brand-text h1{
  font-size:22px;
  font-weight:850;
- letter-spacing:-.045em;
- line-height:1.05
+ letter-spacing:-.045em
 }
 
 .status-indicator{
@@ -179,50 +168,43 @@ button,input,select{
  height:32px;
  padding:0 12px;
  background:var(--surface);
- border:1px solid var(--border-subtle);
- border-radius:var(--r-full);
+ border:1px solid var(--border);
+ border-radius:var(--full);
  font-size:10.5px;
  font-weight:750;
- color:var(--text-secondary);
- box-shadow:var(--shadow-sm);
- white-space:nowrap;
+ color:var(--secondary);
+ box-shadow:0 1px 2px rgba(15,23,42,.04);
  max-width:52%
 }
 
 .status-indicator span:last-child{
  overflow:hidden;
- text-overflow:ellipsis
+ text-overflow:ellipsis;
+ white-space:nowrap
 }
 
 .dot{
  width:7px;
  height:7px;
+ flex-shrink:0;
  border-radius:50%;
  background:var(--good);
- box-shadow:0 0 0 3px var(--good-bg);
- flex-shrink:0;
- animation:pulse-ring 2s infinite
+ box-shadow:0 0 0 3px var(--good-bg)
 }
 
 .status-indicator.offline .dot{
  background:var(--bad);
- box-shadow:0 0 0 3px var(--bad-bg);
- animation:none
+ box-shadow:0 0 0 3px var(--bad-bg)
 }
 
 .status-indicator.syncing .dot{
- background:var(--gold-primary);
- box-shadow:0 0 0 3px var(--gold-tint);
- animation:spin .8s linear infinite;
- border-radius:2px
+ background:var(--gold);
+ box-shadow:0 0 0 3px var(--gold-bg);
+ animation:pulse 1s infinite
 }
 
-@keyframes pulse-ring{
- 50%{transform:scale(1.18);opacity:1}
-}
-
-@keyframes spin{
- to{transform:rotate(360deg)}
+@keyframes pulse{
+ 50%{transform:scale(1.35)}
 }
 
 .purity-strip{
@@ -233,36 +215,21 @@ button,input,select{
 
 .purity-card{
  background:var(--surface);
- border:1px solid var(--border-subtle);
+ border:1px solid var(--border);
  border-radius:16px;
- padding:12px 9px;
+ padding:13px 9px;
  display:flex;
  flex-direction:column;
  align-items:center;
- gap:4px;
- box-shadow:var(--shadow-sm);
- position:relative;
- overflow:hidden
-}
-
-.purity-card:first-child:before,
-.purity-card:nth-child(2):before,
-.purity-card:nth-child(3):before{
- content:"";
- position:absolute;
- top:0;
- left:18%;
- right:18%;
- height:2px;
- background:var(--gold-primary);
- border-radius:0 0 5px 5px
+ gap:5px;
+ box-shadow:0 1px 2px rgba(15,23,42,.04)
 }
 
 .purity-card small{
  font-size:9.5px;
  font-weight:850;
  text-transform:uppercase;
- color:var(--text-tertiary);
+ color:var(--muted);
  letter-spacing:.055em
 }
 
@@ -279,8 +246,6 @@ button,input,select{
  border:1px solid color-mix(in srgb,var(--bad) 35%,transparent);
  border-radius:15px;
  color:var(--bad);
- box-shadow:var(--shadow-sm);
- width:100%;
  cursor:pointer
 }
 
@@ -289,10 +254,10 @@ button,input,select{
 }
 
 .warning-content{
+ width:100%;
  display:flex;
  flex-direction:column;
- gap:3px;
- width:100%
+ gap:3px
 }
 
 .warning-content strong{
@@ -315,32 +280,31 @@ button,input,select{
 }
 
 .hero{
+ position:relative;
+ overflow:hidden;
  background:linear-gradient(
-   145deg,
-   var(--surface),
-   color-mix(in srgb,var(--gold-tint) 30%,var(--surface))
+  145deg,
+  var(--surface),
+  color-mix(in srgb,var(--gold-bg) 30%,var(--surface))
  );
  border:1px solid var(--gold-border);
  border-radius:var(--r-xl);
  padding:24px;
- box-shadow:var(--shadow-hero);
+ box-shadow:var(--shadow-lg);
  display:flex;
  flex-direction:column;
- gap:20px;
- width:100%;
- position:relative;
- overflow:hidden
+ gap:20px
 }
 
 .hero:after{
  content:"";
  position:absolute;
- width:190px;
- height:190px;
- border-radius:50%;
+ width:200px;
+ height:200px;
  right:-90px;
  top:-90px;
- background:radial-gradient(circle,var(--gold-tint),transparent 68%);
+ border-radius:50%;
+ background:radial-gradient(circle,var(--gold-bg),transparent 68%);
  pointer-events:none
 }
 
@@ -348,8 +312,6 @@ button,input,select{
  display:flex;
  align-items:center;
  justify-content:space-between;
- width:100%;
- height:28px;
  position:relative;
  z-index:1
 }
@@ -359,7 +321,7 @@ button,input,select{
  font-weight:850;
  text-transform:uppercase;
  letter-spacing:.09em;
- color:var(--gold-primary)
+ color:var(--gold)
 }
 
 .share-btn{
@@ -370,17 +332,12 @@ button,input,select{
  height:32px;
  padding:0 13px;
  background:var(--surface);
- border:1px solid var(--border-subtle);
- border-radius:var(--r-full);
+ border:1px solid var(--border);
+ border-radius:var(--full);
  font-size:10.5px;
  font-weight:800;
  cursor:pointer;
- transition:all var(--transition);
- box-shadow:var(--shadow-sm)
-}
-
-.share-btn:active{
- transform:scale(.96)
+ box-shadow:0 1px 2px rgba(15,23,42,.04)
 }
 
 .hero-mid{
@@ -389,17 +346,30 @@ button,input,select{
  align-items:center;
  justify-content:center;
  gap:10px;
- padding:5px 0;
- text-align:center;
  position:relative;
  z-index:1
 }
 
 .hero-mid h2{
+ display:flex;
+ align-items:baseline;
+ justify-content:center;
+ gap:9px;
  font-size:clamp(44px,11vw,70px);
  font-weight:850;
+ line-height:.98;
  letter-spacing:-.065em;
- line-height:.98
+ font-variant-numeric:tabular-nums lining-nums
+}
+
+.currency-symbol{
+ display:inline-block;
+ font-weight:850
+}
+
+.currency-number{
+ display:inline-block;
+ font-variant-numeric:tabular-nums lining-nums
 }
 
 .change-pill{
@@ -409,7 +379,7 @@ button,input,select{
  gap:4px;
  min-height:26px;
  padding:0 12px;
- border-radius:var(--r-full);
+ border-radius:var(--full);
  font-size:10.5px;
  font-weight:800
 }
@@ -425,8 +395,8 @@ button,input,select{
 }
 
 .change-pill.same{
- background:var(--surface-subtle);
- color:var(--text-secondary)
+ background:var(--subtle);
+ color:var(--secondary)
 }
 
 .change-pill.mini{
@@ -440,8 +410,7 @@ button,input,select{
  grid-template-columns:1fr 1fr;
  gap:18px;
  padding-top:18px;
- border-top:1px solid var(--border-subtle);
- width:100%;
+ border-top:1px solid var(--border);
  position:relative;
  z-index:1
 }
@@ -457,24 +426,26 @@ button,input,select{
  font-weight:850;
  text-transform:uppercase;
  letter-spacing:.07em;
- color:var(--text-tertiary);
+ color:var(--muted);
  margin-bottom:5px
 }
 
 .hero-sub-val{
- font-size:17px;
+ font-size:16px;
+ line-height:1.25;
  font-weight:850;
  display:flex;
  align-items:center;
  gap:6px;
  margin-bottom:3px;
- white-space:nowrap
+ white-space:nowrap;
+ font-variant-numeric:tabular-nums lining-nums
 }
 
 .hero-sub-sub{
  font-size:10.5px;
  font-weight:550;
- color:var(--text-secondary)
+ color:var(--secondary)
 }
 
 .section{
@@ -488,7 +459,6 @@ button,input,select{
  display:flex;
  align-items:baseline;
  justify-content:space-between;
- width:100%;
  padding:0 3px
 }
 
@@ -501,15 +471,15 @@ button,input,select{
 .section-head span{
  font-size:10px;
  font-weight:700;
- color:var(--text-tertiary)
+ color:var(--muted)
 }
 
 .panel{
  background:var(--surface);
- border:1px solid var(--border-subtle);
+ border:1px solid var(--border);
  border-radius:var(--r-md);
  padding:17px;
- box-shadow:var(--shadow-card);
+ box-shadow:var(--shadow);
  width:100%
 }
 
@@ -521,12 +491,12 @@ button,input,select{
 
 .stat-card{
  background:var(--surface);
- border:1px solid var(--border-subtle);
+ border:1px solid var(--border);
  border-radius:16px;
  padding:14px;
  display:flex;
  flex-direction:column;
- box-shadow:var(--shadow-sm);
+ box-shadow:0 1px 2px rgba(15,23,42,.04);
  min-width:0
 }
 
@@ -534,7 +504,7 @@ button,input,select{
  font-size:9px;
  font-weight:850;
  text-transform:uppercase;
- color:var(--text-tertiary);
+ color:var(--muted);
  letter-spacing:.06em;
  margin-bottom:7px
 }
@@ -548,7 +518,7 @@ button,input,select{
 .stat-card .sub{
  font-size:9.5px;
  font-weight:550;
- color:var(--text-secondary);
+ color:var(--secondary);
  white-space:nowrap;
  overflow:hidden;
  text-overflow:ellipsis
@@ -561,8 +531,8 @@ button,input,select{
 }
 
 .timeline-card{
- background:var(--surface-subtle);
- border:1px solid var(--border-subtle);
+ background:var(--subtle);
+ border:1px solid var(--border);
  border-radius:15px;
  padding:14px;
  display:flex;
@@ -581,7 +551,7 @@ button,input,select{
  font-size:9px;
  font-weight:850;
  text-transform:uppercase;
- color:var(--text-tertiary);
+ color:var(--muted);
  letter-spacing:.06em
 }
 
@@ -590,14 +560,13 @@ button,input,select{
  height:9px;
  border-radius:50%;
  background:var(--surface);
- border:2px solid var(--border-strong);
- transition:all var(--transition)
+ border:2px solid var(--border-strong)
 }
 
 .timeline-node.active{
- border-color:var(--gold-primary);
- background:var(--gold-primary);
- box-shadow:0 0 0 3px var(--gold-tint)
+ border-color:var(--gold);
+ background:var(--gold);
+ box-shadow:0 0 0 3px var(--gold-bg)
 }
 
 .timeline-card b{
@@ -608,60 +577,101 @@ button,input,select{
 .timeline-card small{
  font-size:10px;
  font-weight:550;
- color:var(--text-secondary)
+ color:var(--secondary)
 }
+
+/* =========================
+   NEW PRICE HISTORY DESIGN
+   ========================= */
 
 .segment-ctrl{
  display:grid;
  grid-template-columns:repeat(7,minmax(0,1fr));
  gap:4px;
- background:var(--surface-subtle);
+ background:var(--subtle);
  padding:4px;
- border-radius:var(--r-full);
- border:1px solid var(--border-subtle);
+ border-radius:var(--full);
+ border:1px solid var(--border);
  width:100%
 }
 
 .segment-ctrl button{
- height:29px;
- padding:0;
- border-radius:var(--r-full);
- font-size:10px;
+ height:30px;
+ border-radius:var(--full);
+ font-size:9.5px;
  font-weight:750;
- color:var(--text-secondary);
+ color:var(--secondary);
  cursor:pointer;
- transition:all var(--transition);
- display:flex;
- align-items:center;
- justify-content:center
+ transition:all var(--transition)
 }
 
 .segment-ctrl button.active{
  background:var(--surface);
- color:var(--text-main);
- box-shadow:0 2px 5px rgba(0,0,0,.06)
+ color:var(--text);
+ box-shadow:0 2px 6px rgba(15,23,42,.07)
 }
 
-.chart-header-metrics{
- display:flex;
- justify-content:space-between;
- align-items:flex-end;
- padding-bottom:13px;
- border-bottom:1px dashed var(--border-subtle);
+.chart-panel{
+ position:relative;
+ overflow:hidden;
+ background:
+  linear-gradient(
+   180deg,
+   color-mix(in srgb,var(--elevated) 92%,var(--gold-bg)),
+   var(--surface)
+  );
+ border:1px solid var(--border);
+ border-radius:24px;
+ padding:16px;
+ box-shadow:var(--shadow);
  width:100%
 }
 
-.primary-metric span{
- display:block;
- font-size:9px;
+.chart-title-row{
+ display:flex;
+ justify-content:space-between;
+ align-items:center;
+ padding:1px 2px 11px
+}
+
+.chart-title-row strong{
+ font-size:10px;
  font-weight:850;
  text-transform:uppercase;
- color:var(--text-tertiary);
- margin-bottom:3px
+ letter-spacing:.07em;
+ color:var(--secondary)
+}
+
+.chart-title-row span{
+ font-size:9px;
+ font-weight:650;
+ color:var(--muted)
+}
+
+.chart-header-metrics{
+ display:grid;
+ grid-template-columns:1fr auto;
+ gap:12px;
+ align-items:end;
+ padding:4px 2px 14px;
+ border-bottom:1px solid var(--border)
+}
+
+.primary-metric span,
+.sec-metric span{
+ display:block;
+ font-size:8.5px;
+ font-weight:850;
+ text-transform:uppercase;
+ letter-spacing:.08em;
+ color:var(--muted);
+ margin-bottom:5px
 }
 
 .primary-metric strong{
- font-size:17px;
+ display:block;
+ font-size:21px;
+ line-height:1.05;
  font-weight:850
 }
 
@@ -675,34 +685,38 @@ button,input,select{
 
 .secondary-metrics{
  display:flex;
- gap:18px
+ gap:8px
 }
 
 .sec-metric{
- display:flex;
- flex-direction:column;
- align-items:flex-end
-}
-
-.sec-metric span{
- font-size:9px;
- font-weight:850;
- text-transform:uppercase;
- color:var(--text-tertiary);
- margin-bottom:3px
+ min-width:76px;
+ padding:8px 10px;
+ background:var(--subtle);
+ border:1px solid var(--border);
+ border-radius:12px
 }
 
 .sec-metric b{
- font-size:13px;
- font-weight:750
+ display:block;
+ font-size:12px;
+ line-height:1.1;
+ font-weight:850
 }
 
 .chartwrap{
  width:100%;
- height:230px;
+ height:270px;
  position:relative;
- touch-action:none;
- margin:13px 0 8px
+ margin:12px 0 4px;
+ border-radius:16px;
+ overflow:hidden;
+ background:
+  linear-gradient(
+   180deg,
+   color-mix(in srgb,var(--gold-bg) 35%,transparent),
+   transparent 55%
+  );
+ touch-action:none
 }
 
 .chartwrap canvas{
@@ -714,19 +728,21 @@ button,input,select{
 .chartmeta{
  display:flex;
  justify-content:space-between;
- font-size:9.5px;
- font-weight:650;
- color:var(--text-tertiary);
- border-top:1px dashed var(--border-subtle);
- padding-top:9px;
- width:100%
+ align-items:center;
+ gap:10px;
+ padding:10px 2px 1px;
+ font-size:9px;
+ font-weight:700;
+ color:var(--muted)
 }
+
+/* ========================= */
 
 details.collapsible{
  background:var(--surface);
- border:1px solid var(--border-subtle);
+ border:1px solid var(--border);
  border-radius:var(--r-md);
- box-shadow:var(--shadow-card);
+ box-shadow:var(--shadow);
  overflow:hidden;
  width:100%
 }
@@ -737,9 +753,7 @@ details.collapsible summary{
  justify-content:space-between;
  padding:15px 17px;
  cursor:pointer;
- list-style:none;
- user-select:none;
- width:100%
+ list-style:none
 }
 
 details.collapsible summary::-webkit-details-marker{
@@ -762,12 +776,12 @@ details.collapsible summary::-webkit-details-marker{
 .summary-title span{
  font-size:10px;
  font-weight:650;
- color:var(--text-tertiary)
+ color:var(--muted)
 }
 
 .chevron{
  font-size:10px;
- color:var(--text-tertiary);
+ color:var(--muted);
  transition:transform var(--transition)
 }
 
@@ -776,20 +790,18 @@ details.collapsible[open] .chevron{
 }
 
 details.collapsible .collapsible-content{
- padding:0 17px 17px;
- border-top:1px dashed var(--border-subtle);
- padding-top:13px
+ padding:13px 17px 17px;
+ border-top:1px dashed var(--border)
 }
 
 .horizon-grid{
  display:grid;
  grid-template-columns:repeat(6,minmax(0,1fr));
- gap:7px;
- width:100%
+ gap:7px
 }
 
 .horizon-box{
- background:var(--surface-subtle);
+ background:var(--subtle);
  border-radius:10px;
  padding:9px 6px;
  display:flex;
@@ -802,7 +814,7 @@ details.collapsible .collapsible-content{
  font-size:8.5px;
  font-weight:850;
  text-transform:uppercase;
- color:var(--text-tertiary)
+ color:var(--muted)
 }
 
 .horizon-box b{
@@ -825,7 +837,7 @@ details.collapsible .collapsible-content{
 
 .last-box p{
  font-size:10.5px;
- color:var(--text-secondary);
+ color:var(--secondary);
  font-weight:550
 }
 
@@ -846,47 +858,38 @@ details.collapsible .collapsible-content{
 .calc-suite{
  display:flex;
  flex-direction:column;
- gap:15px;
- width:100%
+ gap:15px
 }
 
 .calc-segmented-mode{
  display:grid;
  grid-template-columns:1fr 1fr;
- background:var(--surface-subtle);
- border:1px solid var(--border-subtle);
- border-radius:var(--r-full);
+ background:var(--subtle);
+ border:1px solid var(--border);
+ border-radius:var(--full);
  padding:4px;
- gap:4px;
- width:100%
+ gap:4px
 }
 
 .calc-mode-btn{
  height:34px;
- border-radius:var(--r-full);
+ border-radius:var(--full);
  font-size:10.5px;
  font-weight:750;
- color:var(--text-secondary);
- cursor:pointer;
- transition:all var(--transition);
- display:flex;
- align-items:center;
- justify-content:center;
- text-align:center;
- padding:0 8px
+ color:var(--secondary);
+ cursor:pointer
 }
 
 .calc-mode-btn.active{
  background:var(--surface);
- color:var(--text-main);
+ color:var(--text);
  box-shadow:0 2px 5px rgba(0,0,0,.07)
 }
 
 .calc-group{
  display:flex;
  flex-direction:column;
- gap:7px;
- width:100%
+ gap:7px
 }
 
 .calc-group-label{
@@ -894,7 +897,7 @@ details.collapsible .collapsible-content{
  font-weight:850;
  text-transform:uppercase;
  letter-spacing:.07em;
- color:var(--text-tertiary)
+ color:var(--muted)
 }
 
 .chip-container{
@@ -902,7 +905,6 @@ details.collapsible .collapsible-content{
  gap:7px;
  overflow-x:auto;
  scrollbar-width:none;
- width:100%;
  padding-bottom:2px
 }
 
@@ -913,110 +915,86 @@ details.collapsible .collapsible-content{
 .chip{
  height:30px;
  padding:0 12px;
- background:var(--surface-subtle);
- border:1px solid var(--border-subtle);
- border-radius:var(--r-full);
+ background:var(--subtle);
+ border:1px solid var(--border);
+ border-radius:var(--full);
  font-size:10px;
  font-weight:750;
- color:var(--text-secondary);
+ color:var(--secondary);
  cursor:pointer;
  white-space:nowrap;
- transition:all var(--transition);
- display:inline-flex;
- align-items:center;
- justify-content:center;
  flex-shrink:0
 }
 
 .chip.active{
- background:var(--gold-tint);
+ background:var(--gold-bg);
  border-color:var(--gold-border);
- color:var(--gold-primary)
-}
-
-.chip:active{
- transform:scale(.96)
+ color:var(--gold)
 }
 
 .calc-grid-form{
  display:grid;
  grid-template-columns:repeat(2,1fr);
- gap:12px;
- width:100%
+ gap:12px
 }
 
 .calc-field{
  display:flex;
- flex-direction:column;
- width:100%
+ flex-direction:column
 }
 
 .calc-field label{
  font-size:9px;
  font-weight:850;
  text-transform:uppercase;
- color:var(--text-tertiary);
+ color:var(--muted);
  letter-spacing:.055em;
- margin-bottom:6px;
- white-space:nowrap;
- overflow:hidden;
- text-overflow:ellipsis
+ margin-bottom:6px
 }
 
 .calc-input{
  width:100%;
  height:46px;
  padding:0 13px;
- background:var(--surface-subtle);
- border:1px solid var(--border-subtle);
+ background:var(--subtle);
+ border:1px solid var(--border);
  border-radius:10px;
  font-size:13px;
- font-weight:700;
- color:var(--text-main);
- transition:border-color var(--transition)
+ font-weight:700
 }
 
 .calc-input:focus{
  background:var(--surface);
- border-color:var(--gold-primary)
+ border-color:var(--gold)
 }
 
 select.calc-input{
- cursor:pointer;
- appearance:none;
- -webkit-appearance:none;
- background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
- background-repeat:no-repeat;
- background-position:right 12px center;
- padding-right:30px
+ cursor:pointer
 }
 
 .exchange-drawer{
- background:var(--surface-subtle);
- border:1px solid var(--border-subtle);
+ background:var(--subtle);
+ border:1px solid var(--border);
  border-radius:15px;
  padding:13px 14px;
  display:flex;
  flex-direction:column;
- gap:10px;
- width:100%
+ gap:10px
 }
 
 .exchange-header{
  font-size:10.5px;
- font-weight:850;
- color:var(--text-main)
+ font-weight:850
 }
 
 .receipt-card{
- background:var(--surface-subtle);
- border:1px solid var(--border-subtle);
+ background:var(--subtle);
+ border:1px solid var(--border);
  border-radius:15px;
  padding:15px 16px;
  display:flex;
  flex-direction:column;
- gap:9px;
- width:100%
+ gap:9px
 }
 
 .receipt-title{
@@ -1024,9 +1002,9 @@ select.calc-input{
  font-weight:850;
  text-transform:uppercase;
  letter-spacing:.07em;
- color:var(--text-tertiary);
+ color:var(--muted);
  padding-bottom:7px;
- border-bottom:1px dashed var(--border-subtle)
+ border-bottom:1px dashed var(--border)
 }
 
 .receipt-line{
@@ -1035,12 +1013,12 @@ select.calc-input{
  align-items:center;
  font-size:11.5px;
  font-weight:600;
- color:var(--text-secondary)
+ color:var(--secondary)
 }
 
 .receipt-line span:last-child{
  font-weight:800;
- color:var(--text-main)
+ color:var(--text)
 }
 
 .receipt-line.deduction span:last-child{
@@ -1064,7 +1042,7 @@ select.calc-input{
 .receipt-total .final-val{
  font-size:21px;
  font-weight:850;
- color:var(--gold-primary)
+ color:var(--gold)
 }
 
 .quote-btn{
@@ -1073,36 +1051,24 @@ select.calc-input{
  margin-top:4px;
  border-radius:10px;
  background:var(--surface);
- border:1px solid var(--border-subtle);
+ border:1px solid var(--border);
  font-size:11px;
  font-weight:850;
- color:var(--text-main);
- display:flex;
- align-items:center;
- justify-content:center;
- gap:6px;
- cursor:pointer;
- transition:all var(--transition)
-}
-
-.quote-btn:active{
- transform:scale(.98)
+ cursor:pointer
 }
 
 .compare-result{
  margin-top:12px;
  padding:13px;
- background:var(--surface-subtle);
+ background:var(--subtle);
  border-radius:10px;
  font-size:11.5px;
- line-height:1.45;
- width:100%
+ line-height:1.45
 }
 
 .compare-result strong{
- font-size:14px;
- font-weight:850;
  display:block;
+ font-size:14px;
  margin-bottom:3px
 }
 
@@ -1116,11 +1082,12 @@ select.calc-input{
  font-weight:750
 }
 
+/* Pixel-controlled historical table */
 .table-wrap{
  max-height:380px;
  overflow-y:auto;
  padding:0;
- border:1px solid var(--border-subtle);
+ border:1px solid var(--border);
  border-radius:var(--r-md);
  width:100%
 }
@@ -1128,47 +1095,47 @@ select.calc-input{
 .history-table{
  width:100%;
  border-collapse:collapse;
- font-size:11.5px;
- table-layout:fixed
+ table-layout:fixed;
+ font-size:11px
 }
 
 .history-table th{
  position:sticky;
  top:0;
- background:var(--surface-subtle);
- padding:11px 13px;
- font-size:9px;
+ background:var(--subtle);
+ padding:11px 10px;
+ font-size:8.5px;
  font-weight:850;
  text-transform:uppercase;
- color:var(--text-tertiary);
- border-bottom:1px solid var(--border-subtle);
+ color:var(--muted);
+ border-bottom:1px solid var(--border);
  z-index:2;
  text-align:left
 }
 
 .history-table td{
- padding:11px 13px;
- border-bottom:1px solid var(--border-subtle);
- font-weight:600;
- vertical-align:middle
-}
-
-.history-table tr:hover td{
- background:var(--surface-subtle)
+ padding:12px 10px;
+ border-bottom:1px solid var(--border);
+ font-weight:650;
+ white-space:nowrap
 }
 
 .history-table th:nth-child(1),
 .history-table td:nth-child(1){
- width:38%;
- white-space:nowrap
+ width:116px;
+ text-align:left
 }
 
 .history-table th:nth-child(2),
-.history-table td:nth-child(2),
+.history-table td:nth-child(2){
+ width:calc((100% - 116px)/2);
+ text-align:right
+}
+
 .history-table th:nth-child(3),
 .history-table td:nth-child(3){
- text-align:right;
- width:31%
+ width:calc((100% - 116px)/2);
+ text-align:right
 }
 
 .pulldown{
@@ -1179,8 +1146,8 @@ select.calc-input{
  background:var(--surface);
  border:1px solid var(--border-strong);
  padding:7px 14px;
- border-radius:var(--r-full);
- box-shadow:var(--shadow-card);
+ border-radius:var(--full);
+ box-shadow:var(--shadow);
  display:flex;
  align-items:center;
  gap:7px;
@@ -1191,24 +1158,12 @@ select.calc-input{
  transition:opacity .2s,transform .2s
 }
 
-.pulldown .icon-idle{
- display:block
-}
-
-.pulldown .icon-spin{
- display:none
-}
-
 .pulldown.visible{
  opacity:1
 }
 
 .pulldown.ready{
- color:var(--gold-primary)
-}
-
-.pulldown.ready .pulldownicon{
- transform:rotate(180deg)
+ color:var(--gold)
 }
 
 .pulldown.loading .icon-idle{
@@ -1220,34 +1175,31 @@ select.calc-input{
  animation:spin .8s linear infinite
 }
 
+.icon-spin{
+ display:none
+}
+
+@keyframes spin{
+ to{transform:rotate(360deg)}
+}
+
 .toast{
  position:fixed;
  top:calc(14px + env(safe-area-inset-top));
  left:50%;
  transform:translate(-50%,-20px);
  background:var(--surface);
- color:var(--text-main);
- border:1px solid var(--border-subtle);
+ color:var(--text);
+ border:1px solid var(--border);
  padding:9px 18px;
- border-radius:var(--r-full);
+ border-radius:var(--full);
  font-size:11px;
  font-weight:750;
- box-shadow:var(--shadow-card);
- display:flex;
- align-items:center;
- gap:7px;
+ box-shadow:var(--shadow);
  opacity:0;
  pointer-events:none;
  transition:opacity .25s,transform .25s;
  z-index:200
-}
-
-.toast::before{
- content:"";
- width:6px;
- height:6px;
- border-radius:50%;
- background:var(--gold-primary)
 }
 
 .toast.show{
@@ -1259,39 +1211,36 @@ footer{
  text-align:center;
  font-size:9.5px;
  font-weight:600;
- color:var(--text-tertiary);
+ color:var(--muted);
  padding:17px 0 8px
 }
 
 @media(max-width:480px){
+
  .app{
   padding-left:14px;
   padding-right:14px
  }
 
  .hero{
-  padding:20px;
-  border-radius:26px
- }
-
- .hero-mid h2{
-  font-size:clamp(42px,12vw,62px)
- }
-
- .panel{
-  padding:14px
+  padding:20px
  }
 
  .horizon-grid{
   grid-template-columns:repeat(3,1fr)
  }
 
- .segment-ctrl button{
-  font-size:9px
+ .chartwrap{
+  height:245px
  }
 
- .calc-mode-btn{
-  font-size:9.5px
+ .secondary-metrics{
+  gap:6px
+ }
+
+ .sec-metric{
+  min-width:70px;
+  padding:7px 8px
  }
 }
 </style>
@@ -1302,27 +1251,65 @@ footer{
 <div class="app">
 
 <div class="pulldown" id="pulldown" aria-hidden="true">
+
 <span class="pulldownicon" id="pulldownIcon">
-<svg class="icon-idle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="13" height="13">
+
+<svg class="icon-idle"
+viewBox="0 0 24 24"
+fill="none"
+stroke="currentColor"
+stroke-width="2.5"
+stroke-linecap="round"
+stroke-linejoin="round"
+width="13"
+height="13">
+
 <path d="M21 12a9 9 0 1 1-2.64-6.36"/>
 <polyline points="21 3 21 9 15 9"/>
+
 </svg>
-<svg class="icon-spin" viewBox="0 0 24 24" fill="none" width="13" height="13">
-<circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="34 22"/>
+
+<svg class="icon-spin"
+viewBox="0 0 24 24"
+fill="none"
+width="13"
+height="13">
+
+<circle
+cx="12"
+cy="12"
+r="9"
+stroke="currentColor"
+stroke-width="2.5"
+stroke-linecap="round"
+stroke-dasharray="34 22"/>
+
 </svg>
+
 </span>
-<span id="pulldownText">Pull to refresh</span>
+
+<span id="pulldownText">
+Pull to refresh
+</span>
+
 </div>
 
 <header class="topbar">
+
 <div class="brand-text">
 <h1>Gold 22k rate</h1>
 </div>
 
 <div class="status-indicator" id="status">
+
 <span class="dot"></span>
-<span id="statusText">Checking live feed…</span>
+
+<span id="statusText">
+Checking live feed…
+</span>
+
 </div>
+
 </header>
 
 <section class="purity-strip">
@@ -1344,14 +1331,26 @@ footer{
 
 </section>
 
-<div class="warning-banner" id="parserWarning" hidden onclick="this.hidden=true;">
+<div class="warning-banner"
+id="parserWarning"
+hidden
+onclick="this.hidden=true;">
+
 <div class="warning-content">
+
 <strong id="warningTitle">
 Notice
-<span class="dismiss-text">Tap to dismiss</span>
+<span class="dismiss-text">
+Tap to dismiss
+</span>
 </strong>
-<p id="warningDesc">Checking feed connection…</p>
+
+<p id="warningDesc">
+Checking feed connection…
+</p>
+
 </div>
+
 </div>
 
 <div hidden>
@@ -1361,67 +1360,164 @@ Notice
 <section class="hero" id="heroCard">
 
 <div class="hero-top">
-<span class="hero-label">1 Sovereign (8 Grams)</span>
 
-<button id="shareBtn" class="share-btn" type="button" aria-label="Share">
+<span class="hero-label">
+1 Sovereign (8 Grams)
+</span>
 
-<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12">
+<button
+id="shareBtn"
+class="share-btn"
+type="button"
+aria-label="Share">
+
+<svg
+viewBox="0 0 24 24"
+fill="none"
+stroke="currentColor"
+stroke-width="2.2"
+stroke-linecap="round"
+stroke-linejoin="round"
+width="12"
+height="12">
+
 <circle cx="18" cy="5" r="3"/>
 <circle cx="6" cy="12" r="3"/>
 <circle cx="18" cy="19" r="3"/>
 <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
 <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+
 </svg>
 
 <span>Share</span>
+
 </button>
+
 </div>
 
 <div class="hero-mid">
-<h2 id="hero8">₹—</h2>
-<div id="change8" class="change-pill same">No change</div>
+
+<h2 id="hero8">
+<span class="currency-symbol">₹</span>
+<span class="currency-number">—</span>
+</h2>
+
+<div
+id="change8"
+class="change-pill same">
+No change
+</div>
+
 </div>
 
 <div class="hero-details-grid">
 
 <div class="hero-detail-col">
-<span class="hero-sub-label">Rate Per Gram</span>
 
-<div class="hero-sub-val" id="hero1">
+<span class="hero-sub-label">
+Rate Per Gram
+</span>
+
+<div
+class="hero-sub-val"
+id="hero1">
+
 ₹—
-<span id="change1" class="change-pill mini same"></span>
+<span
+id="change1"
+class="change-pill mini same">
+</span>
+
 </div>
 
-<div class="hero-sub-sub">1 Gram Benchmark</div>
+<div class="hero-sub-sub">
+1 Gram Benchmark
+</div>
+
 </div>
 
 <div class="hero-detail-col">
-<span class="hero-sub-label">Market Date</span>
-<div class="hero-sub-val" id="today">—</div>
-<div class="hero-sub-sub" id="todayTime">—</div>
+
+<span class="hero-sub-label">
+Market Date
+</span>
+
+<div
+class="hero-sub-val"
+id="today">
+—
+</div>
+
+<div
+class="hero-sub-sub"
+id="todayTime">
+—
 </div>
 
 </div>
+
+</div>
+
 </section>
 
 <section class="quick-grid">
 
 <div class="stat-card">
-<span class="label">Session</span>
-<span class="value" id="session">—</span>
-<span class="sub">IST Market</span>
+
+<span class="label">
+Session
+</span>
+
+<span
+class="value"
+id="session">
+—
+</span>
+
+<span class="sub">
+IST Market
+</span>
+
 </div>
 
 <div class="stat-card">
-<span class="label">3Y Peak</span>
-<span class="value" id="high">—</span>
-<span class="sub" id="highDate">—</span>
+
+<span class="label">
+3Y Peak
+</span>
+
+<span
+class="value"
+id="high">
+—
+</span>
+
+<span
+class="sub"
+id="highDate">
+—
+</span>
+
 </div>
 
 <div class="stat-card">
-<span class="label">3Y Floor</span>
-<span class="value" id="low">—</span>
-<span class="sub" id="lowDate">—</span>
+
+<span class="label">
+3Y Floor
+</span>
+
+<span
+class="value"
+id="low">
+—
+</span>
+
+<span
+class="sub"
+id="lowDate">
+—
+</span>
+
 </div>
 
 </section>
@@ -1429,7 +1525,11 @@ Notice
 <section class="section">
 
 <div class="section-head">
-<h3>Today's Market Activity</h3>
+
+<h3>
+Today's Market Activity
+</h3>
+
 </div>
 
 <div class="panel">
@@ -1439,94 +1539,213 @@ Notice
 <div class="timeline-card">
 
 <div class="timeline-card-header">
-<span class="lbl">Morning Fix (AM)</span>
-<div class="timeline-node" id="amNode"></div>
+
+<span class="lbl">
+Morning Fix (AM)
+</span>
+
+<div
+class="timeline-node"
+id="amNode">
 </div>
 
-<b id="amRate">Pending</b>
-<small id="amTime">—</small>
+</div>
+
+<b id="amRate">
+Pending
+</b>
+
+<small id="amTime">
+—
+</small>
 
 </div>
 
 <div class="timeline-card">
 
 <div class="timeline-card-header">
-<span class="lbl">Evening Fix (PM)</span>
-<div class="timeline-node" id="pmNode"></div>
+
+<span class="lbl">
+Evening Fix (PM)
+</span>
+
+<div
+class="timeline-node"
+id="pmNode">
 </div>
 
-<b id="pmRate">Pending</b>
-<small id="pmTime">—</small>
+</div>
+
+<b id="pmRate">
+Pending
+</b>
+
+<small id="pmTime">
+—
+</small>
 
 </div>
 
 </div>
+
 </div>
+
 </section>
 
 <section class="section">
 
 <div class="section-head">
-<h3>Price History Trend</h3>
-<span id="chartCount">—</span>
+
+<h3>
+Price History Trend
+</h3>
+
+<span id="chartCount">
+—
+</span>
+
 </div>
 
-<div class="segment-ctrl" id="ranges">
-<button data-range="7">7D</button>
-<button class="active" data-range="30">30D</button>
-<button data-range="90">3M</button>
-<button data-range="180">6M</button>
-<button data-range="365">1Y</button>
-<button data-range="1095">3Y</button>
-<button data-range="all">ALL</button>
+<div
+class="segment-ctrl"
+id="ranges">
+
+<button data-range="7">
+7D
+</button>
+
+<button
+class="active"
+data-range="30">
+30D
+</button>
+
+<button data-range="90">
+3M
+</button>
+
+<button data-range="180">
+6M
+</button>
+
+<button data-range="365">
+1Y
+</button>
+
+<button data-range="1095">
+3Y
+</button>
+
+<button data-range="all">
+ALL
+</button>
+
 </div>
 
-<div class="panel">
+<div class="chart-panel">
+
+<div class="chart-title-row">
+
+<strong>
+22K / Gram
+</strong>
+
+<span>
+Drag chart to inspect
+</span>
+
+</div>
 
 <div class="chart-header-metrics">
 
 <div class="primary-metric">
-<span id="chartMetricLabel">Change</span>
-<strong id="periodChange">—</strong>
+
+<span id="chartMetricLabel">
+Period Change
+</span>
+
+<strong id="periodChange">
+—
+</strong>
+
 </div>
 
 <div class="secondary-metrics">
 
 <div class="sec-metric">
-<span>High</span>
-<b id="periodHigh">—</b>
+
+<span>
+High
+</span>
+
+<b id="periodHigh">
+—
+</b>
+
 </div>
 
 <div class="sec-metric">
-<span>Low</span>
-<b id="periodLow">—</b>
+
+<span>
+Low
+</span>
+
+<b id="periodLow">
+—
+</b>
+
 </div>
 
 </div>
+
 </div>
 
 <div class="chartwrap">
-<canvas id="chart"></canvas>
+
+<canvas id="chart">
+</canvas>
+
 </div>
 
 <div class="chartmeta">
-<span id="chartStart">—</span>
-<span id="chartEnd">—</span>
+
+<span id="chartStart">
+—
+</span>
+
+<span id="chartEnd">
+—
+</span>
+
 </div>
 
 </div>
+
 </section>
 
-<div style="display:flex;flex-direction:column;gap:12px;">
+<div
+style="display:flex;flex-direction:column;gap:12px;">
 
 <details class="collapsible">
 
 <summary>
+
 <div class="summary-title">
-<h3>Multi-Horizon Performance</h3>
-<span>Returns</span>
+
+<h3>
+Multi-Horizon Performance
+</h3>
+
+<span>
+Returns
+</span>
+
 </div>
-<span class="chevron">▼</span>
+
+<span class="chevron">
+▼
+</span>
+
 </summary>
 
 <div class="collapsible-content">
@@ -1564,50 +1783,92 @@ Notice
 </div>
 
 </div>
+
 </div>
+
 </details>
 
 <details class="collapsible">
 
 <summary>
+
 <div class="summary-title">
-<h3>Moving Average (SMA)</h3>
-<span>30D Trend</span>
+
+<h3>
+Moving Average (SMA)
+</h3>
+
+<span>
+30D Trend
+</span>
+
 </div>
-<span class="chevron">▼</span>
+
+<span class="chevron">
+▼
+</span>
+
 </summary>
 
 <div class="collapsible-content">
 
-<div style="display:flex;justify-content:space-between;align-items:center;">
+<div
+style="display:flex;justify-content:space-between;align-items:center;">
 
 <div>
-<span style="font-size:9px;font-weight:850;color:var(--text-tertiary);text-transform:uppercase;">
+
+<span
+style="font-size:9px;font-weight:850;color:var(--muted);text-transform:uppercase;">
 30D Average
 </span>
+
 <br>
-<b id="smaValue" style="font-size:15px;margin-top:2px;display:block;">
+
+<b
+id="smaValue"
+style="font-size:15px;margin-top:2px;display:block;">
 ₹—
 </b>
+
 </div>
 
-<div class="change-pill same" id="smaPill">
+<div
+class="change-pill same"
+id="smaPill">
 Calculating…
 </div>
 
 </div>
+
 </div>
+
 </details>
 
 <div class="panel last-box">
 
 <div>
-<h4>Last Movement</h4>
-<p id="lastDate">Analyzing…</p>
-<p id="lastTime" style="font-size:10px;margin-top:1px;">—</p>
+
+<h4>
+Last Movement
+</h4>
+
+<p id="lastDate">
+Analyzing…
+</p>
+
+<p
+id="lastTime"
+style="font-size:10px;margin-top:1px;">
+—
+</p>
+
 </div>
 
-<div class="amount" id="lastAmount">—</div>
+<div
+class="amount"
+id="lastAmount">
+—
+</div>
 
 </div>
 
@@ -1616,7 +1877,11 @@ Calculating…
 <section class="section">
 
 <div class="section-head">
-<h3>Compare Historical Dates</h3>
+
+<h3>
+Compare Historical Dates
+</h3>
+
 </div>
 
 <div class="panel">
@@ -1624,28 +1889,53 @@ Calculating…
 <div class="calc-grid-form">
 
 <div class="calc-field">
-<label>Earlier Date</label>
-<input class="calc-input" type="date" id="dateA">
+
+<label>
+Earlier Date
+</label>
+
+<input
+class="calc-input"
+type="date"
+id="dateA">
+
 </div>
 
 <div class="calc-field">
-<label>Later Date</label>
-<input class="calc-input" type="date" id="dateB">
-</div>
+
+<label>
+Later Date
+</label>
+
+<input
+class="calc-input"
+type="date"
+id="dateB">
 
 </div>
 
-<div class="compare-result" id="compareResult">
+</div>
+
+<div
+class="compare-result"
+id="compareResult">
+
 Select two dates to compare values.
+
 </div>
 
 </div>
+
 </section>
 
 <section class="section">
 
 <div class="section-head">
-<h3>Jewelry Purchase & Exchange Suite</h3>
+
+<h3>
+Jewelry Purchase & Exchange Suite
+</h3>
+
 </div>
 
 <div class="panel">
@@ -1654,21 +1944,38 @@ Select two dates to compare values.
 
 <div class="calc-segmented-mode">
 
-<button class="calc-mode-btn active"
+<button
+class="calc-mode-btn active"
 type="button"
 data-mode="value">
+
 Calculate Price by Weight
+
 </button>
 
-<button class="calc-mode-btn"
+<button
+class="calc-mode-btn"
 type="button"
 data-mode="grams">
+
 Calculate Weight by Budget
+
 </button>
 
-<select id="calcMode" hidden>
-<option value="value" selected>Calculate Price for Weight</option>
-<option value="grams">Calculate Weight for Budget</option>
+<select
+id="calcMode"
+hidden>
+
+<option
+value="value"
+selected>
+Calculate Price for Weight
+</option>
+
+<option value="grams">
+Calculate Weight for Budget
+</option>
+
 </select>
 
 </div>
@@ -1679,35 +1986,61 @@ Calculate Weight by Budget
 Standard Gold Weight
 </span>
 
-<div class="chip-container" id="weightChips">
+<div
+class="chip-container"
+id="weightChips">
 
-<button class="chip" data-val="1" type="button">1g</button>
+<button
+class="chip"
+data-val="1"
+type="button">
+1g
+</button>
 
-<button class="chip" data-val="4" type="button">
+<button
+class="chip"
+data-val="4"
+type="button">
 4g (Half)
 </button>
 
-<button class="chip active" data-val="8" type="button">
+<button
+class="chip active"
+data-val="8"
+type="button">
 8g (1 Sov)
 </button>
 
-<button class="chip" data-val="16" type="button">
+<button
+class="chip"
+data-val="16"
+type="button">
 16g (2 Sov)
 </button>
 
-<button class="chip" data-val="24" type="button">
+<button
+class="chip"
+data-val="24"
+type="button">
 24g (3 Sov)
 </button>
 
-<button class="chip" data-val="50" type="button">
+<button
+class="chip"
+data-val="50"
+type="button">
 50g
 </button>
 
-<button class="chip" data-val="100" type="button">
+<button
+class="chip"
+data-val="100"
+type="button">
 100g
 </button>
 
 </div>
+
 </div>
 
 <div class="calc-group">
@@ -1716,77 +2049,127 @@ Standard Gold Weight
 Jewelry Category & Making Charges
 </span>
 
-<div class="chip-container" id="makingChips">
+<div
+class="chip-container"
+id="makingChips">
 
-<button class="chip" data-val="3.0" type="button">
+<button
+class="chip"
+data-val="3.0"
+type="button">
 Coin (3%)
 </button>
 
-<button class="chip active" data-val="8.0" type="button">
+<button
+class="chip active"
+data-val="8.0"
+type="button">
 Plain Jewelry (8%)
 </button>
 
-<button class="chip" data-val="12.0" type="button">
+<button
+class="chip"
+data-val="12.0"
+type="button">
 Stone / Studded (12%)
 </button>
 
-<button class="chip" data-val="16.0" type="button">
+<button
+class="chip"
+data-val="16.0"
+type="button">
 Antique / Temple (16%)
 </button>
 
 </div>
+
 </div>
 
 <div class="calc-grid-form">
 
-<div class="calc-field" id="weightField">
-<label>Gold Weight (Grams)</label>
-<input class="calc-input"
+<div
+class="calc-field"
+id="weightField">
+
+<label>
+Gold Weight (Grams)
+</label>
+
+<input
+class="calc-input"
 id="weight"
 type="number"
 inputmode="decimal"
 value="8"
 step="0.01">
+
 </div>
 
-<div class="calc-field" id="budgetField" style="display:none;">
-<label>Total Budget (₹)</label>
-<input class="calc-input"
+<div
+class="calc-field"
+id="budgetField"
+style="display:none;">
+
+<label>
+Total Budget (₹)
+</label>
+
+<input
+class="calc-input"
 id="budget"
 type="number"
 inputmode="decimal"
 value="100000"
 step="100">
+
 </div>
 
 <div class="calc-field">
-<label>Making Charge (%)</label>
-<input class="calc-input"
+
+<label>
+Making Charge (%)
+</label>
+
+<input
+class="calc-input"
 id="making"
 type="number"
 inputmode="decimal"
 value="8.0"
 step="0.1">
+
 </div>
 
 <div class="calc-field">
-<label>GST on Jewelry (%)</label>
-<input class="calc-input"
+
+<label>
+GST on Jewelry (%)
+</label>
+
+<input
+class="calc-input"
 id="gstRate"
 type="number"
 inputmode="decimal"
 value="3.0"
 step="0.1">
+
 </div>
 
 <div class="calc-field">
-<label>Hallmarking / Fee (₹)</label>
-<input class="calc-input"
+
+<label>
+Hallmarking / Fee (₹)
+</label>
+
+<input
+class="calc-input"
 id="flatFee"
 type="number"
 inputmode="decimal"
 value="45"
 step="1">
+
 </div>
 
 </div>
@@ -1800,19 +2183,30 @@ Old Gold Scrap Exchange (Optional)
 <div class="calc-grid-form">
 
 <div class="calc-field">
-<label>Scrap Weight (g)</label>
-<input class="calc-input"
+
+<label>
+Scrap Weight (g)
+</label>
+
+<input
+class="calc-input"
 id="oldWeight"
 type="number"
 inputmode="decimal"
 value="0"
 step="0.01">
+
 </div>
 
 <div class="calc-field">
-<label>Scrap Purity</label>
 
-<select class="calc-input" id="oldPurity">
+<label>
+Scrap Purity
+</label>
+
+<select
+class="calc-input"
+id="oldPurity">
 
 <option value="22" selected>
 22K (91.6% Pure)
@@ -1831,9 +2225,11 @@ step="0.01">
 </option>
 
 </select>
+
 </div>
 
 </div>
+
 </div>
 
 <div class="receipt-card">
@@ -1866,47 +2262,74 @@ GST (3%):
 <span id="receiptFee">₹0</span>
 </div>
 
-<div class="receipt-line deduction"
+<div
+class="receipt-line deduction"
 id="receiptOldGoldLine"
 style="display:none;">
 
-<span>Old Gold Exchange Credit:</span>
-<span id="receiptOldGold">-₹0</span>
+<span>
+Old Gold Exchange Credit:
+</span>
+
+<span id="receiptOldGold">
+-₹0
+</span>
 
 </div>
 
 <div class="receipt-total">
 
-<span class="label" id="receiptTotalLabel">
+<span
+class="label"
+id="receiptTotalLabel">
 Net Payable Amount
 </span>
 
-<span class="final-val" id="calcResult">
+<span
+class="final-val"
+id="calcResult">
 ₹—
 </span>
 
 </div>
 
-<div style="font-size:9.5px;font-weight:600;color:var(--text-tertiary);text-align:right;margin-top:2px;"
+<div
+style="font-size:9.5px;font-weight:600;color:var(--muted);text-align:right;margin-top:2px;"
 id="calcSub">
+
 Based on live 22K rate.
+
 </div>
 
-<button class="quote-btn" id="copyQuoteBtn" type="button">
+<button
+class="quote-btn"
+id="copyQuoteBtn"
+type="button">
+
 Copy Quotation Slip
+
 </button>
 
 </div>
 
 </div>
+
 </div>
+
 </section>
 
 <section class="section">
 
 <div class="section-head">
-<h3>Historical Log</h3>
-<span id="historyCount">—</span>
+
+<h3>
+Historical Log
+</h3>
+
+<span id="historyCount">
+—
+</span>
+
 </div>
 
 <div class="panel table-wrap">
@@ -1914,70 +2337,115 @@ Copy Quotation Slip
 <table class="history-table">
 
 <thead>
+
 <tr>
-<th>Date</th>
-<th>Per Gram</th>
-<th>1 Sov (8g)</th>
+
+<th>
+Date
+</th>
+
+<th>
+Per Gram
+</th>
+
+<th>
+1 Sov (8g)
+</th>
+
 </tr>
+
 </thead>
 
 <tbody id="historyBody">
+
 <tr>
-<td colspan="3" style="text-align:center;">
+
+<td
+colspan="3"
+style="text-align:center;">
+
 Loading records…
+
 </td>
+
 </tr>
+
 </tbody>
 
 </table>
 
 </div>
+
 </section>
 
 <footer>
-<div>Gold 22k rate · Institutional Terminal</div>
-<div style="margin-top:2px;font-weight:500;">
-LiveChennai + GoodReturns Live Feeds
+
+<div>
+Gold 22k rate · Institutional Terminal
 </div>
+
+<div
+style="margin-top:2px;font-weight:500;">
+
+LiveChennai + GoodReturns Live Feeds
+
+</div>
+
 </footer>
 
 </div>
 
-<div class="toast" id="toast"></div>
+<div
+class="toast"
+id="toast">
+</div>
 
 <script>
 
-const LIVE_URL = "data/live.json";
-const HISTORY_URL = "data/history.json";
-const WORKER_URL = "https://gold-price-fetch.subramanilrs.workers.dev/";
+const LIVE_URL="data/live.json";
+const HISTORY_URL="data/history.json";
+const WORKER_URL="https://gold-price-fetch.subramanilrs.workers.dev/";
 
-let live = null;
-let history = [];
-let selectedRange = 30;
-let fetchBusy = false;
-let scrubIndex = -1;
+let live=null;
+let history=[];
+let selectedRange=30;
+let fetchBusy=false;
+let scrubIndex=-1;
 
-const $ = id => document.getElementById(id);
+const $=id=>document.getElementById(id);
 
-let audioCtx = null;
+let audioCtx=null;
 
-function playTick(freq=800,duration=0.015){
+function playTick(freq=800,duration=.015){
+
  try{
+
   if(!audioCtx){
-   audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+   audioCtx=
+    new(window.AudioContext||
+    window.webkitAudioContext)();
   }
 
-  if(audioCtx.state==="suspended"){
+  if(audioCtx.state==="suspended")
    audioCtx.resume();
-  }
 
-  const osc=audioCtx.createOscillator();
-  const gain=audioCtx.createGain();
+  const osc=
+   audioCtx.createOscillator();
+
+  const gain=
+   audioCtx.createGain();
 
   osc.type="sine";
-  osc.frequency.setValueAtTime(freq,audioCtx.currentTime);
 
-  gain.gain.setValueAtTime(.03,audioCtx.currentTime);
+  osc.frequency.setValueAtTime(
+   freq,
+   audioCtx.currentTime
+  );
+
+  gain.gain.setValueAtTime(
+   .03,
+   audioCtx.currentTime
+  );
 
   gain.gain.exponentialRampToValueAtTime(
    .0001,
@@ -1988,50 +2456,62 @@ function playTick(freq=800,duration=0.015){
   gain.connect(audioCtx.destination);
 
   osc.start();
-  osc.stop(audioCtx.currentTime+duration);
+  osc.stop(
+   audioCtx.currentTime+duration
+  );
 
  }catch(e){}
 }
 
 const haptic=(ms=10,freq=800)=>{
+
  if("vibrate" in navigator){
-  try{navigator.vibrate(ms)}catch(_){}
+
+  try{
+   navigator.vibrate(ms)
+  }catch(_){}
  }
+
  playTick(freq);
 };
 
-const money=n =>
+const money=n=>
  Number.isFinite(Number(n))
  ? "₹"+Math.round(Number(n)).toLocaleString("en-IN")
  : "₹—";
 
 const dateText=s=>{
+
  if(!s)return"—";
 
- const d=new Date(String(s)+"T00:00:00");
+ const d=
+  new Date(String(s)+"T00:00:00");
 
  return isNaN(d.getTime())
- ? String(s)
- : d.toLocaleDateString(
-   "en-IN",
-   {
-    day:"2-digit",
-    month:"short",
-    year:"numeric"
-   }
- );
+  ?String(s)
+  :d.toLocaleDateString(
+    "en-IN",
+    {
+     day:"2-digit",
+     month:"short",
+     year:"numeric"
+    }
+   );
 };
 
 const timeText=s=>{
+
  if(!s)return"—";
 
  const parts=String(s).split(":");
 
- if(parts.length<2)return String(s);
+ if(parts.length<2)
+  return String(s);
 
  let hour=Number(parts[0]);
 
- if(!Number.isFinite(hour))return String(s);
+ if(!Number.isFinite(hour))
+  return String(s);
 
  const ap=hour>=12?"PM":"AM";
 
@@ -2040,14 +2520,18 @@ const timeText=s=>{
  return hour+":"+parts[1]+" "+ap;
 };
 
-const esc=s =>
+const esc=s=>
  String(s??"")
  .replaceAll("&","&amp;")
  .replaceAll("<","&lt;")
  .replaceAll(">","&gt;")
  .replaceAll('"',"&quot;");
 
-function setStatus(text,offline=false,syncing=false){
+function setStatus(
+ text,
+ offline=false,
+ syncing=false
+){
 
  $("statusText").textContent=text;
 
@@ -2075,19 +2559,32 @@ function toast(text){
 }
 
 function sleep(ms){
- return new Promise(resolve=>setTimeout(resolve,ms));
+
+ return new Promise(
+  resolve=>setTimeout(resolve,ms)
+ );
 }
 
-function checkParserHealth(data,networkError=false){
+function checkParserHealth(
+ data,
+ networkError=false
+){
 
- const warningBox=$("parserWarning");
+ const warningBox=
+  $("parserWarning");
 
  if(!warningBox)return;
 
- if(networkError&&!navigator.onLine){
+ if(
+  networkError&&
+  !navigator.onLine
+ ){
 
   $("warningTitle").innerHTML=
-   `Offline Mode <span class="dismiss-text">Tap to dismiss</span>`;
+   `Offline Mode
+   <span class="dismiss-text">
+   Tap to dismiss
+   </span>`;
 
   $("warningDesc").textContent=
    "Device offline. Displaying saved market records.";
@@ -2107,12 +2604,16 @@ function checkParserHealth(data,networkError=false){
  let hasFailed=false;
  let reasons=[];
 
- if(data.error||data.parsing_failed){
+ if(
+  data.error||
+  data.parsing_failed
+ ){
 
   hasFailed=true;
 
   reasons.push(
-   data.error||"Parser feed issue"
+   data.error||
+   "Parser feed issue"
   );
  }
 
@@ -2140,7 +2641,10 @@ function checkParserHealth(data,networkError=false){
  if(hasFailed){
 
   $("warningTitle").innerHTML=
-   `Source Notice <span class="dismiss-text">Tap to dismiss</span>`;
+   `Source Notice
+   <span class="dismiss-text">
+   Tap to dismiss
+   </span>`;
 
   $("warningDesc").textContent=
    reasons.join(" · ")+
@@ -2151,24 +2655,25 @@ function checkParserHealth(data,networkError=false){
  }else{
 
   warningBox.hidden=true;
-
  }
 }
 
 async function getJSON(url){
 
- const response=await fetch(
-  url+
-  (url.includes("?")?"&":"?")+
-  "v="+Date.now(),
-  {
-   cache:"no-store"
-  }
- );
+ const response=
+  await fetch(
+   url+
+   (url.includes("?")?"&":"?")+
+   "v="+Date.now(),
+   {
+    cache:"no-store"
+   }
+  );
 
- if(!response.ok){
-  throw new Error("HTTP "+response.status);
- }
+ if(!response.ok)
+  throw new Error(
+   "HTTP "+response.status
+  );
 
  return response.json();
 }
@@ -2176,90 +2681,23 @@ async function getJSON(url){
 function normalize(array){
 
  return Array.isArray(array)
- ? array
+ ?array
   .filter(
-   i =>
+   i=>
     i&&
     i.date&&
-    Number.isFinite(Number(i.rate_22k))
+    Number.isFinite(
+     Number(i.rate_22k)
+    )
   )
   .map(
-   i => ({
+   i=>({
     ...i,
-    rate_22k:Number(i.rate_22k)
+    rate_22k:
+     Number(i.rate_22k)
    })
   )
- : [];
-}
-
-function computeLastMovement(){
-
- if(!history||history.length<1||!live)return;
-
- let fullData=[...history];
-
- if(
-  fullData[fullData.length-1].date!==live.date
- ){
-  fullData.push(live);
- }else{
-  fullData[fullData.length-1]=live;
- }
-
- let lastChangeItem=null;
- let oldRate=null;
-
- for(
-  let i=fullData.length-1;
-  i>0;
-  i--
- ){
-
-  let r1=Number(fullData[i].rate_22k);
-  let r0=Number(fullData[i-1].rate_22k);
-
-  if(r1!==r0){
-
-   lastChangeItem=fullData[i];
-   oldRate=r0;
-
-   break;
-  }
- }
-
- if(lastChangeItem&&oldRate){
-
-  let amount=
-   Number(lastChangeItem.rate_22k)-oldRate;
-
-  $("lastDate").textContent=
-   "Price shifted on "+
-   dateText(lastChangeItem.date);
-
-  $("lastAmount").textContent=
-   (amount>0?"▲ ":"▼ ")+
-   money(Math.abs(amount));
-
-  $("lastAmount").className=
-   "amount "+
-   (amount>0?"positive":"negative");
-
-  $("lastTime").textContent=
-   "Previous rate was "+
-   money(oldRate);
-
- }else{
-
-  $("lastDate").textContent=
-   "No recent shifts";
-
-  $("lastTime").textContent=
-   "Market is flat";
-
-  $("lastAmount").textContent="—";
-
-  $("lastAmount").className="amount";
- }
+ :[];
 }
 
 function renderLive(d){
@@ -2268,56 +2706,74 @@ function renderLive(d){
 
  live=d;
 
- const rate=Number(d.rate_22k);
+ const rate=
+  Number(d.rate_22k);
 
  const rate8=
-  Number.isFinite(Number(d.rate_8g))
+  Number.isFinite(
+   Number(d.rate_8g)
+  )
   ?Number(d.rate_8g)
   :rate*8;
 
- $("hero8").textContent=money(rate8);
+ $("hero8").innerHTML=
+  `<span class="currency-symbol">₹</span>
+   <span class="currency-number">
+   ${Math.round(rate8).toLocaleString("en-IN")}
+   </span>`;
 
  $("hero1").innerHTML=
   `${money(rate)}
-   <span id="change1"
-   class="change-pill mini same"></span>`;
+   <span
+   id="change1"
+   class="change-pill mini same">
+   </span>`;
 
- $("today").textContent=dateText(d.date);
- $("todayTime").textContent=timeText(d.time);
+ $("today").textContent=
+  dateText(d.date);
 
- let currentSession=d.session;
+ $("todayTime").textContent=
+  timeText(d.time);
 
- if(!currentSession&&d.time){
+ let session=d.session;
 
-  const hr=parseInt(
-   d.time.split(":")[0]
-  );
+ if(!session&&d.time){
 
-  currentSession=
+  const hr=
+   parseInt(
+    d.time.split(":")[0]
+   );
+
+  session=
    hr<14?"AM":"PM";
  }
 
- if(!currentSession){
+ if(!session){
 
-  currentSession=
+  session=
    new Date().getHours()<14
    ?"AM"
    :"PM";
  }
 
  $("session").textContent=
-  currentSession+" Fix";
+  session+" Fix";
 
  $("purity22").textContent=
   money(rate)+"/g";
 
  $("purity24").textContent=
-  money(Math.round(rate*(24/22)))+"/g";
+  money(
+   Math.round(rate*(24/22))
+  )+"/g";
 
  $("purity18").textContent=
-  money(Math.round(rate*(18/22)))+"/g";
+  money(
+   Math.round(rate*(18/22))
+  )+"/g";
 
- let change1=Number(d.change);
+ let change1=
+  Number(d.change);
 
  if(!Number.isFinite(change1)){
 
@@ -2325,15 +2781,17 @@ function renderLive(d){
    Number.isFinite(
     Number(d.previous_rate_22k)
    )
-   ?rate-Number(d.previous_rate_22k)
+   ?rate-
+    Number(d.previous_rate_22k)
    :0;
  }
 
- const change8=change1*8;
+ const change8=
+  change1*8;
 
  $("change1").textContent=
   change1>0
-  ?" +"+money(change1)
+  ?"+"+money(change1)
   :change1<0
   ?"-"+money(Math.abs(change1))
   :"Flat";
@@ -2377,20 +2835,83 @@ function renderTodayTimeline(){
  let am=null;
  let pm=null;
 
- if(Array.isArray(live.intraday)){
+ const candidates=[];
 
-  am=live.intraday.find(
-   i =>
-    i.date===today&&
-    i.session==="AM"
-  );
+ function addCandidate(x){
 
-  pm=live.intraday.find(
-   i =>
-    i.date===today&&
-    i.session==="PM"
-  );
+  if(!x)return;
+
+  if(Array.isArray(x)){
+
+   x.forEach(addCandidate);
+
+   return;
+  }
+
+  if(typeof x!=="object")
+   return;
+
+  const date=
+   x.date||today;
+
+  const rate=
+   Number(
+    x.rate_22k ??
+    x.rate ??
+    x.rate22k
+   );
+
+  if(
+   date!==today||
+   !Number.isFinite(rate)
+  )
+   return;
+
+  let session=
+   String(
+    x.session||
+    x.fix||
+    x.period||
+    ""
+   ).toUpperCase();
+
+  const time=
+   x.time||
+   x.updated_at||
+   x.timestamp||
+   "";
+
+  if(!session&&time){
+
+   const match=
+    String(time).match(
+     /(?:T|\s)(\d{1,2}):/
+    );
+
+   const hour=
+    match
+    ?Number(match[1])
+    :NaN;
+
+   if(Number.isFinite(hour))
+    session=
+     hour<14
+     ?"AM"
+     :"PM";
+  }
+
+  candidates.push({
+   rate_22k:rate,
+   time:time,
+   session:session
+  });
  }
+
+ addCandidate(live);
+ addCandidate(live.intraday);
+ addCandidate(live.fixes);
+ addCandidate(live.sessions);
+ addCandidate(live.data);
 
  try{
 
@@ -2398,84 +2919,146 @@ function renderTodayTimeline(){
    JSON.parse(
     localStorage.getItem(
      "gold_live_backup"
-    )
+    )||"null"
    );
 
-  if(cached&&cached.date===today){
+  addCandidate(cached);
 
-   if(!am&&cached.session==="AM")
-    am={
-     rate_22k:cached.rate_22k,
-     time:cached.time
-    };
+  if(cached){
 
-   if(!pm&&cached.session==="PM")
-    pm={
-     rate_22k:cached.rate_22k,
-     time:cached.time
-    };
+   addCandidate(
+    cached.intraday
+   );
 
-   if(Array.isArray(cached.intraday)){
+   addCandidate(
+    cached.fixes
+   );
 
-    if(!am)
-     am=cached.intraday.find(
-      i=>i.date===today&&i.session==="AM"
-     );
+   addCandidate(
+    cached.sessions
+   );
 
-    if(!pm)
-     pm=cached.intraday.find(
-      i=>i.date===today&&i.session==="PM"
-     );
-   }
+   addCandidate(
+    cached.data
+   );
   }
 
  }catch(e){}
 
- if(!am&&live.session==="AM")
+ /*
+  IMPORTANT:
+  Some versions of the feed store today's
+  AM/PM observations in history.json.
+ */
+ history
+  .filter(
+   i=>i.date===today
+  )
+  .forEach(addCandidate);
+
+ candidates.forEach(c=>{
+
+  if(
+   c.session==="AM"&&
+   !am
+  )
+   am=c;
+
+  if(
+   c.session==="PM"&&
+   !pm
+  )
+   pm=c;
+ });
+
+ /*
+  Infer a session from timestamp when
+  the source omitted the session field.
+ */
+ candidates.forEach(c=>{
+
+  if(c.session)
+   return;
+
+  const match=
+   String(c.time||"").match(
+    /(?:T|\s)?(\d{1,2}):/
+   );
+
+  const hour=
+   match
+   ?Number(match[1])
+   :NaN;
+
+  if(!Number.isFinite(hour))
+   return;
+
+  if(
+   hour<14&&
+   !am
+  )
+   am=c;
+
+  if(
+   hour>=14&&
+   !pm
+  )
+   pm=c;
+ });
+
+ /*
+  Current live AM observation is a valid
+  morning fix and should never remain pending.
+ */
+ if(
+  !am&&
+  String(live.session||"")
+   .toUpperCase()==="AM"
+ ){
+
   am={
-   rate_22k:live.rate_22k,
+   rate_22k:
+    Number(live.rate_22k),
    time:live.time
   };
+ }
 
- if(!pm&&live.session==="PM")
+ if(
+  !pm&&
+  String(live.session||"")
+   .toUpperCase()==="PM"
+ ){
+
   pm={
-   rate_22k:live.rate_22k,
+   rate_22k:
+    Number(live.rate_22k),
    time:live.time
   };
-
- if(!am&&!pm){
-
-  let hr=
-   live.time
-   ?parseInt(live.time.split(":")[0])
-   :10;
-
-  hr<14
-   ?am={
-      rate_22k:live.rate_22k,
-      time:live.time
-    }
-   :pm={
-      rate_22k:live.rate_22k,
-      time:live.time
-    };
  }
 
  $("amRate").textContent=
-  am?money(am.rate_22k):"Pending";
+  am
+  ?money(am.rate_22k)
+  :"Pending";
 
  $("amTime").textContent=
-  am?timeText(am.time):"—";
+  am
+  ?timeText(am.time)
+  :"—";
 
  $("amNode").className=
   "timeline-node "+
   (am?"active":"");
 
  $("pmRate").textContent=
-  pm?money(pm.rate_22k):"Pending";
+  pm
+  ?money(pm.rate_22k)
+  :"Pending";
 
  $("pmTime").textContent=
-  pm?timeText(pm.time):"—";
+  pm
+  ?timeText(pm.time)
+  :"—";
 
  $("pmNode").className=
   "timeline-node "+
@@ -2484,7 +3067,11 @@ function renderTodayTimeline(){
 
 function updateFintechMetrics(){
 
- if(!history.length||!live)return;
+ if(
+  !history.length||
+  !live
+ )
+  return;
 
  const currentRate=
   Number(live.rate_22k);
@@ -2496,20 +3083,26 @@ function updateFintechMetrics(){
 
  const calcReturn=days=>{
 
-  if(history.length<2)return null;
+  if(history.length<2)
+   return null;
 
   const pastVal=
    Number(
     history[
      Math.max(
       0,
-      history.length-1-days
+      history.length-
+      1-
+      days
      )
     ].rate_22k
    );
 
   return pastVal
-   ?((currentRate-pastVal)/pastVal)*100
+   ?(
+      (currentRate-pastVal)/
+      pastVal
+    )*100
    :null;
  };
 
@@ -2522,7 +3115,8 @@ function updateFintechMetrics(){
   {id:"ret3Y",d:1095}
  ].forEach(h=>{
 
-  const ret=calcReturn(h.d);
+  const ret=
+   calcReturn(h.d);
 
   $(h.id).textContent=
    ret===null
@@ -2533,13 +3127,19 @@ function updateFintechMetrics(){
  });
 
  const smaPeriod=
-  Math.min(30,history.length);
+  Math.min(
+   30,
+   history.length
+  );
 
  const sma=
   values
    .slice(-smaPeriod)
-   .reduce((a,b)=>a+b,0)/
-  smaPeriod;
+   .reduce(
+    (a,b)=>a+b,
+    0
+   )/
+   smaPeriod;
 
  const smaDiff=
   currentRate-sma;
@@ -2552,17 +3152,26 @@ function updateFintechMetrics(){
 
  $("smaPill").className=
   "change-pill "+
-  (smaDiff>=0?"up":"down");
+  (
+   smaDiff>=0
+   ?"up"
+   :"down"
+  );
 
  $("smaPill").textContent=
-  (smaDiff>=0?"▲ +":"▼ -")+
+  (
+   smaDiff>=0
+   ?"▲ +"
+   :"▼ -"
+  )+
   money(Math.abs(smaDiff))+
   ` (${smaPct.toFixed(1)}%)`;
 }
 
 function drawSpline(ctx,pts){
 
- if(pts.length<2)return;
+ if(pts.length<2)
+  return;
 
  ctx.beginPath();
 
@@ -2578,11 +3187,17 @@ function drawSpline(ctx,pts){
  ){
 
   const p0=
-   pts[i===0?i:i-1];
+   pts[
+    i===0
+    ?i
+    :i-1
+   ];
 
-  const p1=pts[i];
+  const p1=
+   pts[i];
 
-  const p2=pts[i+1];
+  const p2=
+   pts[i+1];
 
   const p3=
    pts[
@@ -2606,7 +3221,8 @@ function drawChart(){
 
  const canvas=$("chart");
 
- if(!canvas)return;
+ if(!canvas)
+  return;
 
  const width=
   canvas.parentElement.clientWidth;
@@ -2617,7 +3233,8 @@ function drawChart(){
  const dpr=
   window.devicePixelRatio||1;
 
- if(!width||!height)return;
+ if(!width||!height)
+  return;
 
  canvas.width=
   Math.round(width*dpr);
@@ -2659,46 +3276,26 @@ function drawChart(){
   data.length.toLocaleString()+
   " days";
 
- const styles=
-  getComputedStyle(document.body);
-
- const colorGold=
-  styles.getPropertyValue(
-   "--gold-primary"
-  ).trim()||
-  "#d97706";
-
- const colorGrid=
-  styles.getPropertyValue(
-   "--border-strong"
-  ).trim()||
-  "rgba(0,0,0,.1)";
-
- const colorText=
-  styles.getPropertyValue(
-   "--text-tertiary"
-  ).trim()||
-  "#94a3b8";
-
- const colorPrimary=
-  styles.getPropertyValue(
-   "--text-main"
-  ).trim()||
-  "#0f172a";
-
- if(data.length<2)return;
+ if(data.length<2)
+  return;
 
  const values=
-  data.map(i=>Number(i.rate_22k));
+  data.map(
+   i=>Number(i.rate_22k)
+  );
 
- const min0=Math.min(...values);
- const max0=Math.max(...values);
+ const min0=
+  Math.min(...values);
+
+ const max0=
+  Math.max(...values);
 
  const avg=
   values.reduce(
    (a,b)=>a+b,
    0
-  )/values.length;
+  )/
+  values.length;
 
  const pad=
   Math.max(
@@ -2706,8 +3303,11 @@ function drawChart(){
    (max0-min0)*.14
   );
 
- const min=min0-pad;
- const max=max0+pad;
+ const min=
+  min0-pad;
+
+ const max=
+  max0+pad;
 
  const L=46;
  const R=10;
@@ -2739,32 +3339,72 @@ function drawChart(){
    })
   );
 
- ctx.font=
-  "10px var(--font-sans)";
+ const styles=
+  getComputedStyle(
+   document.documentElement
+  );
 
- ctx.lineWidth=1;
+ const gold=
+  styles
+   .getPropertyValue(
+    "--gold"
+   )
+   .trim();
+
+ const grid=
+  styles
+   .getPropertyValue(
+    "--border-strong"
+   )
+   .trim();
+
+ const muted=
+  styles
+   .getPropertyValue(
+    "--muted"
+   )
+   .trim();
+
+ const primary=
+  styles
+   .getPropertyValue(
+    "--text"
+   )
+   .trim();
+
+ ctx.font=
+  "10px Plus Jakarta Sans";
+
  ctx.textAlign="right";
 
- for(let i=0;i<=4;i++){
+ for(
+  let i=0;
+  i<=4;
+  i++
+ ){
 
-  const gy=
+  const y=
    T+
    plotH*i/4;
 
-  ctx.strokeStyle=colorGrid;
+  ctx.strokeStyle=grid;
+  ctx.lineWidth=1;
 
   ctx.beginPath();
 
-  ctx.moveTo(L,gy);
+  ctx.moveTo(
+   L,
+   y
+  );
 
   ctx.lineTo(
    width-R,
-   gy
+   y
   );
 
   ctx.stroke();
 
-  ctx.fillStyle=colorText;
+  ctx.fillStyle=muted;
 
   ctx.fillText(
    money(
@@ -2772,19 +3412,21 @@ function drawChart(){
     (max-min)*i/4
    ),
    L-8,
-   gy+3
+   y+3
   );
  }
 
  const avgY=py(avg);
 
- ctx.strokeStyle=colorText;
+ ctx.strokeStyle=muted;
+ ctx.setLineDash([3,4]);
 
  ctx.beginPath();
 
- ctx.setLineDash([3,4]);
-
- ctx.moveTo(L,avgY);
+ ctx.moveTo(
+  L,
+  avgY
+ );
 
  ctx.lineTo(
   width-R,
@@ -2795,7 +3437,7 @@ function drawChart(){
 
  ctx.setLineDash([]);
 
- ctx.fillStyle=colorPrimary;
+ ctx.fillStyle=primary;
 
  ctx.fillText(
   "AVG",
@@ -2803,7 +3445,10 @@ function drawChart(){
   avgY+3
  );
 
- drawSpline(ctx,points);
+ drawSpline(
+  ctx,
+  points
+ );
 
  ctx.lineTo(
   points[points.length-1].x,
@@ -2817,7 +3462,7 @@ function drawChart(){
 
  ctx.closePath();
 
- const grad=
+ const gradient=
   ctx.createLinearGradient(
    0,
    T,
@@ -2825,32 +3470,31 @@ function drawChart(){
    height
   );
 
- grad.addColorStop(
+ gradient.addColorStop(
   0,
   "rgba(217,119,6,.18)"
  );
 
- grad.addColorStop(
+ gradient.addColorStop(
   1,
   "rgba(217,119,6,0)"
  );
 
- ctx.fillStyle=grad;
-
+ ctx.fillStyle=gradient;
  ctx.fill();
 
- drawSpline(ctx,points);
+ drawSpline(
+  ctx,
+  points
+ );
 
- ctx.strokeStyle=colorGold;
+ ctx.strokeStyle=gold;
  ctx.lineWidth=2.2;
-
  ctx.stroke();
 
  const activeIdx=
-  (
-   scrubIndex>=0&&
-   scrubIndex<data.length
-  )
+  scrubIndex>=0&&
+  scrubIndex<data.length
   ?scrubIndex
   :data.length-1;
 
@@ -2859,10 +3503,8 @@ function drawChart(){
 
  if(scrubIndex>=0){
 
-  ctx.strokeStyle=colorGold;
-
+  ctx.strokeStyle=gold;
   ctx.lineWidth=1;
-
   ctx.setLineDash([4,4]);
 
   ctx.beginPath();
@@ -2881,19 +3523,25 @@ function drawChart(){
 
   ctx.setLineDash([]);
 
-  ctx.font=
-   "bold 11px var(--font-sans)";
+  ctx.textAlign="right";
 
-  ctx.fillStyle=colorPrimary;
+  ctx.font=
+   "bold 11px Plus Jakarta Sans";
+
+  ctx.fillStyle=primary;
 
   ctx.fillText(
-   `${dateText(data[activeIdx].date)}: ${money(values[activeIdx])}/g`,
+   `${dateText(
+     data[activeIdx].date
+   )}: ${money(
+     values[activeIdx]
+   )}/g`,
    width-R,
    T+10
   );
  }
 
- ctx.fillStyle=colorGold;
+ ctx.fillStyle=gold;
 
  ctx.beginPath();
 
@@ -2907,17 +3555,10 @@ function drawChart(){
 
  ctx.fill();
 
- ctx.strokeStyle=
-  styles.getPropertyValue(
-   "--surface"
-  ).trim();
-
- ctx.lineWidth=2;
-
- ctx.stroke();
-
  $("chartStart").textContent=
-  dateText(data[0].date);
+  dateText(
+   data[0].date
+  );
 
  $("chartEnd").textContent=
   dateText(
@@ -2939,7 +3580,9 @@ function drawChart(){
    "Selected Date";
 
   $("periodChange").textContent=
-   money(values[activeIdx]);
+   money(
+    values[activeIdx]
+   );
 
   $("periodChange").className="";
 
@@ -2972,7 +3615,8 @@ function drawChart(){
 
  const canvas=$("chart");
 
- if(!canvas)return;
+ if(!canvas)
+  return;
 
  const handle=e=>{
 
@@ -2987,18 +3631,19 @@ function drawChart(){
     )
    );
 
-  if(data.length<2)return;
+  if(data.length<2)
+   return;
 
   const r=
    canvas.getBoundingClientRect();
 
+  const clientX=
+   e.touches
+   ?e.touches[0].clientX
+   :e.clientX;
+
   const x=
-   (
-    e.touches
-    ?e.touches[0].clientX
-    :e.clientX
-   )-
-   r.left;
+   clientX-r.left;
 
   const ratio=
    Math.max(
@@ -3012,14 +3657,13 @@ function drawChart(){
 
   const idx=
    Math.round(
-    ratio*(data.length-1)
+    ratio*
+    (data.length-1)
    );
 
   if(idx!==scrubIndex){
 
    scrubIndex=idx;
-
-   haptic(5,1200);
 
    drawChart();
   }
@@ -3055,7 +3699,8 @@ function drawChart(){
  canvas.addEventListener(
   "mousemove",
   e=>{
-   if(e.buttons===1)handle(e);
+   if(e.buttons===1)
+    handle(e);
   }
  );
 
@@ -3073,12 +3718,14 @@ function drawChart(){
 
 function calculate(){
 
- if(!live)return;
+ if(!live)
+  return;
 
  const rate=
   Number(live.rate_22k);
 
- if(!rate)return;
+ if(!rate)
+  return;
 
  const mode=
   $("calcMode").value;
@@ -3125,23 +3772,19 @@ function calculate(){
  const oldGoldCredit=
   oldWeight>0
   ?oldWeight*
-   (
-    rate*
-    (oldPurity/22)
-   )
+   rate*
+   (oldPurity/22)
   :0;
 
- if(mode==="value"){
+ $("weightField").style.display=
+  mode==="value"
+  ?"flex"
+  :"none";
 
-  $("weightField").style.display="flex";
-  $("budgetField").style.display="none";
-
- }else{
-
-  $("weightField").style.display="none";
-  $("budgetField").style.display="flex";
-
- }
+ $("budgetField").style.display=
+  mode==="grams"
+  ?"flex"
+  :"none";
 
  $("receiptMakingLabel").textContent=
   `Making Charges (${makingPct}%):`;
@@ -3178,7 +3821,7 @@ function calculate(){
    sub*
    (gstPct/100);
 
-  const grandTotal=
+  const total=
    Math.max(
     0,
     sub+
@@ -3202,14 +3845,14 @@ function calculate(){
    "Net Payable Amount";
 
   $("calcResult").textContent=
-   money(grandTotal);
+   money(total);
 
   $("calcSub").textContent=
    `For ${weight.toLocaleString("en-IN")}g gold at ₹${rate}/g benchmark`;
 
  }else{
 
-  const effB=
+  const effectiveBudget=
    (
     budget+
     oldGoldCredit
@@ -3218,8 +3861,8 @@ function calculate(){
    flatFee;
 
   const goldBase=
-   effB>0
-   ?effB/
+   effectiveBudget>0
+   ?effectiveBudget/
     (1+makingPct/100)
    :0;
 
@@ -3353,7 +3996,8 @@ function generateShareCardBlob(){
 
  return new Promise(resolve=>{
 
-  if(!live)return resolve(null);
+  if(!live)
+   return resolve(null);
 
   const cvs=
    document.createElement("canvas");
@@ -3367,91 +4011,29 @@ function generateShareCardBlob(){
   cvs.width=w;
   cvs.height=h;
 
-  const r1=
+  const rate=
    Number(live.rate_22k);
 
-  const r8=r1*8;
+  const rate8=
+   Number(live.rate_8g)||
+   rate*8;
 
-  const c1=
+  const change=
    Number(live.change)||0;
 
-  const c8=c1*8;
+  const change8=
+   change*8;
 
   ctx.fillStyle="#030712";
 
   ctx.fillRect(
-   0,
-   0,
-   w,
-   h
+   0,0,w,h
   );
-
-  const gl=
-   ctx.createRadialGradient(
-    w/2,
-    340,
-    40,
-    w/2,
-    340,
-    420
-   );
-
-  gl.addColorStop(
-   0,
-   "rgba(217,119,6,.16)"
-  );
-
-  gl.addColorStop(
-   1,
-   "rgba(3,7,18,0)"
-  );
-
-  ctx.fillStyle=gl;
-
-  ctx.fillRect(
-   0,
-   0,
-   w,
-   h
-  );
-
-  ctx.strokeStyle=
-   "rgba(255,255,255,.08)";
-
-  ctx.lineWidth=3;
-
-  ctx.strokeRect(
-   36,
-   36,
-   w-72,
-   h-72
-  );
-
-  ctx.fillStyle="#0b0f19";
-
-  ctx.beginPath();
-
-  ctx.roundRect(
-   72,
-   72,
-   w-144,
-   76,
-   38
-  );
-
-  ctx.fill();
-
-  ctx.strokeStyle=
-   "rgba(255,255,255,.08)";
-
-  ctx.lineWidth=1.5;
-
-  ctx.stroke();
 
   ctx.fillStyle="#fbbf24";
 
   ctx.font=
-   "800 24px 'Plus Jakarta Sans'";
+   "800 24px Plus Jakarta Sans";
 
   ctx.textAlign="left";
 
@@ -3464,7 +4046,7 @@ function generateShareCardBlob(){
   ctx.fillStyle="#94a3b8";
 
   ctx.font=
-   "700 20px 'Plus Jakarta Sans'";
+   "700 20px Plus Jakarta Sans";
 
   ctx.textAlign="right";
 
@@ -3488,15 +4070,10 @@ function generateShareCardBlob(){
 
   ctx.fill();
 
-  ctx.strokeStyle=
-   "rgba(255,255,255,.08)";
-
-  ctx.stroke();
-
   ctx.fillStyle="#fbbf24";
 
   ctx.font=
-   "800 22px 'Plus Jakarta Sans'";
+   "800 22px Plus Jakarta Sans";
 
   ctx.textAlign="center";
 
@@ -3509,299 +4086,96 @@ function generateShareCardBlob(){
   ctx.fillStyle="#f8fafc";
 
   ctx.font=
-   "800 96px 'Plus Jakarta Sans'";
+   "800 96px Plus Jakarta Sans";
 
   ctx.fillText(
-   money(r8),
+   money(rate8),
    w/2,
    345
   );
 
   ctx.font=
-   "700 26px 'Plus Jakarta Sans'";
-
-  if(c8>0){
-
-   ctx.fillStyle="#34d399";
-
-   ctx.fillText(
-    `▲ +${money(c8)} Today`,
-    w/2,
-    420
-   );
-
-  }else if(c8<0){
-
-   ctx.fillStyle="#f87171";
-
-   ctx.fillText(
-    `▼ -${money(Math.abs(c8))} Today`,
-    w/2,
-    420
-   );
-
-  }else{
-
-   ctx.fillStyle="#94a3b8";
-
-   ctx.fillText(
-    "• Flat Market Today",
-    w/2,
-    420
-   );
-  }
+   "700 26px Plus Jakarta Sans";
 
   ctx.fillStyle=
-   "rgba(255,255,255,.04)";
-
-  ctx.fillRect(
-   72,
-   460,
-   w-144,
-   1.5
-  );
-
-  ctx.fillStyle="#94a3b8";
-
-  ctx.font=
-   "700 20px 'Plus Jakarta Sans'";
-
-  ctx.textAlign="left";
+   change8>0
+   ?" #34d399"
+   :change8<0
+   ?" #f87171"
+   :"#94a3b8";
 
   ctx.fillText(
-   `Rate Per Gram: ${money(r1)}/g`,
-   108,
-   514
+   change8>0
+   ?`▲ +${money(change8)} Today`
+   :change8<0
+   ?`▼ -${money(Math.abs(change8))} Today`
+   :"• Flat Market Today",
+   w/2,
+   420
   );
-
-  ctx.textAlign="right";
-
-  ctx.fillText(
-   "Standard 22K 91.6% Pure",
-   w-108,
-   514
-  );
-
-  const gy=576;
-
-  const cw=
-   (w-144-24)/3;
 
   const purities=[
    {
     l:"24K (99.9%)",
-    v:money(
-     Math.round(r1*(24/22))
-    ),
-    s:"Fine Gold"
+    v:money(Math.round(rate*(24/22)))
    },
    {
     l:"22K (91.6%)",
-    v:money(r1),
-    s:"Jewelry Standard"
+    v:money(rate)
    },
    {
     l:"18K (75.0%)",
-    v:money(
-     Math.round(r1*(18/22))
-    ),
-    s:"Hallmarked"
+    v:money(Math.round(rate*(18/22)))
    }
   ];
 
-  purities.forEach(
-   (item,i)=>{
+  const cw=
+   (w-144-24)/3;
 
-    const x=
-     72+
-     i*(cw+12);
+  purities.forEach((item,i)=>{
 
-    ctx.fillStyle="#0b0f19";
+   const x=
+    72+i*(cw+12);
 
-    ctx.beginPath();
+   ctx.fillStyle="#0b0f19";
 
-    ctx.roundRect(
-     x,
-     gy,
-     cw,
-     220,
-     16
-    );
+   ctx.beginPath();
 
-    ctx.fill();
+   ctx.roundRect(
+    x,
+    576,
+    cw,
+    220,
+    16
+   );
 
-    ctx.strokeStyle=
-     "rgba(255,255,255,.08)";
+   ctx.fill();
 
-    ctx.stroke();
+   ctx.fillStyle="#94a3b8";
 
-    ctx.fillStyle="#94a3b8";
+   ctx.font=
+    "800 18px Plus Jakarta Sans";
 
-    ctx.font=
-     "800 18px 'Plus Jakarta Sans'";
+   ctx.textAlign="center";
 
-    ctx.textAlign="center";
+   ctx.fillText(
+    item.l,
+    x+cw/2,
+    628
+   );
 
-    ctx.fillText(
-     item.l,
-     x+cw/2,
-     gy+52
-    );
+   ctx.fillStyle="#fff";
 
-    ctx.fillStyle="#ffffff";
+   ctx.font=
+    "800 40px Plus Jakarta Sans";
 
-    ctx.font=
-     "800 40px 'Plus Jakarta Sans'";
+   ctx.fillText(
+    item.v,
+    x+cw/2,
+    696
+   );
 
-    ctx.fillText(
-     item.v,
-     x+cw/2,
-     gy+120
-    );
-
-    ctx.fillStyle="#fbbf24";
-
-    ctx.font=
-     "600 19px 'Plus Jakarta Sans'";
-
-    ctx.fillText(
-     item.s,
-     x+cw/2,
-     gy+172
-    );
-   }
-  );
-
-  const ty=820;
-
-  const tw=
-   (w-144-16)/2;
-
-  ctx.fillStyle="#0b0f19";
-
-  ctx.beginPath();
-
-  ctx.roundRect(
-   72,
-   ty,
-   tw,
-   200,
-   16
-  );
-
-  ctx.fill();
-
-  ctx.strokeStyle=
-   "rgba(255,255,255,.08)";
-
-  ctx.stroke();
-
-  ctx.fillStyle="#94a3b8";
-
-  ctx.font=
-   "800 19px 'Plus Jakarta Sans'";
-
-  ctx.textAlign="left";
-
-  ctx.fillText(
-   "MORNING FIX (AM)",
-   100,
-   ty+48
-  );
-
-  ctx.fillStyle="#f8fafc";
-
-  ctx.font=
-   "800 36px 'Plus Jakarta Sans'";
-
-  ctx.fillText(
-   $("amRate").textContent,
-   100,
-   ty+110
-  );
-
-  ctx.fillStyle="#64748b";
-
-  ctx.font=
-   "600 19px 'Plus Jakarta Sans'";
-
-  ctx.fillText(
-   $("amTime").textContent,
-   100,
-   ty+158
-  );
-
-  const px=
-   72+
-   tw+
-   16;
-
-  ctx.fillStyle="#0b0f19";
-
-  ctx.beginPath();
-
-  ctx.roundRect(
-   px,
-   ty,
-   tw,
-   200,
-   16
-  );
-
-  ctx.fill();
-
-  ctx.strokeStyle=
-   "rgba(255,255,255,.08)";
-
-  ctx.stroke();
-
-  ctx.fillStyle="#94a3b8";
-
-  ctx.font=
-   "800 19px 'Plus Jakarta Sans'";
-
-  ctx.textAlign="left";
-
-  ctx.fillText(
-   "EVENING FIX (PM)",
-   px+28,
-   ty+48
-  );
-
-  ctx.fillStyle="#f8fafc";
-
-  ctx.font=
-   "800 36px 'Plus Jakarta Sans'";
-
-  ctx.fillText(
-   $("pmRate").textContent,
-   px+28,
-   ty+110
-  );
-
-  ctx.fillStyle="#64748b";
-
-  ctx.font=
-   "600 19px 'Plus Jakarta Sans'";
-
-  ctx.fillText(
-   $("pmTime").textContent,
-   px+28,
-   ty+158
-  );
-
-  ctx.fillStyle="#64748b";
-
-  ctx.font=
-   "700 20px 'Plus Jakarta Sans'";
-
-  ctx.textAlign="center";
-
-  ctx.fillText(
-   "Gold 22k Terminal · LiveChennai + GoodReturns Feed",
-   w/2,
-   1180
-  );
+  });
 
   cvs.toBlob(
    resolve,
@@ -3814,7 +4188,8 @@ $("shareBtn").onclick=async()=>{
 
  haptic(15);
 
- if(!live)return;
+ if(!live)
+  return;
 
  const shareText=
  `💰 Gold 22K Rate (${dateText(live.date)})
@@ -3868,7 +4243,9 @@ Track live at: ${window.location.href}`;
     shareText
    );
 
-   toast("Copied to clipboard!");
+   toast(
+    "Copied to clipboard!"
+   );
   }
 
  }catch(e){
@@ -3879,16 +4256,18 @@ Track live at: ${window.location.href}`;
     shareText
    );
 
-   toast("Copied text!");
+   toast(
+    "Copied text!"
+   );
   }
- }
 };
 
 $("copyQuoteBtn").onclick=async()=>{
 
  haptic(15);
 
- if(!live)return;
+ if(!live)
+  return;
 
  const txt=
  `📜 GOLD PURCHASE ESTIMATE
@@ -3902,22 +4281,35 @@ Date: ${dateText(live.date)}
 ----------------------
 NET TOTAL: ${$("calcResult").textContent}`;
 
- navigator.clipboard?.writeText(txt);
+ try{
 
- toast("Quotation Copied!");
+  await navigator.clipboard.writeText(
+   txt
+  );
+
+  toast("Quotation Copied!");
+
+ }catch(e){
+
+  toast("Copy unavailable");
+ }
 };
 
 function renderStats(){
 
- if(!history.length)return;
+ if(!history.length)
+  return;
 
  const vals=
   history.map(
    i=>Number(i.rate_22k)
   );
 
- const hi=Math.max(...vals);
- const lo=Math.min(...vals);
+ const hi=
+  Math.max(...vals);
+
+ const lo=
+  Math.min(...vals);
 
  $("high").textContent=
   money(hi);
@@ -3940,22 +4332,24 @@ function renderStats(){
   );
 
  $("historyCount").textContent=
-  history.length.toLocaleString("en-IN")+
+  history.length.toLocaleString(
+   "en-IN"
+  )+
   " records";
 
  $("historyBody").innerHTML=
   [...history]
-  .reverse()
-  .slice(0,300)
-  .map(
-   i=>
-    `<tr>
-     <td>${esc(dateText(i.date))}</td>
-     <td>${money(i.rate_22k)}</td>
-     <td>${money(i.rate_22k*8)}</td>
-    </tr>`
-  )
-  .join("");
+   .reverse()
+   .slice(0,300)
+   .map(
+    i=>
+     `<tr>
+      <td>${esc(dateText(i.date))}</td>
+      <td>${money(i.rate_22k)}</td>
+      <td>${money(i.rate_22k*8)}</td>
+     </tr>`
+   )
+   .join("");
 
  if(!$("dateA").value)
   $("dateA").value=
@@ -3963,12 +4357,115 @@ function renderStats(){
 
  if(!$("dateB").value)
   $("dateB").value=
-   history[history.length-1]?.date||"";
+   history[
+    history.length-1
+   ]?.date||"";
 
  compareDates();
+
  updateFintechMetrics();
+
  computeLastMovement();
+
  drawChart();
+}
+
+function computeLastMovement(){
+
+ if(
+  !history.length||
+  !live
+ )
+  return;
+
+ const fullData=
+  [...history];
+
+ if(
+  fullData[
+   fullData.length-1
+  ]?.date!==live.date
+ ){
+
+  fullData.push(live);
+
+ }else{
+
+  fullData[
+   fullData.length-1
+  ]=live;
+ }
+
+ let last=null;
+ let oldRate=null;
+
+ for(
+  let i=fullData.length-1;
+  i>0;
+  i--
+ ){
+
+  const r1=
+   Number(
+    fullData[i].rate_22k
+   );
+
+  const r0=
+   Number(
+    fullData[i-1].rate_22k
+   );
+
+  if(r1!==r0){
+
+   last=
+    fullData[i];
+
+   oldRate=r0;
+
+   break;
+  }
+ }
+
+ if(last&&oldRate){
+
+  const amount=
+   Number(last.rate_22k)-
+   oldRate;
+
+  $("lastDate").textContent=
+   "Price shifted on "+
+   dateText(last.date);
+
+  $("lastAmount").textContent=
+   (amount>0?"▲ ":"▼ ")+
+   money(Math.abs(amount));
+
+  $("lastAmount").className=
+   "amount "+
+   (
+    amount>0
+    ?"positive"
+    :"negative"
+   );
+
+  $("lastTime").textContent=
+   "Previous rate was "+
+   money(oldRate);
+
+ }else{
+
+  $("lastDate").textContent=
+   "No recent shifts";
+
+  $("lastTime").textContent=
+   "Market is flat";
+
+  $("lastAmount").textContent=
+   "—";
+
+  $("lastAmount").className=
+   "amount";
+ }
 }
 
 function compareDates(){
@@ -4002,7 +4499,9 @@ function compareDates(){
 
  $("compareResult").innerHTML=
   `<strong>
-   ${money(a.rate_22k)} → ${money(b.rate_22k)}
+   ${money(a.rate_22k)}
+   →
+   ${money(b.rate_22k)}
   </strong>
   <span class="${
    diff>0
@@ -4051,7 +4550,8 @@ async function loadPublishedData(){
 
 async function manualFetch(){
 
- if(fetchBusy)return;
+ if(fetchBusy)
+  return;
 
  fetchBusy=true;
 
@@ -4068,8 +4568,8 @@ async function manualFetch(){
   const oldTs=
    live
    ?(
-      live.last_checked_at||
-      live.date+"|"+live.time
+     live.last_checked_at||
+     live.date+"|"+live.time
     )
    :"";
 
@@ -4114,7 +4614,9 @@ async function manualFetch(){
 
   history=
    normalize(
-    await getJSON(HISTORY_URL)
+    await getJSON(
+     HISTORY_URL
+    )
    );
 
   renderLive(latest);
@@ -4148,10 +4650,13 @@ async function manualFetch(){
    false
   );
 
-  checkParserHealth({
-   error:
-    "Live sync failed. Showing cached data."
-  });
+  checkParserHealth(
+   {
+    error:
+     "Live sync failed. Showing cached data."
+   },
+   true
+  );
 
   toast("Sync Failed");
 
@@ -4161,7 +4666,8 @@ async function manualFetch(){
  }
 }
 
-$("fetchNow").onclick=manualFetch;
+$("fetchNow").onclick=
+ manualFetch;
 
 document
 .querySelectorAll("#ranges button")
@@ -4172,9 +4678,13 @@ document
   haptic(8);
 
   document
-   .querySelectorAll("#ranges button")
+   .querySelectorAll(
+    "#ranges button"
+   )
    .forEach(
-    x=>x.classList.remove("active")
+    x=>x.classList.remove(
+     "active"
+    )
    );
 
   b.classList.add("active");
@@ -4182,20 +4692,24 @@ document
   selectedRange=
    b.dataset.range==="all"
    ?"all"
-   :Number(b.dataset.range);
+   :Number(
+     b.dataset.range
+    );
+
+  scrubIndex=-1;
 
   drawChart();
  };
 });
 
 ["dateA","dateB"]
-.forEach(
- id=>
-  $(id).addEventListener(
-   "change",
-   compareDates
-  )
-);
+.forEach(id=>{
+
+ $(id).addEventListener(
+  "change",
+  compareDates
+ );
+});
 
 [
  "weight",
@@ -4205,20 +4719,28 @@ document
  "flatFee",
  "oldWeight",
  "oldPurity"
-].forEach(
- id=>
-  $(id).addEventListener(
-   "input",
-   calculate
-  )
-);
+].forEach(id=>{
+
+ $(id).addEventListener(
+  "input",
+  calculate
+ );
+
+ $(id).addEventListener(
+  "change",
+  calculate
+ );
+});
 
 document.addEventListener(
  "visibilitychange",
  ()=>{
+
   if(
-   document.visibilityState==="visible"
+   document.visibilityState===
+   "visible"
   ){
+
    loadPublishedData()
     .catch(()=>{});
   }
@@ -4238,20 +4760,12 @@ window.addEventListener(
  drawChart
 );
 
-window
-.matchMedia(
- '(prefers-color-scheme: dark)'
-)
-.addEventListener(
- "change",
- drawChart
-);
-
 if("serviceWorker" in navigator){
 
  window.addEventListener(
   "load",
   ()=>{
+
    navigator.serviceWorker
     .register(
      "sw.js?v="+Date.now()
@@ -4275,7 +4789,9 @@ if("serviceWorker" in navigator){
  const PULL_THRESHOLD=64;
  const PULL_MAX=90;
 
- const pulldown=$("pulldown");
+ const pulldown=
+  $("pulldown");
+
  const pulldownText=
   $("pulldownText");
 
@@ -4286,16 +4802,11 @@ if("serviceWorker" in navigator){
  function atTop(){
 
   return(
-   (window.scrollY||0)<=0&&
-   (
-    document.scrollingElement
-    ?document.scrollingElement.scrollTop
-    :0
-   )<=0
+   (window.scrollY||0)<=0
   );
  }
 
- function resetPulldown(){
+ function reset(){
 
   pulldown.classList.remove(
    "visible",
@@ -4319,9 +4830,12 @@ if("serviceWorker" in navigator){
 
    if(
     fetchBusy||
-    event.target.closest(".table-wrap")||
+    event.target.closest(
+     ".table-wrap"
+    )||
     !atTop()
-   )return;
+   )
+    return;
 
    startY=
     event.touches[0].clientY;
@@ -4339,11 +4853,12 @@ if("serviceWorker" in navigator){
    if(
     !dragging||
     startY===null
-   )return;
+   )
+    return;
 
    if(!atTop()){
 
-    resetPulldown();
+    reset();
 
     return;
    }
@@ -4352,7 +4867,8 @@ if("serviceWorker" in navigator){
     event.touches[0].clientY-
     startY;
 
-   if(delta<=0)return;
+   if(delta<=0)
+    return;
 
    if(event.cancelable)
     event.preventDefault();
@@ -4368,7 +4884,10 @@ if("serviceWorker" in navigator){
    );
 
    pulldown.style.transform=
-    `translate(-50%,${pulled-70}px)`;
+    `translate(
+     -50%,
+     ${pulled-70}px
+    )`;
 
    ready=
     pulled>=
@@ -4383,14 +4902,6 @@ if("serviceWorker" in navigator){
     ready
     ?"Release to sync"
     :"Pull to refresh";
-
-   setStatus(
-    ready
-    ?"Release to sync market"
-    :"Pulling to refresh…",
-    false,
-    true
-   );
   },
   {passive:false}
  );
@@ -4398,10 +4909,14 @@ if("serviceWorker" in navigator){
  document.addEventListener(
   "touchend",
   ()=>{
-   
-   if(!dragging)return;
 
-   if(ready&&!fetchBusy){
+   if(!dragging)
+    return;
+
+   if(
+    ready&&
+    !fetchBusy
+   ){
 
     pulldown.classList.add(
      "loading"
@@ -4418,22 +4933,11 @@ if("serviceWorker" in navigator){
      "Syncing…";
 
     manualFetch()
-     .finally(
-      resetPulldown
-     );
+     .finally(reset);
 
    }else{
 
-    resetPulldown();
-
-    setStatus(
-     "Synced at "+
-     (
-      live
-      ?timeText(live.time)
-      :"live"
-     )
-    );
+    reset();
    }
 
    dragging=false;
@@ -4444,7 +4948,7 @@ if("serviceWorker" in navigator){
 
  document.addEventListener(
   "touchcancel",
-  resetPulldown,
+  reset,
   {passive:true}
  );
 
@@ -4491,7 +4995,7 @@ if("serviceWorker" in navigator){
 
    if(
     Array.isArray(savedHistory)&&
-    savedHistory.length>0
+    savedHistory.length
    ){
 
     history=
