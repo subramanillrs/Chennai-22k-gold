@@ -32,8 +32,8 @@
   --surface-hover: #f8fafc;
   --surface-subtle: #f1f5f9;
   
-  --border-light: rgba(0, 0, 0, 0.05);
-  --border-strong: rgba(0, 0, 0, 0.1);
+  --border-light: rgba(0, 0, 0, 0.06);
+  --border-strong: rgba(0, 0, 0, 0.12);
   --specular: inset 0 1px 0 0 rgba(255, 255, 255, 1);
 
   --text-main: #020617;
@@ -71,8 +71,8 @@
     --surface-hover: #1e293b;
     --surface-subtle: #162032;
 
-    --border-light: rgba(255, 255, 255, 0.06);
-    --border-strong: rgba(255, 255, 255, 0.12);
+    --border-light: rgba(255, 255, 255, 0.08);
+    --border-strong: rgba(255, 255, 255, 0.16);
     --specular: inset 0 1px 0 0 rgba(255, 255, 255, 0.04);
 
     --text-main: #f8fafc;
@@ -117,6 +117,7 @@ body {
   justify-content: center;
   min-height: 100vh;
   overflow-x: hidden;
+  line-height: 1.5;
   user-select: none;
   -webkit-user-select: none;
   background: radial-gradient(circle at 50% 0%, var(--gold-tint) 0%, transparent 60%) var(--bg-app);
@@ -125,7 +126,7 @@ body {
 
 input, select { user-select: auto; -webkit-user-select: auto; }
 button, input, select { font-family: inherit; color: inherit; border: none; background: none; outline: none; }
-.num, td, strong, b, h2, .amount { font-variant-numeric: tabular-nums lining-nums; letter-spacing: -0.02em; }
+.num, td, strong, b, h2, .amount, .hero-sub-val { font-variant-numeric: tabular-nums lining-nums; letter-spacing: -0.02em; }
 
 .app {
   width: 100%;
@@ -133,26 +134,26 @@ button, input, select { font-family: inherit; color: inherit; border: none; back
   padding: calc(24px + env(safe-area-inset-top)) 20px calc(120px + env(safe-area-inset-bottom));
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 18px;
 }
 
 /* Staggered Entrance Animation */
 .animate-up {
-  animation: slideUpFade 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   opacity: 0;
-  transform: translateY(16px);
+  transform: translateY(12px);
 }
 .d-1 { animation-delay: 0.05s; }
-.d-2 { animation-delay: 0.1s; }
+.d-2 { animation-delay: 0.10s; }
 .d-3 { animation-delay: 0.15s; }
-.d-4 { animation-delay: 0.2s; }
+.d-4 { animation-delay: 0.20s; }
 .d-5 { animation-delay: 0.25s; }
 
 @keyframes slideUpFade {
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* Premium Top Bar */
+/* Structural Top Bar */
 .topbar {
   display: flex;
   justify-content: space-between;
@@ -164,6 +165,7 @@ button, input, select { font-family: inherit; color: inherit; border: none; back
   font-size: 24px;
   font-weight: 800;
   letter-spacing: -0.04em;
+  margin: 0; padding: 0;
   background: var(--text-main);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -226,18 +228,44 @@ button, input, select { font-family: inherit; color: inherit; border: none; back
 .purity-card small { font-size: 10px; font-weight: 800; color: var(--text-tertiary); letter-spacing: 0.05em; margin-bottom: 2px; }
 .purity-card b { font-size: 14px; font-weight: 800; color: var(--text-main); }
 
-/* Center-Aligned Massive Hero */
+/* Warning Banner */
+.warning-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+  background: var(--bad-bg);
+  border: 1px solid var(--bad);
+  border-radius: var(--radius-md);
+  color: var(--bad);
+  box-shadow: var(--shadow-card);
+  width: 100%;
+  animation: bannerFade 0.25s ease-out;
+  cursor: pointer;
+}
+.warning-banner[hidden] { display: none !important; }
+.warning-content { display: flex; flex-direction: column; gap: 2px; width: 100%; }
+.warning-content strong { font-size: 13px; font-weight: 800; letter-spacing: -0.01em; line-height: 1.2; display: flex; justify-content: space-between; align-items: center;}
+.warning-content p { font-size: 11.5px; font-weight: 600; line-height: 1.4; opacity: 0.95; }
+.dismiss-text { font-size: 10px; opacity: 0.7; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700;}
+
+@keyframes bannerFade {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Beautifully Structured Hero Card */
 .hero {
   position: relative;
   background: var(--surface);
   border: 1px solid var(--border-light);
   border-radius: var(--radius-lg);
-  padding: 32px 20px;
+  padding: 24px;
   box-shadow: var(--shadow-float), var(--specular);
   display: flex;
   flex-direction: column;
-  align-items: center;
-  text-align: center;
+  gap: 20px;
+  width: 100%;
   overflow: hidden;
 }
 
@@ -258,62 +286,113 @@ button, input, select { font-family: inherit; color: inherit; border: none; back
   100% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
 }
 
-.hero-tag {
-  display: inline-flex;
+.hero-top {
+  display: flex;
   align-items: center;
-  font-size: 11px; font-weight: 800;
-  text-transform: uppercase; letter-spacing: 0.1em;
-  color: var(--gold-primary);
-  margin-bottom: 12px;
+  justify-content: space-between;
   z-index: 2;
+  position: relative;
 }
 
-.hero h2 {
-  font-size: clamp(48px, 12vw, 68px);
+.hero-label {
+  font-size: 11.5px;
   font-weight: 800;
-  letter-spacing: -0.05em;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--gold-primary);
+  line-height: 1.2;
+}
+
+.share-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: var(--surface-subtle);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-full);
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--text-main);
+  cursor: pointer;
+  transition: all var(--transition);
+  box-shadow: var(--shadow-card);
+}
+.share-btn:active { transform: scale(0.95); background: var(--border-light); }
+
+.hero-mid {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  position: relative;
+  z-index: 2;
+  padding: 12px 0;
+}
+
+.hero-mid h2 {
+  font-size: clamp(44px, 10vw, 64px);
+  font-weight: 800;
+  letter-spacing: -0.04em;
   line-height: 1;
   color: var(--text-main);
-  margin-bottom: 16px;
-  z-index: 2;
+  margin: 0;
 }
 
 .change-pill {
   display: inline-flex; align-items: center; gap: 4px;
   padding: 6px 14px; border-radius: var(--radius-full);
-  font-size: 13px; font-weight: 700; line-height: 1;
+  font-size: 12.5px; font-weight: 700; line-height: 1;
   z-index: 2;
 }
 .change-pill.up { background: var(--good-bg); color: var(--good); }
 .change-pill.down { background: var(--bad-bg); color: var(--bad); }
 .change-pill.same { background: var(--surface-subtle); color: var(--text-secondary); }
 
-.hero-footer-metrics {
-  display: flex;
-  gap: 12px;
-  margin-top: 24px;
-  width: 100%;
+.change-pill.mini { padding: 4px 8px; font-size: 10.5px; }
+
+.hero-details-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  padding-top: 20px;
+  border-top: 1px dashed var(--border-strong);
+  position: relative;
   z-index: 2;
 }
 
-.metric-pill {
-  flex: 1;
-  background: var(--surface-subtle);
-  border: 1px solid var(--border-light);
-  border-radius: var(--radius-md);
-  padding: 14px 12px;
-  display: flex; flex-direction: column; align-items: center; gap: 2px;
+.hero-detail-col {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
 }
-.metric-pill span { font-size: 10px; font-weight: 700; text-transform: uppercase; color: var(--text-tertiary); letter-spacing: 0.05em; }
-.metric-pill b { font-size: 16px; font-weight: 800; color: var(--text-main); }
-.metric-pill em { font-style: normal; font-size: 11px; font-weight: 700; color: var(--text-secondary); }
+
+.hero-sub-label {
+  font-family: var(--font-display);
+  font-size: 11px; font-weight: 800;
+  text-transform: uppercase; letter-spacing: 0.05em;
+  color: var(--text-tertiary);
+  margin-bottom: 6px; display: block;
+}
+
+.hero-sub-val {
+  font-size: 18px; font-weight: 800; color: var(--text-main);
+  line-height: 1.2; display: flex; align-items: center; gap: 8px;
+  margin-bottom: 2px;
+}
+
+.hero-sub-sub {
+  font-size: 12px; font-weight: 600; color: var(--text-secondary);
+}
 
 /* Deep Cards & Sections */
 .section-head {
   display: flex; align-items: baseline; justify-content: space-between;
-  padding: 0 4px; margin-bottom: -8px;
+  margin-bottom: 12px; padding: 0 4px;
 }
-.section-head h3 { font-size: 16px; font-weight: 800; letter-spacing: -0.02em; }
+.section-head h3 { font-size: 16px; font-weight: 800; letter-spacing: -0.02em; margin: 0; }
 .section-head span { font-size: 12px; font-weight: 600; color: var(--text-tertiary); }
 
 .panel {
@@ -336,8 +415,11 @@ details.collapsible summary {
   padding: 18px 20px; cursor: pointer; list-style: none; user-select: none;
 }
 details.collapsible summary::-webkit-details-marker { display: none; }
-.summary-title h3 { font-size: 15px; font-weight: 700; }
+
+.summary-title { display: flex; align-items: baseline; justify-content: space-between; width: 100%; padding-right: 12px; }
+.summary-title h3 { font-size: 15px; font-weight: 700; margin: 0; color: var(--text-main); }
 .summary-title span { font-size: 12px; font-weight: 600; color: var(--text-tertiary); }
+
 .chevron { font-size: 10px; color: var(--text-tertiary); transition: transform var(--transition); }
 details.collapsible[open] .chevron { transform: rotate(180deg); }
 details.collapsible .collapsible-content {
@@ -350,19 +432,24 @@ details.collapsible .collapsible-content {
   background: var(--surface); border: 1px solid var(--border-light); border-radius: var(--radius-md);
   padding: 16px; display: flex; flex-direction: column; box-shadow: var(--shadow-card), var(--specular);
 }
-.stat-card .label { font-size: 10px; font-weight: 800; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 8px; letter-spacing: 0.05em; }
+.stat-card .label { font-size: 10.5px; font-weight: 800; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 8px; letter-spacing: 0.05em; }
 .stat-card .value { font-size: 16px; font-weight: 800; margin-bottom: 2px; }
 .stat-card .sub { font-size: 11.5px; font-weight: 600; color: var(--text-secondary); }
 
-/* Timeline Re-polished */
-.timeline { display: flex; flex-direction: column; gap: 24px; position: relative; padding-left: 10px; margin-top: 8px; }
-.timeline::before { content: ""; position: absolute; top: 8px; bottom: 8px; left: 15px; width: 2px; background: var(--border-light); z-index: 1; }
+.horizon-grid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 6px; width: 100%; }
+@media (max-width: 480px) { .horizon-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; } }
+.horizon-box { background: var(--surface-subtle); border: 1px solid var(--border-light); border-radius: var(--radius-xs); padding: 10px 8px; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.horizon-box small { font-size: 10px; font-weight: 800; text-transform: uppercase; color: var(--text-tertiary); letter-spacing: 0.05em; }
+.horizon-box b { font-size: 13px; font-weight: 800; color: var(--text-main); }
+
+/* Perfected Vertical Timeline */
+.timeline { display: flex; flex-direction: column; gap: 16px; position: relative; margin-top: 4px; }
+.timeline::before { content: ""; position: absolute; top: 4px; bottom: 4px; left: 6px; width: 2px; background: var(--border-strong); z-index: 1; }
 .timeline-step { display: flex; align-items: flex-start; gap: 16px; position: relative; z-index: 2; }
-.timeline-node {
-  width: 12px; height: 12px; border-radius: 50%; background: var(--surface); border: 2px solid var(--border-strong);
-  margin-top: 4px; transition: all var(--transition);
-}
+.timeline-node { width: 14px; height: 14px; border-radius: 50%; background: var(--surface); border: 2px solid var(--border-strong); flex-shrink: 0; z-index: 2; transition: all var(--transition); }
 .timeline-node.active { border-color: var(--gold-primary); background: var(--gold-primary); box-shadow: 0 0 0 4px var(--gold-tint); }
+
+.timeline-content { display: flex; flex-direction: column; margin-top: -3px; }
 .timeline-content .lbl { font-size: 11px; font-weight: 800; text-transform: uppercase; color: var(--text-tertiary); letter-spacing: 0.05em; display: block; margin-bottom: 4px; }
 .timeline-content b { font-size: 18px; font-weight: 800; display: block; margin-bottom: 2px; }
 .timeline-content small { font-size: 12px; font-weight: 600; color: var(--text-secondary); }
@@ -381,6 +468,7 @@ details.collapsible .collapsible-content {
 
 .chartwrap { width: 100%; height: 240px; position: relative; touch-action: none; margin: 16px 0; }
 .chartwrap canvas { width: 100%; height: 100%; display: block; }
+
 .chart-header-metrics { display: flex; justify-content: space-between; align-items: flex-end; padding-bottom: 12px; border-bottom: 1px dashed var(--border-light); }
 .primary-metric span { display: block; font-size: 11px; font-weight: 800; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 4px; }
 .primary-metric strong { font-size: 20px; font-weight: 800; }
@@ -390,6 +478,8 @@ details.collapsible .collapsible-content {
 .sec-metric { text-align: right; }
 .sec-metric span { font-size: 10px; font-weight: 700; text-transform: uppercase; color: var(--text-tertiary); margin-right: 6px; }
 .sec-metric b { font-size: 14px; font-weight: 700; }
+
+.chartmeta { display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; color: var(--text-tertiary); margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--border-light); width: 100%; }
 
 /* Calculator Forms */
 .chip-container { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; padding-bottom: 4px; margin-bottom: 16px; }
@@ -429,6 +519,21 @@ details.collapsible .collapsible-content {
 }
 .quote-btn:active { transform: scale(0.98); }
 
+.last-box { display: flex; align-items: center; justify-content: space-between; }
+.last-box h4 { font-size: 14px; font-weight: 800; line-height: 1.2; margin-bottom: 4px; }
+.last-box p { font-size: 12px; color: var(--text-secondary); font-weight: 600; }
+.last-box .amount { font-size: 20px; font-weight: 800; line-height: 1.2; text-align: right; }
+.last-box .amount.positive { color: var(--good); }
+.last-box .amount.negative { color: var(--bad); }
+
+.compare-result {
+  margin-top: 16px; padding: 14px 16px; background: var(--surface-subtle);
+  border-radius: var(--radius-md); font-size: 12.5px; line-height: 1.5; width: 100%; border: 1px solid var(--border-light);
+}
+.compare-result strong { font-size: 16px; font-weight: 800; display: block; margin-bottom: 2px; }
+.compare-result .positive { color: var(--good); font-weight: 700; }
+.compare-result .negative { color: var(--bad); font-weight: 700; }
+
 /* Table */
 .table-wrap { max-height: 400px; overflow-y: auto; padding: 0; border: 1px solid var(--border-light); border-radius: var(--radius-md); }
 .history-table { width: 100%; border-collapse: collapse; font-size: 13px; }
@@ -454,7 +559,18 @@ details.collapsible .collapsible-content {
 .fab-btn.fetching .icon-spin { display: block; animation: spin 0.8s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* Toast & Pulldown remain sleek */
+.pulldown {
+  position: fixed; top: env(safe-area-inset-top); left: 50%; transform: translate(-50%, -70px);
+  background: var(--surface); border: 1px solid var(--border-strong); padding: 8px 16px; border-radius: var(--radius-full);
+  box-shadow: var(--shadow-card); display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 800;
+  z-index: 150; opacity: 0; transition: opacity 0.2s, transform 0.2s;
+}
+.pulldown.visible { opacity: 1; }
+.pulldown.ready { color: var(--gold-primary); }
+.pulldown.ready .pulldownicon { transform: rotate(180deg); }
+.pulldown.loading .icon-idle { display: none; }
+.pulldown.loading .icon-spin { display: block; animation: spin 0.8s linear infinite; }
+
 .toast {
   position: fixed; top: calc(16px + env(safe-area-inset-top)); left: 50%; transform: translate(-50%, -20px);
   background: var(--surface); color: var(--text-main); border: 1px solid var(--border-light);
@@ -466,10 +582,6 @@ details.collapsible .collapsible-content {
 .toast.show { opacity: 1; transform: translate(-50%, 0); }
 
 footer { text-align: center; font-size: 12px; font-weight: 600; color: var(--text-tertiary); padding: 20px 0; }
-
-.warning-banner { display: flex; align-items: flex-start; gap: 12px; padding: 16px; background: var(--bad-bg); border-radius: var(--radius-md); color: var(--bad); }
-.warning-banner strong { font-size: 14px; display: block; margin-bottom: 2px; }
-.warning-banner p { font-size: 12px; font-weight: 600; }
 </style>
 </head>
 
@@ -477,7 +589,13 @@ footer { text-align: center; font-size: 12px; font-weight: 600; color: var(--tex
 
 <div class="app">
 
-  <div class="pulldown" id="pulldown" aria-hidden="true" style="display:none;"></div> <!-- Handled internally -->
+  <div class="pulldown" id="pulldown" aria-hidden="true">
+    <span class="pulldownicon" id="pulldownIcon">
+      <svg class="icon-idle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><polyline points="21 3 21 9 15 9"/></svg>
+      <svg class="icon-spin" viewBox="0 0 24 24" fill="none" width="14" height="14"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="34 22"/></svg>
+    </span>
+    <span id="pulldownText">Pull to refresh</span>
+  </div>
 
   <header class="topbar animate-up d-1">
     <div class="brand-text">
@@ -504,31 +622,41 @@ footer { text-align: center; font-size: 12px; font-weight: 600; color: var(--tex
     </div>
   </section>
 
-  <div class="warning-banner animate-up d-1" id="parserWarning" hidden>
+  <!-- Interactive Warning Banner -->
+  <div class="warning-banner animate-up d-1" id="parserWarning" hidden onclick="this.hidden = true;">
     <div class="warning-content">
-      <strong id="warningTitle">Source Issue</strong>
-      <p id="warningDesc">Displaying fallback rate.</p>
+      <strong id="warningTitle">Status Message <span class="dismiss-text">Tap to dismiss</span></strong>
+      <p id="warningDesc">Checking connection...</p>
     </div>
   </div>
 
   <div hidden><button id="fetchNow"></button></div>
 
-  <!-- Redesigned Glowing Center Hero -->
+  <!-- Perfectly Structured Hero Card -->
   <section class="hero animate-up d-2" id="heroCard">
-    <span class="hero-tag">1 Sovereign (8 Grams)</span>
-    <h2 id="hero8">₹—</h2>
-    <div id="change8" class="change-pill same">No change</div>
+    <div class="hero-top">
+      <span class="hero-label">1 Sovereign (8 Grams)</span>
+      <button id="shareBtn" class="share-btn" type="button" aria-label="Share">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="13" height="13"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+        <span>Share</span>
+      </button>
+    </div>
 
-    <div class="hero-footer-metrics">
-      <div class="metric-pill">
-        <span>1G Benchmark</span>
-        <b id="hero1">₹—</b>
-        <em id="change1" class="same"></em>
+    <div class="hero-mid">
+      <h2 id="hero8">₹—</h2>
+      <div id="change8" class="change-pill same">No change</div>
+    </div>
+
+    <div class="hero-details-grid">
+      <div class="hero-detail-col">
+        <span class="hero-sub-label">Rate Per Gram</span>
+        <div class="hero-sub-val" id="hero1">₹— <span id="change1" class="change-pill mini same"></span></div>
+        <div class="hero-sub-sub">1 Gram Benchmark</div>
       </div>
-      <div class="metric-pill">
-        <span>Market Date</span>
-        <b id="today">—</b>
-        <em id="todayTime">—</em>
+      <div class="hero-detail-col">
+        <span class="hero-sub-label">Market Date</span>
+        <div class="hero-sub-val" id="today">—</div>
+        <div class="hero-sub-sub" id="todayTime">—</div>
       </div>
     </div>
   </section>
@@ -622,7 +750,7 @@ footer { text-align: center; font-size: 12px; font-weight: 600; color: var(--tex
   </section>
 
   <!-- Clean Panels Group -->
-  <div class="animate-up d-4" style="display:flex; flex-direction:column; gap:12px;">
+  <div class="animate-up d-4" style="display:flex; flex-direction:column; gap:16px;">
     <details class="collapsible">
       <summary><div class="summary-title"><h3>Multi-Horizon Performance</h3><span>Returns</span></div><span class="chevron">▼</span></summary>
       <div class="collapsible-content">
@@ -641,19 +769,19 @@ footer { text-align: center; font-size: 12px; font-weight: 600; color: var(--tex
       <summary><div class="summary-title"><h3>Moving Average (SMA)</h3><span>30D Trend</span></div><span class="chevron">▼</span></summary>
       <div class="collapsible-content">
         <div style="display:flex; justify-content:space-between; align-items:center;">
-          <div><span style="font-size:10px; font-weight:800; color:var(--text-tertiary); text-transform:uppercase;">30D Avg</span><br><b id="smaValue" style="font-size:16px;">₹—</b></div>
+          <div><span style="font-size:11px; font-weight:800; color:var(--text-tertiary); text-transform:uppercase;">30D Avg</span><br><b id="smaValue" style="font-size:16px; margin-top:2px; display:block;">₹—</b></div>
           <div class="change-pill same" id="smaPill">Calculating…</div>
         </div>
       </div>
     </details>
     
-    <div class="panel" style="display:flex; justify-content:space-between; align-items:center;">
+    <div class="panel last-box">
       <div>
-        <h4 style="font-size:14px; font-weight:800; margin-bottom:4px;">Last Movement</h4>
-        <p id="lastDate" style="font-size:12px; color:var(--text-secondary); font-weight:600;">Analyzing...</p>
-        <p id="lastTime" style="font-size:11px; color:var(--text-tertiary); font-weight:600; margin-top:2px;">—</p>
+        <h4>Last Movement</h4>
+        <p id="lastDate">Analyzing...</p>
+        <p id="lastTime" style="font-size:11px; margin-top:2px;">—</p>
       </div>
-      <div class="amount" id="lastAmount" style="font-size:20px; font-weight:800;">—</div>
+      <div class="amount" id="lastAmount">—</div>
     </div>
   </div>
 
@@ -666,7 +794,7 @@ footer { text-align: center; font-size: 12px; font-weight: 600; color: var(--tex
         <div class="calc-field"><label>Earlier</label><input class="calc-input" type="date" id="dateA"></div>
         <div class="calc-field"><label>Later</label><input class="calc-input" type="date" id="dateB"></div>
       </div>
-      <div class="receipt-box" style="margin-top:16px;" id="compareResult">Select two dates to compare.</div>
+      <div class="compare-result" id="compareResult">Select two dates to compare.</div>
     </div>
   </section>
 
@@ -728,7 +856,7 @@ footer { text-align: center; font-size: 12px; font-weight: 600; color: var(--tex
           <span class="label" id="receiptTotalLabel">Net Payable</span>
           <span class="final-val" id="calcResult">₹—</span>
         </div>
-        <div style="font-size:11px; color:var(--text-tertiary); text-align:right; margin-top:4px;" id="calcSub">Based on live 22K rate.</div>
+        <div style="font-size:11px; font-weight:600; color:var(--text-tertiary); text-align:right; margin-top:4px;" id="calcSub">Based on live 22K rate.</div>
 
         <button class="quote-btn" id="copyQuoteBtn" type="button">Copy Quotation Slip</button>
       </div>
@@ -763,13 +891,6 @@ footer { text-align: center; font-size: 12px; font-weight: 600; color: var(--tex
     </span>
     <span id="fabLabel">Sync Market</span>
   </button>
-</div>
-
-<!-- Image Generation hidden button trigger -->
-<div style="position:fixed; bottom:24px; right:24px; z-index:100;">
-   <button id="shareBtn" style="width:48px; height:48px; border-radius:50%; background:var(--surface); border:1px solid var(--border-light); box-shadow:var(--shadow-float); display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--text-main);">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
-   </button>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -847,7 +968,7 @@ function sleep(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
 function checkParserHealth(data, networkError = false) {
   const warningBox = $("parserWarning");
   if (networkError) {
-    $("warningTitle").textContent = "Offline Mode";
+    $("warningTitle").innerHTML = `Offline Mode <span class="dismiss-text">Tap to dismiss</span>`;
     $("warningDesc").textContent = "Displaying device-cached data.";
     warningBox.hidden = false;
     return;
@@ -860,8 +981,8 @@ function checkParserHealth(data, networkError = false) {
   if (data.status === "degraded" || data.status === "error") { hasFailed = true; reasons.push("Degraded mode"); }
 
   if (hasFailed) {
-    $("warningTitle").textContent = "Source Warning";
-    $("warningDesc").textContent = reasons.join(" · ") + ". Using fallback.";
+    $("warningTitle").innerHTML = `Source Notice <span class="dismiss-text">Tap to dismiss</span>`;
+    $("warningDesc").textContent = reasons.join(" · ") + ". Displaying last verified rate.";
     warningBox.hidden = false;
   } else warningBox.hidden = true;
 }
@@ -922,8 +1043,10 @@ function renderLive(d) {
   if (!Number.isFinite(change1)) change1 = Number.isFinite(Number(d.previous_rate_22k)) ? rate - Number(d.previous_rate_22k) : 0;
   const change8 = change1 * 8;
 
-  $("change1").textContent = change1 > 0 ? "▲ +" + money(change1) : change1 < 0 ? "▼ -" + money(Math.abs(change1)) : "No change";
-  $("change8").textContent = change8 > 0 ? "▲ +" + money(change8) : change8 < 0 ? "▼ -" + money(Math.abs(change8)) : "No change";
+  $("change1").textContent = change1 > 0 ? "+" + money(change1) : change1 < 0 ? "-" + money(Math.abs(change1)) : "Flat";
+  $("change1").className = "change-pill mini " + (change1 > 0 ? "up" : change1 < 0 ? "down" : "same");
+  
+  $("change8").textContent = change8 > 0 ? "▲ +" + money(change8) + " Today" : change8 < 0 ? "▼ -" + money(Math.abs(change8)) + " Today" : "No change";
   $("change8").className = "change-pill " + (change8 > 0 ? "up" : change8 < 0 ? "down" : "same");
 
   renderTodayTimeline();
@@ -1013,7 +1136,7 @@ function drawChart() {
 
   const styles = getComputedStyle(document.body);
   const colorGold = styles.getPropertyValue('--gold-primary').trim() || '#d97706';
-  const colorGrid = styles.getPropertyValue('--border-light').trim() || 'rgba(0,0,0,0.05)';
+  const colorGrid = styles.getPropertyValue('--border-strong').trim() || 'rgba(0,0,0,0.1)';
   const colorText = styles.getPropertyValue('--text-tertiary').trim() || '#94a3b8';
   const colorPrimary = styles.getPropertyValue('--text-main').trim() || '#020617';
 
@@ -1210,7 +1333,7 @@ async function manualFetch() {
     history = normalize(await getJSON(HISTORY_URL)); renderLive(latest); renderStats(); calculate();
     localStorage.setItem("gold_live_backup", JSON.stringify(latest)); localStorage.setItem("gold_history_backup", JSON.stringify(history));
     setStatus("Synced " + timeText(latest.time)); toast("Market Synced");
-  } catch(e) { setStatus("Offline Mode", true); checkParserHealth({error:"Sync failed"}); toast("Sync Failed"); }
+  } catch(e) { setStatus("Offline Mode", true); checkParserHealth({error:"Sync failed"}, true); toast("Sync Failed"); }
   finally { fetchBusy = false; $("refresh").classList.remove("fetching"); $("fabLabel").textContent = "Sync Market"; }
 }
 
