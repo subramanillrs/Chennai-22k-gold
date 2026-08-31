@@ -213,7 +213,7 @@ button, input, select {
   100% { transform: scale(0.95); opacity: 0.8; }
 }
 
-/* Purity Strip (No top line or top accent) */
+/* Top 3 Purity Cards - Clean & Flush */
 .purity-strip {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -224,7 +224,6 @@ button, input, select {
 .purity-card {
   background: var(--surface);
   border: 1px solid var(--border-subtle);
-  border-top: 1px solid var(--border-subtle);
   border-radius: var(--r-sm);
   padding: 10px 8px;
   display: flex;
@@ -278,16 +277,16 @@ button, input, select {
 .warning-content p { font-size: 11px; font-weight: 600; line-height: 1.35; }
 .dismiss-text { font-size: 9.5px; opacity: 0.8; text-transform: uppercase; font-weight: 800; }
 
-/* Hero Center Card */
+/* Redesigned Hero Card */
 .hero {
   background: var(--surface);
   border: 1px solid var(--border-subtle);
   border-radius: var(--r-lg);
-  padding: 20px;
+  padding: 22px 20px;
   box-shadow: var(--shadow-hero);
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 18px;
   width: 100%;
   position: relative;
 }
@@ -301,7 +300,7 @@ button, input, select {
 }
 
 .hero-label {
-  font-size: 11px;
+  font-size: 11.5px;
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -315,7 +314,7 @@ button, input, select {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 5px;
+  gap: 6px;
   height: 28px;
   padding: 0 12px;
   background: var(--surface-subtle);
@@ -334,8 +333,8 @@ button, input, select {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  padding: 4px 0;
+  gap: 10px;
+  padding: 2px 0;
   text-align: center;
 }
 
@@ -345,11 +344,6 @@ button, input, select {
   letter-spacing: -0.03em;
   line-height: 1;
   color: var(--text-main);
-}
-
-.currency-sym {
-  margin-right: 0.24em;
-  font-weight: 700;
 }
 
 .change-pill {
@@ -372,7 +366,7 @@ button, input, select {
 .hero-details-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 12px;
+  gap: 14px;
   padding-top: 16px;
   border-top: 1px dashed var(--border-subtle);
   width: 100%;
@@ -392,7 +386,7 @@ button, input, select {
   letter-spacing: 0.06em;
   color: var(--text-tertiary);
   line-height: 14px;
-  margin-bottom: 4px;
+  margin-bottom: 5px;
 }
 
 .hero-sub-val {
@@ -497,7 +491,7 @@ button, input, select {
   text-overflow: ellipsis;
 }
 
-/* Left & Right Side-by-Side Timeline */
+/* Balanced AM/PM Market Timeline */
 .timeline-horizontal {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -509,18 +503,26 @@ button, input, select {
   background: var(--surface-subtle);
   border: 1px solid var(--border-subtle);
   border-radius: var(--r-sm);
-  padding: 12px 14px;
+  padding: 13px 14px;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 5px;
   overflow: hidden;
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+
+.timeline-card.is-active {
+  border-color: var(--gold-border);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
 }
 
 .timeline-card-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 2px;
+  margin-bottom: 1px;
+  min-height: 16px;
 }
 
 .timeline-card-header .lbl {
@@ -529,17 +531,20 @@ button, input, select {
   text-transform: uppercase;
   color: var(--text-tertiary);
   letter-spacing: 0.05em;
+  line-height: 1;
 }
 
 .timeline-node {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: var(--surface);
+  background: var(--surface-subtle);
   border: 2px solid var(--border-strong);
   transition: all var(--transition);
+  flex-shrink: 0;
 }
-.timeline-node.active {
+
+.timeline-card.is-active .timeline-node {
   border-color: var(--gold-primary);
   background: var(--gold-primary);
   box-shadow: 0 0 0 3px var(--gold-tint);
@@ -549,14 +554,20 @@ button, input, select {
   font-size: 17px;
   font-weight: 800;
   color: var(--text-main);
-  line-height: 1.2;
+  line-height: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
 }
 
 .timeline-card small {
   font-size: 11.5px;
   font-weight: 500;
   color: var(--text-secondary);
-  line-height: 1.2;
+  line-height: 15px;
+  height: 15px;
+  display: flex;
+  align-items: center;
 }
 
 /* Premium Financial Terminal Chart Dashboard */
@@ -785,6 +796,74 @@ details.collapsible .collapsible-content {
 }
 .last-box .amount.positive { color: var(--good); }
 .last-box .amount.negative { color: var(--bad); }
+
+/* Redesigned 3-Column Historical Date Comparison */
+.compare-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1.15fr;
+  gap: 10px;
+  align-items: flex-end;
+  width: 100%;
+}
+
+@media (max-width: 480px) {
+  .compare-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .compare-result-col {
+    grid-column: span 2;
+  }
+}
+
+.compare-field {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.compare-field label {
+  font-size: 10.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  letter-spacing: 0.05em;
+  line-height: 14px;
+  height: 14px;
+  margin-bottom: 6px;
+  display: block;
+  white-space: nowrap;
+}
+
+.compare-result-card {
+  height: 44px;
+  padding: 4px 12px;
+  background: var(--surface-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-xs);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 100%;
+}
+
+.compare-result-top {
+  font-size: 12.5px;
+  font-weight: 800;
+  line-height: 1.2;
+  color: var(--text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.compare-result-sub {
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+.compare-result-sub.positive { color: var(--good); }
+.compare-result-sub.negative { color: var(--bad); }
 
 /* Jewelry Purchase Suite */
 .calc-suite {
@@ -1027,36 +1106,20 @@ select.calc-input {
   background: var(--border-subtle);
 }
 
-.compare-result {
-  margin-top: 12px;
-  padding: 12px;
-  background: var(--surface-subtle);
-  border-radius: var(--r-xs);
-  font-size: 12px;
-  line-height: 1.45;
-  width: 100%;
-}
-.compare-result strong {
-  font-size: 14.5px;
-  font-weight: 800;
-  display: block;
-  margin-bottom: 2px;
-}
-.compare-result .positive { color: var(--good); font-weight: 700; }
-.compare-result .negative { color: var(--bad); font-weight: 700; }
-
-/* Historical Table Pixel-Wise Layout Fix */
+/* Completely Redesigned Pixel-Perfect Historical Table */
 .table-wrap {
-  max-height: 360px;
+  max-height: 380px;
   overflow-y: auto;
   padding: 0;
   border: 1px solid var(--border-subtle);
   border-radius: var(--r-md);
   width: 100%;
+  background: var(--surface);
 }
 .history-table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
   font-size: 13px;
   table-layout: fixed;
 }
@@ -1064,8 +1127,8 @@ select.calc-input {
   position: sticky;
   top: 0;
   background: var(--surface-subtle);
-  padding: 10px 12px;
-  font-size: 10px;
+  padding: 10px 14px;
+  font-size: 10.5px;
   font-weight: 800;
   text-transform: uppercase;
   color: var(--text-tertiary);
@@ -1074,27 +1137,32 @@ select.calc-input {
   line-height: 1.2;
 }
 .history-table td {
-  padding: 11px 12px;
+  padding: 11px 14px;
   border-bottom: 1px solid var(--border-subtle);
   font-weight: 600;
   vertical-align: middle;
   line-height: 1.2;
+  color: var(--text-main);
+}
+.history-table tr:last-child td {
+  border-bottom: none;
 }
 .history-table tr:hover td {
   background-color: var(--surface-subtle);
 }
+
 .history-table th:nth-child(1), .history-table td:nth-child(1) {
-  width: 34%;
+  width: 38%;
   text-align: left;
   white-space: nowrap;
 }
 .history-table th:nth-child(2), .history-table td:nth-child(2) {
-  width: 32%;
+  width: 31%;
   text-align: right;
   white-space: nowrap;
 }
 .history-table th:nth-child(3), .history-table td:nth-child(3) {
-  width: 34%;
+  width: 31%;
   text-align: right;
   white-space: nowrap;
 }
@@ -1193,15 +1261,15 @@ footer {
   <section class="purity-strip">
     <div class="purity-card">
       <small>24K (99.9%)</small>
-      <b id="purity24">₹—</b>
+      <b id="purity24">₹ —</b>
     </div>
     <div class="purity-card">
       <small>22K (91.6%)</small>
-      <b id="purity22">₹—</b>
+      <b id="purity22">₹ —</b>
     </div>
     <div class="purity-card">
       <small>18K (75.0%)</small>
-      <b id="purity18">₹—</b>
+      <b id="purity18">₹ —</b>
     </div>
   </section>
 
@@ -1214,7 +1282,7 @@ footer {
 
   <div hidden><button id="fetchNow"></button></div>
 
-  <!-- Main Hero -->
+  <!-- Redesigned Main Column (Hero) -->
   <section class="hero" id="heroCard">
     <div class="hero-top">
       <span class="hero-label">1 Sovereign (8 Grams)</span>
@@ -1262,14 +1330,14 @@ footer {
     </div>
   </section>
 
-  <!-- Side-by-Side Left & Right Market Timeline -->
+  <!-- Side-by-Side Left & Right Market Timeline (Identical fronts, spacing, lines; latest is active) -->
   <section class="section">
     <div class="section-head">
       <h3>Today's Market Activity</h3>
     </div>
     <div class="panel">
       <div class="timeline-horizontal">
-         <div class="timeline-card">
+         <div class="timeline-card" id="amCard">
             <div class="timeline-card-header">
                <span class="lbl">Morning Fix (AM)</span>
                <div class="timeline-node" id="amNode"></div>
@@ -1277,7 +1345,7 @@ footer {
             <b id="amRate">Pending</b>
             <small id="amTime">—</small>
          </div>
-         <div class="timeline-card">
+         <div class="timeline-card" id="pmCard">
             <div class="timeline-card-header">
                <span class="lbl">Evening Fix (PM)</span>
                <div class="timeline-node" id="pmNode"></div>
@@ -1354,7 +1422,7 @@ footer {
       <summary><div class="summary-title"><h3>Moving Average (SMA)</h3><span>30D Trend</span></div><span class="chevron">▼</span></summary>
       <div class="collapsible-content">
         <div style="display:flex; justify-content:space-between; align-items:center;">
-          <div><span style="font-size:10px; font-weight:800; color:var(--text-tertiary); text-transform:uppercase;">30D Average</span><br><b id="smaValue" style="font-size:15px; margin-top:2px; display:block;">₹—</b></div>
+          <div><span style="font-size:10px; font-weight:800; color:var(--text-tertiary); text-transform:uppercase;">30D Average</span><br><b id="smaValue" style="font-size:15px; margin-top:2px; display:block;">₹ —</b></div>
           <div class="change-pill same" id="smaPill">Calculating…</div>
         </div>
       </div>
@@ -1370,20 +1438,33 @@ footer {
     </div>
   </div>
 
+  <!-- Redesigned 3-Column Historical Comparison -->
   <section class="section">
     <div class="section-head">
       <h3>Compare Historical Dates</h3>
     </div>
     <div class="panel">
-      <div class="calc-grid-form">
-        <div class="calc-field"><label>Earlier Date</label><input class="calc-input" type="date" id="dateA"></div>
-        <div class="calc-field"><label>Later Date</label><input class="calc-input" type="date" id="dateB"></div>
+      <div class="compare-grid">
+        <div class="compare-field">
+          <label>Earlier Date</label>
+          <input class="calc-input" type="date" id="dateA">
+        </div>
+        <div class="compare-field">
+          <label>Later Date</label>
+          <input class="calc-input" type="date" id="dateB">
+        </div>
+        <div class="compare-field compare-result-col">
+          <label>Net Comparison</label>
+          <div class="compare-result-card" id="compareResult">
+            <span class="compare-result-top">Select two dates</span>
+            <span class="compare-result-sub">—</span>
+          </div>
+        </div>
       </div>
-      <div class="compare-result" id="compareResult">Select two dates to compare values.</div>
     </div>
   </section>
 
-  <!-- Jewelry Valuation Suite -->
+  <!-- Jewelry Purchase & Exchange Suite -->
   <section class="section">
     <div class="section-head">
       <h3>Jewelry Purchase & Exchange Suite</h3>
@@ -1473,15 +1554,15 @@ footer {
         <!-- Detailed Itemized Receipt Card -->
         <div class="receipt-card">
           <div class="receipt-title">Itemized Purchase Quotation</div>
-          <div class="receipt-line"><span>Base 22K Gold Cost:</span><span id="receiptBase">₹0</span></div>
-          <div class="receipt-line"><span id="receiptMakingLabel">Making Charges (8%):</span><span id="receiptMaking">₹0</span></div>
-          <div class="receipt-line"><span id="receiptGstLabel">GST (3%):</span><span id="receiptGst">₹0</span></div>
-          <div class="receipt-line"><span>Hallmarking / Flat Fees:</span><span id="receiptFee">₹0</span></div>
-          <div class="receipt-line deduction" id="receiptOldGoldLine" style="display:none;"><span>Old Gold Exchange Credit:</span><span id="receiptOldGold">-₹0</span></div>
+          <div class="receipt-line"><span>Base 22K Gold Cost:</span><span id="receiptBase">₹ 0</span></div>
+          <div class="receipt-line"><span id="receiptMakingLabel">Making Charges (8%):</span><span id="receiptMaking">₹ 0</span></div>
+          <div class="receipt-line"><span id="receiptGstLabel">GST (3%):</span><span id="receiptGst">₹ 0</span></div>
+          <div class="receipt-line"><span>Hallmarking / Flat Fees:</span><span id="receiptFee">₹ 0</span></div>
+          <div class="receipt-line deduction" id="receiptOldGoldLine" style="display:none;"><span>Old Gold Exchange Credit:</span><span id="receiptOldGold">-₹ 0</span></div>
           
           <div class="receipt-total">
             <span class="label" id="receiptTotalLabel">Net Payable Amount</span>
-            <span class="final-val" id="calcResult">₹—</span>
+            <span class="final-val" id="calcResult">₹ —</span>
           </div>
           <div style="font-size:10.5px; font-weight:600; color:var(--text-tertiary); text-align:right; margin-top:2px;" id="calcSub">Based on live 22K rate.</div>
 
@@ -1492,7 +1573,7 @@ footer {
     </div>
   </section>
 
-  <!-- Historical Log Table -->
+  <!-- Redesigned Historical Log Table -->
   <section class="section">
     <div class="section-head">
       <h3>Historical Log</h3>
@@ -1501,7 +1582,7 @@ footer {
     <div class="panel table-wrap">
       <table class="history-table">
         <thead><tr><th>Date</th><th>Per Gram</th><th>1 Sov (8g)</th></tr></thead>
-        <tbody id="historyBody"><tr><td colspan="3" style="text-align:center;">Loading records…</td></tr></tbody>
+        <tbody id="historyBody"><tr><td colspan="3" style="text-align:center; padding: 20px 0;">Loading records…</td></tr></tbody>
       </table>
     </div>
   </section>
@@ -1695,7 +1776,7 @@ function renderTodayTimeline() {
   const today = live.date;
   let am = null, pm = null;
 
-  // 1. Check direct structured properties on live feed
+  // 1. Direct structured properties
   if (live.am_rate || live.amRate || live.morning_rate || live.rate_am) {
     am = {
       rate_22k: Number(live.am_rate || live.amRate || live.morning_rate || live.rate_am),
@@ -1709,7 +1790,7 @@ function renderTodayTimeline() {
     };
   }
 
-  // 2. Check intraday array
+  // 2. Intraday array
   if (Array.isArray(live.intraday)) {
     const amEntry = live.intraday.find(i => (i.date === today || !i.date) && (i.session === "AM" || String(i.session).toUpperCase().includes("AM") || String(i.session).toUpperCase().includes("MORNING")));
     if (amEntry && amEntry.rate_22k) am = { rate_22k: Number(amEntry.rate_22k), time: amEntry.time || "10:30" };
@@ -1718,7 +1799,7 @@ function renderTodayTimeline() {
     if (pmEntry && pmEntry.rate_22k) pm = { rate_22k: Number(pmEntry.rate_22k), time: pmEntry.time || "17:00" };
   }
 
-  // 3. Fallback to LocalStorage cache
+  // 3. LocalStorage cache fallback
   try {
     const cached = JSON.parse(localStorage.getItem("gold_live_backup"));
     if (cached && cached.date === today) {
@@ -1741,7 +1822,7 @@ function renderTodayTimeline() {
     }
   } catch(e) {}
 
-  // 4. Session & Time-based resolution
+  // 4. Session & time attribution
   const sessionUpper = String(live.session || "").toUpperCase();
   const timeHour = live.time ? parseInt(String(live.time).split(":")[0], 10) : new Date().getHours();
 
@@ -1752,14 +1833,14 @@ function renderTodayTimeline() {
     pm = { rate_22k: Number(live.rate_22k), time: live.time || "17:00" };
   }
 
-  // 5. If PM is published, derive Morning rate if previous_rate_22k or opening_rate exists
+  // 5. If PM is published, derive opening AM if available
   if (pm && !am) {
     if (live.morning_rate || live.opening_rate || live.previous_rate_22k) {
       am = { rate_22k: Number(live.morning_rate || live.opening_rate || live.previous_rate_22k), time: "10:30" };
     }
   }
 
-  // 6. Time-based attribution fallback
+  // 6. Time-based heuristic
   if (!am && !pm && live.rate_22k) {
     if (timeHour < 14) {
       am = { rate_22k: Number(live.rate_22k), time: live.time || "10:30" };
@@ -1773,11 +1854,16 @@ function renderTodayTimeline() {
 
   $("amRate").textContent = am && Number.isFinite(am.rate_22k) ? money(am.rate_22k) : "Pending";
   $("amTime").textContent = am ? timeText(am.time) : "—";
-  $("amNode").className = "timeline-node " + (am ? "active" : "");
 
   $("pmRate").textContent = pm && Number.isFinite(pm.rate_22k) ? money(pm.rate_22k) : "Pending";
   $("pmTime").textContent = pm ? timeText(pm.time) : "—";
-  $("pmNode").className = "timeline-node " + (pm ? "active" : "");
+
+  // Light up ONLY the single latest active fix
+  const isPmActive = Boolean(pm && Number.isFinite(pm.rate_22k));
+  const isAmActive = Boolean(am && Number.isFinite(am.rate_22k) && !isPmActive);
+
+  $("amCard").classList.toggle("is-active", isAmActive);
+  $("pmCard").classList.toggle("is-active", isPmActive);
 }
 
 function updateFintechMetrics() {
@@ -1909,7 +1995,6 @@ function drawChart() {
     ctx.stroke();
     ctx.setLineDash([]);
 
-    // Callout tooltip badge
     const badgeText = `${dateText(data[activeIdx].date)}: ${money(values[activeIdx])}/g`;
     ctx.font = "800 11px var(--font-sans)";
     ctx.fillStyle = colorTextMain;
@@ -2065,77 +2150,94 @@ document.querySelectorAll("#makingChips .chip").forEach(c => c.onclick = () => {
   calculate();
 });
 
-/* PNG Card Generator */
+/* Theme-Adaptive Canvas Snapshot Generator */
 function generateShareCardBlob() {
   return new Promise((resolve) => {
     if (!live) return resolve(null);
+    const isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
     const cvs = document.createElement("canvas"), ctx = cvs.getContext("2d"), w = 1080, h = 1350;
     cvs.width = w; cvs.height = h;
     const r1 = Number(live.rate_22k), r8 = r1 * 8, c1 = Number(live.change) || 0, c8 = c1 * 8;
 
-    ctx.fillStyle = "#030712";
+    // Adaptive Theme Palette
+    const bgApp = isDark ? "#030712" : "#f8fafc";
+    const bgSurface = isDark ? "#0b0f19" : "#ffffff";
+    const borderCard = isDark ? "rgba(255, 255, 255, 0.08)" : "rgba(15, 23, 42, 0.08)";
+    const textMain = isDark ? "#f8fafc" : "#0f172a";
+    const textSec = isDark ? "#94a3b8" : "#475569";
+    const textTert = isDark ? "#64748b" : "#94a3b8";
+    const goldColor = isDark ? "#fbbf24" : "#d97706";
+    const goodColor = isDark ? "#34d399" : "#059669";
+    const badColor = isDark ? "#f87171" : "#dc2626";
+
+    // 1. Base Canvas Fill
+    ctx.fillStyle = bgApp;
     ctx.fillRect(0, 0, w, h);
 
-    const gl = ctx.createRadialGradient(w/2, 340, 40, w/2, 340, 420);
-    gl.addColorStop(0, "rgba(217, 119, 6, 0.16)");
-    gl.addColorStop(1, "rgba(3, 7, 18, 0)");
+    // Subtle Gold Ambient Glow
+    const gl = ctx.createRadialGradient(w/2, 340, 40, w/2, 340, 480);
+    gl.addColorStop(0, isDark ? "rgba(251, 191, 36, 0.12)" : "rgba(217, 119, 6, 0.08)");
+    gl.addColorStop(1, isDark ? "rgba(3, 7, 18, 0)" : "rgba(248, 250, 252, 0)");
     ctx.fillStyle = gl;
     ctx.fillRect(0, 0, w, h);
 
-    ctx.strokeStyle = "rgba(255, 255, 255, 0.08)";
-    ctx.lineWidth = 3;
+    // Outer Frame
+    ctx.strokeStyle = borderCard;
+    ctx.lineWidth = 2;
     ctx.strokeRect(36, 36, w - 72, h - 72);
 
-    ctx.fillStyle = "#0b0f19";
+    // 2. Top Header Bar
+    ctx.fillStyle = bgSurface;
     ctx.beginPath();
     ctx.roundRect(72, 72, w - 144, 76, 38);
     ctx.fill();
-    ctx.strokeStyle = "rgba(255, 255, 255, 0.08)";
+    ctx.strokeStyle = borderCard;
     ctx.lineWidth = 1.5;
     ctx.stroke();
 
-    ctx.fillStyle = "#fbbf24";
+    ctx.fillStyle = goldColor;
     ctx.font = "800 24px 'Plus Jakarta Sans'";
     ctx.textAlign = "left";
     ctx.fillText("GOLD 22K RATE", 104, 119);
 
-    ctx.fillStyle = "#94a3b8";
+    ctx.fillStyle = textSec;
     ctx.font = "700 20px 'Plus Jakarta Sans'";
     ctx.textAlign = "right";
     ctx.fillText(`${dateText(live.date)} · ${$("session").textContent}`, w - 104, 118);
 
-    ctx.fillStyle = "#0b0f19";
+    // 3. Main Hero Sovereign Card
+    ctx.fillStyle = bgSurface;
     ctx.beginPath();
     ctx.roundRect(72, 172, w - 144, 380, 24);
     ctx.fill();
-    ctx.strokeStyle = "rgba(255, 255, 255, 0.08)";
+    ctx.strokeStyle = borderCard;
     ctx.stroke();
 
-    ctx.fillStyle = "#fbbf24";
+    ctx.fillStyle = goldColor;
     ctx.font = "800 22px 'Plus Jakarta Sans'";
     ctx.textAlign = "center";
     ctx.fillText("1 SOVEREIGN (8 GRAMS) 22K", w/2, 230);
 
-    ctx.fillStyle = "#f8fafc";
-    ctx.font = "800 96px 'Plus Jakarta Sans'";
+    ctx.fillStyle = textMain;
+    ctx.font = "800 92px 'Plus Jakarta Sans'";
     ctx.fillText(money(r8), w/2, 345);
 
     ctx.font = "700 26px 'Plus Jakarta Sans'";
     if (c8 > 0) {
-      ctx.fillStyle = "#34d399";
+      ctx.fillStyle = goodColor;
       ctx.fillText(`▲ +${money(c8)} Today`, w/2, 420);
     } else if (c8 < 0) {
-      ctx.fillStyle = "#f87171";
+      ctx.fillStyle = badColor;
       ctx.fillText(`▼ -${money(Math.abs(c8))} Today`, w/2, 420);
     } else {
-      ctx.fillStyle = "#94a3b8";
+      ctx.fillStyle = textSec;
       ctx.fillText("• Flat Market Today", w/2, 420);
     }
 
-    ctx.fillStyle = "rgba(255, 255, 255, 0.04)";
+    ctx.fillStyle = borderCard;
     ctx.fillRect(72, 460, w - 144, 1.5);
 
-    ctx.fillStyle = "#94a3b8";
+    ctx.fillStyle = textSec;
     ctx.font = "700 20px 'Plus Jakarta Sans'";
     ctx.textAlign = "left";
     ctx.fillText(`Rate Per Gram: ${money(r1)}/g`, 108, 514);
@@ -2143,6 +2245,7 @@ function generateShareCardBlob() {
     ctx.textAlign = "right";
     ctx.fillText(`Standard 22K 91.6% Pure`, w - 108, 514);
 
+    // 4. Three Purity Columns
     const gy = 576, cw = (w - 144 - 24) / 3;
     const purities = [
       { l: "24K (99.9%)", v: money(Math.round(r1 * (24 / 22))), s: "Fine Gold" },
@@ -2152,74 +2255,77 @@ function generateShareCardBlob() {
 
     purities.forEach((item, i) => {
       const x = 72 + i * (cw + 12);
-      ctx.fillStyle = "#0b0f19";
+      ctx.fillStyle = bgSurface;
       ctx.beginPath();
       ctx.roundRect(x, gy, cw, 220, 16);
       ctx.fill();
-      ctx.strokeStyle = "rgba(255, 255, 255, 0.08)";
+      ctx.strokeStyle = borderCard;
       ctx.stroke();
 
-      ctx.fillStyle = "#94a3b8";
+      ctx.fillStyle = textTert;
       ctx.font = "800 18px 'Plus Jakarta Sans'";
       ctx.textAlign = "center";
       ctx.fillText(item.l, x + cw/2, gy + 52);
 
-      ctx.fillStyle = "#ffffff";
-      ctx.font = "800 40px 'Plus Jakarta Sans'";
+      ctx.fillStyle = textMain;
+      ctx.font = "800 38px 'Plus Jakarta Sans'";
       ctx.fillText(item.v, x + cw/2, gy + 120);
 
-      ctx.fillStyle = "#fbbf24";
+      ctx.fillStyle = goldColor;
       ctx.font = "600 19px 'Plus Jakarta Sans'";
       ctx.fillText(item.s, x + cw/2, gy + 172);
     });
 
+    // 5. Timeline Fix Cards
     const ty = 820, tw = (w - 144 - 16) / 2;
     
     // AM Box
-    ctx.fillStyle = "#0b0f19";
+    ctx.fillStyle = bgSurface;
     ctx.beginPath();
     ctx.roundRect(72, ty, tw, 200, 16);
     ctx.fill();
-    ctx.strokeStyle = "rgba(255, 255, 255, 0.08)";
+    ctx.strokeStyle = $("amCard").classList.contains("is-active") ? goldColor : borderCard;
+    ctx.lineWidth = $("amCard").classList.contains("is-active") ? 2 : 1;
     ctx.stroke();
 
-    ctx.fillStyle = "#94a3b8";
+    ctx.fillStyle = textTert;
     ctx.font = "800 19px 'Plus Jakarta Sans'";
     ctx.textAlign = "left";
     ctx.fillText("MORNING FIX (AM)", 100, ty + 48);
 
-    ctx.fillStyle = "#f8fafc";
-    ctx.font = "800 36px 'Plus Jakarta Sans'";
+    ctx.fillStyle = textMain;
+    ctx.font = "800 34px 'Plus Jakarta Sans'";
     ctx.fillText($("amRate").textContent, 100, ty + 110);
 
-    ctx.fillStyle = "#64748b";
+    ctx.fillStyle = textTert;
     ctx.font = "600 19px 'Plus Jakarta Sans'";
     ctx.fillText($("amTime").textContent, 100, ty + 158);
 
     // PM Box
     const px = 72 + tw + 16;
-    ctx.fillStyle = "#0b0f19";
+    ctx.fillStyle = bgSurface;
     ctx.beginPath();
     ctx.roundRect(px, ty, tw, 200, 16);
     ctx.fill();
-    ctx.strokeStyle = "rgba(255, 255, 255, 0.08)";
+    ctx.strokeStyle = $("pmCard").classList.contains("is-active") ? goldColor : borderCard;
+    ctx.lineWidth = $("pmCard").classList.contains("is-active") ? 2 : 1;
     ctx.stroke();
 
-    ctx.fillStyle = "#94a3b8";
+    ctx.fillStyle = textTert;
     ctx.font = "800 19px 'Plus Jakarta Sans'";
     ctx.textAlign = "left";
     ctx.fillText("EVENING FIX (PM)", px + 28, ty + 48);
 
-    ctx.fillStyle = "#f8fafc";
-    ctx.font = "800 36px 'Plus Jakarta Sans'";
+    ctx.fillStyle = textMain;
+    ctx.font = "800 34px 'Plus Jakarta Sans'";
     ctx.fillText($("pmRate").textContent, px + 28, ty + 110);
 
-    ctx.fillStyle = "#64748b";
+    ctx.fillStyle = textTert;
     ctx.font = "600 19px 'Plus Jakarta Sans'";
     ctx.fillText($("pmTime").textContent, px + 28, ty + 158);
 
-    // Footer
-    ctx.fillStyle = "#64748b";
+    // 6. Footer
+    ctx.fillStyle = textTert;
     ctx.font = "700 20px 'Plus Jakarta Sans'";
     ctx.textAlign = "center";
     ctx.fillText("Gold 22k Terminal · LiveChennai + GoodReturns Feed", w/2, 1180);
@@ -2280,9 +2386,19 @@ function renderStats() {
 
 function compareDates() {
   const a = history.find(i => i.date === $("dateA").value), b = history.find(i => i.date === $("dateB").value);
-  if (!a || !b) return $("compareResult").textContent = "Select two dates to compare values.";
+  if (!a || !b) {
+    $("compareResult").innerHTML = `<span class="compare-result-top">Select valid dates</span><span class="compare-result-sub">—</span>`;
+    return;
+  }
   const diff = b.rate_22k - a.rate_22k, pct = a.rate_22k ? (diff/a.rate_22k*100) : 0;
-  $("compareResult").innerHTML = `<strong>${money(a.rate_22k)} → ${money(b.rate_22k)}</strong><span class="${diff>0?"positive":diff<0?"negative":""}">${diff>=0?"+":""}${money(diff)}/g · ${pct>=0?"+":""}${pct.toFixed(2)}%</span>`;
+  const isPos = diff > 0, isNeg = diff < 0;
+  
+  $("compareResult").innerHTML = `
+    <span class="compare-result-top">${money(a.rate_22k)} → ${money(b.rate_22k)}</span>
+    <span class="compare-result-sub ${isPos ? 'positive' : isNeg ? 'negative' : ''}">
+      ${diff >= 0 ? '+' : ''}${money(diff)}/g (${diff >= 0 ? '+' : ''}${pct.toFixed(2)}%)
+    </span>
+  `;
 }
 
 async function loadPublishedData() {
