@@ -25,13 +25,14 @@
   color-scheme: light dark;
   --font-sans: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", sans-serif;
 
+  /* Strict Harmonic Spatial Tokens (4px / 8px Baseline) */
   --r-xs: 6px;
   --r-sm: 10px;
   --r-md: 14px;
   --r-lg: 20px;
   --r-full: 9999px;
 
-  /* Color System */
+  /* Palette - Light */
   --bg-app: #f8fafc;
   --surface: #ffffff;
   --surface-subtle: #f1f5f9;
@@ -137,7 +138,7 @@ button, input, select {
 
 .app {
   width: 100%;
-  max-width: 620px;
+  max-width: 580px;
   padding: calc(18px + env(safe-area-inset-top)) 16px calc(36px + env(safe-area-inset-bottom));
   display: flex;
   flex-direction: column;
@@ -1162,15 +1163,15 @@ footer {
   <section class="purity-strip">
     <div class="purity-card">
       <small>24K (99.9%)</small>
-      <b id="purity24">₹—</b>
+      <b id="purity24">₹ —</b>
     </div>
     <div class="purity-card">
       <small>22K (91.6%)</small>
-      <b id="purity22">₹—</b>
+      <b id="purity22">₹ —</b>
     </div>
     <div class="purity-card">
       <small>18K (75.0%)</small>
-      <b id="purity18">₹—</b>
+      <b id="purity18">₹ —</b>
     </div>
   </section>
 
@@ -1194,14 +1195,14 @@ footer {
     </div>
 
     <div class="hero-mid">
-      <h2 id="hero8">₹—</h2>
+      <h2 id="hero8">₹ —</h2>
       <div id="change8" class="change-pill same">No change</div>
     </div>
 
     <div class="hero-details-grid">
       <div class="hero-detail-col">
         <span class="hero-sub-label">Rate Per Gram</span>
-        <div class="hero-sub-val" id="hero1">₹— <span id="change1" class="change-pill mini same"></span></div>
+        <div class="hero-sub-val" id="hero1">₹ — <span id="change1" class="change-pill mini same"></span></div>
         <div class="hero-sub-sub">1 Gram Benchmark</div>
       </div>
       <div class="hero-detail-col">
@@ -1323,7 +1324,7 @@ footer {
       <summary><div class="summary-title"><h3>Moving Average (SMA)</h3><span>30D Trend</span></div><span class="chevron">▼</span></summary>
       <div class="collapsible-content">
         <div style="display:flex; justify-content:space-between; align-items:center;">
-          <div><span style="font-size:10px; font-weight:800; color:var(--text-tertiary); text-transform:uppercase;">30D Average</span><br><b id="smaValue" style="font-size:15px; margin-top:2px; display:block;">₹—</b></div>
+          <div><span style="font-size:10px; font-weight:800; color:var(--text-tertiary); text-transform:uppercase;">30D Average</span><br><b id="smaValue" style="font-size:15px; margin-top:2px; display:block;">₹ —</b></div>
           <div class="change-pill same" id="smaPill">Calculating…</div>
         </div>
       </div>
@@ -1442,15 +1443,15 @@ footer {
         <!-- Detailed Itemized Receipt Card -->
         <div class="receipt-card">
           <div class="receipt-title">Itemized Purchase Quotation</div>
-          <div class="receipt-line"><span>Base 22K Gold Cost:</span><span id="receiptBase">₹0</span></div>
-          <div class="receipt-line"><span id="receiptMakingLabel">Making Charges (8%):</span><span id="receiptMaking">₹0</span></div>
-          <div class="receipt-line"><span id="receiptGstLabel">GST (3%):</span><span id="receiptGst">₹0</span></div>
-          <div class="receipt-line"><span>Hallmarking / Flat Fees:</span><span id="receiptFee">₹0</span></div>
-          <div class="receipt-line deduction" id="receiptOldGoldLine" style="display:none;"><span>Old Gold Exchange Credit:</span><span id="receiptOldGold">-₹0</span></div>
+          <div class="receipt-line"><span>Base 22K Gold Cost:</span><span id="receiptBase">₹ 0</span></div>
+          <div class="receipt-line"><span id="receiptMakingLabel">Making Charges (8%):</span><span id="receiptMaking">₹ 0</span></div>
+          <div class="receipt-line"><span id="receiptGstLabel">GST (3%):</span><span id="receiptGst">₹ 0</span></div>
+          <div class="receipt-line"><span>Hallmarking / Flat Fees:</span><span id="receiptFee">₹ 0</span></div>
+          <div class="receipt-line deduction" id="receiptOldGoldLine" style="display:none;"><span>Old Gold Exchange Credit:</span><span id="receiptOldGold">- ₹ 0</span></div>
           
           <div class="receipt-total">
             <span class="label" id="receiptTotalLabel">Net Payable Amount</span>
-            <span class="final-val" id="calcResult">₹—</span>
+            <span class="final-val" id="calcResult">₹ —</span>
           </div>
           <div style="font-size:10.5px; font-weight:600; color:var(--text-tertiary); text-align:right; margin-top:2px;" id="calcSub">Based on live 22K rate.</div>
 
@@ -1520,7 +1521,8 @@ const haptic = (ms = 10, freq = 800) => {
   playTick(freq);
 };
 
-const money = n => Number.isFinite(Number(n)) ? "₹" + Math.round(Number(n)).toLocaleString("en-IN") : "₹—";
+// Strict Space-After-Rupee Formatting
+const money = n => Number.isFinite(Number(n)) ? "₹ " + Math.round(Number(n)).toLocaleString("en-IN") : "₹ —";
 
 const dateText = s => {
   if (!s) return "—";
@@ -1610,7 +1612,7 @@ function computeLastMovement() {
   if (lastChangeItem && oldRate) {
     let amount = Number(lastChangeItem.rate_22k) - oldRate;
     $("lastDate").textContent = "Price shifted on " + dateText(lastChangeItem.date);
-    $("lastAmount").textContent = (amount > 0 ? "▲ " : "▼ ") + money(Math.abs(amount));
+    $("lastAmount").textContent = (amount > 0 ? "▲ +" : "▼ -") + money(Math.abs(amount));
     $("lastAmount").className = "amount " + (amount > 0 ? "positive" : "negative");
     $("lastTime").textContent = "Previous rate was " + money(oldRate);
   } else {
@@ -1632,7 +1634,6 @@ function renderLive(d) {
   $("today").textContent = dateText(d.date);
   $("todayTime").textContent = timeText(d.time);
   
-  // Intelligent Session Display Fix
   let currentSession = d.session;
   if (!currentSession && d.time) {
     const hr = parseInt(d.time.split(":")[0]);
@@ -1793,7 +1794,7 @@ function drawChart() {
     $("chartMetricLabel").textContent = "Selected Date"; $("periodChange").textContent = money(values[activeIdx]); $("periodChange").className = "";
   } else {
     $("chartMetricLabel").textContent = "Period Change";
-    $("periodChange").textContent = (delta >= 0 ? "+" : "") + money(delta) + ` (${(pct >= 0 ? "+" : "")}${pct.toFixed(1)}%)`;
+    $("periodChange").textContent = (delta >= 0 ? "+" : "-") + money(Math.abs(delta)) + ` (${(pct >= 0 ? "+" : "")}${pct.toFixed(1)}%)`;
     $("periodChange").className = delta > 0 ? "positive" : delta < 0 ? "negative" : "";
   }
   $("periodHigh").textContent = money(max0); $("periodLow").textContent = money(min0);
@@ -1830,7 +1831,6 @@ function calculate() {
   const oldPurity = Number($("oldPurity").value) || 22;
   const oldGoldCredit = oldWeight > 0 ? (oldWeight * (rate * (oldPurity / 22))) : 0;
 
-  // Toggle Visibility for Mode Input Fields
   if (mode === "value") {
     $("weightField").style.display = "flex";
     $("budgetField").style.display = "none";
@@ -1857,7 +1857,7 @@ function calculate() {
     $("receiptFee").textContent = money(flatFee);
     $("receiptTotalLabel").textContent = "Net Payable Amount";
     $("calcResult").textContent = money(grandTotal);
-    $("calcSub").textContent = `For ${weight.toLocaleString("en-IN")}g gold at ₹${rate}/g benchmark`;
+    $("calcSub").textContent = `For ${weight.toLocaleString("en-IN")}g gold at ₹ ${rate}/g benchmark`;
   } else {
     const effB = (budget + oldGoldCredit) / (1 + gstPct / 100) - flatFee;
     const goldBase = effB > 0 ? effB / (1 + makingPct / 100) : 0;
@@ -1905,7 +1905,7 @@ document.querySelectorAll("#makingChips .chip").forEach(c => c.onclick = () => {
   calculate();
 });
 
-/* Visually Matching PNG Card Generator */
+/* Visually Consistent Dark Share Card Generator */
 function generateShareCardBlob() {
   return new Promise((resolve) => {
     if (!live) return resolve(null);
@@ -1913,19 +1913,23 @@ function generateShareCardBlob() {
     cvs.width = w; cvs.height = h;
     const r1 = Number(live.rate_22k), r8 = r1 * 8, c1 = Number(live.change) || 0, c8 = c1 * 8;
 
+    // Background Canvas - Solid App Deep Dark
     ctx.fillStyle = "#030712";
     ctx.fillRect(0, 0, w, h);
 
-    const gl = ctx.createRadialGradient(w/2, 340, 40, w/2, 340, 420);
-    gl.addColorStop(0, "rgba(217, 119, 6, 0.16)");
+    // Subtle Radial Glow
+    const gl = ctx.createRadialGradient(w/2, 340, 40, w/2, 340, 440);
+    gl.addColorStop(0, "rgba(217, 119, 6, 0.18)");
     gl.addColorStop(1, "rgba(3, 7, 18, 0)");
     ctx.fillStyle = gl;
     ctx.fillRect(0, 0, w, h);
 
+    // App Exterior Border Outline
     ctx.strokeStyle = "rgba(255, 255, 255, 0.08)";
     ctx.lineWidth = 3;
-    ctx.strokeRect(36, 36, w - 72, h - 72);
+    ctx.strokeRect(40, 40, w - 80, h - 80);
 
+    // Top Header Bar
     ctx.fillStyle = "#0b0f19";
     ctx.beginPath();
     ctx.roundRect(72, 72, w - 144, 76, 38);
@@ -1944,6 +1948,7 @@ function generateShareCardBlob() {
     ctx.textAlign = "right";
     ctx.fillText(`${dateText(live.date)} · ${$("session").textContent}`, w - 104, 118);
 
+    // Main Sovereign Hero Card
     ctx.fillStyle = "#0b0f19";
     ctx.beginPath();
     ctx.roundRect(72, 172, w - 144, 380, 24);
@@ -1960,6 +1965,7 @@ function generateShareCardBlob() {
     ctx.font = "800 96px 'Plus Jakarta Sans'";
     ctx.fillText(money(r8), w/2, 345);
 
+    // Change Pill Indicator
     ctx.font = "700 26px 'Plus Jakarta Sans'";
     if (c8 > 0) {
       ctx.fillStyle = "#34d399";
@@ -1983,10 +1989,11 @@ function generateShareCardBlob() {
     ctx.textAlign = "right";
     ctx.fillText(`Standard 22K 91.6% Pure`, w - 108, 514);
 
+    // Karat Purity Grid (3 Columns)
     const gy = 576, cw = (w - 144 - 24) / 3;
     const purities = [
       { l: "24K (99.9%)", v: money(Math.round(r1 * (24 / 22))), s: "Fine Gold" },
-      { l: "22K (91.6%)", v: money(r1), s: "Jewelry Standard" },
+      { l: "22K (91.6%)", v: money(r1), s: "Jewelry Std" },
       { l: "18K (75.0%)", v: money(Math.round(r1 * (18 / 22))), s: "Hallmarked" }
     ];
 
@@ -2013,6 +2020,7 @@ function generateShareCardBlob() {
       ctx.fillText(item.s, x + cw/2, gy + 172);
     });
 
+    // Market Timeline Split (Side-by-Side AM & PM)
     const ty = 820, tw = (w - 144 - 16) / 2;
     
     // AM Box
@@ -2058,7 +2066,7 @@ function generateShareCardBlob() {
     ctx.font = "600 19px 'Plus Jakarta Sans'";
     ctx.fillText($("pmTime").textContent, px + 28, ty + 158);
 
-    // Footer
+    // Footer Credit
     ctx.fillStyle = "#64748b";
     ctx.font = "700 20px 'Plus Jakarta Sans'";
     ctx.textAlign = "center";
@@ -2105,7 +2113,7 @@ function compareDates() {
   const a = history.find(i => i.date === $("dateA").value), b = history.find(i => i.date === $("dateB").value);
   if (!a || !b) return $("compareResult").textContent = "Select valid dates.";
   const diff = b.rate_22k - a.rate_22k, pct = a.rate_22k ? (diff/a.rate_22k*100) : 0;
-  $("compareResult").innerHTML = `<strong>${money(a.rate_22k)} → ${money(b.rate_22k)}</strong><span class="${diff>0?"positive":diff<0?"negative":""}">${diff>=0?"+":""}${money(diff)}/g · ${pct>=0?"+":""}${pct.toFixed(2)}%</span>`;
+  $("compareResult").innerHTML = `<strong>${money(a.rate_22k)} → ${money(b.rate_22k)}</strong><span class="${diff>0?"positive":diff<0?"negative":""}">${diff>=0?"+ ":"- "}${money(Math.abs(diff))}/g · ${pct>=0?"+":""}${pct.toFixed(2)}%</span>`;
 }
 
 async function loadPublishedData() {
