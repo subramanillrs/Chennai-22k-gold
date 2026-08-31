@@ -3,101 +3,94 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<meta name="theme-color" content="#f8fafc" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#06080c" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#F2F2F7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
 <meta name="description" content="22K Gold Price Tracker & Valuation Dashboard">
 
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Gold 22k rate">
+<meta name="apple-mobile-web-app-title" content="Gold 22K">
 
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon.svg">
-
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
 <title>Gold 22k rate</title>
 
 <style>
 :root {
   color-scheme: light dark;
+  --font-display: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Display", "Roboto", "Segoe UI", sans-serif;
 
-  --font-display: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", sans-serif;
+  /* Apple/Material Light Theme */
+  --bg-app: #F2F2F7;
+  --surface: #FFFFFF;
+  --surface-grouped: #FFFFFF;
+  --surface-subtle: #F2F2F7;
+  --surface-active: #E5E5EA;
+  
+  --border-subtle: rgba(60, 60, 67, 0.12);
+  --border-strong: rgba(60, 60, 67, 0.29);
 
-  --bg-app: #f8fafc;
-  --surface: #ffffff;
-  --surface-subtle: #f1f5f9;
-  --surface-elevated: #ffffff;
+  --text-primary: #000000;
+  --text-secondary: rgba(60, 60, 67, 0.6);
+  --text-tertiary: rgba(60, 60, 67, 0.3);
 
-  --border-subtle: #e2e8f0;
-  --border-strong: #cbd5e1;
-  --specular: inset 0 1px 0 0 rgba(255, 255, 255, 0.9);
+  --gold-primary: #FF9500;
+  --gold-tint: #FFF4E5;
+  --gold-gradient: linear-gradient(135deg, #FFB340 0%, #FF9500 100%);
 
-  --text-primary: #0f172a;
-  --text-secondary: #475569;
-  --text-tertiary: #94a3b8;
+  --good: #34C759;
+  --good-bg: #E8F8EE;
+  --bad: #FF3B30;
+  --bad-bg: #FFEBE9;
 
-  --gold-primary: #d97706;
-  --gold-light: #f59e0b;
-  --gold-gradient: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-  --gold-tint: #fef3c7;
-  --gold-border: rgba(217, 119, 6, 0.22);
-  --gold-glow: rgba(217, 119, 6, 0.12);
-
-  --good: #059669;
-  --good-bg: #d1fae5;
-  --bad: #dc2626;
-  --bad-bg: #fee2e2;
-  --warn: #d97706;
-  --warn-bg: #fef3c7;
-
-  --radius-xs: 6px;
-  --radius-sm: 10px;
-  --radius-md: 14px;
-  --radius-lg: 20px;
+  --radius-xs: 8px;
+  --radius-sm: 12px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
   --radius-full: 9999px;
 
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.04);
-  --shadow-card: 0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 4px 14px 0 rgba(0, 0, 0, 0.02);
-  --shadow-fab: 0 8px 24px -4px rgba(217, 119, 6, 0.24), 0 2px 6px -1px rgba(0, 0, 0, 0.06);
-
-  --transition: 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+  --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.04);
+  --shadow-fab: 0 10px 30px rgba(255, 149, 0, 0.3);
+  
+  --glass-bg: rgba(255, 255, 255, 0.85);
+  --glass-border: rgba(255, 255, 255, 0.4);
+  
+  --transition: 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg-app: #06080c;
-    --surface: #0e121a;
-    --surface-subtle: #141a24;
-    --surface-elevated: #1a2230;
+    /* Apple/Material Dark Theme */
+    --bg-app: #000000;
+    --surface: #1C1C1E;
+    --surface-grouped: #1C1C1E;
+    --surface-subtle: #2C2C2E;
+    --surface-active: #3A3A3C;
 
-    --border-subtle: rgba(255, 255, 255, 0.07);
-    --border-strong: rgba(255, 255, 255, 0.15);
-    --specular: inset 0 1px 0 0 rgba(255, 255, 255, 0.08);
+    --border-subtle: rgba(235, 235, 245, 0.15);
+    --border-strong: rgba(235, 235, 245, 0.3);
 
-    --text-primary: #f8fafc;
-    --text-secondary: #94a3b8;
-    --text-tertiary: #64748b;
+    --text-primary: #FFFFFF;
+    --text-secondary: rgba(235, 235, 245, 0.6);
+    --text-tertiary: rgba(235, 235, 245, 0.3);
 
-    --gold-primary: #fbbf24;
-    --gold-light: #fcd34d;
-    --gold-gradient: linear-gradient(135deg, #fcd34d 0%, #f59e0b 100%);
-    --gold-tint: rgba(245, 158, 11, 0.12);
-    --gold-border: rgba(251, 191, 36, 0.25);
-    --gold-glow: rgba(251, 191, 36, 0.15);
+    --gold-primary: #FF9F0A;
+    --gold-tint: rgba(255, 159, 10, 0.15);
+    --gold-gradient: linear-gradient(135deg, #FFB340 0%, #FF9F0A 100%);
 
-    --good: #34d399;
-    --good-bg: rgba(5, 150, 105, 0.15);
-    --bad: #f87171;
-    --bad-bg: rgba(220, 38, 38, 0.15);
-    --warn: #fbbf24;
-    --warn-bg: rgba(245, 158, 11, 0.15);
+    --good: #30D158;
+    --good-bg: rgba(48, 209, 88, 0.15);
+    --bad: #FF453A;
+    --bad-bg: rgba(255, 69, 58, 0.15);
 
-    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.6);
-    --shadow-card: 0 4px 20px 0 rgba(0, 0, 0, 0.5);
-    --shadow-fab: 0 8px 28px -4px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(251, 191, 36, 0.25);
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+    --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.4);
+    --shadow-fab: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 159, 10, 0.3);
+    
+    --glass-bg: rgba(28, 28, 30, 0.85);
+    --glass-border: rgba(255, 255, 255, 0.1);
   }
 }
 
@@ -115,38 +108,34 @@ html {
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   -webkit-text-size-adjust: 100%;
-  overflow-x: hidden;
-  touch-action: pan-y;
 }
 
 body {
-  margin: 0;
   display: flex;
   justify-content: center;
   min-height: 100vh;
   overflow-x: hidden;
-  touch-action: pan-y;
   user-select: none;
   -webkit-user-select: none;
 }
 
-input, select {
+input, select, .selectable {
   user-select: auto;
   -webkit-user-select: auto;
 }
 
 .num, [data-num], td, strong, b, h2, .rate, .value, .amount, .hero-sub-val {
   font-variant-numeric: tabular-nums lining-nums;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.01em;
 }
 
 .app {
   width: 100%;
-  max-width: 680px;
-  padding: calc(16px + env(safe-area-inset-top)) 16px calc(110px + env(safe-area-inset-bottom));
+  max-width: 600px;
+  padding: calc(64px + env(safe-area-inset-top)) 16px calc(120px + env(safe-area-inset-bottom));
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 20px;
 }
 
 button, input, select {
@@ -157,44 +146,53 @@ button, input, select {
   outline: none;
 }
 
+/* Glassmorphic Top Bar */
 .topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 8px;
-  padding: 0;
-  margin: 0;
+  align-items: center;
+  justify-content: space-between;
+  padding: calc(12px + env(safe-area-inset-top)) 20px 12px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border-subtle);
+  z-index: 100;
+}
+
+.topbar-content {
   width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .brand-text h1 {
-  font-size: 26px;
-  font-weight: 800;
-  letter-spacing: -0.035em;
-  line-height: 1.15;
-  margin: 0;
-  padding: 0;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
 }
 
 .status-indicator {
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  gap: 7px;
-  padding: 5px 12px;
-  background: var(--surface);
-  border: 1px solid var(--border-subtle);
+  gap: 6px;
+  padding: 6px 12px;
+  background: var(--surface-subtle);
   border-radius: var(--radius-full);
-  font-size: 11.5px;
+  font-size: 12px;
   font-weight: 600;
   color: var(--text-secondary);
-  box-shadow: var(--shadow-sm), var(--specular);
-  white-space: nowrap;
-  margin: 0;
 }
 
 .dot {
-  width: 7px;
-  height: 7px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
   background-color: var(--good);
   box-shadow: 0 0 0 3px var(--good-bg);
@@ -208,955 +206,489 @@ button, input, select {
 }
 
 @keyframes pulse-ring {
-  0% { transform: scale(0.95); opacity: 0.8; }
-  50% { transform: scale(1.15); opacity: 1; }
-  100% { transform: scale(0.95); opacity: 0.8; }
+  0% { transform: scale(0.85); opacity: 0.8; }
+  50% { transform: scale(1.1); opacity: 1; }
+  100% { transform: scale(0.85); opacity: 0.8; }
 }
 
+/* Warnings */
 .warning-banner {
   display: flex;
   align-items: flex-start;
   gap: 12px;
-  padding: 13px 16px;
+  padding: 16px;
   background: var(--bad-bg);
-  border: 1px solid var(--bad);
   border-radius: var(--radius-md);
   color: var(--bad);
-  box-shadow: var(--shadow-card);
-  width: 100%;
-  animation: bannerFade 0.25s ease-out;
+  animation: bannerFade 0.3s ease-out;
 }
+.warning-banner[hidden] { display: none !important; }
+.warning-content strong { font-size: 14px; font-weight: 700; display: block; margin-bottom: 4px; }
+.warning-content p { font-size: 13px; opacity: 0.9; line-height: 1.4; }
 
-.warning-banner[hidden] {
-  display: none !important;
-}
-
-.warning-icon {
-  flex-shrink: 0;
-  margin-top: 1px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.warning-content {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.warning-content strong {
-  font-size: 13px;
-  font-weight: 800;
-  letter-spacing: -0.01em;
-  line-height: 1.2;
-}
-
-.warning-content p {
-  font-size: 11.5px;
-  font-weight: 600;
-  line-height: 1.4;
-  opacity: 0.95;
-}
-
-@keyframes bannerFade {
-  from { opacity: 0; transform: translateY(-4px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
+/* Hero Section - Apple Wallet Style */
 .hero {
-  background: var(--surface);
-  border: 1px solid var(--border-subtle);
+  background: var(--gold-gradient);
   border-radius: var(--radius-lg);
-  padding: 22px;
-  box-shadow: var(--shadow-card), var(--specular);
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  width: 100%;
+  padding: 24px;
+  color: #FFFFFF;
+  box-shadow: var(--shadow-card);
   position: relative;
   overflow: hidden;
+}
+
+.hero::after {
+  content: '';
+  position: absolute;
+  top: 0; right: 0; bottom: 0; left: 0;
+  background: radial-gradient(circle at top right, rgba(255,255,255,0.2) 0%, transparent 60%);
+  pointer-events: none;
 }
 
 .hero-top {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  margin-bottom: 24px;
+  position: relative;
+  z-index: 2;
 }
 
 .hero-label {
-  font-size: 11.5px;
-  font-weight: 700;
+  font-size: 13px;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--gold-primary);
-  line-height: 1.2;
+  letter-spacing: 0.05em;
+  opacity: 0.9;
 }
 
-.hero-actions {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
+.hero-actions { display: flex; align-items: center; gap: 8px; }
 
 .share-btn {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  padding: 5px 10px;
-  background: var(--surface-subtle);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-full);
-  font-size: 11.5px;
-  font-weight: 700;
-  color: var(--text-secondary);
+  justify-content: center;
+  width: 32px; height: 32px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  color: #FFF;
   cursor: pointer;
-  transition: all var(--transition);
+  transition: transform var(--transition), background var(--transition);
+  backdrop-filter: blur(10px);
 }
-
-.share-btn:active {
-  transform: scale(0.95);
-  background: var(--border-subtle);
-}
+.share-btn:active { transform: scale(0.9); background: rgba(255, 255, 255, 0.3); }
 
 .change-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 5px 10px;
+  padding: 6px 12px;
   border-radius: var(--radius-full);
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 700;
-  line-height: 1;
+  background: rgba(255,255,255,0.2);
+  backdrop-filter: blur(10px);
 }
+.change-pill.up { background: rgba(52, 199, 89, 0.9); color: #FFF; }
+.change-pill.down { background: rgba(255, 59, 48, 0.9); color: #FFF; }
 
-.change-pill.up { background: var(--good-bg); color: var(--good); }
-.change-pill.down { background: var(--bad-bg); color: var(--bad); }
-.change-pill.same { background: var(--surface-subtle); color: var(--text-secondary); }
-
-.hero-mid {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
+.hero-mid { position: relative; z-index: 2; margin-bottom: 24px; }
 .hero-mid h2 {
-  font-size: clamp(38px, 8.5vw, 54px);
+  font-size: clamp(42px, 10vw, 56px);
   font-weight: 800;
   letter-spacing: -0.04em;
   line-height: 1;
 }
-
 .hero-mid .sub {
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 500;
-  color: var(--text-tertiary);
-  margin-top: 2px;
+  opacity: 0.85;
+  display: block;
+  margin-top: 8px;
 }
 
 .hero-details-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 16px;
-  padding-top: 16px;
-  border-top: 1px solid var(--border-subtle);
+  padding-top: 20px;
+  border-top: 1px solid rgba(255,255,255,0.2);
+  position: relative;
+  z-index: 2;
 }
 
-.hero-detail-col {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  text-align: left;
-}
+.hero-detail-col { display: flex; flex-direction: column; gap: 4px; }
+.hero-sub-label { font-size: 12px; font-weight: 600; opacity: 0.8; text-transform: uppercase; letter-spacing: 0.04em; }
+.hero-sub-val { font-size: 20px; font-weight: 700; }
+.hero-sub-sub { font-size: 13px; font-weight: 500; opacity: 0.8; }
 
-.hero-sub-label {
-  font-family: var(--font-display);
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--text-tertiary);
-  line-height: 14px;
-  height: 14px;
-  margin-bottom: 6px;
-  display: block;
-}
-
-.hero-sub-val {
-  font-family: var(--font-display);
-  font-size: 18px;
-  font-weight: 800;
-  color: var(--text-primary);
-  line-height: 24px;
-  height: 24px;
-  margin-bottom: 2px;
-  letter-spacing: -0.02em;
-  font-variant-numeric: tabular-nums lining-nums;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: block;
-}
-
-.hero-sub-sub {
-  font-family: var(--font-display);
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--text-secondary);
-  line-height: 16px;
-  height: 16px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  font-variant-numeric: tabular-nums lining-nums;
-  display: block;
-}
-
-.horizon-grid {
-  display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
-  gap: 6px;
-  width: 100%;
-}
-
-@media (max-width: 480px) {
-  .horizon-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 8px;
-  }
-}
-
-.horizon-box {
-  background: var(--surface);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-xs);
-  padding: 10px 8px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  box-shadow: var(--shadow-sm), var(--specular);
-}
-
-.horizon-box small {
-  font-size: 10px;
-  font-weight: 800;
-  text-transform: uppercase;
-  color: var(--text-tertiary);
-  letter-spacing: 0.05em;
-}
-
-.horizon-box b {
-  font-size: 13px;
-  font-weight: 800;
-  font-variant-numeric: tabular-nums;
-  color: var(--text-primary);
-}
-
-.sentiment-banner {
-  background: var(--surface);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-md);
-  padding: 14px 16px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  box-shadow: var(--shadow-sm), var(--specular);
-}
-
-.sentiment-left {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.sentiment-left span {
-  font-size: 10.5px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--text-tertiary);
-}
-
-.sentiment-left b {
-  font-size: 14px;
-  font-weight: 800;
-}
-
-.sentiment-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  padding: 6px 12px;
-  border-radius: var(--radius-full);
-  font-size: 11.5px;
-  font-weight: 800;
-  line-height: 1;
-}
-
-.quick-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 10px;
-  width: 100%;
-}
-
-.stat-card {
-  background: var(--surface);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-sm);
-  padding: 14px;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  box-shadow: var(--shadow-card), var(--specular);
-}
-
-.stat-card .label {
-  font-size: 10.5px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--text-tertiary);
-  line-height: 14px;
-  height: 14px;
-  margin-bottom: 6px;
-  display: block;
-}
-
-.stat-card .value {
-  font-size: 16px;
-  font-weight: 800;
-  line-height: 20px;
-  height: 20px;
-  margin-bottom: 4px;
-  display: block;
-}
-
-.stat-card .sub {
-  font-size: 11.5px;
-  font-weight: 500;
-  color: var(--text-secondary);
-  line-height: 16px;
-  height: 16px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: block;
-}
-
-.section {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  width: 100%;
-}
-
+/* Inset Grouped Panels (Apple HIG Style) */
 .section-head {
+  padding: 0 8px 10px;
   display: flex;
-  align-items: baseline;
   justify-content: space-between;
-  padding: 0;
-  margin: 0;
-  width: 100%;
+  align-items: baseline;
 }
-
-.section-head h3 {
-  font-size: 15px;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-}
-
-.section-head span {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--text-tertiary);
-}
+.section-head h3 { font-size: 17px; font-weight: 700; }
+.section-head span { font-size: 13px; color: var(--text-secondary); font-weight: 500; }
 
 .panel {
-  background: var(--surface);
-  border: 1px solid var(--border-subtle);
+  background: var(--surface-grouped);
   border-radius: var(--radius-md);
   padding: 16px;
-  box-shadow: var(--shadow-card), var(--specular);
-  width: 100%;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-subtle);
 }
 
-.session-grid {
+.grid-grouped {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  width: 100%;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: 1px;
+  background: var(--border-subtle);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+  overflow: hidden;
 }
 
-.session-box {
-  background: var(--surface-subtle);
-  border-radius: var(--radius-sm);
-  padding: 14px;
+.grid-item {
+  background: var(--surface-grouped);
+  padding: 16px 12px;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-}
-
-.session-box .tag {
-  align-self: flex-start;
-  font-size: 10px;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  padding: 3px 6px;
-  border-radius: var(--radius-xs);
-  background: var(--surface);
-  border: 1px solid var(--border-subtle);
-  color: var(--text-secondary);
-  line-height: 12px;
-  height: 18px;
-  margin-bottom: 8px;
-  display: inline-flex;
   align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 6px;
 }
+.grid-item small { font-size: 11px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.04em; }
+.grid-item b { font-size: 15px; font-weight: 700; }
 
-.session-box .rate {
-  font-size: 19px;
-  font-weight: 800;
-  line-height: 22px;
-  height: 22px;
-  margin-bottom: 4px;
-  display: block;
-}
-
-.session-box .time {
-  font-size: 11.5px;
-  font-weight: 500;
-  color: var(--text-tertiary);
-  line-height: 14px;
-  height: 14px;
-  display: block;
-}
-
+/* Segmented Control (Cupertino Style) */
 .segment-ctrl {
-  display: grid;
-  grid-template-columns: repeat(7, minmax(0, 1fr));
-  gap: 4px;
+  display: flex;
   background: var(--surface-subtle);
   padding: 3px;
-  border-radius: var(--radius-full);
-  border: 1px solid var(--border-subtle);
-  width: 100%;
+  border-radius: 9px;
+  margin-bottom: 16px;
 }
-
 .segment-ctrl button {
-  width: 100%;
+  flex: 1;
   padding: 6px 0;
-  border-radius: var(--radius-full);
-  font-size: 11.5px;
-  font-weight: 700;
-  color: var(--text-secondary);
+  border-radius: 7px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
   text-align: center;
   cursor: pointer;
   transition: all var(--transition);
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
-
 .segment-ctrl button.active {
   background: var(--surface);
-  color: var(--text-primary);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.08);
 }
 
+/* Chart Area */
 .chart-stats-row {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 8px;
-  margin-bottom: 16px;
-  width: 100%;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 20px;
 }
-
-.metric-card {
-  background: var(--surface-subtle);
-  border-radius: var(--radius-xs);
-  padding: 10px 12px;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-}
-
-.metric-card small {
-  font-size: 10px;
-  font-weight: 700;
-  text-transform: uppercase;
-  color: var(--text-tertiary);
-  line-height: 12px;
-  height: 12px;
-  margin-bottom: 6px;
-  display: block;
-}
-
-.metric-card b {
-  font-size: 13.5px;
-  font-weight: 800;
-  line-height: 18px;
-  height: 18px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: block;
-}
-
+.metric-card { display: flex; flex-direction: column; gap: 4px; }
+.metric-card small { font-size: 12px; color: var(--text-secondary); font-weight: 500; }
+.metric-card b { font-size: 15px; font-weight: 700; }
 .metric-card b.positive { color: var(--good); }
 .metric-card b.negative { color: var(--bad); }
 
 .chartwrap {
   width: 100%;
-  height: 220px;
+  height: 240px;
   position: relative;
   touch-action: none;
 }
-
-.chartwrap canvas {
-  width: 100%;
-  height: 100%;
-  display: block;
-}
+.chartwrap canvas { width: 100%; height: 100%; display: block; }
 
 .chartmeta {
   display: flex;
   justify-content: space-between;
-  font-size: 11px;
-  font-weight: 600;
+  font-size: 12px;
   color: var(--text-tertiary);
-  margin-top: 10px;
-  padding-top: 8px;
-  border-top: 1px dashed var(--border-subtle);
-  width: 100%;
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-subtle);
+  font-weight: 500;
 }
 
+/* List Items (Apple Settings Style) */
+.list-group {
+  background: var(--surface-grouped);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+  overflow: hidden;
+}
+.list-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.list-item:last-child { border-bottom: none; }
+.list-item-content h4 { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+.list-item-content p { font-size: 13px; color: var(--text-secondary); }
+.list-item-value { font-size: 18px; font-weight: 700; }
+.list-item-value.positive { color: var(--good); }
+.list-item-value.negative { color: var(--bad); }
+
+/* Calculator Forms */
 .chip-container {
   display: flex;
-  gap: 6px;
+  gap: 8px;
   overflow-x: auto;
   scrollbar-width: none;
-  padding-bottom: 4px;
-  margin-bottom: 14px;
-  width: 100%;
+  padding-bottom: 8px;
+  margin-bottom: 16px;
 }
 .chip-container::-webkit-scrollbar { display: none; }
 
 .chip {
-  padding: 6px 12px;
+  padding: 8px 16px;
   background: var(--surface-subtle);
-  border: 1px solid var(--border-subtle);
   border-radius: var(--radius-full);
-  font-size: 11.5px;
-  font-weight: 700;
-  color: var(--text-secondary);
-  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
   white-space: nowrap;
   transition: all var(--transition);
 }
-
 .chip.active {
   background: var(--gold-tint);
-  border-color: var(--gold-border);
   color: var(--gold-primary);
-}
-
-.chip:active {
-  transform: scale(0.96);
+  box-shadow: inset 0 0 0 1px var(--gold-primary);
 }
 
 .calc-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 14px 12px;
-  width: 100%;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+@media (min-width: 480px) {
+  .calc-grid { grid-template-columns: 1fr 1fr; }
 }
 
-.calc-field {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-}
-
-.calc-field label {
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--text-secondary);
-  line-height: 14px;
-  height: 14px;
-  margin-bottom: 6px;
-  display: block;
-}
-
+.calc-field { display: flex; flex-direction: column; gap: 8px; }
+.calc-field label { font-size: 13px; font-weight: 600; color: var(--text-secondary); }
 .calc-input {
   width: 100%;
-  height: 44px;
-  padding: 0 12px;
+  height: 48px;
+  padding: 0 16px;
   background: var(--surface-subtle);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-xs);
-  font-size: 13.5px;
-  font-weight: 600;
+  border-radius: var(--radius-sm);
+  font-size: 16px;
+  font-weight: 500;
   color: var(--text-primary);
-  transition: border-color var(--transition), background-color var(--transition);
+  border: 1px solid transparent;
+  transition: all var(--transition);
 }
-
 .calc-input:focus {
   border-color: var(--gold-primary);
   background: var(--surface);
-}
-
-select.calc-input {
-  cursor: pointer;
+  box-shadow: 0 0 0 3px var(--gold-tint);
 }
 
 .receipt-box {
-  margin-top: 14px;
-  padding: 14px 16px;
+  margin-top: 24px;
+  padding: 20px;
   background: var(--surface-subtle);
-  border: 1px solid var(--border-subtle);
   border-radius: var(--radius-sm);
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  width: 100%;
+  gap: 12px;
 }
-
 .receipt-title {
-  font-size: 11px;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--text-tertiary);
-  padding-bottom: 4px;
-  border-bottom: 1px dashed var(--border-subtle);
-  line-height: 1.2;
-}
-
-.receipt-line {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
   font-size: 12px;
-  color: var(--text-secondary);
-}
-
-.receipt-line span:last-child {
   font-weight: 700;
-  color: var(--text-primary);
-}
-
-.receipt-total {
-  margin-top: 4px;
-  padding-top: 8px;
-  border-top: 1px solid var(--border-strong);
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-}
-
-.receipt-total .label {
-  font-size: 13px;
-  font-weight: 800;
-  color: var(--text-primary);
-}
-
-.receipt-total .final-val {
-  font-size: 22px;
-  font-weight: 800;
-  color: var(--gold-primary);
-}
-
-.calc-subtext {
-  font-size: 11px;
-  color: var(--text-tertiary);
-  text-align: right;
-}
-
-.last-box {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 14px 16px;
-}
-
-.last-box h4 { font-size: 14px; font-weight: 700; line-height: 1.2; }
-.last-box p { font-size: 12px; color: var(--text-tertiary); font-weight: 500; margin-top: 3px; }
-.last-box .amount { font-size: 18px; font-weight: 800; line-height: 1.2; }
-.last-box .amount.positive { color: var(--good); }
-.last-box .amount.negative { color: var(--bad); }
-
-.compare-result {
-  margin-top: 12px;
-  padding: 12px 14px;
-  background: var(--surface-subtle);
-  border-radius: var(--radius-xs);
-  font-size: 12.5px;
-  line-height: 1.5;
-  width: 100%;
-}
-
-.compare-result strong {
-  font-size: 16px;
-  font-weight: 800;
-  display: block;
-  margin-bottom: 2px;
-}
-
-.compare-result .positive { color: var(--good); font-weight: 700; }
-.compare-result .negative { color: var(--bad); font-weight: 700; }
-
-.table-wrap {
-  max-height: 360px;
-  overflow-y: auto;
-  padding: 0;
-  border: 1px solid var(--border-subtle);
-  width: 100%;
-}
-
-.history-table {
-  width: 100%;
-  border-collapse: collapse;
-  table-layout: fixed;
-  font-size: 12.5px;
-}
-
-.history-table th {
-  position: sticky;
-  top: 0;
-  background: var(--surface-subtle);
-  padding: 12px 14px;
-  font-size: 10.5px;
-  font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: var(--text-tertiary);
+  color: var(--text-secondary);
+  padding-bottom: 8px;
   border-bottom: 1px solid var(--border-subtle);
-  z-index: 2;
-  line-height: 1.2;
 }
+.receipt-line {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+.receipt-line span:last-child { font-weight: 600; color: var(--text-primary); }
+.receipt-total {
+  margin-top: 8px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-strong);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.receipt-total .label { font-size: 16px; font-weight: 700; }
+.receipt-total .final-val { font-size: 24px; font-weight: 800; color: var(--gold-primary); }
+.calc-subtext { font-size: 12px; color: var(--text-tertiary); text-align: right; margin-top: 4px; }
 
+/* Compare Results */
+.compare-result {
+  margin-top: 16px;
+  padding: 16px;
+  background: var(--surface-subtle);
+  border-radius: var(--radius-sm);
+  line-height: 1.5;
+}
+.compare-result strong { font-size: 18px; display: block; margin-bottom: 4px; }
+.compare-result .positive { color: var(--good); font-weight: 600; }
+.compare-result .negative { color: var(--bad); font-weight: 600; }
+
+/* History Table */
+.table-wrap {
+  max-height: 400px;
+  overflow-y: auto;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+  background: var(--surface-grouped);
+}
+.history-table { width: 100%; border-collapse: collapse; text-align: left; }
+.history-table th {
+  position: sticky; top: 0;
+  background: var(--surface-subtle);
+  padding: 12px 16px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  backdrop-filter: blur(10px);
+  z-index: 10;
+}
 .history-table td {
-  padding: 12px 14px;
+  padding: 14px 16px;
   border-bottom: 1px solid var(--border-subtle);
-  font-weight: 600;
-  vertical-align: middle;
-  line-height: 1.2;
+  font-size: 14px;
+  font-weight: 500;
 }
+.history-table tr:last-child td { border-bottom: none; }
+.history-table td:nth-child(2), .history-table th:nth-child(2),
+.history-table td:nth-child(3), .history-table th:nth-child(3) { text-align: right; }
 
-.history-table tr:hover td {
-  background-color: var(--surface-subtle);
-}
-
-.history-table tr:last-child td {
-  border-bottom: none;
-}
-
-.history-table th:nth-child(1), .history-table td:nth-child(1) {
-  text-align: left;
-  width: 34%;
-}
-
-.history-table th:nth-child(2), .history-table td:nth-child(2) {
-  text-align: right;
-  width: 33%;
-}
-
-.history-table th:nth-child(3), .history-table td:nth-child(3) {
-  text-align: right;
-  width: 33%;
-}
-
+/* FAB & Toasts */
 .fab-anchor {
   position: fixed;
-  bottom: calc(18px + env(safe-area-inset-bottom));
+  bottom: calc(24px + env(safe-area-inset-bottom));
   left: 50%;
   transform: translateX(-50%);
   z-index: 100;
 }
-
 .fab-btn {
-  height: 44px;
-  padding: 0 18px;
-  background: var(--surface);
-  border: 1px solid var(--border-strong);
+  height: 56px;
+  padding: 0 24px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
   border-radius: var(--radius-full);
   box-shadow: var(--shadow-fab);
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 13px;
-  font-weight: 700;
+  gap: 12px;
+  font-size: 16px;
+  font-weight: 600;
   color: var(--text-primary);
   cursor: pointer;
-  transition: transform var(--transition), box-shadow var(--transition);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  white-space: nowrap;
+  transition: transform var(--transition);
 }
-
-.fab-btn:active {
-  transform: translateY(1px) scale(0.98);
-}
-
-.fab-icon {
-  width: 18px;
-  height: 18px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--gold-primary);
-}
-
-.fab-btn svg { width: 16px; height: 16px; }
+.fab-btn:active { transform: translateY(2px) scale(0.96); }
+.fab-icon { color: var(--gold-primary); display: flex; align-items: center; }
+.fab-btn svg { width: 20px; height: 20px; }
 .fab-btn .icon-spin { display: none; }
 .fab-btn.fetching .icon-idle { display: none; }
 .fab-btn.fetching .icon-spin { display: block; animation: spin 0.8s linear infinite; }
-.fab-btn.spin .icon-idle { animation: spin 0.6s var(--transition); }
 
 @keyframes spin { to { transform: rotate(360deg); } }
 
-.pulldown {
-  position: fixed;
-  left: 50%;
-  top: env(safe-area-inset-top);
-  transform: translate(-50%, -70px);
-  background: var(--surface);
-  border: 1px solid var(--border-strong);
-  padding: 6px 14px;
-  border-radius: var(--radius-full);
-  box-shadow: var(--shadow-card);
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 12px;
-  font-weight: 700;
-  z-index: 150;
-  opacity: 0;
-  transition: opacity 0.2s, transform 0.2s;
-}
-
-.pulldown.visible { opacity: 1; }
-.pulldown.ready { color: var(--gold-primary); }
-.pulldown.ready .pulldownicon { transform: rotate(180deg); }
-.pulldown.loading .icon-idle { display: none; }
-.pulldown.loading .icon-spin { display: block; animation: spin 0.8s linear infinite; }
-
 .toast {
   position: fixed;
-  top: calc(14px + env(safe-area-inset-top));
+  top: calc(80px + env(safe-area-inset-top));
   left: 50%;
-  transform: translate(-50%, -24px);
-  background: var(--surface);
-  color: var(--text-primary);
-  border: 1px solid var(--border-strong);
-  padding: 8px 18px;
+  transform: translate(-50%, -20px) scale(0.9);
+  background: var(--text-primary);
+  color: var(--bg-app);
+  padding: 12px 24px;
   border-radius: var(--radius-full);
-  font-size: 12.5px;
-  font-weight: 700;
-  box-shadow: var(--shadow-fab);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  box-shadow: var(--shadow-card);
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.25s, transform 0.25s;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
   z-index: 200;
   white-space: nowrap;
 }
-
-.toast::before {
-  content: "";
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--gold-primary);
-  flex-shrink: 0;
-}
-
-.toast.show { opacity: 1; transform: translate(-50%, 0); }
+.toast.show { opacity: 1; transform: translate(-50%, 0) scale(1); }
 
 footer {
   text-align: center;
-  font-size: 11.5px;
+  font-size: 13px;
   color: var(--text-tertiary);
-  line-height: 1.8;
-  padding: 10px 0;
+  padding: 24px 0;
 }
 </style>
 </head>
 
 <body>
 
-<div class="app">
-
-  <div class="pulldown" id="pulldown" aria-hidden="true">
-    <span class="pulldownicon" id="pulldownIcon">
-      <svg class="icon-idle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="14" height="14">
-        <path d="M21 12a9 9 0 1 1-2.64-6.36"/><polyline points="21 3 21 9 15 9"/>
-      </svg>
-      <svg class="icon-spin" viewBox="0 0 24 24" fill="none" width="14" height="14">
-        <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="34 22"/>
-      </svg>
-    </span>
-    <span id="pulldownText">Pull to refresh</span>
-  </div>
-
-  <header class="topbar">
+<header class="topbar">
+  <div class="topbar-content">
     <div class="brand-text">
-      <h1>Gold 22k rate</h1>
+      <h1>Gold 22k Tracker</h1>
     </div>
     <div class="status-indicator" id="status">
       <span class="dot"></span>
-      <span id="statusText">Checking rate…</span>
+      <span id="statusText">Checking…</span>
     </div>
-  </header>
+  </div>
+</header>
+
+<div class="app">
 
   <div class="warning-banner" id="parserWarning" hidden>
     <div class="warning-icon">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24">
         <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/>
         <line x1="12" y1="9" x2="12" y2="13"/>
         <line x1="12" y1="17" x2="12.01" y2="17"/>
       </svg>
     </div>
     <div class="warning-content">
-      <strong id="warningTitle">Source Parsing Issue Detected</strong>
-      <p id="warningDesc">One or more benchmark sources failed to parse. Displaying last verified fallback rate.</p>
+      <strong id="warningTitle">Source Alert</strong>
+      <p id="warningDesc">Data source degraded.</p>
     </div>
   </div>
 
-  <div hidden><button id="fetchNow"><span id="fetchNowText">Fetch</span></button></div>
-
   <section class="hero">
     <div class="hero-top">
-      <span class="hero-label">1 Sovereign (8 Grams)</span>
+      <span class="hero-label">1 Sovereign (8g)</span>
       <div class="hero-actions">
-        <button id="shareBtn" class="share-btn" type="button" aria-label="Share current gold price">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="13" height="13">
-            <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
-            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+        <button id="shareBtn" class="share-btn" type="button" aria-label="Share">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+            <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/>
           </svg>
-          <span>Share</span>
         </button>
-        <div id="change" class="change-pill same">No change</div>
+        <div id="change" class="change-pill same">--</div>
       </div>
     </div>
 
     <div class="hero-mid">
       <h2 id="hero8">₹—</h2>
-      <span class="sub">Standard 22 Karat Hallmarked</span>
+      <span class="sub">Standard 22K Hallmarked</span>
     </div>
 
     <div class="hero-details-grid">
       <div class="hero-detail-col">
-        <span class="hero-sub-label">Rate Per Gram</span>
+        <span class="hero-sub-label">Per Gram</span>
         <div class="hero-sub-val" id="hero1">₹—</div>
-        <div class="hero-sub-sub">1 Gram Benchmark</div>
+        <div class="hero-sub-sub">Benchmark Rate</div>
       </div>
       <div class="hero-detail-col">
         <span class="hero-sub-label">Market Date</span>
@@ -1168,99 +700,60 @@ footer {
 
   <section class="section">
     <div class="section-head">
-      <h3>Multi-Horizon Performance</h3>
-      <span>Historic Returns</span>
+      <h3>Quick Stats</h3>
+      <span id="session">IST</span>
     </div>
-    <div class="horizon-grid">
-      <div class="horizon-box">
-        <small>1 Week</small>
-        <b id="ret1W">—</b>
+    <div class="grid-grouped">
+      <div class="grid-item">
+        <small>Session</small>
+        <b id="todaySummary">—</b>
       </div>
-      <div class="horizon-box">
-        <small>1 Month</small>
-        <b id="ret1M">—</b>
+      <div class="grid-item">
+        <small>30-Day SMA</small>
+        <b id="smaValue" style="color: var(--gold-primary);">₹—</b>
       </div>
-      <div class="horizon-box">
-        <small>3 Months</small>
-        <b id="ret3M">—</b>
+      <div class="grid-item">
+        <small>3Y Peak</small>
+        <b id="high">—</b>
       </div>
-      <div class="horizon-box">
-        <small>6 Months</small>
-        <b id="ret6M">—</b>
-      </div>
-      <div class="horizon-box">
-        <small>1 Year</small>
-        <b id="ret1Y">—</b>
-      </div>
-      <div class="horizon-box">
-        <small>3 Years</small>
-        <b id="ret3Y">—</b>
-      </div>
-    </div>
-  </section>
-
-  <section class="sentiment-banner">
-    <div class="sentiment-left">
-      <span>30-Day Moving Average (SMA)</span>
-      <b id="smaValue">₹—</b>
-    </div>
-    <div class="sentiment-pill same" id="smaPill">Calculating…</div>
-  </section>
-
-  <section class="quick-grid">
-    <div class="stat-card">
-      <span class="label">Session</span>
-      <span class="value" id="session">—</span>
-      <span class="sub">IST Market</span>
-    </div>
-    <div class="stat-card">
-      <span class="label">3Y Peak</span>
-      <span class="value" id="high">—</span>
-      <span class="sub" id="highDate">—</span>
-    </div>
-    <div class="stat-card">
-      <span class="label">3Y Floor</span>
-      <span class="value" id="low">—</span>
-      <span class="sub" id="lowDate">—</span>
-    </div>
-  </section>
-
-  <section class="section">
-    <div class="section-head">
-      <h3>Intraday Sessions</h3>
-      <span id="todaySummary">—</span>
-    </div>
-    <div class="session-grid">
-      <div class="session-box">
-        <span class="tag">Morning</span>
-        <span class="rate" id="amRate">—</span>
-        <span class="time" id="amTime">Not recorded</span>
-      </div>
-      <div class="session-box">
-        <span class="tag">Evening</span>
-        <span class="rate" id="pmRate">—</span>
-        <span class="time" id="pmTime">Not recorded</span>
+      <div class="grid-item">
+        <small>3Y Floor</small>
+        <b id="low">—</b>
       </div>
     </div>
   </section>
 
   <section class="section">
     <div class="section-head">
-      <h3>Price History Trend</h3>
+      <h3>Historical Performance</h3>
+    </div>
+    <div class="grid-grouped">
+      <div class="grid-item"><small>1W</small><b id="ret1W">—</b></div>
+      <div class="grid-item"><small>1M</small><b id="ret1M">—</b></div>
+      <div class="grid-item"><small>3M</small><b id="ret3M">—</b></div>
+      <div class="grid-item"><small>6M</small><b id="ret6M">—</b></div>
+      <div class="grid-item"><small>1Y</small><b id="ret1Y">—</b></div>
+      <div class="grid-item"><small>3Y</small><b id="ret3Y">—</b></div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head">
+      <h3>Price Trend</h3>
       <span id="chartCount">—</span>
     </div>
-
-    <div class="segment-ctrl" id="ranges">
-      <button data-range="7">7D</button>
-      <button class="active" data-range="30">30D</button>
-      <button data-range="90">3M</button>
-      <button data-range="180">6M</button>
-      <button data-range="365">1Y</button>
-      <button data-range="1095">3Y</button>
-      <button data-range="all">ALL</button>
-    </div>
-
+    
     <div class="panel">
+      <div class="segment-ctrl" id="ranges">
+        <button data-range="7">7D</button>
+        <button class="active" data-range="30">1M</button>
+        <button data-range="90">3M</button>
+        <button data-range="180">6M</button>
+        <button data-range="365">1Y</button>
+        <button data-range="1095">3Y</button>
+        <button data-range="all">ALL</button>
+      </div>
+
       <div class="chart-stats-row">
         <div class="metric-card">
           <small id="chartMetricLabel">Change</small>
@@ -1279,7 +772,6 @@ footer {
       <div class="chartwrap">
         <canvas id="chart"></canvas>
       </div>
-
       <div class="chartmeta">
         <span id="chartStart">—</span>
         <span id="chartEnd">—</span>
@@ -1289,101 +781,93 @@ footer {
 
   <section class="section">
     <div class="section-head">
-      <h3>Last Rate Movement</h3>
+      <h3>Movement Log</h3>
     </div>
-    <div class="panel last-box">
-      <div>
-        <h4 id="lastDate">No recorded change</h4>
-        <p id="lastTime">—</p>
+    <div class="list-group">
+      <div class="list-item">
+        <div class="list-item-content">
+          <h4>Last Recorded Change</h4>
+          <p id="lastDate">No change</p>
+        </div>
+        <div class="list-item-value" id="lastAmount">—</div>
       </div>
-      <div class="amount" id="lastAmount">—</div>
+      <div class="list-item">
+        <div class="list-item-content">
+          <h4>Morning Session</h4>
+          <p id="amTime">Not recorded</p>
+        </div>
+        <div class="list-item-value" id="amRate">—</div>
+      </div>
+      <div class="list-item">
+        <div class="list-item-content">
+          <h4>Evening Session</h4>
+          <p id="pmTime">Not recorded</p>
+        </div>
+        <div class="list-item-value" id="pmRate">—</div>
+      </div>
     </div>
   </section>
 
   <section class="section">
     <div class="section-head">
-      <h3>Compare Historical Dates</h3>
-    </div>
-    <div class="panel">
-      <div class="calc-grid">
-        <div class="calc-field">
-          <label>Earlier Date</label>
-          <input class="calc-input" type="date" id="dateA">
-        </div>
-        <div class="calc-field">
-          <label>Later Date</label>
-          <input class="calc-input" type="date" id="dateB">
-        </div>
-      </div>
-      <div class="compare-result" id="compareResult">Select two dates to compare values.</div>
-    </div>
-  </section>
-
-  <section class="section">
-    <div class="section-head">
-      <h3>Jewelry Purchase Calculator</h3>
+      <h3>Calculator</h3>
     </div>
     <div class="panel">
       <div class="chip-container" id="weightChips">
-        <button class="chip" data-val="1" type="button">1g</button>
-        <button class="chip" data-val="4" type="button">4g (Half)</button>
-        <button class="chip active" data-val="8" type="button">8g (1 Sov)</button>
-        <button class="chip" data-val="16" type="button">16g (2 Sov)</button>
-        <button class="chip" data-val="24" type="button">24g (3 Sov)</button>
-        <button class="chip" data-val="50" type="button">50g</button>
-        <button class="chip" data-val="100" type="button">100g</button>
+        <button class="chip" data-val="1">1g</button>
+        <button class="chip" data-val="4">4g</button>
+        <button class="chip active" data-val="8">8g (1 Sov)</button>
+        <button class="chip" data-val="16">16g</button>
+        <button class="chip" data-val="24">24g</button>
+        <button class="chip" data-val="50">50g</button>
       </div>
 
       <div class="calc-grid">
         <div class="calc-field">
-          <label>Calculation Mode</label>
+          <label>Mode</label>
           <select class="calc-input" id="calcMode">
-            <option value="value">Calculate Price for Weight</option>
-            <option value="grams">Calculate Weight for Budget</option>
+            <option value="value">Price for Weight</option>
+            <option value="grams">Weight for Budget</option>
           </select>
         </div>
         <div class="calc-field" id="weightField">
-          <label>Weight in Grams</label>
-          <input class="calc-input" id="weight" type="number" inputmode="decimal" min="0" step="0.01" value="8">
+          <label>Grams</label>
+          <input class="calc-input selectable" id="weight" type="number" inputmode="decimal" min="0" step="0.01" value="8">
         </div>
-        <div class="calc-field" id="budgetField">
-          <label>Total Budget (₹)</label>
-          <input class="calc-input" id="budget" type="number" inputmode="decimal" min="0" step="100" value="100000">
-        </div>
-        <div class="calc-field">
-          <label>Making / Wastage (%)</label>
-          <input class="calc-input" id="making" type="number" inputmode="decimal" min="0" step="0.1" value="8.0">
+        <div class="calc-field" id="budgetField" style="display:none;">
+          <label>Budget (₹)</label>
+          <input class="calc-input selectable" id="budget" type="number" inputmode="decimal" min="0" step="100" value="100000">
         </div>
         <div class="calc-field">
-          <label>GST on Jewelry (%)</label>
-          <input class="calc-input" id="gstRate" type="number" inputmode="decimal" min="0" step="0.1" value="3.0">
+          <label>Making (%)</label>
+          <input class="calc-input selectable" id="making" type="number" inputmode="decimal" min="0" step="0.1" value="8.0">
         </div>
         <div class="calc-field">
-          <label>Hallmarking / Flat Fees (₹)</label>
-          <input class="calc-input" id="flatFee" type="number" inputmode="decimal" min="0" step="1" value="45">
+          <label>GST (%)</label>
+          <input class="calc-input selectable" id="gstRate" type="number" inputmode="decimal" min="0" step="0.1" value="3.0">
+        </div>
+        <div class="calc-field">
+          <label>Flat Fees (₹)</label>
+          <input class="calc-input selectable" id="flatFee" type="number" inputmode="decimal" min="0" step="1" value="45">
         </div>
       </div>
 
       <div class="receipt-box">
-        <div class="receipt-title">Itemized Cost Breakdown</div>
+        <div class="receipt-title">Itemized Breakdown</div>
         <div class="receipt-line">
-          <span>Base 22K Gold Cost:</span>
-          <span id="receiptBase">₹0</span>
+          <span>Base Cost:</span><span id="receiptBase">₹0</span>
         </div>
         <div class="receipt-line">
-          <span id="receiptMakingLabel">Making Charges (8%):</span>
-          <span id="receiptMaking">₹0</span>
+          <span id="receiptMakingLabel">Making:</span><span id="receiptMaking">₹0</span>
         </div>
         <div class="receipt-line">
-          <span id="receiptGstLabel">GST (3%):</span>
-          <span id="receiptGst">₹0</span>
+          <span id="receiptGstLabel">GST:</span><span id="receiptGst">₹0</span>
         </div>
         <div class="receipt-line">
-          <span>Hallmarking / Misc Fees:</span>
-          <span id="receiptFee">₹0</span>
+          <span>Fees:</span><span id="receiptFee">₹0</span>
         </div>
         <div class="receipt-total">
-          <span class="label" id="receiptTotalLabel">Total Estimated Price</span>
+          <span class="label" id="receiptTotalLabel">Total</span>
           <span class="final-val" id="calcResult">₹—</span>
         </div>
         <div class="calc-subtext" id="calcSub">Based on live 22K rate.</div>
@@ -1393,40 +877,57 @@ footer {
 
   <section class="section">
     <div class="section-head">
-      <h3>Historical Log</h3>
+      <h3>Compare Dates</h3>
+    </div>
+    <div class="panel">
+      <div class="calc-grid">
+        <div class="calc-field">
+          <label>Date 1</label>
+          <input class="calc-input selectable" type="date" id="dateA">
+        </div>
+        <div class="calc-field">
+          <label>Date 2</label>
+          <input class="calc-input selectable" type="date" id="dateB">
+        </div>
+      </div>
+      <div class="compare-result" id="compareResult">Select dates to compare.</div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head">
+      <h3>Data Log</h3>
       <span id="historyCount">—</span>
     </div>
-    <div class="panel table-wrap">
+    <div class="table-wrap">
       <table class="history-table">
         <thead>
           <tr>
             <th>Date</th>
-            <th>Per Gram</th>
-            <th>1 Sov (8g)</th>
+            <th>1g</th>
+            <th>8g (Sov)</th>
           </tr>
         </thead>
         <tbody id="historyBody">
-          <tr><td colspan="3" style="text-align:center; color:var(--text-tertiary);">Loading historical log…</td></tr>
+          <tr><td colspan="3" style="text-align:center;">Loading…</td></tr>
         </tbody>
       </table>
     </div>
   </section>
 
   <footer>
-    <div>Gold 22k rate · Live Tracker</div>
-    <div>Synchronized via Cloudflare Edge Worker · Sources: LiveChennai + GoodReturns</div>
+    <p>Gold 22K Live Tracker<br>Synced securely via Cloudflare</p>
   </footer>
-
 </div>
 
-<div class="fab-anchor" hidden>
-  <button class="fab-btn" id="refresh" aria-label="Fetch latest rate" type="button">
+<div class="fab-anchor">
+  <button class="fab-btn" id="refresh" aria-label="Sync">
     <span class="fab-icon">
-      <svg class="icon-idle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+      <svg class="icon-idle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
         <path d="M21 12a9 9 0 1 1-2.64-6.36"/><polyline points="21 3 21 9 15 9"/>
       </svg>
       <svg class="icon-spin" viewBox="0 0 24 24" fill="none">
-        <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-dasharray="34 22"/>
+        <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="34 22"/>
       </svg>
     </span>
     <span id="fabLabel">Sync Live Rate</span>
@@ -1488,7 +989,7 @@ function setStatus(text, offline = false) {
 function toast(text) {
   $("toast").textContent = text;
   $("toast").classList.add("show");
-  setTimeout(() => $("toast").classList.remove("show"), 2200);
+  setTimeout(() => $("toast").classList.remove("show"), 2500);
 }
 
 function sleep(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
@@ -1499,8 +1000,8 @@ function checkParserHealth(data, networkError = false) {
   const desc = $("warningDesc");
 
   if (networkError) {
-    title.textContent = "Offline / Connection Degraded";
-    desc.textContent = "Unable to reach benchmark catalog. Displaying device-cached data.";
+    title.textContent = "Offline Mode";
+    desc.textContent = "Showing cached data.";
     warningBox.hidden = false;
     return;
   }
@@ -1515,22 +1016,12 @@ function checkParserHealth(data, networkError = false) {
 
   if (data.error || data.parsing_failed) {
     hasFailed = true;
-    reasons.push(data.error || "Source crawler parsing error");
-  }
-
-  if (Array.isArray(data.failed_sources) && data.failed_sources.length > 0) {
-    hasFailed = true;
-    reasons.push(`Failed to parse: ${data.failed_sources.join(", ")}`);
-  }
-
-  if (data.status === "degraded" || data.status === "error") {
-    hasFailed = true;
-    reasons.push("Crawler operating in degraded mode");
+    reasons.push(data.error || "Parsing error");
   }
 
   if (hasFailed) {
-    title.textContent = "Important: Source Parsing Warning";
-    desc.textContent = reasons.join(" · ") + ". Displaying last verified fallback benchmark.";
+    title.textContent = "Source Warning";
+    desc.textContent = reasons.join(" · ") + ". Displaying verified fallback.";
     warningBox.hidden = false;
   } else {
     warningBox.hidden = true;
@@ -1563,7 +1054,7 @@ function renderLive(d) {
   $("hero1").textContent = money(rate);
   $("today").textContent = dateText(d.date);
   $("todayTime").textContent = timeText(d.time);
-  $("session").textContent = d.session || "—";
+  $("session").textContent = d.session || "IST";
 
   let change = Number(d.change);
   if (!Number.isFinite(change)) {
@@ -1573,22 +1064,14 @@ function renderLive(d) {
 
   const badge = $("change");
   badge.className = "change-pill " + (change > 0 ? "up" : change < 0 ? "down" : "same");
-  badge.textContent = change > 0 ? "▲ " + money(change) + "/g" 
-                    : change < 0 ? "▼ " + money(Math.abs(change)) + "/g" 
-                    : "No change";
+  badge.textContent = change > 0 ? "▲ " + money(change) : change < 0 ? "▼ " + money(Math.abs(change)) : "—";
 
   const lastChange = d.last_change;
   if (lastChange) {
-    $("lastDate").textContent = dateText(lastChange.date);
-    $("lastTime").textContent = timeText(lastChange.time) + (lastChange.session ? " · " + lastChange.session : "");
+    $("lastDate").textContent = dateText(lastChange.date) + " · " + timeText(lastChange.time);
     const amount = Number(lastChange.change);
-    $("lastAmount").textContent = amount > 0 ? "▲ " + money(amount) : amount < 0 ? "▼ " + money(Math.abs(amount)) : "• No change";
-    $("lastAmount").className = "amount " + (amount > 0 ? "positive" : amount < 0 ? "negative" : "");
-  } else {
-    $("lastDate").textContent = "No recorded change";
-    $("lastTime").textContent = "—";
-    $("lastAmount").textContent = "—";
-    $("lastAmount").className = "amount";
+    $("lastAmount").textContent = amount > 0 ? "+" + money(amount) : amount < 0 ? "-" + money(Math.abs(amount)) : "0";
+    $("lastAmount").className = "list-item-value " + (amount > 0 ? "positive" : amount < 0 ? "negative" : "");
   }
 
   renderToday();
@@ -1610,7 +1093,7 @@ function renderToday() {
   $("amTime").textContent = am ? timeText(am.time) : "Not recorded";
   $("pmRate").textContent = pm ? money(pm.rate_22k) : "—";
   $("pmTime").textContent = pm ? timeText(pm.time) : "Not recorded";
-  $("todaySummary").textContent = changes.length ? `${changes.length} change${changes.length === 1 ? '' : 's'} recorded` : "No session updates";
+  $("todaySummary").textContent = changes.length ? `${changes.length} Updates` : "No updates";
 }
 
 function updateFintechMetrics() {
@@ -1628,12 +1111,9 @@ function updateFintechMetrics() {
   };
 
   const horizons = [
-    { id: "ret1W", days: 7 },
-    { id: "ret1M", days: 30 },
-    { id: "ret3M", days: 90 },
-    { id: "ret6M", days: 180 },
-    { id: "ret1Y", days: 365 },
-    { id: "ret3Y", days: 1095 }
+    { id: "ret1W", days: 7 }, { id: "ret1M", days: 30 },
+    { id: "ret3M", days: 90 }, { id: "ret6M", days: 180 },
+    { id: "ret1Y", days: 365 }, { id: "ret3Y", days: 1095 }
   ];
 
   horizons.forEach(h => {
@@ -1641,26 +1121,17 @@ function updateFintechMetrics() {
     const elem = $(h.id);
     if (ret === null) {
       elem.textContent = "—";
+      elem.style.color = "var(--text-primary)";
     } else {
       elem.textContent = (ret >= 0 ? "+" : "") + ret.toFixed(1) + "%";
+      elem.style.color = ret >= 0 ? "var(--good)" : "var(--bad)";
     }
   });
 
   const smaPeriod = Math.min(30, history.length);
   const recentSlice = values.slice(-smaPeriod);
   const sma = recentSlice.reduce((a, b) => a + b, 0) / smaPeriod;
-  const smaDiff = currentRate - sma;
-  const smaPct = (smaDiff / sma) * 100;
-
-  $("smaValue").textContent = money(sma) + " · 30D Average";
-  const pill = $("smaPill");
-  if (smaDiff >= 0) {
-    pill.className = "sentiment-pill up";
-    pill.textContent = `▲ +${money(smaDiff)} (+${smaPct.toFixed(1)}%) Bullish`;
-  } else {
-    pill.className = "sentiment-pill down";
-    pill.textContent = `▼ -${money(Math.abs(smaDiff))} (${smaPct.toFixed(1)}%) Pullback`;
-  }
+  $("smaValue").textContent = money(sma);
 }
 
 function chartData() {
@@ -1685,22 +1156,16 @@ function drawChart() {
   ctx.clearRect(0, 0, width, height);
 
   const data = chartData();
-  $("chartCount").textContent = data.length.toLocaleString("en-IN") + (data.length === 1 ? " day" : " days");
+  $("chartCount").textContent = data.length.toLocaleString("en-IN") + " Points";
 
   const styles = getComputedStyle(document.body);
-  const colorGold = styles.getPropertyValue('--gold-primary').trim() || '#d97706';
-  const colorGrid = styles.getPropertyValue('--border-subtle').trim() || '#e2e8f0';
-  const colorText = styles.getPropertyValue('--text-tertiary').trim() || '#94a3b8';
-  const colorSurface = styles.getPropertyValue('--surface').trim() || '#ffffff';
-  const colorPrimary = styles.getPropertyValue('--text-primary').trim() || '#0f172a';
+  const colorGold = styles.getPropertyValue('--gold-primary').trim();
+  const colorGrid = styles.getPropertyValue('--border-subtle').trim();
+  const colorText = styles.getPropertyValue('--text-tertiary').trim();
+  const colorSurface = styles.getPropertyValue('--surface').trim();
+  const colorPrimary = styles.getPropertyValue('--text-primary').trim();
 
-  if (data.length < 2) {
-    ctx.fillStyle = colorText;
-    ctx.textAlign = "center";
-    ctx.font = "12px var(--font-display)";
-    ctx.fillText("Insufficient historical points", width / 2, height / 2);
-    return;
-  }
+  if (data.length < 2) return;
 
   const values = data.map(item => Number(item.rate_22k));
   const min0 = Math.min(...values);
@@ -1741,8 +1206,8 @@ function drawChart() {
   ctx.closePath();
 
   const gradient = ctx.createLinearGradient(0, T, 0, height);
-  gradient.addColorStop(0, "rgba(217, 119, 6, 0.18)");
-  gradient.addColorStop(1, "rgba(217, 119, 6, 0)");
+  gradient.addColorStop(0, colorGold + "33"); // 20% opacity
+  gradient.addColorStop(1, colorGold + "00");
   ctx.fillStyle = gradient;
   ctx.fill();
 
@@ -1772,7 +1237,6 @@ function drawChart() {
     const tooltipText = `${dateText(data[activeIndex].date)}: ${money(values[activeIndex])}/g`;
     ctx.font = "bold 11px var(--font-display)";
     const tagW = ctx.measureText(tooltipText).width + 16;
-    const tagH = 24;
     let tagX = activeX - tagW / 2;
     if (tagX < L) tagX = L;
     if (tagX + tagW > width - R) tagX = width - R - tagW;
@@ -1782,14 +1246,10 @@ function drawChart() {
     ctx.shadowColor = "rgba(0,0,0,0.15)";
     ctx.shadowBlur = 8;
     ctx.beginPath();
-    ctx.roundRect(tagX, tagY, tagW, tagH, 6);
+    ctx.roundRect(tagX, tagY, tagW, 24, 8);
     ctx.fill();
     ctx.shadowColor = "transparent";
-
-    ctx.strokeStyle = colorGold;
-    ctx.lineWidth = 1;
-    ctx.stroke();
-
+    
     ctx.fillStyle = colorPrimary;
     ctx.textAlign = "center";
     ctx.fillText(tooltipText, tagX + tagW / 2, tagY + 16);
@@ -1797,7 +1257,7 @@ function drawChart() {
 
   ctx.fillStyle = colorGold;
   ctx.beginPath();
-  ctx.arc(activeX, activeY, scrubIndex >= 0 ? 6 : 4.5, 0, Math.PI * 2);
+  ctx.arc(activeX, activeY, scrubIndex >= 0 ? 6 : 4, 0, Math.PI * 2);
   ctx.fill();
   ctx.strokeStyle = colorSurface;
   ctx.lineWidth = 2;
@@ -1812,7 +1272,7 @@ function drawChart() {
   const percentage = first ? (delta / first * 100) : 0;
 
   if (scrubIndex >= 0) {
-    $("chartMetricLabel").textContent = "Selected Date";
+    $("chartMetricLabel").textContent = "Selected";
     $("periodChange").textContent = money(values[activeIndex]) + " /g";
     $("periodChange").className = "";
   } else {
@@ -1853,11 +1313,10 @@ function drawChart() {
     }
   }
 
-  canvas.addEventListener("touchstart", (e) => { handleScrub(e); }, { passive: true });
-  canvas.addEventListener("touchmove", (e) => { handleScrub(e); }, { passive: true });
+  canvas.addEventListener("touchstart", handleScrub, { passive: true });
+  canvas.addEventListener("touchmove", handleScrub, { passive: true });
   canvas.addEventListener("touchend", endScrub, { passive: true });
   canvas.addEventListener("touchcancel", endScrub, { passive: true });
-
   canvas.addEventListener("mousemove", (e) => { if (e.buttons === 1) handleScrub(e); });
   canvas.addEventListener("mouseup", endScrub);
   canvas.addEventListener("mouseleave", endScrub);
@@ -1869,13 +1328,22 @@ function calculate() {
   if (!Number.isFinite(rate) || rate <= 0) return;
 
   const mode = $("calcMode").value;
+  
+  if(mode === "value") {
+    $("weightField").style.display = "flex";
+    $("budgetField").style.display = "none";
+  } else {
+    $("weightField").style.display = "none";
+    $("budgetField").style.display = "flex";
+  }
+
   const weight = Math.max(0, Number($("weight").value) || 0);
   const budget = Math.max(0, Number($("budget").value) || 0);
   const makingPct = Math.max(0, Number($("making").value) || 0);
   const gstPct = Math.max(0, Number($("gstRate").value) || 0);
   const flatFee = Math.max(0, Number($("flatFee").value) || 0);
 
-  $("receiptMakingLabel").textContent = `Making Charges (${makingPct}%):`;
+  $("receiptMakingLabel").textContent = `Making (${makingPct}%):`;
   $("receiptGstLabel").textContent = `GST (${gstPct}%):`;
 
   if (mode === "value") {
@@ -1890,9 +1358,9 @@ function calculate() {
     $("receiptGst").textContent = money(gstAmount);
     $("receiptFee").textContent = money(flatFee);
 
-    $("receiptTotalLabel").textContent = "Total Estimated Price";
+    $("receiptTotalLabel").textContent = "Total Est. Price";
     $("calcResult").textContent = money(grandTotal);
-    $("calcSub").textContent = `For ${weight.toLocaleString("en-IN")} grams at current ₹${rate}/g`;
+    $("calcSub").textContent = `For ${weight}g at current ₹${rate}/g`;
   } else {
     const effectiveBudget = budget / (1 + gstPct / 100) - flatFee;
     const goldBase = effectiveBudget > 0 ? effectiveBudget / (1 + makingPct / 100) : 0;
@@ -1907,9 +1375,9 @@ function calculate() {
     $("receiptGst").textContent = money(gstAmount);
     $("receiptFee").textContent = money(flatFee);
 
-    $("receiptTotalLabel").textContent = "Purchasable Gold Weight";
+    $("receiptTotalLabel").textContent = "Purchasable Weight";
     $("calcResult").textContent = grams.toFixed(3) + " g";
-    $("calcSub").textContent = `Fits budget ${money(budget)} after all taxes and charges`;
+    $("calcSub").textContent = `Fits budget ${money(budget)}`;
   }
 }
 
@@ -1927,36 +1395,24 @@ document.querySelectorAll("#weightChips .chip").forEach(chip => {
 $("shareBtn").onclick = async () => {
   haptic(15);
   if (!live) return;
-  const rate1 = Number(live.rate_22k);
-  const rate8 = Number.isFinite(Number(live.rate_8g)) ? Number(live.rate_8g) : rate1 * 8;
-  const shareText = `💰 Gold 22K Rate (${dateText(live.date)})\n• 1 Gram: ${money(rate1)}\n• 1 Sovereign (8g): ${money(rate8)}\n• Session: ${live.session || "IST"}\nTrack live at: ${window.location.href}`;
-
+  const shareText = `Gold 22K: ${money(live.rate_22k)}/g\nTrack live at: ${window.location.href}`;
   if (navigator.share) {
-    try {
-      await navigator.share({ title: "Gold 22k rate", text: shareText });
-    } catch (_) {}
-  } else if (navigator.clipboard) {
+    try { await navigator.share({ title: "Gold Rate", text: shareText }); } catch (_) {}
+  } else {
     await navigator.clipboard.writeText(shareText);
-    toast("Gold rate copied to clipboard!");
+    toast("Copied to clipboard!");
   }
 };
 
 function renderStats() {
   if (!history.length) return;
   const values = history.map(item => Number(item.rate_22k));
-  const high = Math.max(...values);
-  const low = Math.min(...values);
+  
+  $("high").textContent = money(Math.max(...values));
+  $("low").textContent = money(Math.min(...values));
+  $("historyCount").textContent = history.length.toLocaleString("en-IN");
 
-  const highItem = history.find(item => Number(item.rate_22k) === high);
-  const lowItem = history.find(item => Number(item.rate_22k) === low);
-
-  $("high").textContent = money(high);
-  $("low").textContent = money(low);
-  $("highDate").textContent = dateText(highItem?.date);
-  $("lowDate").textContent = dateText(lowItem?.date);
-  $("historyCount").textContent = history.length.toLocaleString("en-IN") + " records";
-
-  $("historyBody").innerHTML = [...history].reverse().slice(0, 300).map(item => `
+  $("historyBody").innerHTML = [...history].reverse().slice(0, 100).map(item => `
     <tr>
       <td>${esc(dateText(item.date))}</td>
       <td>${money(item.rate_22k)}</td>
@@ -1973,223 +1429,61 @@ function renderStats() {
 }
 
 function compareDates() {
-  const dateA = $("dateA").value;
-  const dateB = $("dateB").value;
-  const a = history.find(item => item.date === dateA);
-  const b = history.find(item => item.date === dateB);
+  const a = history.find(item => item.date === $("dateA").value);
+  const b = history.find(item => item.date === $("dateB").value);
   const output = $("compareResult");
 
   if (!a || !b) {
-    output.textContent = "Select two dates available in the historical catalog.";
+    output.textContent = "Select two valid historical dates.";
     return;
   }
 
-  const difference = Number(b.rate_22k) - Number(a.rate_22k);
-  const percentage = Number(a.rate_22k) ? (difference / Number(a.rate_22k) * 100) : 0;
+  const diff = Number(b.rate_22k) - Number(a.rate_22k);
+  const pct = Number(a.rate_22k) ? (diff / Number(a.rate_22k) * 100) : 0;
 
   output.innerHTML = `
     <strong>${money(a.rate_22k)} → ${money(b.rate_22k)}</strong>
-    <span class="${difference > 0 ? "positive" : difference < 0 ? "negative" : ""}">
-      ${difference >= 0 ? "+" : ""}${money(difference)}/g · ${percentage >= 0 ? "+" : ""}${percentage.toFixed(2)}%
-    </span>
-    <span style="display:block; color:var(--text-tertiary); font-size:11.5px; margin-top:3px;">
-      ${dateText(a.date)} to ${dateText(b.date)} · 1 Sov diff: ${money(difference * 8)}
+    <span class="${diff > 0 ? "positive" : diff < 0 ? "negative" : ""}">
+      ${diff >= 0 ? "+" : ""}${money(diff)}/g (${pct >= 0 ? "+" : ""}${pct.toFixed(2)}%)
     </span>
   `;
-}
-
-async function loadPublishedData() {
-  const results = await Promise.all([getJSON(LIVE_URL), getJSON(HISTORY_URL)]);
-  const latest = results[0];
-  const historical = results[1];
-
-  renderLive(latest);
-  history = normalize(historical);
-  renderStats();
-  calculate();
-
-  localStorage.setItem("gold_live_backup", JSON.stringify(latest));
-  localStorage.setItem("gold_history_backup", JSON.stringify(history));
-  return latest;
-}
-
-async function refresh(manual = false) {
-  const button = $("refresh");
-  if (manual) {
-    button.classList.remove("spin");
-    void button.offsetWidth;
-    button.classList.add("spin");
-  }
-
-  try {
-    setStatus("Checking rate…");
-    await loadPublishedData();
-    setStatus("Synced at " + new Date().toLocaleTimeString("en-IN", { hour: "numeric", minute: "2-digit" }));
-    if (manual) toast("Latest rate loaded");
-  } catch (error) {
-    console.error("Refresh error:", error);
-    try {
-      const savedLive = JSON.parse(localStorage.getItem("gold_live_backup") || "null");
-      const savedHistory = JSON.parse(localStorage.getItem("gold_history_backup") || "null");
-      if (savedLive) renderLive(savedLive);
-      if (Array.isArray(savedHistory)) {
-        history = normalize(savedHistory);
-        renderStats();
-        calculate();
-      }
-      setStatus("Offline · Showing saved cache", true);
-      checkParserHealth(null, true);
-    } catch (backupError) {
-      console.error("Backup error:", backupError);
-      setStatus("Unable to load data", true);
-      checkParserHealth(null, true);
-    }
-  }
-}
-
-function getDataTimestamp(data) {
-  if (!data) return "";
-  return data.last_checked_at || data.last_checked || data.timestamp || data.updated_at || (String(data.date || "") + "|" + String(data.time || ""));
-}
-
-async function waitForUpdatedData(oldTimestamp) {
-  const maxAttempts = 12;
-  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-    await sleep(attempt === 1 ? 1500 : 2000);
-    try {
-      const latest = await getJSON(LIVE_URL);
-      const newTimestamp = getDataTimestamp(latest);
-      if (newTimestamp && newTimestamp !== oldTimestamp) return latest;
-      if (live && Number(latest.rate_22k) !== Number(live.rate_22k)) return latest;
-    } catch (error) {
-      console.warn("Waiting for published data sync:", error);
-    }
-  }
-  return getJSON(LIVE_URL);
 }
 
 async function manualFetch() {
   if (fetchBusy) return;
   fetchBusy = true;
   haptic(15);
-
-  const button = $("refresh");
-  const label = $("fabLabel");
-
-  button.disabled = true;
-  button.classList.add("fetching");
-  if (label) label.textContent = "Syncing…";
+  $("refresh").classList.add("fetching");
+  $("fabLabel").textContent = "Syncing…";
 
   try {
-    setStatus("Triggering live crawler…");
-    const oldLive = live;
-    const oldTimestamp = getDataTimestamp(oldLive);
-
-    const response = await fetch(WORKER_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ force: true }),
-      cache: "no-store"
-    });
-
-    if (!response.ok) throw new Error("Worker HTTP " + response.status);
-    const workerRes = await response.json().catch(() => ({}));
-    if (workerRes && (workerRes.error || workerRes.parsing_failed)) {
-      checkParserHealth(workerRes);
+    setStatus("Syncing…");
+    const results = await Promise.all([getJSON(LIVE_URL).catch(()=>null), getJSON(HISTORY_URL).catch(()=>null)]);
+    
+    if (results[0]) {
+      renderLive(results[0]);
+      localStorage.setItem("gold_live_backup", JSON.stringify(results[0]));
     }
-
-    setStatus("Worker done · Syncing catalog…");
-
-    const newestLive = await waitForUpdatedData(oldTimestamp);
-    const newestHistory = await getJSON(HISTORY_URL);
-
-    renderLive(newestLive);
-    history = normalize(newestHistory);
-    renderStats();
+    if (results[1]) {
+      history = normalize(results[1]);
+      renderStats();
+      localStorage.setItem("gold_history_backup", JSON.stringify(history));
+    }
+    
     calculate();
-
-    localStorage.setItem("gold_live_backup", JSON.stringify(newestLive));
-    localStorage.setItem("gold_history_backup", JSON.stringify(history));
-
-    setStatus("Updated · " + dateText(newestLive.date) + " · " + timeText(newestLive.time));
-
-    if (oldLive && Number(oldLive.rate_22k) === Number(newestLive.rate_22k)) {
-      toast("Rate checked · no change");
-    } else {
-      toast("New gold rate updated");
-    }
+    setStatus("Synced " + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+    toast("Up to date");
   } catch (error) {
-    console.error("Manual fetch error:", error);
-    setStatus("Fetch error · Cached data active", true);
-    checkParserHealth({ error: "Edge Crawler parsing failure" });
-    toast("Could not update live rate");
+    setStatus("Offline", true);
+    toast("Could not update");
   } finally {
     fetchBusy = false;
-    button.disabled = false;
-    button.classList.remove("fetching");
-    if (label) label.textContent = "Sync Live Rate";
+    $("refresh").classList.remove("fetching");
+    $("fabLabel").textContent = "Sync Live Rate";
   }
 }
 
 $("refresh").onclick = manualFetch;
-$("fetchNow").onclick = manualFetch;
-
-(function setupPullToRefresh() {
-  const PULL_THRESHOLD = 64;
-  const PULL_MAX = 90;
-  const pulldown = $("pulldown");
-  const pulldownText = $("pulldownText");
-  let startY = null, dragging = false, ready = false;
-
-  function atTop() { return (window.scrollY || 0) <= 0 && (document.scrollingElement ? document.scrollingElement.scrollTop : 0) <= 0; }
-  
-  function resetPulldown() {
-    pulldown.classList.remove("visible", "ready", "loading");
-    pulldown.style.transform = "";
-    pulldownText.textContent = "Pull to refresh";
-    startY = null; dragging = false; ready = false;
-  }
-
-  document.addEventListener("touchstart", event => {
-    if (fetchBusy || event.target.closest(".table-wrap") || !atTop()) return;
-    startY = event.touches[0].clientY;
-    dragging = true; ready = false;
-  }, { passive: true });
-
-  document.addEventListener("touchmove", event => {
-    if (!dragging || startY === null) return;
-    if (!atTop()) { resetPulldown(); return; }
-    
-    const delta = event.touches[0].clientY - startY;
-    if (delta <= 0) return;
-    if (event.cancelable) event.preventDefault();
-    
-    const pulled = Math.min(delta * 0.5, PULL_MAX);
-    pulldown.classList.add("visible");
-    pulldown.style.transform = `translate(-50%, ${pulled - 70}px)`;
-    ready = pulled >= PULL_THRESHOLD * 0.5;
-    
-    pulldown.classList.toggle("ready", ready);
-    pulldownText.textContent = ready ? "Release to sync" : "Pull to refresh";
-  }, { passive: false });
-
-  document.addEventListener("touchend", () => {
-    if (!dragging) return;
-    if (ready && !fetchBusy) {
-      pulldown.classList.add("loading");
-      pulldown.classList.remove("ready");
-      pulldown.style.transform = "translate(-50%, 14px)";
-      pulldownText.textContent = "Syncing…";
-      manualFetch().finally(resetPulldown);
-    } else {
-      resetPulldown();
-    }
-    dragging = false; startY = null;
-  }, { passive: true });
-
-  document.addEventListener("touchcancel", resetPulldown, { passive: true });
-})();
-
 document.querySelectorAll("#ranges button").forEach(button => {
   button.onclick = () => {
     haptic(8);
@@ -2201,24 +1495,20 @@ document.querySelectorAll("#ranges button").forEach(button => {
 });
 
 ["dateA", "dateB"].forEach(id => $(id).addEventListener("change", compareDates));
-["weight", "budget", "making", "gstRate", "flatFee"].forEach(id => $(id).addEventListener("input", calculate));
-$("calcMode").addEventListener("change", calculate);
+["weight", "budget", "making", "gstRate", "flatFee", "calcMode"].forEach(id => $(id).addEventListener("input", calculate));
+window.addEventListener("resize", drawChart);
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', drawChart);
 
-document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") refresh(); });
-window.addEventListener("pageshow", () => refresh());
-window.addEventListener("resize", () => { updateFintechMetrics(); drawChart(); });
-window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { drawChart(); });
+// Init Cache fallback
+try {
+  const cachedLive = JSON.parse(localStorage.getItem("gold_live_backup"));
+  const cachedHist = JSON.parse(localStorage.getItem("gold_history_backup"));
+  if (cachedLive) renderLive(cachedLive);
+  if (cachedHist) { history = normalize(cachedHist); renderStats(); }
+  calculate();
+} catch(e) {}
 
-if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => {
-    navigator.serviceWorker
-      .register("sw.js?v=" + Date.now())
-      .then((reg) => reg.update())
-      .catch((e) => console.warn("Service worker register skipped:", e));
-  });
-}
-
-refresh();
+manualFetch();
 </script>
 </body>
 </html>
