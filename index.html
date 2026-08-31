@@ -412,6 +412,68 @@ button, input, select {
   display: block;
 }
 
+/* Updated Details / Collapsible Styling */
+details.collapsible {
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card), var(--specular);
+  width: 100%;
+  overflow: hidden;
+}
+
+details.collapsible summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+}
+
+details.collapsible summary::-webkit-details-marker {
+  display: none;
+}
+
+.summary-title {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  width: 100%;
+  padding-right: 12px;
+}
+
+.summary-title h3 {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+
+.summary-title span {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-tertiary);
+}
+
+.chevron {
+  font-size: 10px;
+  color: var(--text-tertiary);
+  transition: transform var(--transition);
+}
+
+details.collapsible[open] .chevron {
+  transform: rotate(180deg);
+}
+
+details.collapsible .collapsible-content {
+  padding: 0 16px 16px 16px;
+  border-top: 1px dashed var(--border-subtle);
+  margin-top: -4px;
+  padding-top: 14px;
+}
+
 .horizon-grid {
   display: grid;
   grid-template-columns: repeat(6, minmax(0, 1fr));
@@ -427,7 +489,7 @@ button, input, select {
 }
 
 .horizon-box {
-  background: var(--surface);
+  background: var(--surface-subtle);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-xs);
   padding: 10px 8px;
@@ -435,7 +497,6 @@ button, input, select {
   flex-direction: column;
   align-items: center;
   gap: 4px;
-  box-shadow: var(--shadow-sm), var(--specular);
 }
 
 .horizon-box small {
@@ -454,14 +515,10 @@ button, input, select {
 }
 
 .sentiment-banner {
-  background: var(--surface);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-md);
-  padding: 14px 16px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  box-shadow: var(--shadow-sm), var(--specular);
+  width: 100%;
 }
 
 .sentiment-left {
@@ -674,13 +731,16 @@ button, input, select {
   width: 100%;
 }
 
+/* Updated Metric Card Styling for Perfect Alignment */
 .metric-card {
   background: var(--surface-subtle);
   border-radius: var(--radius-xs);
-  padding: 10px 12px;
+  padding: 10px 8px;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
+  text-align: center;
+  justify-content: center;
 }
 
 .metric-card small {
@@ -695,7 +755,7 @@ button, input, select {
 }
 
 .metric-card b {
-  font-size: 13.5px;
+  font-size: 13px;
   font-weight: 800;
   line-height: 18px;
   height: 18px;
@@ -703,6 +763,7 @@ button, input, select {
   overflow: hidden;
   text-overflow: ellipsis;
   display: block;
+  width: 100%;
 }
 
 .metric-card b.positive { color: var(--good); }
@@ -954,19 +1015,21 @@ select.calc-input {
   border-bottom: none;
 }
 
+/* Updated Table Alignments */
 .history-table th:nth-child(1), .history-table td:nth-child(1) {
   text-align: left;
-  width: 34%;
+  width: 36%;
+  white-space: nowrap;
 }
 
 .history-table th:nth-child(2), .history-table td:nth-child(2) {
   text-align: right;
-  width: 33%;
+  width: 32%;
 }
 
 .history-table th:nth-child(3), .history-table td:nth-child(3) {
   text-align: right;
-  width: 33%;
+  width: 32%;
 }
 
 .fab-anchor {
@@ -1166,46 +1229,64 @@ footer {
     </div>
   </section>
 
-  <section class="section">
-    <div class="section-head">
-      <h3>Multi-Horizon Performance</h3>
-      <span>Historic Returns</span>
+  <!-- Changed to Collapsible -->
+  <details class="collapsible">
+    <summary>
+      <div class="summary-title">
+        <h3>Multi-Horizon Performance</h3>
+        <span>Historic Returns</span>
+      </div>
+      <span class="chevron">▼</span>
+    </summary>
+    <div class="collapsible-content">
+      <div class="horizon-grid">
+        <div class="horizon-box">
+          <small>1 Week</small>
+          <b id="ret1W">—</b>
+        </div>
+        <div class="horizon-box">
+          <small>1 Month</small>
+          <b id="ret1M">—</b>
+        </div>
+        <div class="horizon-box">
+          <small>3 Months</small>
+          <b id="ret3M">—</b>
+        </div>
+        <div class="horizon-box">
+          <small>6 Months</small>
+          <b id="ret6M">—</b>
+        </div>
+        <div class="horizon-box">
+          <small>1 Year</small>
+          <b id="ret1Y">—</b>
+        </div>
+        <div class="horizon-box">
+          <small>3 Years</small>
+          <b id="ret3Y">—</b>
+        </div>
+      </div>
     </div>
-    <div class="horizon-grid">
-      <div class="horizon-box">
-        <small>1 Week</small>
-        <b id="ret1W">—</b>
-      </div>
-      <div class="horizon-box">
-        <small>1 Month</small>
-        <b id="ret1M">—</b>
-      </div>
-      <div class="horizon-box">
-        <small>3 Months</small>
-        <b id="ret3M">—</b>
-      </div>
-      <div class="horizon-box">
-        <small>6 Months</small>
-        <b id="ret6M">—</b>
-      </div>
-      <div class="horizon-box">
-        <small>1 Year</small>
-        <b id="ret1Y">—</b>
-      </div>
-      <div class="horizon-box">
-        <small>3 Years</small>
-        <b id="ret3Y">—</b>
-      </div>
-    </div>
-  </section>
+  </details>
 
-  <section class="sentiment-banner">
-    <div class="sentiment-left">
-      <span>30-Day Moving Average (SMA)</span>
-      <b id="smaValue">₹—</b>
+  <!-- Changed to Collapsible -->
+  <details class="collapsible">
+    <summary>
+      <div class="summary-title">
+        <h3>Moving Average (SMA)</h3>
+        <span>30-Day Sentiment</span>
+      </div>
+      <span class="chevron">▼</span>
+    </summary>
+    <div class="collapsible-content">
+      <div class="sentiment-banner">
+        <div class="sentiment-left">
+          <span>30-Day Moving Average</span>
+          <b id="smaValue">₹—</b>
+        </div>
+        <div class="sentiment-pill same" id="smaPill">Calculating…</div>
+      </div>
     </div>
-    <div class="sentiment-pill same" id="smaPill">Calculating…</div>
-  </section>
+  </details>
 
   <section class="quick-grid">
     <div class="stat-card">
@@ -1603,6 +1684,22 @@ function renderToday() {
   let am = changes.find(item => item.session === "AM");
   let pm = changes.find(item => item.session === "PM");
 
+  // Prevent data loss bug: Fetch missing sessions from local cache to persist AM data during PM refresh
+  try {
+    const cachedStr = localStorage.getItem("gold_live_backup");
+    if (cachedStr) {
+      const cached = JSON.parse(cachedStr);
+      if (cached && cached.date === today) {
+        if (!am && cached.session === "AM") am = { rate_22k: cached.rate_22k, time: cached.time };
+        if (!pm && cached.session === "PM") pm = { rate_22k: cached.rate_22k, time: cached.time };
+        if (Array.isArray(cached.intraday)) {
+          if (!am) am = cached.intraday.find(item => item.date === today && item.session === "AM");
+          if (!pm) pm = cached.intraday.find(item => item.date === today && item.session === "PM");
+        }
+      }
+    }
+  } catch(e) {}
+
   if (!am && live.session === "AM") am = { rate_22k: live.rate_22k, time: live.time };
   if (!pm && live.session === "PM") pm = { rate_22k: live.rate_22k, time: live.time };
 
@@ -1610,7 +1707,9 @@ function renderToday() {
   $("amTime").textContent = am ? timeText(am.time) : "Not recorded";
   $("pmRate").textContent = pm ? money(pm.rate_22k) : "—";
   $("pmTime").textContent = pm ? timeText(pm.time) : "Not recorded";
-  $("todaySummary").textContent = changes.length ? `${changes.length} change${changes.length === 1 ? '' : 's'} recorded` : "No session updates";
+  
+  const totalRecorded = (am ? 1 : 0) + (pm ? 1 : 0);
+  $("todaySummary").textContent = totalRecorded ? `${totalRecorded} session${totalRecorded === 1 ? '' : 's'} recorded` : "No session updates";
 }
 
 function updateFintechMetrics() {
@@ -1652,7 +1751,7 @@ function updateFintechMetrics() {
   const smaDiff = currentRate - sma;
   const smaPct = (smaDiff / sma) * 100;
 
-  $("smaValue").textContent = money(sma) + " · 30D Average";
+  $("smaValue").textContent = money(sma) + " /g";
   const pill = $("smaPill");
   if (smaDiff >= 0) {
     pill.className = "sentiment-pill up";
