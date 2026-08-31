@@ -25,18 +25,14 @@
   color-scheme: light dark;
   --font-sans: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", sans-serif;
 
-  /* Strict Harmonic Spatial System (4px / 8px Baseline) */
-  --grid-unit: 4px;
-  --pad-card: 16px;
-  --gap-grid: 12px;
-
+  /* Strict Harmonic Spatial Geometry */
   --r-xs: 6px;
   --r-sm: 10px;
   --r-md: 14px;
   --r-lg: 20px;
   --r-full: 9999px;
 
-  /* Light Theme */
+  /* Theme Tokens */
   --bg-app: #f8fafc;
   --surface: #ffffff;
   --surface-subtle: #f1f5f9;
@@ -143,7 +139,7 @@ button, input, select {
 .app {
   width: 100%;
   max-width: 620px;
-  padding: calc(16px + env(safe-area-inset-top)) 16px calc(32px + env(safe-area-inset-bottom));
+  padding: calc(18px + env(safe-area-inset-top)) 16px calc(36px + env(safe-area-inset-bottom));
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -155,23 +151,23 @@ button, input, select {
   justify-content: space-between;
   align-items: center;
   width: 100%;
-  height: 32px;
+  min-height: 36px;
 }
 
 .brand-text h1 {
-  font-size: 20px;
+  font-size: 26px;
   font-weight: 800;
-  letter-spacing: -0.035em;
+  letter-spacing: -0.04em;
   color: var(--text-main);
-  line-height: 1;
+  line-height: 1.1;
 }
 
 .status-indicator {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  height: 28px;
-  padding: 0 12px;
+  gap: 7px;
+  height: 30px;
+  padding: 0 14px;
   background: var(--surface);
   border: 1px solid var(--border-subtle);
   border-radius: var(--r-full);
@@ -190,8 +186,8 @@ button, input, select {
 }
 
 .dot {
-  width: 6px;
-  height: 6px;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
   background-color: var(--good);
   box-shadow: 0 0 0 2px var(--good-bg);
@@ -218,7 +214,7 @@ button, input, select {
   100% { transform: scale(0.95); opacity: 0.8; }
 }
 
-/* Purity Macro Strip */
+/* Purity Strip */
 .purity-strip {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -246,8 +242,6 @@ button, input, select {
   color: var(--text-tertiary);
   letter-spacing: 0.05em;
   line-height: 12px;
-  height: 12px;
-  display: block;
 }
 
 .purity-card b {
@@ -255,8 +249,6 @@ button, input, select {
   font-weight: 800;
   color: var(--text-main);
   line-height: 18px;
-  height: 18px;
-  display: block;
 }
 
 /* Notice Banner */
@@ -308,7 +300,6 @@ button, input, select {
   letter-spacing: 0.08em;
   color: var(--gold-primary);
   line-height: 14px;
-  height: 14px;
   display: flex;
   align-items: center;
 }
@@ -319,11 +310,11 @@ button, input, select {
   justify-content: center;
   gap: 5px;
   height: 28px;
-  padding: 0 11px;
+  padding: 0 12px;
   background: var(--surface-subtle);
   border: 1px solid var(--border-subtle);
   border-radius: var(--r-full);
-  font-size: 11px;
+  font-size: 11.5px;
   font-weight: 700;
   color: var(--text-main);
   cursor: pointer;
@@ -389,9 +380,7 @@ button, input, select {
   letter-spacing: 0.06em;
   color: var(--text-tertiary);
   line-height: 14px;
-  height: 14px;
   margin-bottom: 4px;
-  display: block;
 }
 
 .hero-sub-val {
@@ -399,7 +388,6 @@ button, input, select {
   font-weight: 800;
   color: var(--text-main);
   line-height: 22px;
-  height: 22px;
   display: flex;
   align-items: center;
   gap: 6px;
@@ -412,8 +400,6 @@ button, input, select {
   font-weight: 500;
   color: var(--text-secondary);
   line-height: 15px;
-  height: 15px;
-  display: block;
   white-space: nowrap;
 }
 
@@ -480,64 +466,66 @@ button, input, select {
   color: var(--text-tertiary);
   letter-spacing: 0.05em;
   line-height: 12px;
-  height: 12px;
   margin-bottom: 6px;
-  display: block;
 }
 .stat-card .value {
   font-size: 15px;
   font-weight: 800;
   line-height: 18px;
-  height: 18px;
   margin-bottom: 2px;
-  display: block;
 }
 .stat-card .sub {
   font-size: 11px;
   font-weight: 500;
   color: var(--text-secondary);
   line-height: 14px;
-  height: 14px;
-  display: block;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-/* Mathematically Centered Timeline */
-.timeline {
+/* Side-by-Side (Left & Right) Timeline */
+.timeline-horizontal {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  position: relative;
+  width: 100%;
+}
+
+.timeline-card {
+  background: var(--surface-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-sm);
+  padding: 12px 14px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 4px;
   position: relative;
-  width: 100%;
+  overflow: hidden;
 }
-.timeline::before {
-  content: "";
-  position: absolute;
-  top: 5px;
-  bottom: 5px;
-  left: 5px;
-  width: 2px;
-  background: var(--border-subtle);
-  z-index: 1;
-}
-.timeline-step {
+
+.timeline-card-header {
   display: flex;
-  align-items: flex-start;
-  gap: 14px;
-  position: relative;
-  z-index: 2;
-  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2px;
 }
+
+.timeline-card-header .lbl {
+  font-size: 10.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  letter-spacing: 0.05em;
+}
+
 .timeline-node {
-  width: 12px;
-  height: 12px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
   background: var(--surface);
   border: 2px solid var(--border-strong);
-  flex-shrink: 0;
-  margin-top: 3px;
   transition: all var(--transition);
 }
 .timeline-node.active {
@@ -545,36 +533,19 @@ button, input, select {
   background: var(--gold-primary);
   box-shadow: 0 0 0 3px var(--gold-tint);
 }
-.timeline-content {
-  display: flex;
-  flex-direction: column;
-}
-.timeline-content .lbl {
-  font-size: 10.5px;
+
+.timeline-card b {
+  font-size: 17px;
   font-weight: 800;
-  text-transform: uppercase;
-  color: var(--text-tertiary);
-  letter-spacing: 0.05em;
-  line-height: 13px;
-  height: 13px;
-  margin-bottom: 2px;
-  display: block;
+  color: var(--text-main);
+  line-height: 1.2;
 }
-.timeline-content b {
-  font-size: 16px;
-  font-weight: 800;
-  line-height: 20px;
-  height: 20px;
-  margin-bottom: 1px;
-  display: block;
-}
-.timeline-content small {
+
+.timeline-card small {
   font-size: 11.5px;
   font-weight: 500;
   color: var(--text-secondary);
-  line-height: 15px;
-  height: 15px;
-  display: block;
+  line-height: 1.2;
 }
 
 /* Chart Dashboard */
@@ -622,15 +593,12 @@ button, input, select {
   text-transform: uppercase;
   color: var(--text-tertiary);
   line-height: 13px;
-  height: 13px;
   margin-bottom: 3px;
 }
 .primary-metric strong {
   font-size: 17px;
   font-weight: 800;
   line-height: 20px;
-  height: 20px;
-  display: block;
 }
 .primary-metric strong.positive { color: var(--good); }
 .primary-metric strong.negative { color: var(--bad); }
@@ -650,16 +618,12 @@ button, input, select {
   text-transform: uppercase;
   color: var(--text-tertiary);
   line-height: 13px;
-  height: 13px;
   margin-bottom: 3px;
-  display: block;
 }
 .sec-metric b {
   font-size: 13.5px;
   font-weight: 700;
   line-height: 20px;
-  height: 20px;
-  display: block;
 }
 
 .chartwrap {
@@ -764,14 +728,12 @@ details.collapsible .collapsible-content {
   text-transform: uppercase;
   color: var(--text-tertiary);
   line-height: 12px;
-  height: 12px;
 }
 .horizon-box b {
   font-size: 12.5px;
   font-weight: 800;
   color: var(--text-main);
   line-height: 16px;
-  height: 16px;
 }
 
 .last-box {
@@ -801,23 +763,68 @@ details.collapsible .collapsible-content {
 .last-box .amount.positive { color: var(--good); }
 .last-box .amount.negative { color: var(--bad); }
 
-/* Calculator UI - Strict Label & Box Sizing */
+/* Completely Redesigned Ground-Up Jewelry Purchase Suite */
+.calc-suite {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: 100%;
+}
+
+.calc-segmented-mode {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background: var(--surface-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-full);
+  padding: 3px;
+  gap: 3px;
+}
+
+.calc-mode-btn {
+  height: 30px;
+  border-radius: var(--r-full);
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.calc-mode-btn.active {
+  background: var(--surface);
+  color: var(--text-main);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.calc-section-label {
+  font-size: 10.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-tertiary);
+  margin-bottom: 6px;
+  display: block;
+}
+
 .chip-container {
   display: flex;
   gap: 6px;
   overflow-x: auto;
   scrollbar-width: none;
-  margin-bottom: 12px;
   width: 100%;
 }
 .chip-container::-webkit-scrollbar { display: none; }
 .chip {
-  height: 30px;
+  height: 28px;
   padding: 0 12px;
   background: var(--surface-subtle);
   border: 1px solid var(--border-subtle);
   border-radius: var(--r-full);
-  font-size: 11.5px;
+  font-size: 11px;
   font-weight: 700;
   color: var(--text-secondary);
   cursor: pointer;
@@ -834,17 +841,17 @@ details.collapsible .collapsible-content {
 }
 .chip:active { transform: scale(0.96); }
 
-.calc-grid {
+.calc-input-block {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 12px;
+  gap: 10px;
   width: 100%;
 }
 
 .calc-field {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  gap: 4px;
   width: 100%;
 }
 
@@ -853,20 +860,23 @@ details.collapsible .collapsible-content {
   font-weight: 800;
   text-transform: uppercase;
   color: var(--text-tertiary);
-  line-height: 14px;
-  height: 14px;
-  margin-bottom: 6px;
-  display: block;
   letter-spacing: 0.05em;
+  line-height: 13px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.calc-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
   width: 100%;
 }
 
 .calc-input {
   width: 100%;
-  height: 44px;
+  height: 42px;
   padding: 0 12px;
   background: var(--surface-subtle);
   border: 1px solid var(--border-subtle);
@@ -875,8 +885,6 @@ details.collapsible .collapsible-content {
   font-weight: 700;
   color: var(--text-main);
   transition: border-color var(--transition);
-  display: block;
-  line-height: 44px;
 }
 .calc-input:focus {
   background: var(--surface);
@@ -890,15 +898,37 @@ select.calc-input {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 12px center;
-  padding-right: 32px;
+  padding-right: 30px;
 }
 
-.receipt-box {
-  margin-top: 16px;
-  padding: 16px;
+/* Sleek Exchange Toggle Drawer */
+.exchange-toggle-box {
   background: var(--surface-subtle);
   border: 1px solid var(--border-subtle);
   border-radius: var(--r-sm);
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.exchange-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.exchange-header span {
+  font-size: 11.5px;
+  font-weight: 800;
+  color: var(--text-main);
+}
+
+.receipt-card {
+  background: var(--surface-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-sm);
+  padding: 14px 16px;
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -940,19 +970,17 @@ select.calc-input {
 .receipt-total .label {
   font-size: 13px;
   font-weight: 800;
-  line-height: 1.2;
 }
 .receipt-total .final-val {
-  font-size: 20px;
+  font-size: 21px;
   font-weight: 800;
   color: var(--gold-primary);
-  line-height: 1.2;
 }
 
 .quote-btn {
   width: 100%;
-  height: 40px;
-  margin-top: 6px;
+  height: 38px;
+  margin-top: 4px;
   border-radius: var(--r-xs);
   background: var(--surface);
   border: 1px solid var(--border-subtle);
@@ -964,7 +992,7 @@ select.calc-input {
   justify-content: center;
   gap: 6px;
   cursor: pointer;
-  transition: transform var(--transition), background-color var(--transition);
+  transition: all var(--transition);
 }
 .quote-btn:active {
   transform: scale(0.98);
@@ -1038,7 +1066,7 @@ select.calc-input {
   width: 31%;
 }
 
-/* Pull to Refresh Banner */
+/* Pull to Refresh Widget */
 .pulldown {
   position: fixed;
   top: env(safe-area-inset-top);
@@ -1187,7 +1215,7 @@ footer {
     <div class="stat-card">
       <span class="label">Session</span>
       <span class="value" id="session">—</span>
-      <span class="sub">IST Sync</span>
+      <span class="sub">IST Market</span>
     </div>
     <div class="stat-card">
       <span class="label">3Y Peak</span>
@@ -1201,28 +1229,28 @@ footer {
     </div>
   </section>
 
-  <!-- Market Activity Timeline -->
+  <!-- Side-by-Side Left & Right Market Timeline -->
   <section class="section">
     <div class="section-head">
-      <h3>Today's Market Timeline</h3>
+      <h3>Today's Market Activity</h3>
     </div>
     <div class="panel">
-      <div class="timeline">
-         <div class="timeline-step">
-            <div class="timeline-node" id="amNode"></div>
-            <div class="timeline-content">
+      <div class="timeline-horizontal">
+         <div class="timeline-card">
+            <div class="timeline-card-header">
                <span class="lbl">Morning Fix (AM)</span>
-               <b id="amRate">Pending</b>
-               <small id="amTime">—</small>
+               <div class="timeline-node" id="amNode"></div>
             </div>
+            <b id="amRate">Pending</b>
+            <small id="amTime">—</small>
          </div>
-         <div class="timeline-step">
-            <div class="timeline-node" id="pmNode"></div>
-            <div class="timeline-content">
+         <div class="timeline-card">
+            <div class="timeline-card-header">
                <span class="lbl">Evening Fix (PM)</span>
-               <b id="pmRate">Pending</b>
-               <small id="pmTime">—</small>
+               <div class="timeline-node" id="pmNode"></div>
             </div>
+            <b id="pmRate">Pending</b>
+            <small id="pmTime">—</small>
          </div>
       </div>
     </div>
@@ -1322,68 +1350,112 @@ footer {
     </div>
   </section>
 
-  <!-- Valuation & Calculator Suite -->
+  <!-- Ground-Up Redesigned Jewelry Valuation Suite -->
   <section class="section">
     <div class="section-head">
       <h3>Jewelry Purchase & Exchange Suite</h3>
     </div>
     <div class="panel">
-      <div class="chip-container" id="weightChips">
-        <button class="chip active" data-val="8">8g (1 Sov)</button>
-        <button class="chip" data-val="16">16g (2 Sov)</button>
-        <button class="chip" data-val="24">24g (3 Sov)</button>
-        <button class="chip" data-val="50">50g</button>
-        <button class="chip" data-val="100">100g</button>
-        <button class="chip" data-val="1">1g</button>
-      </div>
-
-      <div class="chip-container" id="makingChips">
-        <button class="chip active" data-val="8.0">Plain (8%)</button>
-        <button class="chip" data-val="12.0">Studded (12%)</button>
-        <button class="chip" data-val="16.0">Antique (16%)</button>
-        <button class="chip" data-val="3.0">Coin (3%)</button>
-      </div>
-
-      <div class="calc-grid">
-        <div class="calc-field">
-          <label>Mode</label>
-          <select class="calc-input" id="calcMode">
-            <option value="value">Price for Weight</option>
-            <option value="grams">Weight for Budget</option>
+      <div class="calc-suite">
+        
+        <!-- Segmented Mode Control -->
+        <div class="calc-segmented-mode">
+          <button class="calc-mode-btn active" type="button" data-mode="value">Calculate Price by Weight</button>
+          <button class="calc-mode-btn" type="button" data-mode="grams">Calculate Weight by Budget</button>
+          <select id="calcMode" hidden>
+            <option value="value" selected>Calculate Price for Weight</option>
+            <option value="grams">Calculate Weight for Budget</option>
           </select>
         </div>
-        <div class="calc-field" id="weightField"><label>Weight (g)</label><input class="calc-input" id="weight" type="number" inputmode="decimal" value="8"></div>
-        <div class="calc-field" id="budgetField"><label>Budget (₹)</label><input class="calc-input" id="budget" type="number" inputmode="decimal" value="100000"></div>
-        <div class="calc-field"><label>Making (%)</label><input class="calc-input" id="making" type="number" inputmode="decimal" value="8.0"></div>
-        <div class="calc-field"><label>GST (%)</label><input class="calc-input" id="gstRate" type="number" inputmode="decimal" value="3.0"></div>
-        <div class="calc-field"><label>Hallmarking (₹)</label><input class="calc-input" id="flatFee" type="number" inputmode="decimal" value="45"></div>
-        
-        <div class="calc-field"><label>Old Scrap (g)</label><input class="calc-input" id="oldWeight" type="number" inputmode="decimal" value="0"></div>
-        <div class="calc-field">
-          <label>Scrap Purity</label>
-          <select class="calc-input" id="oldPurity">
-            <option value="22">22K (91.6%)</option>
-            <option value="18">18K (75.0%)</option>
-            <option value="24">24K (99.9%)</option>
-          </select>
-        </div>
-      </div>
 
-      <div class="receipt-box">
-        <div class="receipt-title">Itemized Quotation Breakdown</div>
-        <div class="receipt-line"><span>Base 22K Gold:</span><span id="receiptBase">₹0</span></div>
-        <div class="receipt-line"><span id="receiptMakingLabel">Making Charges (8%):</span><span id="receiptMaking">₹0</span></div>
-        <div class="receipt-line"><span id="receiptGstLabel">GST (3%):</span><span id="receiptGst">₹0</span></div>
-        <div class="receipt-line"><span>Hallmarking / Fees:</span><span id="receiptFee">₹0</span></div>
-        <div class="receipt-line deduction" id="receiptOldGoldLine" style="display:none;"><span>Old Gold Exchange Credit:</span><span id="receiptOldGold">-₹0</span></div>
-        
-        <div class="receipt-total">
-          <span class="label" id="receiptTotalLabel">Net Payable Amount</span>
-          <span class="final-val" id="calcResult">₹—</span>
+        <!-- Weight Presets Section -->
+        <div>
+          <span class="calc-section-label">Select Standard Gold Weight</span>
+          <div class="chip-container" id="weightChips">
+            <button class="chip active" data-val="8" type="button">8g (1 Sov)</button>
+            <button class="chip" data-val="16" type="button">16g (2 Sov)</button>
+            <button class="chip" data-val="24" type="button">24g (3 Sov)</button>
+            <button class="chip" data-val="50" type="button">50g</button>
+            <button class="chip" data-val="100" type="button">100g</button>
+            <button class="chip" data-val="1" type="button">1g</button>
+          </div>
         </div>
-        <div style="font-size:10.5px; font-weight:600; color:var(--text-tertiary); text-align:right; margin-top:2px;" id="calcSub">Based on live 22K rate.</div>
 
-        <button class="quote-btn" id="copyQuoteBtn" type="button">Copy Quotation Slip</button>
+        <!-- Making Charge Presets -->
+        <div>
+          <span class="calc-section-label">Jewelry Category & Making / Wastage</span>
+          <div class="chip-container" id="makingChips">
+            <button class="chip active" data-val="8.0" type="button">Plain Jewelry (8%)</button>
+            <button class="chip" data-val="12.0" type="button">Studded / Stone (12%)</button>
+            <button class="chip" data-val="16.0" type="button">Antique / Temple (16%)</button>
+            <button class="chip" data-val="3.0" type="button">Gold Coin (3%)</button>
+          </div>
+        </div>
+
+        <!-- Primary Calculation Inputs -->
+        <div class="calc-input-block">
+          <div class="calc-field" id="weightField">
+            <label>Gold Weight (Grams)</label>
+            <input class="calc-input" id="weight" type="number" inputmode="decimal" value="8" step="0.01">
+          </div>
+          <div class="calc-field" id="budgetField">
+            <label>Total Budget (₹)</label>
+            <input class="calc-input" id="budget" type="number" inputmode="decimal" value="100000" step="100">
+          </div>
+          <div class="calc-field">
+            <label>Making Charge (%)</label>
+            <input class="calc-input" id="making" type="number" inputmode="decimal" value="8.0" step="0.1">
+          </div>
+          <div class="calc-field">
+            <label>GST on Jewelry (%)</label>
+            <input class="calc-input" id="gstRate" type="number" inputmode="decimal" value="3.0" step="0.1">
+          </div>
+          <div class="calc-field">
+            <label>Hallmarking / Flat Fee (₹)</label>
+            <input class="calc-input" id="flatFee" type="number" inputmode="decimal" value="45" step="1">
+          </div>
+        </div>
+
+        <!-- Old Gold Exchange Drawer -->
+        <div class="exchange-toggle-box">
+          <div class="exchange-header">
+            <span>Old Gold Scrap Exchange (Optional)</span>
+          </div>
+          <div class="calc-input-block">
+            <div class="calc-field">
+              <label>Old Gold Weight (g)</label>
+              <input class="calc-input" id="oldWeight" type="number" inputmode="decimal" value="0" step="0.01">
+            </div>
+            <div class="calc-field">
+              <label>Old Gold Karat Purity</label>
+              <select class="calc-input" id="oldPurity">
+                <option value="22" selected>22K (91.6% Pure)</option>
+                <option value="18">18K (75.0% Pure)</option>
+                <option value="24">24K (99.9% Pure)</option>
+                <option value="20">84.0% Standard Melt</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Itemized Cost Receipt -->
+        <div class="receipt-card">
+          <div class="receipt-title">Itemized Purchase Quotation</div>
+          <div class="receipt-line"><span>Base 22K Gold Cost:</span><span id="receiptBase">₹0</span></div>
+          <div class="receipt-line"><span id="receiptMakingLabel">Making Charges (8%):</span><span id="receiptMaking">₹0</span></div>
+          <div class="receipt-line"><span id="receiptGstLabel">GST (3%):</span><span id="receiptGst">₹0</span></div>
+          <div class="receipt-line"><span>Hallmarking / Flat Fees:</span><span id="receiptFee">₹0</span></div>
+          <div class="receipt-line deduction" id="receiptOldGoldLine" style="display:none;"><span>Old Gold Exchange Credit:</span><span id="receiptOldGold">-₹0</span></div>
+          
+          <div class="receipt-total">
+            <span class="label" id="receiptTotalLabel">Net Payable Amount</span>
+            <span class="final-val" id="calcResult">₹—</span>
+          </div>
+          <div style="font-size:10.5px; font-weight:600; color:var(--text-tertiary); text-align:right; margin-top:2px;" id="calcSub">Based on live 22K rate.</div>
+
+          <button class="quote-btn" id="copyQuoteBtn" type="button">Copy Quotation Slip</button>
+        </div>
+
       </div>
     </div>
   </section>
@@ -1558,7 +1630,17 @@ function renderLive(d) {
   $("hero1").innerHTML = `${money(rate)} <span id="change1" class="change-pill mini same"></span>`;
   $("today").textContent = dateText(d.date);
   $("todayTime").textContent = timeText(d.time);
-  $("session").textContent = d.session || "—";
+  
+  // Intelligent Session Display Fix
+  let currentSession = d.session;
+  if (!currentSession && d.time) {
+    const hr = parseInt(d.time.split(":")[0]);
+    currentSession = hr < 14 ? "AM" : "PM";
+  }
+  if (!currentSession) {
+    currentSession = new Date().getHours() < 14 ? "AM" : "PM";
+  }
+  $("session").textContent = currentSession + " Fix";
 
   $("purity22").textContent = money(rate) + "/g";
   $("purity24").textContent = money(Math.round(rate * (24 / 22))) + "/g";
@@ -1731,37 +1813,99 @@ function drawChart() {
   canvas.addEventListener("mouseup", end); canvas.addEventListener("mouseleave", end);
 })();
 
+/* Redesigned Ground-Up Calculation Logic */
 function calculate() {
   if (!live) return;
   const rate = Number(live.rate_22k);
   if (!rate) return;
 
-  const mode = $("calcMode").value, weight = Math.max(0, Number($("weight").value) || 0), budget = Math.max(0, Number($("budget").value) || 0);
-  const makingPct = Math.max(0, Number($("making").value) || 0), gstPct = Math.max(0, Number($("gstRate").value) || 0), flatFee = Math.max(0, Number($("flatFee").value) || 0);
-  const oldWeight = Math.max(0, Number($("oldWeight").value) || 0), oldPurity = Number($("oldPurity").value) || 22;
+  const mode = $("calcMode").value;
+  const weight = Math.max(0, Number($("weight").value) || 0);
+  const budget = Math.max(0, Number($("budget").value) || 0);
+  const makingPct = Math.max(0, Number($("making").value) || 0);
+  const gstPct = Math.max(0, Number($("gstRate").value) || 0);
+  const flatFee = Math.max(0, Number($("flatFee").value) || 0);
+  const oldWeight = Math.max(0, Number($("oldWeight").value) || 0);
+  const oldPurity = Number($("oldPurity").value) || 22;
   const oldGoldCredit = oldWeight > 0 ? (oldWeight * (rate * (oldPurity / 22))) : 0;
 
-  $("receiptMakingLabel").textContent = `Making Charges (${makingPct}%):`; $("receiptGstLabel").textContent = `GST (${gstPct}%):`;
+  // Toggle Visibility for Mode Input Fields
+  if (mode === "value") {
+    $("weightField").style.display = "flex";
+    $("budgetField").style.display = "none";
+  } else {
+    $("weightField").style.display = "none";
+    $("budgetField").style.display = "flex";
+  }
+
+  $("receiptMakingLabel").textContent = `Making Charges (${makingPct}%):`;
+  $("receiptGstLabel").textContent = `GST (${gstPct}%):`;
   $("receiptOldGoldLine").style.display = oldGoldCredit > 0 ? "flex" : "none";
   if (oldGoldCredit > 0) $("receiptOldGold").textContent = "- " + money(oldGoldCredit);
 
   if (mode === "value") {
-    const goldVal = rate * weight, makeAmt = goldVal * (makingPct / 100), sub = goldVal + makeAmt + flatFee, gstAmt = sub * (gstPct / 100);
-    $("receiptBase").textContent = money(goldVal); $("receiptMaking").textContent = money(makeAmt);
-    $("receiptGst").textContent = money(gstAmt); $("receiptFee").textContent = money(flatFee);
-    $("receiptTotalLabel").textContent = "Net Payable Amount"; $("calcResult").textContent = money(Math.max(0, sub + gstAmt - oldGoldCredit));
+    const goldVal = rate * weight;
+    const makeAmt = goldVal * (makingPct / 100);
+    const sub = goldVal + makeAmt + flatFee;
+    const gstAmt = sub * (gstPct / 100);
+    const grandTotal = Math.max(0, sub + gstAmt - oldGoldCredit);
+
+    $("receiptBase").textContent = money(goldVal);
+    $("receiptMaking").textContent = money(makeAmt);
+    $("receiptGst").textContent = money(gstAmt);
+    $("receiptFee").textContent = money(flatFee);
+    $("receiptTotalLabel").textContent = "Net Payable Amount";
+    $("calcResult").textContent = money(grandTotal);
+    $("calcSub").textContent = `For ${weight.toLocaleString("en-IN")}g gold at ₹${rate}/g benchmark`;
   } else {
-    const effB = (budget + oldGoldCredit) / (1 + gstPct / 100) - flatFee, goldBase = effB > 0 ? effB / (1 + makingPct / 100) : 0;
-    const makeAmt = goldBase * (makingPct / 100), sub = goldBase + makeAmt + flatFee, gstAmt = sub * (gstPct / 100);
-    $("receiptBase").textContent = money(goldBase); $("receiptMaking").textContent = money(makeAmt);
-    $("receiptGst").textContent = money(gstAmt); $("receiptFee").textContent = money(flatFee);
-    $("receiptTotalLabel").textContent = "Purchasable Weight"; $("calcResult").textContent = (rate > 0 ? goldBase / rate : 0).toFixed(3) + " g";
+    const effB = (budget + oldGoldCredit) / (1 + gstPct / 100) - flatFee;
+    const goldBase = effB > 0 ? effB / (1 + makingPct / 100) : 0;
+    const grams = rate > 0 ? goldBase / rate : 0;
+    const makeAmt = goldBase * (makingPct / 100);
+    const sub = goldBase + makeAmt + flatFee;
+    const gstAmt = sub * (gstPct / 100);
+
+    $("receiptBase").textContent = money(goldBase);
+    $("receiptMaking").textContent = money(makeAmt);
+    $("receiptGst").textContent = money(gstAmt);
+    $("receiptFee").textContent = money(flatFee);
+    $("receiptTotalLabel").textContent = "Purchasable Gold Weight";
+    $("calcResult").textContent = grams.toFixed(3) + " g";
+    $("calcSub").textContent = `Fits budget ${money(budget)} after all taxes & deductions`;
   }
 }
 
-document.querySelectorAll("#weightChips .chip").forEach(c => c.onclick = () => { haptic(10); document.querySelectorAll("#weightChips .chip").forEach(x => x.classList.remove("active")); c.classList.add("active"); $("weight").value = c.dataset.val; $("calcMode").value = "value"; calculate(); });
-document.querySelectorAll("#makingChips .chip").forEach(c => c.onclick = () => { haptic(10); document.querySelectorAll("#makingChips .chip").forEach(x => x.classList.remove("active")); c.classList.add("active"); $("making").value = c.dataset.val; calculate(); });
+// Mode Switcher Controls
+document.querySelectorAll(".calc-mode-btn").forEach(btn => {
+  btn.onclick = () => {
+    haptic(10);
+    document.querySelectorAll(".calc-mode-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    $("calcMode").value = btn.dataset.mode;
+    calculate();
+  };
+});
 
+document.querySelectorAll("#weightChips .chip").forEach(c => c.onclick = () => {
+  haptic(10);
+  document.querySelectorAll("#weightChips .chip").forEach(x => x.classList.remove("active"));
+  c.classList.add("active");
+  $("weight").value = c.dataset.val;
+  // Ensure mode is set to value
+  $("calcMode").value = "value";
+  document.querySelectorAll(".calc-mode-btn").forEach(b => b.classList.toggle("active", b.dataset.mode === "value"));
+  calculate();
+});
+
+document.querySelectorAll("#makingChips .chip").forEach(c => c.onclick = () => {
+  haptic(10);
+  document.querySelectorAll("#makingChips .chip").forEach(x => x.classList.remove("active"));
+  c.classList.add("active");
+  $("making").value = c.dataset.val;
+  calculate();
+});
+
+/* Visually Matching PNG Card Generator */
 function generateShareCardBlob() {
   return new Promise((resolve) => {
     if (!live) return resolve(null);
@@ -1769,33 +1913,166 @@ function generateShareCardBlob() {
     cvs.width = w; cvs.height = h;
     const r1 = Number(live.rate_22k), r8 = r1 * 8, c1 = Number(live.change) || 0, c8 = c1 * 8;
 
-    ctx.fillStyle = "#030712"; ctx.fillRect(0, 0, w, h);
-    const gl = ctx.createRadialGradient(w/2, 380, 50, w/2, 380, 480);
-    gl.addColorStop(0, "rgba(217, 119, 6, 0.2)"); gl.addColorStop(1, "rgba(3, 7, 18, 0)");
-    ctx.fillStyle = gl; ctx.fillRect(0, 0, w, h);
-    ctx.strokeStyle = "rgba(255,255,255,0.06)"; ctx.lineWidth = 4; ctx.strokeRect(40, 40, w-80, h-80);
+    // Background Canvas
+    ctx.fillStyle = "#030712";
+    ctx.fillRect(0, 0, w, h);
 
-    ctx.fillStyle = "#fbbf24"; ctx.font = "800 28px 'Plus Jakarta Sans'"; ctx.textAlign = "center"; ctx.fillText("MARKET REPORT", w/2, 130);
-    ctx.fillStyle = "#94a3b8"; ctx.font = "600 32px 'Plus Jakarta Sans'"; ctx.fillText(`${dateText(live.date)} · ${live.session || 'IST'}`, w/2, 180);
+    // Subtle Radial Background Glow
+    const gl = ctx.createRadialGradient(w/2, 340, 40, w/2, 340, 420);
+    gl.addColorStop(0, "rgba(217, 119, 6, 0.16)");
+    gl.addColorStop(1, "rgba(3, 7, 18, 0)");
+    ctx.fillStyle = gl;
+    ctx.fillRect(0, 0, w, h);
 
-    ctx.fillStyle = "#0f172a"; ctx.beginPath(); ctx.roundRect(80, 240, w-160, 360, 32); ctx.fill(); ctx.lineWidth=2; ctx.stroke();
-    ctx.fillStyle = "#fbbf24"; ctx.font = "700 28px 'Plus Jakarta Sans'"; ctx.fillText("1 SOVEREIGN (8g) 22K", w/2, 310);
-    ctx.fillStyle = "#ffffff"; ctx.font = "800 104px 'Plus Jakarta Sans'"; ctx.fillText(money(r8), w/2, 440);
-    ctx.font = "700 32px 'Plus Jakarta Sans'";
-    if(c8 > 0) { ctx.fillStyle = "#34d399"; ctx.fillText(`▲ +${money(c8)} Today`, w/2, 520); }
-    else if(c8 < 0) { ctx.fillStyle = "#f87171"; ctx.fillText(`▼ -${money(Math.abs(c8))} Today`, w/2, 520); }
-    else { ctx.fillStyle = "#94a3b8"; ctx.fillText("• Flat Market", w/2, 520); }
+    // Precise App-Style Outer Border
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.08)";
+    ctx.lineWidth = 3;
+    ctx.strokeRect(36, 36, w - 72, h - 72);
 
-    const gy = 660, cw = (w - 160 - 32) / 3;
-    [{ l: "1G (22K)", v: money(r1), s: c1 >= 0 ? `+${money(c1)}` : `-${money(Math.abs(c1))}` }, { l: "1G (24K)", v: money(Math.round(r1*(24/22))), s: "99.9% Pure" }, { l: "1G (18K)", v: money(Math.round(r1*(18/22))), s: "75.0% Hallmarked" }].forEach((item, i) => {
-      const x = 80 + i*(cw+16);
-      ctx.fillStyle = "#0f172a"; ctx.beginPath(); ctx.roundRect(x, gy, cw, 240, 24); ctx.fill(); ctx.stroke();
-      ctx.fillStyle = "#94a3b8"; ctx.font = "700 24px 'Plus Jakarta Sans'"; ctx.fillText(item.l, x+cw/2, gy+60);
-      ctx.fillStyle = "#ffffff"; ctx.font = "800 44px 'Plus Jakarta Sans'"; ctx.fillText(item.v, x+cw/2, gy+130);
-      ctx.fillStyle = "#fbbf24"; ctx.font = "600 22px 'Plus Jakarta Sans'"; ctx.fillText(item.s, x+cw/2, gy+185);
+    // Header Pill
+    ctx.fillStyle = "#0b0f19";
+    ctx.beginPath();
+    ctx.roundRect(72, 72, w - 144, 76, 38);
+    ctx.fill();
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.08)";
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    ctx.fillStyle = "#fbbf24";
+    ctx.font = "800 24px 'Plus Jakarta Sans'";
+    ctx.textAlign = "left";
+    ctx.fillText("GOLD 22K RATE", 104, 119);
+
+    ctx.fillStyle = "#94a3b8";
+    ctx.font = "700 20px 'Plus Jakarta Sans'";
+    ctx.textAlign = "right";
+    ctx.fillText(`${dateText(live.date)} · ${$("session").textContent}`, w - 104, 118);
+
+    // Main Sovereign Hero Card
+    ctx.fillStyle = "#0b0f19";
+    ctx.beginPath();
+    ctx.roundRect(72, 172, w - 144, 380, 24);
+    ctx.fill();
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.08)";
+    ctx.stroke();
+
+    ctx.fillStyle = "#fbbf24";
+    ctx.font = "800 22px 'Plus Jakarta Sans'";
+    ctx.textAlign = "center";
+    ctx.fillText("1 SOVEREIGN (8 GRAMS) 22K", w/2, 230);
+
+    ctx.fillStyle = "#f8fafc";
+    ctx.font = "800 96px 'Plus Jakarta Sans'";
+    ctx.fillText(money(r8), w/2, 345);
+
+    // Change Pill
+    ctx.font = "700 26px 'Plus Jakarta Sans'";
+    if (c8 > 0) {
+      ctx.fillStyle = "#34d399";
+      ctx.fillText(`▲ +${money(c8)} Today`, w/2, 420);
+    } else if (c8 < 0) {
+      ctx.fillStyle = "#f87171";
+      ctx.fillText(`▼ -${money(Math.abs(c8))} Today`, w/2, 420);
+    } else {
+      ctx.fillStyle = "#94a3b8";
+      ctx.fillText("• Flat Market Today", w/2, 420);
+    }
+
+    // Hero Sub Details Bar
+    ctx.fillStyle = "rgba(255, 255, 255, 0.04)";
+    ctx.fillRect(72, 460, w - 144, 1.5);
+
+    ctx.fillStyle = "#94a3b8";
+    ctx.font = "700 20px 'Plus Jakarta Sans'";
+    ctx.textAlign = "left";
+    ctx.fillText(`Rate Per Gram: ${money(r1)}/g`, 108, 514);
+
+    ctx.textAlign = "right";
+    ctx.fillText(`Standard 22K 91.6% Pure`, w - 108, 514);
+
+    // Karat Purity Grid (3 Columns)
+    const gy = 576, cw = (w - 144 - 24) / 3;
+    const purities = [
+      { l: "24K (99.9%)", v: money(Math.round(r1 * (24 / 22))), s: "Fine Gold" },
+      { l: "22K (91.6%)", v: money(r1), s: "Jewelry Standard" },
+      { l: "18K (75.0%)", v: money(Math.round(r1 * (18 / 22))), s: "Hallmarked" }
+    ];
+
+    purities.forEach((item, i) => {
+      const x = 72 + i * (cw + 12);
+      ctx.fillStyle = "#0b0f19";
+      ctx.beginPath();
+      ctx.roundRect(x, gy, cw, 220, 16);
+      ctx.fill();
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.08)";
+      ctx.stroke();
+
+      ctx.fillStyle = "#94a3b8";
+      ctx.font = "800 18px 'Plus Jakarta Sans'";
+      ctx.textAlign = "center";
+      ctx.fillText(item.l, x + cw/2, gy + 52);
+
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "800 40px 'Plus Jakarta Sans'";
+      ctx.fillText(item.v, x + cw/2, gy + 120);
+
+      ctx.fillStyle = "#fbbf24";
+      ctx.font = "600 19px 'Plus Jakarta Sans'";
+      ctx.fillText(item.s, x + cw/2, gy + 172);
     });
 
-    ctx.fillStyle = "#475569"; ctx.font = "600 24px 'Plus Jakarta Sans'"; ctx.fillText("Gold 22k Institutional Tracker", w/2, 1200);
+    // Market Timeline Split (Left & Right Boxes on Image)
+    const ty = 820, tw = (w - 144 - 16) / 2;
+    
+    // AM Box
+    ctx.fillStyle = "#0b0f19";
+    ctx.beginPath();
+    ctx.roundRect(72, ty, tw, 200, 16);
+    ctx.fill();
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.08)";
+    ctx.stroke();
+
+    ctx.fillStyle = "#94a3b8";
+    ctx.font = "800 19px 'Plus Jakarta Sans'";
+    ctx.textAlign = "left";
+    ctx.fillText("MORNING FIX (AM)", 100, ty + 48);
+
+    ctx.fillStyle = "#f8fafc";
+    ctx.font = "800 36px 'Plus Jakarta Sans'";
+    ctx.fillText($("amRate").textContent, 100, ty + 110);
+
+    ctx.fillStyle = "#64748b";
+    ctx.font = "600 19px 'Plus Jakarta Sans'";
+    ctx.fillText($("amTime").textContent, 100, ty + 158);
+
+    // PM Box
+    const px = 72 + tw + 16;
+    ctx.fillStyle = "#0b0f19";
+    ctx.beginPath();
+    ctx.roundRect(px, ty, tw, 200, 16);
+    ctx.fill();
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.08)";
+    ctx.stroke();
+
+    ctx.fillStyle = "#94a3b8";
+    ctx.font = "800 19px 'Plus Jakarta Sans'";
+    ctx.textAlign = "left";
+    ctx.fillText("EVENING FIX (PM)", px + 28, ty + 48);
+
+    ctx.fillStyle = "#f8fafc";
+    ctx.font = "800 36px 'Plus Jakarta Sans'";
+    ctx.fillText($("pmRate").textContent, px + 28, ty + 110);
+
+    ctx.fillStyle = "#64748b";
+    ctx.font = "600 19px 'Plus Jakarta Sans'";
+    ctx.fillText($("pmTime").textContent, px + 28, ty + 158);
+
+    // Footer
+    ctx.fillStyle = "#64748b";
+    ctx.font = "700 20px 'Plus Jakarta Sans'";
+    ctx.textAlign = "center";
+    ctx.fillText("Gold 22k Terminal · LiveChennai + GoodReturns Feed", w/2, 1180);
+
     cvs.toBlob(resolve, "image/png");
   });
 }
@@ -1814,7 +2091,7 @@ $("shareBtn").onclick = async () => {
 
 $("copyQuoteBtn").onclick = async () => {
   haptic(15); if (!live) return;
-  const txt = `📜 GOLD PURCHASE ESTIMATE\nDate: ${dateText(live.date)}\n----------------------\n• Base Rate: ${money(live.rate_22k)}/g\n• Weight: ${$("weight").value}g\n• Making (${$("making").value}%): ${$("receiptMaking").textContent}\n• GST (3%): ${$("receiptGst").textContent}\n• Exchange: ${$("receiptOldGold").textContent}\n----------------------\nNET TOTAL: ${$("calcResult").textContent}`;
+  const txt = `📜 GOLD PURCHASE ESTIMATE\nDate: ${dateText(live.date)}\n----------------------\n• Base Rate: ${money(live.rate_22k)}/g\n• Weight: ${$("weight").value}g\n• Making (${$("making").value}%): ${$("receiptMaking").textContent}\n• GST (${$("gstRate").value}%): ${$("receiptGst").textContent}\n• Exchange: ${$("receiptOldGold").textContent}\n----------------------\nNET TOTAL: ${$("calcResult").textContent}`;
   navigator.clipboard?.writeText(txt); toast("Quotation Copied!");
 };
 
@@ -1873,7 +2150,6 @@ $("fetchNow").onclick = manualFetch;
 document.querySelectorAll("#ranges button").forEach(b => b.onclick = () => { haptic(8); document.querySelectorAll("#ranges button").forEach(x => x.classList.remove("active")); b.classList.add("active"); selectedRange = b.dataset.range === "all" ? "all" : Number(b.dataset.range); drawChart(); });
 ["dateA", "dateB"].forEach(id => $(id).addEventListener("change", compareDates));
 ["weight", "budget", "making", "gstRate", "flatFee", "oldWeight", "oldPurity"].forEach(id => $(id).addEventListener("input", calculate));
-$("calcMode").addEventListener("change", calculate);
 
 document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") loadPublishedData().catch(()=>{}); });
 window.addEventListener("pageshow", () => { loadPublishedData().catch(()=>{}); });
