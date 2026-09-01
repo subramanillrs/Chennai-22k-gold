@@ -45,11 +45,52 @@ REQUEST_TIMEOUT = 20
 # MONITORING WINDOWS
 # ============================================================
 
-AM_START = (8, 30)
-AM_END = (11, 30)
+# Fixed windows used ONLY as a fallback until 30 days of history with
+# session-tagged records exist. Once enough history is available,
+# the actual monitoring window is computed from real observed fix
+# times instead (see predict_session_times() below).
+AM_START = (9, 30)
+AM_END = (12, 30)
 
-PM_START = (17, 0)
-PM_END = (20, 0)
+PM_START = (16, 30)
+PM_END = (19, 30)
+
+FALLBACK_AM_TIME = AM_START
+FALLBACK_PM_TIME = PM_START
+
+# How many past days of history.json to look at when predicting
+# today's likely AM/PM fix time.
+HISTORY_LOOKBACK_DAYS = 30
+
+# Start polling this many minutes BEFORE the predicted fix time...
+PRE_WINDOW_MINUTES = 15
+
+# ...and keep polling for this long in total (so the window runs from
+# predicted-15min to predicted+45min = 60 minutes, if nothing changes
+# sooner — monitor_window() already exits the moment a change IS
+# detected, well before the window closes).
+WINDOW_DURATION_MINUTES = 60
+
+# Need at least this many past AM/PM samples before trusting the
+# prediction over the fixed fallback time.
+MIN_SAMPLES_FOR_PREDICTION = 3
+
+# Sanity bounds for predicted fix times. Even if history data is noisy,
+# or a burst of odd-hour force-fetches somehow gets session-tagged
+# wrong, the predicted median is clamped back into a plausible range
+# instead of the monitoring window drifting somewhere absurd (e.g. a
+# bad sample pulling the "predicted AM fix" to 2 AM).
+AM_PREDICTION_MIN = (7, 0)
+AM_PREDICTION_MAX = (13, 0)
+PM_PREDICTION_MIN = (14, 0)
+PM_PREDICTION_MAX = (21, 0)
+
+# A single day's genuine gold price move is essentially never this
+# large. If a newly scraped rate deviates from the last known good
+# rate by more than this, it's far more likely a parser grabbed the
+# wrong number (e.g. a different purity's column) than a real move —
+# reject it rather than saving it as if it were legitimate.
+MAX_DAILY_CHANGE_PCT = 8
 
 
 # ============================================================
@@ -58,6 +99,7 @@ PM_END = (20, 0)
 
 ALERT_FILE = DATA_DIR / "alert_state.json"
 SUMMARY_FILE = DATA_DIR / "summary.json"
+HEALTH_FILE = DATA_DIR / "health_status.json"
 
 # If live.json hasn't been successfully written in this many hours,
 # something is wrong with both scrapers (site down, blocked, HTML
@@ -655,6 +697,20 @@ def fetch_all_sources():
 # SELECT BEST RATE
 # ============================================================
 
+def _rate_is_plausible(rate, previous_rate):
+    """
+    True if `rate` is within MAX_DAILY_CHANGE_PCT of `previous_rate`.
+    If there's no previous rate to compare against yet (first ever
+    run), nothing to reject — always plausible.
+    """
+
+    if not isinstance(previous_rate, (int, float)) or previous_rate <= 0:
+        return True
+
+    change_pct = abs(rate - previous_rate) / previous_rate * 100
+    return change_pct <= MAX_DAILY_CHANGE_PCT
+
+
 def select_rate(
     live,
     good,
@@ -703,6 +759,24 @@ def select_rate(
             "Sources agree."
         )
 
+        if not _rate_is_plausible(live_rate, previous_rate):
+
+            print(
+                f"WARNING: Both sources agree on {format_rupees(live_rate)}, "
+                f"but that's a >{MAX_DAILY_CHANGE_PCT}% jump from the last "
+                f"saved rate {format_rupees(previous_rate)}. Both parsers "
+                "may be reading the wrong field. Keeping previous rate."
+            )
+
+            if previous_rate is not None:
+                return {
+                    "rate_22k": previous_rate,
+                    "agreement": False,
+                    "source": "Previous rate - agreed value implausible",
+                    "livechennai": live,
+                    "goodreturns": good
+                }
+
         return {
             "rate_22k": live_rate,
             "agreement": True,
@@ -724,6 +798,23 @@ def select_rate(
             "Only LiveChennai returned a valid rate."
         )
 
+        if not _rate_is_plausible(live_rate, previous_rate) and previous_rate is not None:
+
+            print(
+                f"WARNING: LiveChennai's only rate {format_rupees(live_rate)} "
+                f"is a >{MAX_DAILY_CHANGE_PCT}% jump from the last saved "
+                f"rate {format_rupees(previous_rate)}, and GoodReturns "
+                "isn't available to cross-check it. Keeping previous rate."
+            )
+
+            return {
+                "rate_22k": previous_rate,
+                "agreement": False,
+                "source": "Previous rate - LiveChennai value implausible",
+                "livechennai": live,
+                "goodreturns": good
+            }
+
         return {
             "rate_22k": live_rate,
             "agreement": False,
@@ -744,6 +835,23 @@ def select_rate(
         print(
             "Only GoodReturns returned a valid rate."
         )
+
+        if not _rate_is_plausible(good_rate, previous_rate) and previous_rate is not None:
+
+            print(
+                f"WARNING: GoodReturns' only rate {format_rupees(good_rate)} "
+                f"is a >{MAX_DAILY_CHANGE_PCT}% jump from the last saved "
+                f"rate {format_rupees(previous_rate)}, and LiveChennai "
+                "isn't available to cross-check it. Keeping previous rate."
+            )
+
+            return {
+                "rate_22k": previous_rate,
+                "agreement": False,
+                "source": "Previous rate - GoodReturns value implausible",
+                "livechennai": live,
+                "goodreturns": good
+            }
 
         return {
             "rate_22k": good_rate,
@@ -1012,18 +1120,26 @@ def save_history(
 
 def session_for_time(dt, previous_session=None):
     """
-    Map an IST datetime to the AM/PM fix window it falls inside.
+    Map an IST datetime to the AM/PM fix window it falls inside, using
+    the SAME adaptive prediction (last 30 days' median fix time,
+    +/- the same start/duration) that current_window()/next_window()
+    use for actual polling — so a record's "session" label always
+    matches whichever window it was really detected in.
     Outside both real windows, we do NOT guess a session — we keep
     whatever session was last recorded, so a force-fetch at 1 AM
     never gets labeled as a fresh "AM" fix.
     """
 
-    hm = (dt.hour, dt.minute)
+    predicted = predict_session_times(dt)
+    day = dt.date()
 
-    if AM_START <= hm <= AM_END:
+    am_start, am_end = _session_bounds(day, predicted["AM"])
+    pm_start, pm_end = _session_bounds(day, predicted["PM"])
+
+    if am_start <= dt <= am_end:
         return "AM"
 
-    if PM_START <= hm <= PM_END:
+    if pm_start <= dt <= pm_end:
         return "PM"
 
     return previous_session
@@ -1302,6 +1418,33 @@ def run_health_check():
     if changed_state:
         save_json(ALERT_FILE, state)
 
+    # --------------------------------------------------------
+    # 3. Persist a plain status snapshot regardless of whether a
+    #    webhook is configured — so feed health is inspectable just
+    #    by looking at a committed file, even if ALERT_WEBHOOK_URL
+    #    was never set up (or the webhook itself silently breaks).
+    # --------------------------------------------------------
+
+    disagree_hours_now = _hours_since(state.get("disagree_since"), now)
+
+    if hours_since_checked is not None and hours_since_checked >= ALERT_STALE_HOURS:
+        status = "stale"
+    elif disagree_hours_now is not None and disagree_hours_now >= ALERT_DISAGREE_HOURS:
+        status = "disagreeing"
+    else:
+        status = "ok"
+
+    save_json(HEALTH_FILE, {
+        "checked_at": now.isoformat(),
+        "status": status,
+        "hours_since_last_checked": round(hours_since_checked, 2) if hours_since_checked is not None else None,
+        "sources_agree": live.get("agreement"),
+        "disagree_since": state.get("disagree_since"),
+        "webhook_configured": bool(os.environ.get("ALERT_WEBHOOK_URL")),
+        "current_rate_22k": live.get("rate_22k"),
+        "current_rate_date": live.get("date"),
+    })
+
 
 # ============================================================
 # SERVER-SIDE SUMMARY STATS (monthly/yearly avg, all-time high/low)
@@ -1389,6 +1532,108 @@ def compute_and_save_summary():
 # MONITORING WINDOWS
 # ============================================================
 
+def _parse_time_to_minutes(time_str):
+
+    try:
+        parts = str(time_str).split(":")
+        return int(parts[0]) * 60 + int(parts[1])
+    except Exception:
+        return None
+
+
+def _median(values):
+
+    if not values:
+        return None
+
+    s = sorted(values)
+    n = len(s)
+    mid = n // 2
+
+    if n % 2 == 0:
+        return (s[mid - 1] + s[mid]) / 2
+
+    return s[mid]
+
+
+def _clamp_hm(hm, lo, hi):
+    minutes = hm[0] * 60 + hm[1]
+    lo_minutes = lo[0] * 60 + lo[1]
+    hi_minutes = hi[0] * 60 + hi[1]
+    clamped = max(lo_minutes, min(hi_minutes, minutes))
+    return (clamped // 60, clamped % 60)
+
+
+def predict_session_times(now=None):
+    """
+    Looks at the last HISTORY_LOOKBACK_DAYS days of data/history.json
+    and returns the MEDIAN observed AM and PM fix time, as (hour,
+    minute) tuples — e.g. today's gold rate has actually been
+    changing around 08:47 and 17:12, this returns those, not the
+    generic 08:30/17:00 assumption.
+
+    Falls back to FALLBACK_AM_TIME / FALLBACK_PM_TIME per session
+    when there isn't yet enough session-tagged history to trust
+    (fewer than MIN_SAMPLES_FOR_PREDICTION samples).
+    """
+
+    now = now or now_ist()
+    cutoff_date = (now - timedelta(days=HISTORY_LOOKBACK_DAYS)).strftime("%Y-%m-%d")
+
+    existing = load_json(HISTORY_FILE, [])
+    records = extract_history_records(existing)
+
+    am_minutes = []
+    pm_minutes = []
+
+    for r in records:
+
+        if not isinstance(r, dict):
+            continue
+
+        date_str = r.get("date")
+        time_str = r.get("time")
+        session = r.get("session")
+
+        if not date_str or not time_str or not session:
+            continue
+
+        if date_str < cutoff_date:
+            continue
+
+        mins = _parse_time_to_minutes(time_str)
+
+        if mins is None:
+            continue
+
+        if session == "AM":
+            am_minutes.append(mins)
+        elif session == "PM":
+            pm_minutes.append(mins)
+
+    result = {}
+
+    if len(am_minutes) >= MIN_SAMPLES_FOR_PREDICTION:
+        med = _median(am_minutes)
+        raw = (int(med // 60), int(med % 60))
+        result["AM"] = _clamp_hm(raw, AM_PREDICTION_MIN, AM_PREDICTION_MAX)
+        if result["AM"] != raw:
+            print(f"Predicted AM time {raw} out of sane range — clamped to {result['AM']}")
+    else:
+        result["AM"] = FALLBACK_AM_TIME
+
+    if len(pm_minutes) >= MIN_SAMPLES_FOR_PREDICTION:
+        med = _median(pm_minutes)
+        raw = (int(med // 60), int(med % 60))
+        result["PM"] = _clamp_hm(raw, PM_PREDICTION_MIN, PM_PREDICTION_MAX)
+        if result["PM"] != raw:
+            print(f"Predicted PM time {raw} out of sane range — clamped to {result['PM']}")
+    else:
+        result["PM"] = FALLBACK_PM_TIME
+
+    return result
+
+
 def make_datetime(
     day,
     hour,
@@ -1406,36 +1651,30 @@ def make_datetime(
     )
 
 
+def _session_bounds(day, predicted_hm):
+    """
+    Given a predicted (hour, minute) fix time on a given day, returns
+    the (start, end) datetimes for the polling window: starts
+    PRE_WINDOW_MINUTES before the predicted time, runs for
+    WINDOW_DURATION_MINUTES total.
+    """
+
+    predicted_dt = make_datetime(day, predicted_hm[0], predicted_hm[1])
+    start = predicted_dt - timedelta(minutes=PRE_WINDOW_MINUTES)
+    end = start + timedelta(minutes=WINDOW_DURATION_MINUTES)
+    return start, end
+
+
 def current_window(now=None):
 
     if now is None:
         now = now_ist()
 
     today = now.date()
+    predicted = predict_session_times(now)
 
-    am_start = make_datetime(
-        today,
-        AM_START[0],
-        AM_START[1]
-    )
-
-    am_end = make_datetime(
-        today,
-        AM_END[0],
-        AM_END[1]
-    )
-
-    pm_start = make_datetime(
-        today,
-        PM_START[0],
-        PM_START[1]
-    )
-
-    pm_end = make_datetime(
-        today,
-        PM_END[0],
-        PM_END[1]
-    )
+    am_start, am_end = _session_bounds(today, predicted["AM"])
+    pm_start, pm_end = _session_bounds(today, predicted["PM"])
 
     if (
         am_start
@@ -1470,29 +1709,17 @@ def next_window(now=None):
         now = now_ist()
 
     today = now.date()
+    predicted = predict_session_times(now)
 
-    am_start = make_datetime(
-        today,
-        AM_START[0],
-        AM_START[1]
-    )
-
-    pm_start = make_datetime(
-        today,
-        PM_START[0],
-        PM_START[1]
-    )
+    am_start, am_end = _session_bounds(today, predicted["AM"])
+    pm_start, pm_end = _session_bounds(today, predicted["PM"])
 
     if now < am_start:
 
         return {
             "name": "AM",
             "start": am_start,
-            "end": make_datetime(
-                today,
-                AM_END[0],
-                AM_END[1]
-            )
+            "end": am_end
         }
 
     if now < pm_start:
@@ -1500,33 +1727,27 @@ def next_window(now=None):
         return {
             "name": "PM",
             "start": pm_start,
-            "end": make_datetime(
-                today,
-                PM_END[0],
-                PM_END[1]
-            )
+            "end": pm_end
         }
 
-    tomorrow = today + timedelta(
-        days=1
+    tomorrow = today + timedelta(days=1)
+    predicted_tomorrow = predict_session_times(
+        make_datetime(tomorrow, 0, 0)
+    )
+    am_start_tomorrow, am_end_tomorrow = _session_bounds(
+        tomorrow, predicted_tomorrow["AM"]
     )
 
     return {
         "name": "AM",
-        "start": make_datetime(
-            tomorrow,
-            AM_START[0],
-            AM_START[1]
-        ),
-        "end": make_datetime(
-            tomorrow,
-            AM_END[0],
-            AM_END[1]
-        )
+        "start": am_start_tomorrow,
+        "end": am_end_tomorrow
     }
 
 
 def save_window_info(window):
+
+    predicted = predict_session_times(now_ist())
 
     data = {
 
@@ -1534,16 +1755,20 @@ def save_window_info(window):
 
         "updated_at": now_ist().isoformat(),
 
+        "prediction_basis": f"median of last {HISTORY_LOOKBACK_DAYS} days",
+
         "windows": {
 
             "AM": {
-                "start": "08:30",
-                "end": "11:30"
+                "predicted_fix_time": f"{predicted['AM'][0]:02d}:{predicted['AM'][1]:02d}",
+                "polling_starts": f"{PRE_WINDOW_MINUTES} min before predicted time",
+                "polling_duration_minutes": WINDOW_DURATION_MINUTES
             },
 
             "PM": {
-                "start": "17:00",
-                "end": "20:00"
+                "predicted_fix_time": f"{predicted['PM'][0]:02d}:{predicted['PM'][1]:02d}",
+                "polling_starts": f"{PRE_WINDOW_MINUTES} min before predicted time",
+                "polling_duration_minutes": WINDOW_DURATION_MINUTES
             }
         },
 
@@ -2034,6 +2259,7 @@ def main():
     ):
 
         upcoming = next_window(now)
+        wait_seconds = (upcoming["start"] - now).total_seconds()
 
         print("")
         print(
@@ -2054,6 +2280,39 @@ def main():
                 "%d-%m-%Y %H:%M:%S"
             )
         )
+
+        print(
+            f"Wait required: {wait_seconds / 60:.1f} minutes"
+        )
+
+        # GitHub's `schedule:` trigger is best-effort and can fire
+        # significantly late on low-traffic repos (an 08:30 cron
+        # starting at 13:29 has been observed here). If that happens,
+        # the AM window is already over, and blindly sleeping until
+        # the NEXT window (PM) can burn the entire job timeout before
+        # ever reaching monitor_window() — leaving that run having
+        # done nothing at all. Instead, once the wait grows past a
+        # sane bound, do one immediate fetch now so at least today's
+        # rate gets checked, and let the next scheduled trigger handle
+        # its own window normally.
+        MAX_SCHEDULE_WAIT_MINUTES = 45
+
+        if wait_seconds > MAX_SCHEDULE_WAIT_MINUTES * 60:
+
+            print("")
+            print(
+                f"Wait exceeds {MAX_SCHEDULE_WAIT_MINUTES} minutes — "
+                "GitHub's scheduler likely delayed this run past its "
+                "intended window. Doing one immediate fetch instead of "
+                "waiting, so this run isn't wasted."
+            )
+
+            success = normal_fetch()
+
+            if not success:
+                sys.exit(1)
+
+            return
 
         while True:
 
