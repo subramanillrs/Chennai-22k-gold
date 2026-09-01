@@ -877,4 +877,2122 @@ details.collapsible summary::-webkit-details-marker { display: none; }
   font-size: 11.5px;
   font-weight: 600;
   color: var(--text-tertiary);
-  line-height: 1
+  line-height: 1.2;
+}
+.chevron {
+  font-size: 10px;
+  color: var(--text-tertiary);
+  transition: transform var(--transition);
+}
+details.collapsible[open] .chevron { transform: rotate(180deg); }
+details.collapsible .collapsible-content {
+  padding: 0 16px 16px 16px;
+  border-top: 1px dashed var(--border-subtle);
+  padding-top: 12px;
+}
+
+.horizon-grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 6px;
+  width: 100%;
+}
+@media (max-width: 480px) {
+  .horizon-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+  }
+}
+.horizon-box {
+  background: var(--surface-subtle);
+  border-radius: var(--r-xs);
+  padding: 8px 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+.horizon-box small {
+  font-size: 9.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  line-height: 12px;
+}
+.horizon-box b {
+  font-size: 12.5px;
+  font-weight: 800;
+  color: var(--text-main);
+  line-height: 16px;
+}
+
+.last-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+}
+.last-box h4 {
+  font-size: 13.5px;
+  font-weight: 800;
+  line-height: 16px;
+  margin-bottom: 2px;
+}
+.last-box p {
+  font-size: 11.5px;
+  color: var(--text-secondary);
+  font-weight: 500;
+  line-height: 15px;
+}
+.last-box .amount {
+  font-size: 18px;
+  font-weight: 800;
+  text-align: right;
+  line-height: 1.2;
+}
+.last-box .amount.positive { color: var(--good); }
+.last-box .amount.negative { color: var(--bad); }
+
+/* Historical Comparison */
+.compare-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  width: 100%;
+}
+
+.compare-field {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.compare-field label {
+  font-size: 10.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  letter-spacing: 0.05em;
+  line-height: 14px;
+  height: 14px;
+  margin-bottom: 6px;
+  display: block;
+  white-space: nowrap;
+}
+
+.compare-result-panel {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px dashed var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.compare-result-label {
+  font-size: 10.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  letter-spacing: 0.05em;
+  line-height: 14px;
+}
+
+.compare-result-card {
+  min-height: 60px;
+  padding: 14px 16px;
+  background: var(--surface-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-sm);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+}
+
+.compare-result-top {
+  font-size: 15px;
+  font-weight: 800;
+  line-height: 1.25;
+  color: var(--text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.compare-result-sub {
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1;
+  padding: 7px 11px;
+  border-radius: var(--r-full);
+  background: var(--surface);
+  color: var(--text-secondary);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.compare-result-sub.positive { color: var(--good); background: var(--good-bg); }
+.compare-result-sub.negative { color: var(--bad); background: var(--bad-bg); }
+
+/* Jewelry Purchase Suite */
+.calc-suite {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: 100%;
+}
+
+.calc-segmented-mode {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background: var(--surface-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-full);
+  padding: 3px;
+  gap: 3px;
+  width: 100%;
+}
+
+.calc-mode-btn {
+  height: 30px;
+  border-radius: var(--r-full);
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.calc-mode-btn.active {
+  background: var(--surface);
+  color: var(--text-main);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.calc-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+}
+
+.calc-group-label {
+  font-size: 10.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-tertiary);
+  line-height: 14px;
+  height: 14px;
+  display: block;
+}
+
+.chip-container {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  width: 100%;
+  padding-bottom: 2px;
+}
+.chip-container::-webkit-scrollbar { display: none; }
+.chip {
+  height: 28px;
+  padding: 0 12px;
+  background: var(--surface-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-full);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all var(--transition);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.chip.active {
+  background: var(--gold-tint);
+  border-color: var(--gold-border);
+  color: var(--gold-primary);
+}
+.chip:active { transform: scale(0.96); }
+
+.calc-grid-form {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  width: 100%;
+}
+
+.calc-field {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.calc-field label {
+  font-size: 10.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  letter-spacing: 0.05em;
+  line-height: 14px;
+  height: 14px;
+  margin-bottom: 6px;
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.calc-input {
+  width: 100%;
+  height: 44px;
+  padding: 0 12px;
+  background: var(--surface-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-xs);
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--text-main);
+  transition: border-color var(--transition);
+  display: flex;
+  align-items: center;
+}
+.calc-input:focus {
+  background: var(--surface);
+  border-color: var(--gold-primary);
+}
+
+input[type="date"].calc-input {
+  color-scheme: light;
+  line-height: normal;
+}
+html[data-theme="dark"] input[type="date"].calc-input {
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: dark) {
+  input[type="date"].calc-input { color-scheme: dark; }
+}
+html[data-theme="light"] input[type="date"].calc-input {
+  color-scheme: light;
+}
+input[type="date"].calc-input::-webkit-date-and-time-value {
+  text-align: left;
+  margin: 0;
+}
+input[type="date"].calc-input::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  opacity: 0.65;
+  filter: none;
+}
+
+select.calc-input {
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 30px;
+}
+
+.exchange-drawer {
+  background: var(--surface-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-sm);
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+.exchange-header {
+  font-size: 11.5px;
+  font-weight: 800;
+  color: var(--text-main);
+  line-height: 1.2;
+}
+
+.receipt-card {
+  background: var(--surface-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-sm);
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.receipt-title {
+  font-size: 10.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-tertiary);
+  padding-bottom: 6px;
+  border-bottom: 1px dashed var(--border-subtle);
+  line-height: 1.2;
+}
+
+.receipt-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  line-height: 16px;
+}
+.receipt-line span:last-child {
+  font-weight: 800;
+  color: var(--text-main);
+}
+.receipt-line.deduction span:last-child { color: var(--good); }
+
+.receipt-total {
+  margin-top: 4px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border-strong);
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+.receipt-total .label {
+  font-size: 13px;
+  font-weight: 800;
+}
+.receipt-total .final-val {
+  font-size: 21px;
+  font-weight: 800;
+  color: var(--gold-primary);
+}
+
+.quote-btn {
+  width: 100%;
+  height: 40px;
+  margin-top: 4px;
+  border-radius: var(--r-xs);
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--text-main);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+.quote-btn:active {
+  transform: scale(0.98);
+  background: var(--border-subtle);
+}
+
+/* Historical Log Table */
+.table-wrap {
+  max-height: 380px;
+  overflow-y: auto;
+  padding: 0;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-md);
+  width: 100%;
+  background: var(--surface);
+}
+.history-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 13px;
+  table-layout: fixed;
+}
+.history-table th {
+  position: sticky;
+  top: 0;
+  background: var(--surface-subtle);
+  padding: 10px 8px;
+  font-size: 10.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  border-bottom: 1px solid var(--border-subtle);
+  z-index: 2;
+  line-height: 1.2;
+  text-align: center;
+}
+.history-table td {
+  padding: 11px 8px;
+  border-bottom: 1px solid var(--border-subtle);
+  font-weight: 600;
+  vertical-align: middle;
+  line-height: 1.2;
+  color: var(--text-main);
+  text-align: center;
+}
+.history-table tr:last-child td {
+  border-bottom: none;
+}
+.history-table tr:hover td {
+  background-color: var(--surface-subtle);
+}
+
+.history-table th:nth-child(1), .history-table td:nth-child(1),
+.history-table th:nth-child(2), .history-table td:nth-child(2),
+.history-table th:nth-child(3), .history-table td:nth-child(3) {
+  width: 33.333%;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Pull to Refresh Widget */
+.pulldown {
+  position: fixed;
+  top: env(safe-area-inset-top);
+  left: 50%;
+  transform: translate(-50%, -70px);
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  padding: 6px 14px;
+  border-radius: var(--r-full);
+  box-shadow: var(--shadow-card);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  font-weight: 700;
+  z-index: 150;
+  opacity: 0;
+  transition: opacity 0.2s, transform 0.2s;
+}
+.pulldown .icon-idle { display: block; }
+.pulldown .icon-spin { display: none; }
+.pulldown.visible { opacity: 1; }
+.pulldown.ready { color: var(--gold-primary); }
+.pulldown.ready .pulldownicon { transform: rotate(180deg); }
+.pulldown.loading .icon-idle { display: none; }
+.pulldown.loading .icon-spin { display: block; animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.toast {
+  position: fixed;
+  top: calc(14px + env(safe-area-inset-top));
+  left: 50%;
+  transform: translate(-50%, -20px);
+  background: var(--surface);
+  color: var(--text-main);
+  border: 1px solid var(--border-subtle);
+  padding: 8px 18px;
+  border-radius: var(--r-full);
+  font-size: 12px;
+  font-weight: 700;
+  box-shadow: var(--shadow-card);
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s, transform 0.25s;
+  z-index: 200;
+}
+.toast::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--gold-primary);
+}
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+footer {
+  text-align: center;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  padding: 16px 0 8px 0;
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+  <div class="pulldown" id="pulldown" aria-hidden="true">
+    <span class="pulldownicon" id="pulldownIcon">
+      <svg class="icon-idle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="13" height="13"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><polyline points="21 3 21 9 15 9"/></svg>
+      <svg class="icon-spin" viewBox="0 0 24 24" fill="none" width="13" height="13"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="34 22"/></svg>
+    </span>
+    <span id="pulldownText">Pull to refresh</span>
+  </div>
+
+  <header class="topbar">
+    <div class="brand-text">
+      <h1>Gold 22k rate</h1>
+    </div>
+    <div class="topbar-actions">
+      <div class="status-indicator" id="status">
+        <span class="dot"></span>
+        <span id="statusText">Checking live feed…</span>
+      </div>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle dark mode">
+        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <section class="purity-strip">
+    <div class="purity-card">
+      <small>24K (99.9%)</small>
+      <b id="purity24">₹ —</b>
+    </div>
+    <div class="purity-card">
+      <small>22K (91.6%)</small>
+      <b id="purity22">₹ —</b>
+    </div>
+    <div class="purity-card">
+      <small>18K (75.0%)</small>
+      <b id="purity18">₹ —</b>
+    </div>
+  </section>
+
+  <div class="warning-banner" id="parserWarning" hidden onclick="this.hidden = true;">
+    <div class="warning-content">
+      <strong id="warningTitle">Notice <span class="dismiss-text">Tap to dismiss</span></strong>
+      <p id="warningDesc">Checking feed connection…</p>
+    </div>
+  </div>
+
+  <div class="warning-banner stale-banner" id="staleWarning" hidden>
+    <div class="warning-content">
+      <strong>Showing Previous Close</strong>
+      <p>No new fix published yet today — next update expected around 10:20 AM IST.</p>
+    </div>
+  </div>
+
+  <div hidden><button id="fetchNow"></button></div>
+
+  <!-- Hero Card -->
+  <section class="hero" id="heroCard">
+    <div class="hero-top">
+      <span class="hero-label">1 Sovereign (8 Grams)</span>
+      <button id="shareBtn" class="share-btn" type="button" aria-label="Share">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+        <span>Share</span>
+      </button>
+    </div>
+
+    <div class="hero-mid">
+      <h2 id="hero8">₹ —</h2>
+      <div id="change8" class="change-pill same">No change</div>
+    </div>
+
+    <div class="hero-details-grid">
+      <div class="hero-detail-col">
+        <span class="hero-sub-label">Rate Per Gram</span>
+        <div class="hero-sub-val" id="hero1">₹ — <span id="change1" class="change-pill mini same"></span></div>
+        <div class="hero-sub-sub">1 Gram Benchmark</div>
+      </div>
+      <div class="hero-detail-col">
+        <span class="hero-sub-label">Market Date</span>
+        <div class="hero-sub-val" id="today">—</div>
+        <div class="hero-sub-sub" id="todayTime">—</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Quick Grid -->
+  <section class="quick-grid">
+    <div class="stat-card">
+      <span class="label">Session</span>
+      <span class="value" id="session">—</span>
+      <span class="sub">IST Market</span>
+    </div>
+    <div class="stat-card">
+      <span class="label">3Y Peak</span>
+      <span class="value" id="high">—</span>
+      <span class="sub" id="highDate">—</span>
+    </div>
+    <div class="stat-card">
+      <span class="label">3Y Floor</span>
+      <span class="value" id="low">—</span>
+      <span class="sub" id="lowDate">—</span>
+    </div>
+  </section>
+
+  <!-- Side-by-Side Market Timeline -->
+  <section class="section">
+    <div class="section-head">
+      <h3>Today's Market Activity</h3>
+    </div>
+    <div class="panel">
+      <div class="timeline-horizontal">
+         <div class="timeline-card" id="amCard">
+            <div class="timeline-card-header">
+               <span class="lbl">Morning Fix (AM)</span>
+               <div class="timeline-node" id="amNode"></div>
+            </div>
+            <b id="amRate">Pending</b>
+            <small id="amTime">—</small>
+         </div>
+         <div class="timeline-card" id="pmCard">
+            <div class="timeline-card-header">
+               <span class="lbl">Evening Fix (PM)</span>
+               <div class="timeline-node" id="pmNode"></div>
+            </div>
+            <b id="pmRate">Pending</b>
+            <small id="pmTime">—</small>
+         </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Price History Trend Chart -->
+  <section class="section">
+    <div class="section-head">
+      <h3>Price History Trend</h3>
+      <span id="chartCount">—</span>
+    </div>
+
+    <div class="panel chart-panel">
+      <div class="segment-ctrl" id="ranges">
+        <button data-range="7">7D</button>
+        <button class="active" data-range="30">30D</button>
+        <button data-range="90">3M</button>
+        <button data-range="180">6M</button>
+        <button data-range="365">1Y</button>
+        <button data-range="1095">3Y</button>
+        <button data-range="all">ALL</button>
+      </div>
+
+      <div class="chart-header-metrics">
+        <div class="primary-metric">
+          <span id="chartMetricLabel">Period Performance</span>
+          <strong id="periodChange">—</strong>
+        </div>
+        <div class="secondary-metrics">
+          <div class="sec-metric">
+            <span>High</span>
+            <b id="periodHigh">—</b>
+          </div>
+          <div class="sec-metric">
+            <span>Low</span>
+            <b id="periodLow">—</b>
+          </div>
+        </div>
+      </div>
+
+      <div class="chartwrap">
+        <canvas id="chart"></canvas>
+      </div>
+      <div class="chartmeta">
+        <span id="chartStart">—</span>
+        <span class="chart-legend"><i class="dot-am"></i>AM<i class="dot-pm"></i>PM</span>
+        <span id="chartEnd">—</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Multi-Horizon & Indicators Group -->
+  <div style="display:flex; flex-direction:column; gap: 12px;">
+    <details class="collapsible">
+      <summary><div class="summary-title"><h3>Multi-Horizon Performance</h3><span>Returns</span></div><span class="chevron">▼</span></summary>
+      <div class="collapsible-content">
+        <div class="horizon-grid">
+          <div class="horizon-box"><small>1W</small><b id="ret1W">—</b></div>
+          <div class="horizon-box"><small>1M</small><b id="ret1M">—</b></div>
+          <div class="horizon-box"><small>3M</small><b id="ret3M">—</b></div>
+          <div class="horizon-box"><small>6M</small><b id="ret6M">—</b></div>
+          <div class="horizon-box"><small>1Y</small><b id="ret1Y">—</b></div>
+          <div class="horizon-box"><small>3Y</small><b id="ret3Y">—</b></div>
+        </div>
+      </div>
+    </details>
+
+    <details class="collapsible">
+      <summary><div class="summary-title"><h3>Moving Average (SMA)</h3><span>30D Trend</span></div><span class="chevron">▼</span></summary>
+      <div class="collapsible-content">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <div><span style="font-size:10px; font-weight:800; color:var(--text-tertiary); text-transform:uppercase;">30D Average</span><br><b id="smaValue" style="font-size:15px; margin-top:2px; display:block;">₹ —</b></div>
+          <div class="change-pill same" id="smaPill">Calculating…</div>
+        </div>
+      </div>
+    </details>
+    
+    <div class="panel last-box">
+      <div>
+        <h4>Last Movement</h4>
+        <p id="lastDate">Analyzing…</p>
+        <p id="lastTime" style="font-size:11px; margin-top:1px;">—</p>
+      </div>
+      <div class="amount" id="lastAmount">—</div>
+    </div>
+  </div>
+
+  <!-- Historical Comparison -->
+  <details class="collapsible">
+    <summary><div class="summary-title"><h3>Compare Historical Dates</h3><span>Tap to open</span></div><span class="chevron">▼</span></summary>
+    <div class="collapsible-content">
+      <div class="compare-grid">
+        <div class="compare-field">
+          <label>Earlier Date</label>
+          <input class="calc-input" type="date" id="dateA">
+        </div>
+        <div class="compare-field">
+          <label>Later Date</label>
+          <input class="calc-input" type="date" id="dateB">
+        </div>
+      </div>
+      <div class="compare-result-panel">
+        <span class="compare-result-label">Net Comparison</span>
+        <div class="compare-result-card" id="compareResult">
+          <span class="compare-result-top">Select two dates</span>
+          <span class="compare-result-sub">—</span>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <!-- Jewelry Purchase & Exchange Suite -->
+  <section class="section">
+    <div class="section-head">
+      <h3>Jewelry Purchase & Exchange Suite</h3>
+    </div>
+    <div class="panel">
+      <div class="calc-suite">
+        
+        <!-- Calculation Mode Switcher -->
+        <div class="calc-segmented-mode">
+          <button class="calc-mode-btn active" type="button" data-mode="value">Calculate Price by Weight</button>
+          <button class="calc-mode-btn" type="button" data-mode="grams">Calculate Weight by Budget</button>
+          <select id="calcMode" hidden>
+            <option value="value" selected>Calculate Price for Weight</option>
+            <option value="grams">Calculate Weight for Budget</option>
+          </select>
+        </div>
+
+        <!-- Standard Gold Weight Presets -->
+        <div class="calc-group">
+          <span class="calc-group-label">Standard Gold Weight</span>
+          <div class="chip-container" id="weightChips">
+            <button class="chip" data-val="1" type="button">1g</button>
+            <button class="chip" data-val="4" type="button">4g (Half)</button>
+            <button class="chip active" data-val="8" type="button">8g (1 Sov)</button>
+            <button class="chip" data-val="16" type="button">16g (2 Sov)</button>
+            <button class="chip" data-val="24" type="button">24g (3 Sov)</button>
+            <button class="chip" data-val="50" type="button">50g</button>
+            <button class="chip" data-val="100" type="button">100g</button>
+          </div>
+        </div>
+
+        <!-- Category & Making Charges -->
+        <div class="calc-group">
+          <span class="calc-group-label">Jewelry Category & Making Charges</span>
+          <div class="chip-container" id="makingChips">
+            <button class="chip" data-val="3.0" type="button">Coin (3%)</button>
+            <button class="chip active" data-val="8.0" type="button">Plain Jewelry (8%)</button>
+            <button class="chip" data-val="12.0" type="button">Stone / Studded (12%)</button>
+            <button class="chip" data-val="16.0" type="button">Antique / Temple (16%)</button>
+          </div>
+        </div>
+
+        <!-- Parameter Input Grid -->
+        <div class="calc-grid-form">
+          <div class="calc-field" id="weightField">
+            <label>Gold Weight (Grams)</label>
+            <input class="calc-input" id="weight" type="number" inputmode="decimal" value="8" step="0.01">
+          </div>
+          <div class="calc-field" id="budgetField" style="display: none;">
+            <label>Total Budget (₹)</label>
+            <input class="calc-input" id="budget" type="number" inputmode="decimal" value="100000" step="100">
+          </div>
+          <div class="calc-field">
+            <label>Making Charge (%)</label>
+            <input class="calc-input" id="making" type="number" inputmode="decimal" value="8.0" step="0.1">
+          </div>
+          <div class="calc-field">
+            <label>GST on Jewelry (%)</label>
+            <input class="calc-input" id="gstRate" type="number" inputmode="decimal" value="3.0" step="0.1">
+          </div>
+          <div class="calc-field">
+            <label>Hallmarking / Fee (₹)</label>
+            <input class="calc-input" id="flatFee" type="number" inputmode="decimal" value="45" step="1">
+          </div>
+        </div>
+
+        <!-- Scrap Gold Exchange Drawer -->
+        <div class="exchange-drawer">
+          <span class="exchange-header">Old Gold Scrap Exchange (Optional)</span>
+          <div class="calc-grid-form">
+            <div class="calc-field">
+              <label>Scrap Weight (g)</label>
+              <input class="calc-input" id="oldWeight" type="number" inputmode="decimal" value="0" step="0.01">
+            </div>
+            <div class="calc-field">
+              <label>Scrap Purity</label>
+              <select class="calc-input" id="oldPurity">
+                <option value="22" selected>22K (91.6% Pure)</option>
+                <option value="18">18K (75.0% Pure)</option>
+                <option value="24">24K (99.9% Pure)</option>
+                <option value="20">84.0% Standard Melt</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Detailed Itemized Receipt Card -->
+        <div class="receipt-card">
+          <div class="receipt-title">Itemized Purchase Quotation</div>
+          <div class="receipt-line"><span>Base 22K Gold Cost:</span><span id="receiptBase">₹ 0</span></div>
+          <div class="receipt-line"><span id="receiptMakingLabel">Making Charges (8%):</span><span id="receiptMaking">₹ 0</span></div>
+          <div class="receipt-line"><span id="receiptGstLabel">GST (3%):</span><span id="receiptGst">₹ 0</span></div>
+          <div class="receipt-line"><span>Hallmarking / Flat Fees:</span><span id="receiptFee">₹ 0</span></div>
+          <div class="receipt-line deduction" id="receiptOldGoldLine" style="display:none;"><span>Old Gold Exchange Credit:</span><span id="receiptOldGold">-₹ 0</span></div>
+          
+          <div class="receipt-total">
+            <span class="label" id="receiptTotalLabel">Net Payable Amount</span>
+            <span class="final-val" id="calcResult">₹ —</span>
+          </div>
+          <div style="font-size:10.5px; font-weight:600; color:var(--text-tertiary); text-align:right; margin-top:2px;" id="calcSub">Based on live 22K rate.</div>
+
+          <button class="quote-btn" id="copyQuoteBtn" type="button">Copy Quotation Slip</button>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Historical Log Table -->
+  <section class="section">
+    <div class="section-head">
+      <h3>Historical Log</h3>
+      <span id="historyCount">—</span>
+    </div>
+    <div class="panel table-wrap">
+      <table class="history-table">
+        <thead><tr><th>Date</th><th>Per Gram</th><th>1 Sov (8g)</th></tr></thead>
+        <tbody id="historyBody"><tr><td colspan="3" style="text-align:center; padding: 20px 0;">Loading records…</td></tr></tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer>
+    <div>Gold 22k rate · Institutional Terminal</div>
+    <div style="margin-top:2px; font-weight:500;">LiveChennai + GoodReturns Live Feeds</div>
+  </footer>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const LIVE_URL = "data/live.json";
+const HISTORY_URL = "data/history.json";
+const WORKER_URL = "https://gold-price-fetch.subramanilrs.workers.dev/";
+
+let live = null;
+let history = [];
+let selectedRange = 30;
+let fetchBusy = false;
+let scrubIndex = -1;
+
+let pollTimer = null;
+let isHighFrequency = false;
+let highFreqStartTime = 0;
+let predictedAmMinuteOfDay = 10 * 60 + 20; // 10:20 AM IST
+let predictedPmMinuteOfDay = 16 * 60 + 20; // 04:20 PM IST
+
+const syncChannel = ("BroadcastChannel" in window) ? new BroadcastChannel("gold_price_sync") : null;
+const $ = id => document.getElementById(id);
+
+(function setupThemeToggle() {
+  const root = document.documentElement;
+  const metaLight = document.querySelector('meta[name="theme-color"][media*="light"]');
+  const metaDark = document.querySelector('meta[name="theme-color"][media*="dark"]');
+
+  function applyTheme(theme) {
+    if (theme === "light" || theme === "dark") {
+      root.setAttribute("data-theme", theme);
+    } else {
+      root.removeAttribute("data-theme");
+    }
+    const isDark = theme === "dark" || (!theme && window.matchMedia("(prefers-color-scheme: dark)").matches);
+    const color = isDark ? "#030712" : "#f8fafc";
+    if (metaLight) metaLight.setAttribute("content", color);
+    if (metaDark) metaDark.setAttribute("content", color);
+    if (typeof drawChart === "function") requestAnimationFrame(drawChart);
+  }
+
+  const saved = localStorage.getItem("gold_theme");
+  applyTheme(saved);
+
+  const btn = $("themeToggle");
+  if (btn) {
+    btn.onclick = () => {
+      haptic(8);
+      const current = root.getAttribute("data-theme") ||
+        (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+      const next = current === "dark" ? "light" : "dark";
+      localStorage.setItem("gold_theme", next);
+      applyTheme(next);
+    };
+  }
+})();
+
+let audioCtx = null;
+function playTick(freq = 800, duration = 0.015) {
+  try {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = "sine";
+    osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+    gain.gain.setValueAtTime(0.03, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start();
+    osc.stop(audioCtx.currentTime + duration);
+  } catch(e) {}
+}
+
+const haptic = (ms = 10, freq = 800) => {
+  if ("vibrate" in navigator) { try { navigator.vibrate(ms); } catch (_) {} }
+  playTick(freq);
+};
+
+const money = n => Number.isFinite(Number(n)) ? "₹ " + Math.round(Number(n)).toLocaleString("en-IN") : "₹ —";
+
+const dateText = s => {
+  if (!s) return "—";
+  const d = new Date(String(s) + "T00:00:00");
+  return isNaN(d.getTime()) ? String(s) : d.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
+};
+
+const timeText = s => {
+  if (!s) return "—";
+  const parts = String(s).split(":");
+  if (parts.length < 2) return String(s);
+  let hour = Number(parts[0]);
+  if (!Number.isFinite(hour)) return String(s);
+  const ap = hour >= 12 ? "PM" : "AM";
+  hour = hour % 12 || 12;
+  return hour + ":" + parts[1] + " " + ap;
+};
+
+const esc = s => String(s ?? "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;");
+
+function setStatus(text, offline = false, syncing = false, hunting = false) {
+  const elText = $("statusText");
+  const elStatus = $("status");
+  if (elText) elText.textContent = text;
+  if (elStatus) {
+    elStatus.classList.toggle("offline", offline);
+    elStatus.classList.toggle("syncing", syncing);
+    elStatus.classList.toggle("hunting", hunting);
+  }
+}
+
+function toast(text) {
+  const el = $("toast");
+  if (!el) return;
+  el.textContent = text;
+  el.classList.add("show");
+  setTimeout(() => el.classList.remove("show"), 2200);
+}
+
+function sleep(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
+
+function checkParserHealth(data, networkError = false) {
+  const warningBox = $("parserWarning");
+  if (!warningBox) return;
+
+  if (networkError && !navigator.onLine) {
+    const title = $("warningTitle");
+    const desc = $("warningDesc");
+    if (title) title.innerHTML = `Offline Mode <span class="dismiss-text">Tap to dismiss</span>`;
+    if (desc) desc.textContent = "Device offline. Displaying saved market records.";
+    warningBox.hidden = false;
+    return;
+  }
+  
+  if (!data) {
+    warningBox.hidden = true;
+    return;
+  }
+
+  let hasFailed = false, reasons = [];
+  if (data.error || data.parsing_failed) { hasFailed = true; reasons.push(data.error || "Parser feed issue"); }
+  if (Array.isArray(data.failed_sources) && data.failed_sources.length > 0) { hasFailed = true; reasons.push(`Failed: ${data.failed_sources.join(", ")}`); }
+  if (data.status === "degraded") { hasFailed = true; reasons.push("Operating in fallback mode"); }
+
+  if (hasFailed) {
+    const title = $("warningTitle");
+    const desc = $("warningDesc");
+    if (title) title.innerHTML = `Source Notice <span class="dismiss-text">Tap to dismiss</span>`;
+    if (desc) desc.textContent = reasons.join(" · ") + ". Displaying last verified benchmark.";
+    warningBox.hidden = false;
+  } else {
+    warningBox.hidden = true;
+  }
+}
+
+async function getJSON(url) {
+  const response = await fetch(url + (url.includes("?") ? "&" : "?") + "v=" + Date.now(), { cache: "no-store" });
+  if (!response.ok) throw new Error("HTTP " + response.status);
+  return response.json();
+}
+
+function normalize(array) {
+  return Array.isArray(array) ? array.filter(i => i && i.date && Number.isFinite(Number(i.rate_22k))).map(i => ({ ...i, rate_22k: Number(i.rate_22k) })) : [];
+}
+
+function computeLastMovement() {
+  if (!history || history.length < 1 || !live) return;
+  let fullData = [...history];
+  if (fullData[fullData.length - 1].date !== live.date) fullData.push(live);
+  else fullData[fullData.length - 1] = live;
+
+  let lastChangeItem = null, oldRate = null;
+  for (let i = fullData.length - 1; i > 0; i--) {
+    let r1 = Number(fullData[i].rate_22k), r0 = Number(fullData[i - 1].rate_22k);
+    if (r1 !== r0) { lastChangeItem = fullData[i]; oldRate = r0; break; }
+  }
+
+  const lastDateEl = $("lastDate");
+  const lastAmtEl = $("lastAmount");
+  const lastTimeEl = $("lastTime");
+
+  if (lastChangeItem && oldRate) {
+    let amount = Number(lastChangeItem.rate_22k) - oldRate;
+    if (lastDateEl) lastDateEl.textContent = "Price shifted on " + dateText(lastChangeItem.date);
+    if (lastAmtEl) {
+      lastAmtEl.textContent = (amount > 0 ? "▲ " : "▼ ") + money(Math.abs(amount));
+      lastAmtEl.className = "amount " + (amount > 0 ? "positive" : "negative");
+    }
+    if (lastTimeEl) lastTimeEl.textContent = "Previous rate was " + money(oldRate);
+  } else {
+    if (lastDateEl) lastDateEl.textContent = "No recent shifts";
+    if (lastTimeEl) lastTimeEl.textContent = "Market is flat";
+    if (lastAmtEl) {
+      lastAmtEl.textContent = "—";
+      lastAmtEl.className = "amount";
+    }
+  }
+}
+
+function calculate30DayAverageUpdateTimes() {
+  if (!Array.isArray(history) || history.length < 2) return;
+  const recent30 = history.slice(-30);
+  let amMinutes = [], pmMinutes = [];
+
+  recent30.forEach(item => {
+    if (item && item.time) {
+      const parts = String(item.time).split(":");
+      const mins = parseInt(parts[0], 10) * 60 + parseInt(parts[1] || 0, 10);
+      if (mins < 14 * 60) amMinutes.push(mins);
+      else pmMinutes.push(mins);
+    }
+  });
+
+  if (amMinutes.length > 0) {
+    predictedAmMinuteOfDay = Math.round(amMinutes.reduce((a, b) => a + b, 0) / amMinutes.length);
+  }
+  if (pmMinutes.length > 0) {
+    predictedPmMinuteOfDay = Math.round(pmMinutes.reduce((a, b) => a + b, 0) / pmMinutes.length);
+  }
+}
+
+function renderLive(d) {
+  if (!d) return;
+  live = d;
+  const rate = Number(d.rate_22k);
+  const rate8 = Number.isFinite(Number(d.rate_8g)) ? Number(d.rate_8g) : rate * 8;
+
+  if ($("hero8")) $("hero8").textContent = money(rate8);
+  if ($("hero1")) $("hero1").innerHTML = `${money(rate)} <span id="change1" class="change-pill mini same"></span>`;
+  if ($("today")) $("today").textContent = dateText(d.date);
+  
+  const isFreshToday = d.date === todayLocalDateStr();
+  if ($("todayTime")) $("todayTime").textContent = timeText(d.time) + (isFreshToday ? "" : " · Previous Close");
+  if ($("staleWarning")) $("staleWarning").hidden = isFreshToday;
+
+  let currentSession = d.session;
+  if (!currentSession) {
+    if (d.time) {
+      const hr = parseInt(String(d.time).split(":")[0], 10);
+      currentSession = hr < 14 ? "AM" : "PM";
+    } else {
+      currentSession = "PM";
+    }
+  }
+  if ($("session")) $("session").textContent = currentSession + " Fix";
+
+  if ($("purity22")) $("purity22").textContent = money(rate) + "/g";
+  if ($("purity24")) $("purity24").textContent = money(Math.round(rate * (24 / 22))) + "/g";
+  if ($("purity18")) $("purity18").textContent = money(Math.round(rate * (18 / 22))) + "/g";
+
+  let change1 = Number(d.change);
+  if (!Number.isFinite(change1)) change1 = Number.isFinite(Number(d.previous_rate_22k)) ? rate - Number(d.previous_rate_22k) : 0;
+  const change8 = change1 * 8;
+
+  if ($("change1")) {
+    $("change1").textContent = change1 > 0 ? "+" + money(change1) : change1 < 0 ? "-" + money(Math.abs(change1)) : "Flat";
+    $("change1").className = "change-pill mini " + (change1 > 0 ? "up" : change1 < 0 ? "down" : "same");
+  }
+  
+  if ($("change8")) {
+    $("change8").textContent = change8 > 0 ? "▲ +" + money(change8) + " Today" : change8 < 0 ? "▼ -" + money(Math.abs(change8)) + " Today" : "No change";
+    $("change8").className = "change-pill " + (change8 > 0 ? "up" : change8 < 0 ? "down" : "same");
+  }
+
+  renderTodayTimeline();
+}
+
+function todayLocalDateStr() {
+  const d0 = new Date();
+  const y = d0.getFullYear(), m = String(d0.getMonth() + 1).padStart(2, "0"), day = String(d0.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+
+function renderTodayTimeline() {
+  if (!live) return;
+  const today = live.date;
+  const isFreshToday = today === todayLocalDateStr();
+  
+  if (!isFreshToday) {
+    if ($("amRate")) $("amRate").textContent = "Pending";
+    if ($("amTime")) $("amTime").textContent = "—";
+    if ($("pmRate")) $("pmRate").textContent = "Pending";
+    if ($("pmTime")) $("pmTime").textContent = "—";
+    if ($("amCard")) $("amCard").classList.remove("is-active");
+    if ($("pmCard")) $("pmCard").classList.remove("is-active");
+    return;
+  }
+
+  let am = null, pm = null;
+
+  if (live.am_rate || live.amRate || live.morning_rate || live.rate_am) {
+    am = {
+      rate_22k: Number(live.am_rate || live.amRate || live.morning_rate || live.rate_am),
+      time: live.am_time || live.amTime || "10:30"
+    };
+  }
+  if (live.pm_rate || live.pmRate || live.evening_rate || live.rate_pm) {
+    pm = {
+      rate_22k: Number(live.pm_rate || live.pmRate || live.evening_rate || live.rate_pm),
+      time: live.pm_time || live.pmTime || "17:00"
+    };
+  }
+
+  if (Array.isArray(live.intraday)) {
+    const amEntry = live.intraday.find(i => (i.date === today || !i.date) && (i.session === "AM" || String(i.session).toUpperCase().includes("AM") || String(i.session).toUpperCase().includes("MORNING")));
+    if (amEntry && amEntry.rate_22k) am = { rate_22k: Number(amEntry.rate_22k), time: amEntry.time || "10:30" };
+    
+    const pmEntry = live.intraday.find(i => (i.date === today || !i.date) && (i.session === "PM" || String(i.session).toUpperCase().includes("PM") || String(i.session).toUpperCase().includes("EVENING")));
+    if (pmEntry && pmEntry.rate_22k) pm = { rate_22k: Number(pmEntry.rate_22k), time: pmEntry.time || "17:00" };
+  }
+
+  try {
+    const cached = JSON.parse(localStorage.getItem("gold_live_backup"));
+    if (cached && cached.date === today) {
+      if (!am && (cached.session === "AM" || cached.am_rate || cached.amRate)) {
+        am = { rate_22k: Number(cached.am_rate || cached.amRate || cached.rate_22k), time: cached.am_time || cached.time || "10:30" };
+      }
+      if (!pm && (cached.session === "PM" || cached.pm_rate || cached.pmRate)) {
+        pm = { rate_22k: Number(cached.pm_rate || cached.pmRate || cached.rate_22k), time: cached.pm_time || cached.time || "17:00" };
+      }
+      if (Array.isArray(cached.intraday)) {
+        if (!am) {
+          const cAm = cached.intraday.find(i => (i.date === today || !i.date) && (i.session === "AM" || String(i.session).toUpperCase().includes("AM")));
+          if (cAm && cAm.rate_22k) am = { rate_22k: Number(cAm.rate_22k), time: cAm.time || "10:30" };
+        }
+        if (!pm) {
+          const cPm = cached.intraday.find(i => (i.date === today || !i.date) && (i.session === "PM" || String(i.session).toUpperCase().includes("PM")));
+          if (cPm && cPm.rate_22k) pm = { rate_22k: Number(cPm.rate_22k), time: cPm.time || "17:00" };
+        }
+      }
+    }
+  } catch(e) {}
+
+  const sessionUpper = String(live.session || "").toUpperCase();
+  const timeHour = live.time ? parseInt(String(live.time).split(":")[0], 10) : null;
+
+  if (!am && (sessionUpper === "AM" || sessionUpper.includes("MORNING"))) {
+    am = { rate_22k: Number(live.rate_22k), time: live.time || "10:30" };
+  }
+  if (!pm && (sessionUpper === "PM" || sessionUpper.includes("EVENING"))) {
+    pm = { rate_22k: Number(live.rate_22k), time: live.time || "17:00" };
+  }
+
+  if (pm && !am) {
+    if (live.morning_rate || live.opening_rate || live.previous_rate_22k) {
+      am = { rate_22k: Number(live.morning_rate || live.opening_rate || live.previous_rate_22k), time: "10:30" };
+    }
+  }
+
+  if (!am && !pm && live.rate_22k) {
+    if (timeHour !== null && timeHour < 14) {
+      am = { rate_22k: Number(live.rate_22k), time: live.time || "10:30" };
+    } else {
+      pm = { rate_22k: Number(live.rate_22k), time: live.time || "17:00" };
+      if (live.previous_rate_22k) {
+        am = { rate_22k: Number(live.previous_rate_22k), time: "10:30" };
+      }
+    }
+  }
+
+  if ($("amRate")) $("amRate").textContent = am && Number.isFinite(am.rate_22k) ? money(am.rate_22k) : "Pending";
+  if ($("amTime")) $("amTime").textContent = am ? timeText(am.time) : "—";
+
+  if ($("pmRate")) $("pmRate").textContent = pm && Number.isFinite(pm.rate_22k) ? money(pm.rate_22k) : "Pending";
+  if ($("pmTime")) $("pmTime").textContent = pm ? timeText(pm.time) : "—";
+
+  const isPmActive = Boolean(pm && Number.isFinite(pm.rate_22k));
+  const isAmActive = Boolean(am && Number.isFinite(am.rate_22k) && !isPmActive);
+
+  if ($("amCard")) $("amCard").classList.toggle("is-active", isAmActive);
+  if ($("pmCard")) $("pmCard").classList.toggle("is-active", isPmActive);
+}
+
+function updateFintechMetrics() {
+  if (!history.length || !live) return;
+  const currentRate = Number(live.rate_22k), values = history.map(i => Number(i.rate_22k));
+
+  const calcReturn = (days) => {
+    if (history.length < 2) return null;
+    const pastVal = Number(history[Math.max(0, history.length - 1 - days)].rate_22k);
+    return pastVal ? ((currentRate - pastVal) / pastVal) * 100 : null;
+  };
+
+  [{ id: "ret1W", d: 7 }, { id: "ret1M", d: 30 }, { id: "ret3M", d: 90 }, { id: "ret6M", d: 180 }, { id: "ret1Y", d: 365 }, { id: "ret3Y", d: 1095 }].forEach(h => {
+    const ret = calcReturn(h.d);
+    if ($(h.id)) $(h.id).textContent = ret === null ? "—" : (ret >= 0 ? "+" : "") + ret.toFixed(1) + "%";
+  });
+
+  const smaPeriod = Math.min(30, history.length);
+  const sma = values.slice(-smaPeriod).reduce((a, b) => a + b, 0) / smaPeriod;
+  const smaDiff = currentRate - sma, smaPct = (smaDiff / sma) * 100;
+
+  if ($("smaValue")) $("smaValue").textContent = money(sma);
+  if ($("smaPill")) {
+    $("smaPill").className = "change-pill " + (smaDiff >= 0 ? "up" : "down");
+    $("smaPill").textContent = (smaDiff >= 0 ? "▲ +" : "▼ -") + money(Math.abs(smaDiff)) + ` (${smaPct.toFixed(1)}%)`;
+  }
+}
+
+function drawSpline(ctx, pts) {
+  if (pts.length < 2) return;
+  ctx.beginPath();
+  ctx.moveTo(pts[0].x, pts[0].y);
+  for (let i = 0; i < pts.length - 1; i++) {
+    const p0 = pts[i === 0 ? i : i - 1];
+    const p1 = pts[i];
+    const p2 = pts[i + 1];
+    const p3 = pts[i + 2 < pts.length ? i + 2 : i + 1];
+    ctx.bezierCurveTo(
+      p1.x + (p2.x - p0.x) / 6,
+      p1.y + (p2.y - p0.y) / 6,
+      p2.x - (p3.x - p1.x) / 6,
+      p2.y - (p3.y - p1.y) / 6,
+      p2.x,
+      p2.y
+    );
+  }
+}
+
+function drawChart() {
+  const canvas = $("chart");
+  if (!canvas || !canvas.parentElement) return;
+  const width = canvas.parentElement.clientWidth, height = canvas.parentElement.clientHeight, dpr = window.devicePixelRatio || 1;
+  if (!width || !height) return;
+  canvas.width = Math.round(width * dpr); canvas.height = Math.round(height * dpr);
+  const ctx = canvas.getContext("2d");
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, width, height);
+
+  const data = selectedRange === "all" ? history : history.slice(Math.max(0, history.length - Number(selectedRange)));
+  if ($("chartCount")) $("chartCount").textContent = data.length.toLocaleString() + " records";
+
+  const styles = getComputedStyle(document.body);
+  const colorGold = styles.getPropertyValue('--gold-primary').trim() || '#d97706';
+  const colorTextTertiary = styles.getPropertyValue('--text-tertiary').trim() || '#94a3b8';
+  const colorTextMain = styles.getPropertyValue('--text-main').trim() || '#0f172a';
+
+  if (data.length < 2) return;
+
+  const values = data.map(i => Number(i.rate_22k));
+  const min0 = Math.min(...values), max0 = Math.max(...values);
+  const pad = Math.max(60, (max0 - min0) * 0.16);
+  const min = min0 - pad, max = max0 + pad;
+
+  const L = 52, R = 12, T = 16, B = 22;
+  const plotW = width - L - R, plotH = height - T - B;
+
+  const py = val => T + (1 - ((val - min) / (max - min))) * plotH;
+  const points = values.map((val, i) => ({ x: L + (i / (values.length - 1)) * plotW, y: py(val) }));
+
+  ctx.font = "600 10px var(--font-sans)";
+  ctx.textAlign = "right";
+  ctx.lineWidth = 1;
+
+  for (let i = 0; i <= 4; i++) {
+    const gy = T + (plotH * i / 4);
+    ctx.strokeStyle = "rgba(148, 163, 184, 0.12)";
+    ctx.setLineDash([]);
+    ctx.beginPath();
+    ctx.moveTo(L, gy);
+    ctx.lineTo(width - R, gy);
+    ctx.stroke();
+
+    const gridVal = max - ((max - min) * i / 4);
+    ctx.fillStyle = colorTextTertiary;
+    ctx.fillText(Math.round(gridVal).toLocaleString("en-IN"), L - 8, gy + 3.5);
+  }
+
+  drawSpline(ctx, points);
+  ctx.lineTo(points[points.length - 1].x, height - B);
+  ctx.lineTo(points[0].x, height - B);
+  ctx.closePath();
+  const fillGrad = ctx.createLinearGradient(0, T, 0, height - B);
+  fillGrad.addColorStop(0, "rgba(217, 119, 6, 0.22)");
+  fillGrad.addColorStop(0.7, "rgba(217, 119, 6, 0.04)");
+  fillGrad.addColorStop(1, "rgba(217, 119, 6, 0)");
+  ctx.fillStyle = fillGrad;
+  ctx.fill();
+
+  drawSpline(ctx, points);
+  ctx.strokeStyle = colorGold;
+  ctx.lineWidth = 2.4;
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
+  ctx.stroke();
+
+  if (data.length <= 60) {
+    data.forEach((rec, i) => {
+      let session = rec.session;
+      if (!session) {
+        const hr = rec.time ? parseInt(String(rec.time).split(":")[0], 10) : null;
+        session = (hr !== null && hr < 14) ? "AM" : "PM";
+      }
+      ctx.beginPath();
+      ctx.arc(points[i].x, points[i].y, 2.4, 0, Math.PI * 2);
+      ctx.fillStyle = session === "AM" ? "#38bdf8" : colorGold;
+      ctx.fill();
+    });
+  }
+
+  const activeIdx = (scrubIndex >= 0 && scrubIndex < data.length) ? scrubIndex : data.length - 1;
+  const activePt = points[activeIdx];
+
+  if (scrubIndex >= 0) {
+    ctx.strokeStyle = colorGold;
+    ctx.lineWidth = 1.2;
+    ctx.setLineDash([4, 4]);
+    ctx.beginPath();
+    ctx.moveTo(activePt.x, T);
+    ctx.lineTo(activePt.x, height - B);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    const badgeText = `${dateText(data[activeIdx].date)}: ${money(values[activeIdx])}/g`;
+    ctx.font = "800 11px var(--font-sans)";
+    ctx.fillStyle = colorTextMain;
+    ctx.textAlign = "right";
+    ctx.fillText(badgeText, width - R, T + 10);
+  }
+
+  ctx.fillStyle = colorGold;
+  ctx.beginPath();
+  ctx.arc(activePt.x, activePt.y, scrubIndex >= 0 ? 5.5 : 4, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = styles.getPropertyValue('--surface').trim() || '#ffffff';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  if ($("chartStart")) $("chartStart").textContent = "From: " + dateText(data[0].date);
+  if ($("chartEnd")) $("chartEnd").textContent = "To: " + dateText(data[data.length - 1].date);
+  
+  const delta = values[values.length - 1] - values[0];
+  const pct = values[0] ? (delta / values[0] * 100) : 0;
+
+  if (scrubIndex >= 0) {
+    if ($("chartMetricLabel")) $("chartMetricLabel").textContent = "Selected Benchmark";
+    if ($("periodChange")) {
+      $("periodChange").textContent = money(values[activeIdx]) + "/g";
+      $("periodChange").className = "";
+    }
+  } else {
+    if ($("chartMetricLabel")) $("chartMetricLabel").textContent = "Period Performance";
+    if ($("periodChange")) {
+      $("periodChange").textContent = (delta >= 0 ? "+" : "") + money(delta) + ` (${(pct >= 0 ? "+" : "")}${pct.toFixed(1)}%)`;
+      $("periodChange").className = delta > 0 ? "positive" : delta < 0 ? "negative" : "";
+    }
+  }
+  if ($("periodHigh")) $("periodHigh").textContent = money(max0);
+  if ($("periodLow")) $("periodLow").textContent = money(min0);
+}
+
+(function setupChartScrub() {
+  const canvas = $("chart");
+  if (!canvas) return;
+  const handle = e => {
+    const data = selectedRange === "all" ? history : history.slice(Math.max(0, history.length - Number(selectedRange)));
+    if (data.length < 2) return;
+    const r = canvas.getBoundingClientRect();
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const x = clientX - r.left;
+    const L = 52, plotW = r.width - L - 12;
+    const ratio = Math.max(0, Math.min(1, (x - L) / plotW));
+    const idx = Math.round(ratio * (data.length - 1));
+    if (idx !== scrubIndex) {
+      scrubIndex = idx;
+      haptic(5, 1200);
+      drawChart();
+    }
+  };
+  const end = () => {
+    if (scrubIndex !== -1) {
+      scrubIndex = -1;
+      drawChart();
+    }
+  };
+  canvas.addEventListener("touchstart", handle, { passive: true });
+  canvas.addEventListener("touchmove", handle, { passive: true });
+  canvas.addEventListener("touchend", end);
+  canvas.addEventListener("mousemove", e => { if (e.buttons === 1) handle(e); });
+  canvas.addEventListener("mouseup", end);
+  canvas.addEventListener("mouseleave", end);
+})();
+
+function calculate() {
+  if (!live || !$("calcMode")) return;
+  const rate = Number(live.rate_22k);
+  if (!rate) return;
+
+  const mode = $("calcMode").value;
+  const weight = Math.max(0, Number($("weight")?.value) || 0);
+  const budget = Math.max(0, Number($("budget")?.value) || 0);
+  const makingPct = Math.max(0, Number($("making")?.value) || 0);
+  const gstPct = Math.max(0, Number($("gstRate")?.value) || 0);
+  const flatFee = Math.max(0, Number($("flatFee")?.value) || 0);
+  const oldWeight = Math.max(0, Number($("oldWeight")?.value) || 0);
+  const oldPurity = Number($("oldPurity")?.value) || 22;
+  const oldGoldCredit = oldWeight > 0 ? (oldWeight * (rate * (oldPurity / 22))) : 0;
+
+  if (mode === "value") {
+    if ($("weightField")) $("weightField").style.display = "flex";
+    if ($("budgetField")) $("budgetField").style.display = "none";
+  } else {
+    if ($("weightField")) $("weightField").style.display = "none";
+    if ($("budgetField")) $("budgetField").style.display = "flex";
+  }
+
+  if ($("receiptMakingLabel")) $("receiptMakingLabel").textContent = `Making Charges (${makingPct}%):`;
+  if ($("receiptGstLabel")) $("receiptGstLabel").textContent = `GST (${gstPct}%):`;
+  if ($("receiptOldGoldLine")) $("receiptOldGoldLine").style.display = oldGoldCredit > 0 ? "flex" : "none";
+  if (oldGoldCredit > 0 && $("receiptOldGold")) $("receiptOldGold").textContent = "- " + money(oldGoldCredit);
+
+  if (mode === "value") {
+    const goldVal = rate * weight;
+    const makeAmt = goldVal * (makingPct / 100);
+    const sub = goldVal + makeAmt + flatFee;
+    const gstAmt = sub * (gstPct / 100);
+    const grandTotal = Math.max(0, sub + gstAmt - oldGoldCredit);
+
+    if ($("receiptBase")) $("receiptBase").textContent = money(goldVal);
+    if ($("receiptMaking")) $("receiptMaking").textContent = money(makeAmt);
+    if ($("receiptGst")) $("receiptGst").textContent = money(gstAmt);
+    if ($("receiptFee")) $("receiptFee").textContent = money(flatFee);
+    if ($("receiptTotalLabel")) $("receiptTotalLabel").textContent = "Net Payable Amount";
+    if ($("calcResult")) $("calcResult").textContent = money(grandTotal);
+    if ($("calcSub")) $("calcSub").textContent = `For ${weight.toLocaleString("en-IN")}g gold at ₹ ${rate.toLocaleString("en-IN")}/g benchmark`;
+  } else {
+    const effB = (budget + oldGoldCredit) / (1 + gstPct / 100) - flatFee;
+    const goldBase = effB > 0 ? effB / (1 + makingPct / 100) : 0;
+    const grams = rate > 0 ? goldBase / rate : 0;
+    const makeAmt = goldBase * (makingPct / 100);
+    const sub = goldBase + makeAmt + flatFee;
+    const gstAmt = sub * (gstPct / 100);
+
+    if ($("receiptBase")) $("receiptBase").textContent = money(goldBase);
+    if ($("receiptMaking")) $("receiptMaking").textContent = money(makeAmt);
+    if ($("receiptGst")) $("receiptGst").textContent = money(gstAmt);
+    if ($("receiptFee")) $("receiptFee").textContent = money(flatFee);
+    if ($("receiptTotalLabel")) $("receiptTotalLabel").textContent = "Purchasable Gold Weight";
+    if ($("calcResult")) $("calcResult").textContent = grams.toFixed(3) + " g";
+    if ($("calcSub")) $("calcSub").textContent = `Fits budget ${money(budget)} after all taxes & deductions`;
+  }
+}
+
+document.querySelectorAll(".calc-mode-btn").forEach(btn => {
+  btn.onclick = () => {
+    haptic(10);
+    document.querySelectorAll(".calc-mode-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    if ($("calcMode")) $("calcMode").value = btn.dataset.mode;
+    calculate();
+  };
+});
+
+document.querySelectorAll("#weightChips .chip").forEach(c => c.onclick = () => {
+  haptic(10);
+  document.querySelectorAll("#weightChips .chip").forEach(x => x.classList.remove("active"));
+  c.classList.add("active");
+  if ($("weight")) $("weight").value = c.dataset.val;
+  if ($("calcMode")) $("calcMode").value = "value";
+  document.querySelectorAll(".calc-mode-btn").forEach(b => b.classList.toggle("active", b.dataset.mode === "value"));
+  calculate();
+});
+
+document.querySelectorAll("#makingChips .chip").forEach(c => c.onclick = () => {
+  haptic(10);
+  document.querySelectorAll("#makingChips .chip").forEach(x => x.classList.remove("active"));
+  c.classList.add("active");
+  if ($("making")) $("making").value = c.dataset.val;
+  calculate();
+});
+
+function generateShareCardBlob() {
+  return new Promise((resolve) => {
+    if (!live) return resolve(null);
+    const isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const cvs = document.createElement("canvas"), ctx = cvs.getContext("2d"), w = 1080, h = 1350;
+    cvs.width = w; cvs.height = h;
+    const r1 = Number(live.rate_22k), r8 = r1 * 8, c1 = Number(live.change) || 0, c8 = c1 * 8;
+
+    const bgApp = isDark ? "#030712" : "#f8fafc";
+    const bgSurface = isDark ? "#0b0f19" : "#ffffff";
+    const borderCard = isDark ? "rgba(255, 255, 255, 0.08)" : "rgba(15, 23, 42, 0.08)";
+    const textMain = isDark ? "#f8fafc" : "#0f172a";
+    const textSec = isDark ? "#94a3b8" : "#475569";
+    const textTert = isDark ? "#64748b" : "#94a3b8";
+    const goldColor = isDark ? "#fbbf24" : "#d97706";
+    const goodColor = isDark ? "#34d399" : "#059669";
+    const badColor = isDark ? "#f87171" : "#dc2626";
+
+    ctx.fillStyle = bgApp;
+    ctx.fillRect(0, 0, w, h);
+
+    const gl = ctx.createRadialGradient(w/2, 340, 40, w/2, 340, 480);
+    gl.addColorStop(0, isDark ? "rgba(251, 191, 36, 0.12)" : "rgba(217, 119, 6, 0.08)");
+    gl.addColorStop(1, isDark ? "rgba(3, 7, 18, 0)" : "rgba(248, 250, 252, 0)");
+    ctx.fillStyle = gl;
+    ctx.fillRect(0, 0, w, h);
+
+    ctx.strokeStyle = borderCard;
+    ctx.lineWidth = 2;
+    ctx.strokeRect(36, 36, w - 72, h - 72);
+
+    ctx.fillStyle = bgSurface;
+    ctx.beginPath();
+    ctx.roundRect(72, 72, w - 144, 76, 38);
+    ctx.fill();
+    ctx.strokeStyle = borderCard;
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    ctx.fillStyle = goldColor;
+    ctx.font = "800 24px 'Plus Jakarta Sans'";
+    ctx.textAlign = "left";
+    ctx.fillText("GOLD 22K RATE", 104, 119);
+
+    ctx.fillStyle = textSec;
+    ctx.font = "700 20px 'Plus Jakarta Sans'";
+    ctx.textAlign = "right";
+    ctx.fillText(`${dateText(live.date)} · ${$("session")?.textContent || "IST Market"}`, w - 104, 118);
+
+    ctx.fillStyle = bgSurface;
+    ctx.beginPath();
+    ctx.roundRect(72, 172, w - 144, 380, 24);
+    ctx.fill();
+    ctx.strokeStyle = borderCard;
+    ctx.stroke();
+
+    ctx.fillStyle = goldColor;
+    ctx.font = "800 22px 'Plus Jakarta Sans'";
+    ctx.textAlign = "center";
+    ctx.fillText("1 SOVEREIGN (8 GRAMS) 22K", w/2, 230);
+
+    ctx.fillStyle = textMain;
+    ctx.font = "800 92px 'Plus Jakarta Sans'";
+    ctx.fillText(money(r8), w/2, 345);
+
+    ctx.font = "700 26px 'Plus Jakarta Sans'";
+    if (c8 > 0) {
+      ctx.fillStyle = goodColor;
+      ctx.fillText(`▲ +${money(c8)} Today`, w/2, 420);
+    } else if (c8 < 0) {
+      ctx.fillStyle = badColor;
+      ctx.fillText(`▼ -${money(Math.abs(c8))} Today`, w/2, 420);
+    } else {
+      ctx.fillStyle = textSec;
+      ctx.fillText("• Flat Market Today", w/2, 420);
+    }
+
+    ctx.fillStyle = borderCard;
+    ctx.fillRect(72, 460, w - 144, 1.5);
+
+    ctx.fillStyle = textSec;
+    ctx.font = "700 20px 'Plus Jakarta Sans'";
+    ctx.textAlign = "left";
+    ctx.fillText(`Rate Per Gram: ${money(r1)}/g`, 108, 514);
+
+    ctx.textAlign = "right";
+    ctx.fillText(`Standard 22K 91.6% Pure`, w - 108, 514);
+
+    const gy = 576, cw = (w - 144 - 24) / 3;
+    const purities = [
+      { l: "24K (99.9%)", v: money(Math.round(r1 * (24 / 22))), s: "Fine Gold" },
+      { l: "22K (91.6%)", v: money(r1), s: "Jewelry Standard" },
+      { l: "18K (75.0%)", v: money(Math.round(r1 * (18 / 22))), s: "Hallmarked" }
+    ];
+
+    purities.forEach((item, i) => {
+      const x = 72 + i * (cw + 12);
+      ctx.fillStyle = bgSurface;
+      ctx.beginPath();
+      ctx.roundRect(x, gy, cw, 220, 16);
+      ctx.fill();
+      ctx.strokeStyle = borderCard;
+      ctx.stroke();
+
+      ctx.fillStyle = textTert;
+      ctx.font = "800 18px 'Plus Jakarta Sans'";
+      ctx.textAlign = "center";
+      ctx.fillText(item.l, x + cw/2, gy + 52);
+
+      ctx.fillStyle = textMain;
+      ctx.font = "800 38px 'Plus Jakarta Sans'";
+      ctx.fillText(item.v, x + cw/2, gy + 120);
+
+      ctx.fillStyle = goldColor;
+      ctx.font = "600 19px 'Plus Jakarta Sans'";
+      ctx.fillText(item.s, x + cw/2, gy + 172);
+    });
+
+    const ty = 820, tw = (w - 144 - 16) / 2;
+    
+    ctx.fillStyle = bgSurface;
+    ctx.beginPath();
+    ctx.roundRect(72, ty, tw, 200, 16);
+    ctx.fill();
+    ctx.strokeStyle = $("amCard")?.classList.contains("is-active") ? goldColor : borderCard;
+    ctx.lineWidth = $("amCard")?.classList.contains("is-active") ? 2 : 1;
+    ctx.stroke();
+
+    ctx.fillStyle = textTert;
+    ctx.font = "800 19px 'Plus Jakarta Sans'";
+    ctx.textAlign = "left";
+    ctx.fillText("MORNING FIX (AM)", 100, ty + 48);
+
+    ctx.fillStyle = textMain;
+    ctx.font = "800 34px 'Plus Jakarta Sans'";
+    ctx.fillText($("amRate")?.textContent || "Pending", 100, ty + 110);
+
+    ctx.fillStyle = textTert;
+    ctx.font = "600 19px 'Plus Jakarta Sans'";
+    ctx.fillText($("amTime")?.textContent || "—", 100, ty + 158);
+
+    const px = 72 + tw + 16;
+    ctx.fillStyle = bgSurface;
+    ctx.beginPath();
+    ctx.roundRect(px, ty, tw, 200, 16);
+    ctx.fill();
+    ctx.strokeStyle = $("pmCard")?.classList.contains("is-active") ? goldColor : borderCard;
+    ctx.lineWidth = $("pmCard")?.classList.contains("is-active") ? 2 : 1;
+    ctx.stroke();
+
+    ctx.fillStyle = textTert;
+    ctx.font = "800 19px 'Plus Jakarta Sans'";
+    ctx.textAlign = "left";
+    ctx.fillText("EVENING FIX (PM)", px + 28, ty + 48);
+
+    ctx.fillStyle = textMain;
+    ctx.font = "800 34px 'Plus Jakarta Sans'";
+    ctx.fillText($("pmRate")?.textContent || "Pending", px + 28, ty + 110);
+
+    ctx.fillStyle = textTert;
+    ctx.font = "600 19px 'Plus Jakarta Sans'";
+    ctx.fillText($("pmTime")?.textContent || "—", px + 28, ty + 158);
+
+    ctx.fillStyle = textTert;
+    ctx.font = "700 20px 'Plus Jakarta Sans'";
+    ctx.textAlign = "center";
+    ctx.fillText("Gold 22k Terminal · LiveChennai + GoodReturns Feed", w/2, 1180);
+
+    cvs.toBlob(resolve, "image/png");
+  });
+}
+
+if ($("shareBtn")) {
+  $("shareBtn").onclick = async () => {
+    haptic(15);
+    if (!live) return;
+    const shareText = `💰 Gold 22K Rate (${dateText(live.date)})\n• 1 Gram: ${money(live.rate_22k)}\n• 1 Sovereign: ${money(live.rate_8g || live.rate_22k*8)}\nTrack live at: ${window.location.href}`;
+    try {
+      toast("Generating snapshot…");
+      const blob = await generateShareCardBlob();
+      if (blob && navigator.canShare && navigator.canShare({ files: [new File([blob], "gold.png", { type: "image/png" })] })) {
+        await navigator.share({ title: "Gold 22k", text: shareText, files: [new File([blob], `gold-${live.date}.png`, { type: "image/png" })] });
+      } else if (navigator.share) {
+        await navigator.share({ title: "Gold 22k", text: shareText });
+      } else {
+        navigator.clipboard?.writeText(shareText);
+        toast("Copied to clipboard!");
+      }
+    } catch(e) {
+      if (e.name !== "AbortError") {
+        navigator.clipboard?.writeText(shareText);
+        toast("Copied text!");
+      }
+    }
+  };
+}
+
+if ($("copyQuoteBtn")) {
+  $("copyQuoteBtn").onclick = async () => {
+    haptic(15);
+    if (!live) return;
+    const txt = `📜 GOLD PURCHASE ESTIMATE\nDate: ${dateText(live.date)}\n----------------------\n• Base Rate: ${money(live.rate_22k)}/g\n• Weight: ${$("weight")?.value || 8}g\n• Making (${$("making")?.value || 8}%): ${$("receiptMaking")?.textContent || "₹ 0"}\n• GST (${$("gstRate")?.value || 3}%): ${$("receiptGst")?.textContent || "₹ 0"}\n• Exchange: ${$("receiptOldGold")?.textContent || "-₹ 0"}\n----------------------\nNET TOTAL: ${$("calcResult")?.textContent || "—"}`;
+    navigator.clipboard?.writeText(txt);
+    toast("Quotation Copied!");
+  };
+}
+
+function renderStats() {
+  if (!history.length) return;
+  const vals = history.map(i => Number(i.rate_22k)), hi = Math.max(...vals), lo = Math.min(...vals);
+  if ($("high")) $("high").textContent = money(hi);
+  if ($("low")) $("low").textContent = money(lo);
+  if ($("highDate")) $("highDate").textContent = dateText(history.find(i => Number(i.rate_22k) === hi)?.date);
+  if ($("lowDate")) $("lowDate").textContent = dateText(history.find(i => Number(i.rate_22k) === lo)?.date);
+  if ($("historyCount")) $("historyCount").textContent = history.length.toLocaleString("en-IN") + " records";
+
+  if ($("historyBody")) {
+    $("historyBody").innerHTML = [...history].reverse().slice(0, 300).map(i => `<tr><td>${esc(dateText(i.date))}</td><td>${money(i.rate_22k)}</td><td>${money(i.rate_22k*8)}</td></tr>`).join("");
+  }
+  
+  if ($("dateA") && !$("dateA").value) $("dateA").value = history[0]?.date || "";
+  if ($("dateB") && !$("dateB").value) $("dateB").value = history[history.length-1]?.date || "";
+
+  compareDates();
+  updateFintechMetrics();
+  computeLastMovement();
+  calculate30DayAverageUpdateTimes();
+  drawChart();
+}
+
+function compareDates() {
+  if (!$("dateA") || !$("dateB") || !$("compareResult")) return;
+  const a = history.find(i => i.date === $("dateA").value);
+  const b = history.find(i => i.date === $("dateB").value);
+  
+  if (!a || !b) {
+    $("compareResult").innerHTML = `<span class="compare-result-top">Select valid dates</span><span class="compare-result-sub">—</span>`;
+    return;
+  }
+  const diff = b.rate_22k - a.rate_22k, pct = a.rate_22k ? (diff/a.rate_22k*100) : 0;
+  const isPos = diff > 0, isNeg = diff < 0;
+  
+  $("compareResult").innerHTML = `
+    <span class="compare-result-top">${money(a.rate_22k)} → ${money(b.rate_22k)}</span>
+    <span class="compare-result-sub ${isPos ? 'positive' : isNeg ? 'negative' : ''}">
+      ${diff >= 0 ? '+' : ''}${money(diff)}/g (${diff >= 0 ? '+' : ''}${pct.toFixed(2)}%)
+    </span>
+  `;
+}
+
+async function loadPublishedData(silent = false) {
+  const prevRate = live ? Number(live.rate_22k) : null;
+  const [latest, historical] = await Promise.all([getJSON(LIVE_URL), getJSON(HISTORY_URL)]);
+  history = normalize(historical);
+  renderLive(latest);
+  renderStats();
+  calculate();
+  localStorage.setItem("gold_live_backup", JSON.stringify(latest));
+  localStorage.setItem("gold_history_backup", JSON.stringify(history));
+
+  if (silent && prevRate !== null && Number.isFinite(Number(latest.rate_22k)) && Number(latest.rate_22k) !== prevRate) {
+    const dir = Number(latest.rate_22k) > prevRate ? "▲" : "▼";
+    haptic(25, 900);
+    toast(`Gold Rate Updated ${dir} ${money(latest.rate_22k)}/g`);
+  }
+
+  return latest;
+}
+
+async function triggerFailSafeScrape() {
+  try {
+    await fetch(WORKER_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ force: true, auto_hunt: true })
+    });
+  } catch(e) {
+    console.warn("Auto-scrape worker ping failed:", e);
+  }
+}
+
+async function runMarketCycleCheck(manualTrigger = false) {
+  if (fetchBusy) return;
+  const now = new Date();
+  const currentMinutes = now.getHours() * 60 + now.getMinutes();
+  const todayStr = todayLocalDateStr();
+
+  const isNearAmFix = (currentMinutes >= (predictedAmMinuteOfDay - 15) && currentMinutes <= (predictedAmMinuteOfDay + 45));
+  const isNearPmFix = (currentMinutes >= (predictedPmMinuteOfDay - 15) && currentMinutes <= (predictedPmMinuteOfDay + 45));
+
+  const needsAmUpdate = Boolean(isNearAmFix && (!live || live.date !== todayStr || !live.session || live.session === "PM"));
+  const needsPmUpdate = Boolean(isNearPmFix && (!live || live.date !== todayStr || live.session !== "PM"));
+
+  if (needsAmUpdate || needsPmUpdate) {
+    if (!isHighFrequency) {
+      isHighFrequency = true;
+      highFreqStartTime = Date.now();
+    }
+  }
+
+  if (isHighFrequency && (Date.now() - highFreqStartTime > 3600000)) {
+    isHighFrequency = false;
+  }
+
+  try {
+    if (isHighFrequency) {
+      setStatus("Hunting live rate (10s)…", false, false, true);
+    }
+
+    const latest = await getJSON(LIVE_URL);
+
+    const isRateChanged = Boolean(
+      latest && (!live || latest.date !== live.date || latest.session !== live.session || Number(latest.rate_22k) !== Number(live.rate_22k))
+    );
+
+    if (isRateChanged) {
+      const historical = await getJSON(HISTORY_URL);
+      history = normalize(historical);
+      renderLive(latest);
+      renderStats();
+      calculate();
+
+      localStorage.setItem("gold_live_backup", JSON.stringify(latest));
+      localStorage.setItem("gold_history_backup", JSON.stringify(history));
+
+      isHighFrequency = false;
+      setStatus("Synced at " + timeText(latest.time));
+      haptic(25, 900);
+      toast(`Rate Updated: ₹ ${Number(latest.rate_22k).toLocaleString("en-IN")}/g`);
+
+      if (syncChannel) {
+        syncChannel.postMessage({ type: "RATE_UPDATED", live: latest });
+      }
+    } else {
+      if (isHighFrequency) {
+        if ((Date.now() - highFreqStartTime) > 30000 && Math.random() < 0.3) {
+          triggerFailSafeScrape();
+        }
+      } else if (!manualTrigger) {
+        setStatus("Synced at " + (live ? timeText(live.time) : "live"));
+      }
+    }
+  } catch(e) {
+    if (manualTrigger) setStatus("Offline", true);
+  }
+
+  scheduleNextPoll();
+}
+
+function scheduleNextPoll() {
+  if (pollTimer) clearTimeout(pollTimer);
+  const interval = isHighFrequency ? 10000 : 60000;
+  pollTimer = setTimeout(() => {
+    if (document.visibilityState === "visible") {
+      runMarketCycleCheck(false);
+    } else {
+      scheduleNextPoll();
+    }
+  }, interval);
+}
+
+async function manualFetch() {
+  if (fetchBusy) return;
+  fetchBusy = true;
+  haptic(15);
+  setStatus("Connecting to Edge Worker…", false, true);
+  try {
+    const oldTs = live ? (live.last_checked_at || live.date+"|"+live.time) : "";
+    await fetch(WORKER_URL, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ force: true }) });
+    setStatus("Parsing live benchmark sources…", false, true);
+    let latest = await getJSON(LIVE_URL);
+    for (let i = 0; i < 8 && (latest.last_checked_at || latest.date + "|" + latest.time) === oldTs; i++) {
+      await sleep(1500);
+      latest = await getJSON(LIVE_URL);
+    }
+    history = normalize(await getJSON(HISTORY_URL));
+    renderLive(latest);
+    renderStats();
+    calculate();
+    localStorage.setItem("gold_live_backup", JSON.stringify(latest));
+    localStorage.setItem("gold_history_backup", JSON.stringify(history));
+    setStatus("Synced at " + timeText(latest.time));
+    toast("Market Synced");
+  } catch(e) { 
+    setStatus("Using offline cache", true, false); 
+    checkParserHealth({ error: "Live sync failed. Showing cached data." }); 
+    toast("Sync Failed"); 
+  }
+  finally { 
+    fetchBusy = false; 
+  }
+}
+
+if ($("fetchNow")) $("fetchNow").onclick = manualFetch;
+
+document.querySelectorAll("#ranges button").forEach(b => b.onclick = () => {
+  haptic(8);
+  document.querySelectorAll("#ranges button").forEach(x => x.classList.remove("active"));
+  b.classList.add("active");
+  selectedRange = b.dataset.range === "all" ? "all" : Number(b.dataset.range);
+  drawChart();
+});
+
+["dateA", "dateB"].forEach(id => {
+  if ($(id)) $(id).addEventListener("change", compareDates);
+});
+
+["weight", "budget", "making", "gstRate", "flatFee", "oldWeight", "oldPurity"].forEach(id => {
+  if ($(id)) $(id).addEventListener("input", calculate);
+});
+
+if (syncChannel) {
+  syncChannel.onmessage = (event) => {
+    if (event.data && event.data.type === "RATE_UPDATED") {
+      loadPublishedData(true).catch(() => {});
+    }
+  };
+}
+
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible") {
+    runMarketCycleCheck(false);
+  }
+});
+window.addEventListener("focus", () => runMarketCycleCheck(false));
+window.addEventListener("pageshow", () => runMarketCycleCheck(false));
+window.addEventListener("online", () => runMarketCycleCheck(false));
+window.addEventListener("resize", drawChart);
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', drawChart);
+
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker
+      .register("sw.js?v=" + Date.now())
+      .then((reg) => reg.update())
+      .catch((e) => console.warn("Service worker register skipped:", e));
+  });
+}
+
+(function setupPullToRefresh() {
+  const PULL_THRESHOLD = 64, PULL_MAX = 90;
+  const pulldown = $("pulldown"), pulldownText = $("pulldownText");
+  let startY = null, dragging = false, ready = false;
+
+  function atTop() { return (window.scrollY || 0) <= 0 && (document.scrollingElement ? document.scrollingElement.scrollTop : 0) <= 0; }
+  
+  function resetPulldown() {
+    if (!pulldown) return;
+    pulldown.classList.remove("visible", "ready", "loading");
+    pulldown.style.transform = "";
+    if (pulldownText) pulldownText.textContent = "Pull to refresh";
+    startY = null; dragging = false; ready = false;
+  }
+
+  document.addEventListener("touchstart", event => {
+    if (fetchBusy || event.target.closest(".table-wrap") || !atTop()) return;
+    startY = event.touches[0].clientY;
+    dragging = true; ready = false;
+  }, { passive: true });
+
+  document.addEventListener("touchmove", event => {
+    if (!dragging || startY === null) return;
+    if (!atTop()) { resetPulldown(); return; }
+    
+    const delta = event.touches[0].clientY - startY;
+    if (delta <= 0) return;
+    if (event.cancelable) event.preventDefault();
+    
+    const pulled = Math.min(delta * 0.5, PULL_MAX);
+    if (pulldown) {
+      pulldown.classList.add("visible");
+      pulldown.style.transform = `translate(-50%, ${pulled - 70}px)`;
+      ready = pulled >= PULL_THRESHOLD * 0.5;
+      pulldown.classList.toggle("ready", ready);
+    }
+    if (pulldownText) pulldownText.textContent = ready ? "Release to sync" : "Pull to refresh";
+    setStatus(ready ? "Release to sync market" : "Pulling to refresh…", false, true);
+  }, { passive: false });
+
+  document.addEventListener("touchend", () => {
+    if (!dragging) return;
+    if (ready && !fetchBusy) {
+      if (pulldown) {
+        pulldown.classList.add("loading");
+        pulldown.classList.remove("ready");
+        pulldown.style.transform = "translate(-50%, 14px)";
+      }
+      if (pulldownText) pulldownText.textContent = "Syncing…";
+      manualFetch().finally(resetPulldown);
+    } else {
+      resetPulldown();
+      setStatus("Synced at " + (live ? timeText(live.time) : "live"));
+    }
+    dragging = false; startY = null;
+  }, { passive: true });
+
+  document.addEventListener("touchcancel", resetPulldown, { passive: true });
+})();
+
+(async function init() {
+  try { 
+    setStatus("Checking live feed…", false, true);
+    await loadPublishedData(); 
+    setStatus("Synced at " + (live ? timeText(live.time) : "live"));
+    scheduleNextPoll();
+  }
+  catch(e) {
+    try {
+      const savedHistory = JSON.parse(localStorage.getItem("gold_history_backup") || "[]");
+      const savedLive = JSON.parse(localStorage.getItem("gold_live_backup") || "null");
+      if (Array.isArray(savedHistory) && savedHistory.length > 0) {
+        history = normalize(savedHistory);
+      }
+      if (savedLive) {
+        renderLive(savedLive);
+      }
+      if (history.length) renderStats();
+      calculate();
+      setStatus("Cached data loaded");
+      scheduleNextPoll();
+    } catch(err) {
+      setStatus("Offline", true);
+    }
+  }
+})();
+</script>
+</body>
+</html>
