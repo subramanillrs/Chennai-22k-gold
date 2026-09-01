@@ -53,6 +53,27 @@ PM_END = (20, 0)
 
 
 # ============================================================
+# ALERTING / HEALTH CHECK
+# ============================================================
+
+ALERT_FILE = DATA_DIR / "alert_state.json"
+SUMMARY_FILE = DATA_DIR / "summary.json"
+
+# If live.json hasn't been successfully written in this many hours,
+# something is wrong with both scrapers (site down, blocked, HTML
+# structure changed, etc.) — worth a human looking at it.
+ALERT_STALE_HOURS = 20
+
+# If LiveChennai and GoodReturns have disagreed continuously for this
+# long, one of the parsers is likely broken or reading a stale page.
+ALERT_DISAGREE_HOURS = 3
+
+# Don't repeat the same alert more often than this, even if the
+# condition is still true on every subsequent run.
+ALERT_COOLDOWN_HOURS = 12
+
+
+# ============================================================
 # HTTP SESSION
 # ============================================================
 
@@ -883,6 +904,8 @@ def save_history(
 
         "timestamp": current.isoformat(),
 
+        "session": session_for_time(current, None),
+
         "rate_22k": int(rate),
 
         "rate_8g": int(rate * 8),
@@ -1143,6 +1166,223 @@ def save_live(
         LIVE_FILE,
         output
     )
+
+
+# ============================================================
+# ALERTING (webhook notifications for stuck feed / disagreement)
+# ============================================================
+
+def send_alert(title, message):
+    """
+    POSTs a notification to ALERT_WEBHOOK_URL if that secret/env var is
+    set. Sends both "text" and "content" keys so this works out of the
+    box with Slack incoming webhooks (text) and Discord webhooks
+    (content) without extra config; unused keys are ignored by both.
+    If no webhook is configured, just logs to the Actions log instead
+    of failing.
+    """
+
+    webhook = os.environ.get("ALERT_WEBHOOK_URL")
+
+    if not webhook:
+        print(f"ALERT (no ALERT_WEBHOOK_URL configured): {title} — {message}")
+        return
+
+    body = f"{title}\n{message}"
+
+    payload = {
+        "text": body,
+        "content": body,
+    }
+
+    try:
+        requests.post(webhook, json=payload, timeout=10)
+        print(f"Alert sent: {title}")
+
+    except Exception as exc:
+        print(f"Failed to send alert webhook: {exc}")
+
+
+def _hours_since(iso_string, now):
+    if not iso_string:
+        return None
+
+    try:
+        then = datetime.fromisoformat(iso_string)
+        return (now - then).total_seconds() / 3600
+    except Exception:
+        return None
+
+
+def run_health_check():
+    """
+    Looks at the CURRENT data/live.json + data/alert_state.json and
+    decides whether to fire an alert. Safe to call on every run,
+    success or failure — it never raises past its own boundary
+    (callers still wrap it defensively too).
+    """
+
+    now = now_ist()
+
+    state = load_json(ALERT_FILE, {})
+    if not isinstance(state, dict):
+        state = {}
+
+    live = load_json(LIVE_FILE, {})
+    if not isinstance(live, dict):
+        live = {}
+
+    changed_state = False
+
+    # --------------------------------------------------------
+    # 1. Stale feed: live.json hasn't been successfully written
+    #    (by save_live, which always sets last_checked) in too long.
+    # --------------------------------------------------------
+
+    hours_since_checked = _hours_since(live.get("last_checked"), now)
+
+    if hours_since_checked is not None and hours_since_checked >= ALERT_STALE_HOURS:
+
+        cooldown_ok = True
+        last_alert_hours = _hours_since(state.get("last_stale_alert_at"), now)
+        if last_alert_hours is not None and last_alert_hours < ALERT_COOLDOWN_HOURS:
+            cooldown_ok = False
+
+        if cooldown_ok:
+            send_alert(
+                "Gold Rate Feed Stale",
+                f"No successful rate update in {hours_since_checked:.1f} hours. "
+                "LiveChennai and/or GoodReturns may be unreachable, blocking "
+                "the scraper, or their page structure may have changed."
+            )
+            state["last_stale_alert_at"] = now.isoformat()
+            changed_state = True
+
+    elif state.get("last_stale_alert_at") is not None:
+        # Feed recovered — clear so the next stale spell can alert again.
+        state["last_stale_alert_at"] = None
+        changed_state = True
+
+    # --------------------------------------------------------
+    # 2. Sustained source disagreement.
+    # --------------------------------------------------------
+
+    agreement = live.get("agreement")
+
+    if agreement is False:
+
+        if not state.get("disagree_since"):
+            state["disagree_since"] = now.isoformat()
+            changed_state = True
+
+        disagree_hours = _hours_since(state.get("disagree_since"), now) or 0
+
+        if disagree_hours >= ALERT_DISAGREE_HOURS:
+
+            cooldown_ok = True
+            last_alert_hours = _hours_since(state.get("last_disagree_alert_at"), now)
+            if last_alert_hours is not None and last_alert_hours < ALERT_COOLDOWN_HOURS:
+                cooldown_ok = False
+
+            if cooldown_ok:
+                send_alert(
+                    "Gold Rate Sources Disagreeing",
+                    f"LiveChennai and GoodReturns have disagreed for over "
+                    f"{disagree_hours:.1f} hours. Current live rate: "
+                    f"{format_rupees(live.get('rate_22k'))}. One parser may "
+                    "need attention."
+                )
+                state["last_disagree_alert_at"] = now.isoformat()
+                changed_state = True
+
+    elif state.get("disagree_since") is not None:
+        state["disagree_since"] = None
+        changed_state = True
+
+    if changed_state:
+        save_json(ALERT_FILE, state)
+
+
+# ============================================================
+# SERVER-SIDE SUMMARY STATS (monthly/yearly avg, all-time high/low)
+# ============================================================
+
+def compute_and_save_summary():
+    """
+    Reads data/history.json and writes data/summary.json with
+    pre-computed stats, so the front end doesn't need to crunch the
+    whole history array on every page load just to show a high/low
+    or a monthly average.
+    """
+
+    existing = load_json(HISTORY_FILE, [])
+    records = extract_history_records(existing)
+
+    valid = []
+
+    for r in records:
+
+        if not isinstance(r, dict):
+            continue
+
+        rate = r.get("rate_22k")
+        date_str = r.get("date")
+
+        if not isinstance(rate, (int, float)) or not date_str:
+            continue
+
+        valid.append((date_str, int(rate)))
+
+    if not valid:
+        print("No history records available yet — skipping summary.")
+        return
+
+    now = now_ist()
+    current_month = now.strftime("%Y-%m")
+    current_year = now.strftime("%Y")
+
+    all_time_high = max(valid, key=lambda item: item[1])
+    all_time_low = min(valid, key=lambda item: item[1])
+
+    month_vals = [v for d, v in valid if d.startswith(current_month)]
+    year_vals = [v for d, v in valid if d.startswith(current_year)]
+
+    last_30 = valid[-30:] if len(valid) > 30 else valid
+    last_30_vals = [v for _, v in last_30]
+
+    def bucket(vals):
+        if not vals:
+            return {"average_22k": None, "high": None, "low": None}
+        return {
+            "average_22k": round(sum(vals) / len(vals)),
+            "high": max(vals),
+            "low": min(vals),
+        }
+
+    summary = {
+        "generated_at": now.isoformat(),
+
+        "all_time_high": {
+            "rate_22k": all_time_high[1],
+            "date": all_time_high[0],
+        },
+
+        "all_time_low": {
+            "rate_22k": all_time_low[1],
+            "date": all_time_low[0],
+        },
+
+        "current_month": {"month": current_month, **bucket(month_vals)},
+        "current_year": {"year": current_year, **bucket(year_vals)},
+        "last_30_records": bucket(last_30_vals),
+
+        "total_records": len(valid),
+    }
+
+    save_json(SUMMARY_FILE, summary)
+
+    print("Summary stats saved:")
+    print(json.dumps(summary, indent=2))
 
 
 # ============================================================
@@ -1892,3 +2132,21 @@ if __name__ == "__main__":
         )
 
         sys.exit(1)
+
+    finally:
+
+        # Runs after every attempt — success, failure, or interrupt —
+        # so a stuck feed or persistent source disagreement always gets
+        # evaluated, and the summary file stays in sync with whatever
+        # history.json currently holds. Wrapped so a problem here can
+        # never mask the real exit code from the block above.
+
+        try:
+            run_health_check()
+        except Exception as exc:
+            print(f"Health check failed (non-fatal): {exc}")
+
+        try:
+            compute_and_save_summary()
+        except Exception as exc:
+            print(f"Summary computation failed (non-fatal): {exc}")
