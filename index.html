@@ -355,10 +355,17 @@ html[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
   cursor: pointer;
 }
 .warning-banner[hidden] { display: none !important; }
+.warning-banner.stale-banner {
+  background: var(--gold-tint);
+  border-color: var(--gold-border);
+  color: var(--gold-primary);
+  cursor: default;
+}
 .warning-content { display: flex; flex-direction: column; gap: 2px; width: 100%; }
 .warning-content strong { font-size: 12px; font-weight: 800; display: flex; justify-content: space-between; line-height: 1.2; }
 .warning-content p { font-size: 11px; font-weight: 600; line-height: 1.35; }
 .dismiss-text { font-size: 9.5px; opacity: 0.8; text-transform: uppercase; font-weight: 800; }
+.stale-banner p { color: var(--text-secondary); }
 
 /* Redesigned Hero Card */
 /* Redesigned Hero Card — premium focal point */
@@ -803,6 +810,7 @@ html[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
 .chartmeta {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   font-size: 10.5px;
   font-weight: 700;
   color: var(--text-tertiary);
@@ -810,6 +818,25 @@ html[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
   padding-top: 10px;
   width: 100%;
 }
+
+.chart-legend {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 9.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-tertiary);
+}
+.chart-legend i {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+.chart-legend i.dot-am { background: #38bdf8; }
+.chart-legend i.dot-pm { background: var(--gold-primary); margin-left: 6px; }
 
 /* Collapsible Units */
 details.collapsible {
@@ -1448,6 +1475,13 @@ footer {
     </div>
   </div>
 
+  <div class="warning-banner stale-banner" id="staleWarning" hidden>
+    <div class="warning-content">
+      <strong>Showing Previous Close</strong>
+      <p>No new fix published yet today — next update expected around 8:30 AM IST.</p>
+    </div>
+  </div>
+
   <div hidden><button id="fetchNow"></button></div>
 
   <!-- Redesigned Main Column (Hero) -->
@@ -1565,6 +1599,7 @@ footer {
       </div>
       <div class="chartmeta">
         <span id="chartStart">—</span>
+        <span class="chart-legend"><i class="dot-am"></i>AM<i class="dot-pm"></i>PM</span>
         <span id="chartEnd">—</span>
       </div>
     </div>
@@ -1942,15 +1977,25 @@ function renderLive(d) {
   $("hero8").textContent = money(rate8);
   $("hero1").innerHTML = `${money(rate)} <span id="change1" class="change-pill mini same"></span>`;
   $("today").textContent = dateText(d.date);
-  $("todayTime").textContent = timeText(d.time);
-  
+  const isFreshToday = d.date === todayLocalDateStr();
+  $("todayTime").textContent = timeText(d.time) + (isFreshToday ? "" : " · Previous Close");
+  if ($("staleWarning")) $("staleWarning").hidden = isFreshToday;
+
+  // International-standard rule: a "session" is only real when the SOURCE says
+  // so (via d.session, or the timestamp on the data itself). We never infer a
+  // fresh AM session purely from the client's current wall-clock time — that's
+  // what caused the AM card to light up at 1 AM using yesterday's PM figure.
+  // Until the source actually publishes a new fix, we keep showing the last
+  // known session (PM = previous close), the same way a stock ticker shows
+  // "previous close" outside market hours instead of guessing a new session.
   let currentSession = d.session;
-  if (!currentSession && d.time) {
-    const hr = parseInt(d.time.split(":")[0]);
-    currentSession = hr < 14 ? "AM" : "PM";
-  }
   if (!currentSession) {
-    currentSession = new Date().getHours() < 14 ? "AM" : "PM";
+    if (d.time) {
+      const hr = parseInt(String(d.time).split(":")[0], 10);
+      currentSession = hr < 14 ? "AM" : "PM";
+    } else {
+      currentSession = "PM";
+    }
   }
   $("session").textContent = currentSession + " Fix";
 
@@ -1971,9 +2016,32 @@ function renderLive(d) {
   renderTodayTimeline();
 }
 
+function todayLocalDateStr() {
+  const d0 = new Date();
+  const y = d0.getFullYear(), m = String(d0.getMonth() + 1).padStart(2, "0"), day = String(d0.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+
 function renderTodayTimeline() {
   if (!live) return;
   const today = live.date;
+
+  // If the most recent published rate isn't actually dated today, then by
+  // definition NEITHER of today's fixes has happened yet — the hero card can
+  // still show that rate as the last available price, but the "Today's
+  // Market Activity" panel should read Pending/Pending rather than lighting
+  // up a fix (AM or PM) that belongs to a previous day.
+  const isFreshToday = today === todayLocalDateStr();
+  if (!isFreshToday) {
+    $("amRate").textContent = "Pending";
+    $("amTime").textContent = "—";
+    $("pmRate").textContent = "Pending";
+    $("pmTime").textContent = "—";
+    $("amCard").classList.remove("is-active");
+    $("pmCard").classList.remove("is-active");
+    return;
+  }
+
   let am = null, pm = null;
 
   // 1. Direct structured properties
@@ -2024,7 +2092,7 @@ function renderTodayTimeline() {
 
   // 4. Session & time attribution
   const sessionUpper = String(live.session || "").toUpperCase();
-  const timeHour = live.time ? parseInt(String(live.time).split(":")[0], 10) : new Date().getHours();
+  const timeHour = live.time ? parseInt(String(live.time).split(":")[0], 10) : null;
 
   if (!am && (sessionUpper === "AM" || sessionUpper.includes("MORNING"))) {
     am = { rate_22k: Number(live.rate_22k), time: live.time || "10:30" };
@@ -2040,9 +2108,12 @@ function renderTodayTimeline() {
     }
   }
 
-  // 6. Time-based heuristic
+  // 6. Time-based heuristic — anchored ONLY to the data's own timestamp
+  // (live.time), never to the client's current wall-clock. We already know
+  // live.date === today at this point, so this purely decides whether
+  // today's single published rate so far is the AM or PM fix.
   if (!am && !pm && live.rate_22k) {
-    if (timeHour < 14) {
+    if (timeHour !== null && timeHour < 14) {
       am = { rate_22k: Number(live.rate_22k), time: live.time || "10:30" };
     } else {
       pm = { rate_22k: Number(live.rate_22k), time: live.time || "17:00" };
@@ -2180,6 +2251,24 @@ function drawChart() {
   ctx.lineCap = "round";
   ctx.lineJoin = "round";
   ctx.stroke();
+
+  // AM / PM Fix Markers — small dots along the line, colored by session.
+  // Uses the "session" field the backend now writes; falls back to a
+  // simple hour check for older records saved before that field existed.
+  // Skipped when there are too many points to keep the line readable.
+  if (data.length <= 60) {
+    data.forEach((rec, i) => {
+      let session = rec.session;
+      if (!session) {
+        const hr = rec.time ? parseInt(String(rec.time).split(":")[0], 10) : null;
+        session = (hr !== null && hr < 14) ? "AM" : "PM";
+      }
+      ctx.beginPath();
+      ctx.arc(points[i].x, points[i].y, 2.4, 0, Math.PI * 2);
+      ctx.fillStyle = session === "AM" ? "#38bdf8" : colorGold;
+      ctx.fill();
+    });
+  }
 
   // Active or Latest Indicator Point
   const activeIdx = (scrubIndex >= 0 && scrubIndex < data.length) ? scrubIndex : data.length - 1;
@@ -2601,7 +2690,8 @@ function compareDates() {
   `;
 }
 
-async function loadPublishedData() {
+async function loadPublishedData(silent = false) {
+  const prevRate = live ? Number(live.rate_22k) : null;
   const [latest, historical] = await Promise.all([getJSON(LIVE_URL), getJSON(HISTORY_URL)]);
   history = normalize(historical);
   renderLive(latest);
@@ -2609,6 +2699,14 @@ async function loadPublishedData() {
   calculate();
   localStorage.setItem("gold_live_backup", JSON.stringify(latest));
   localStorage.setItem("gold_history_backup", JSON.stringify(history));
+
+  // Rate-changed notification — only for quiet background refreshes
+  // (auto-poll, tab refocus), not the very first load on app open.
+  if (silent && prevRate !== null && Number.isFinite(Number(latest.rate_22k)) && Number(latest.rate_22k) !== prevRate) {
+    const dir = Number(latest.rate_22k) > prevRate ? "▲" : "▼";
+    toast(`Gold Rate Updated ${dir} ${money(latest.rate_22k)}/g`);
+  }
+
   return latest;
 }
 
@@ -2655,10 +2753,19 @@ document.querySelectorAll("#ranges button").forEach(b => b.onclick = () => {
 ["dateA", "dateB"].forEach(id => $(id).addEventListener("change", compareDates));
 ["weight", "budget", "making", "gstRate", "flatFee", "oldWeight", "oldPurity"].forEach(id => $(id).addEventListener("input", calculate));
 
-document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") loadPublishedData().catch(()=>{}); });
-window.addEventListener("pageshow", () => { loadPublishedData().catch(()=>{}); });
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") loadPublishedData(true).catch(()=>{}); });
+window.addEventListener("pageshow", () => { loadPublishedData(true).catch(()=>{}); });
 window.addEventListener("resize", drawChart);
 window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', drawChart);
+
+// Quiet background refresh every 5 minutes while the tab is open and
+// visible, so a new AM/PM fix shows up (with a toast) without the user
+// having to background/reopen the app or pull-to-refresh manually.
+setInterval(() => {
+  if (document.visibilityState === "visible" && !fetchBusy) {
+    loadPublishedData(true).catch(() => {});
+  }
+}, 5 * 60 * 1000);
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
