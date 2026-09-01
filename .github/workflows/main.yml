@@ -4,11 +4,13 @@ on:
   workflow_dispatch:
 
   schedule:
-    # 08:30 AM IST = 03:00 UTC
-    - cron: "0 3 * * *"
+    # Fires ~30 min before the 9:30 AM predicted fix (window opens 9:15 IST)
+    # 08:45 AM IST = 03:15 UTC
+    - cron: "15 3 * * *"
 
-    # 05:00 PM IST = 11:30 UTC
-    - cron: "30 11 * * *"
+    # Fires ~30 min before the 4:30 PM predicted fix (window opens 16:15 IST)
+    # 03:45 PM IST = 10:15 UTC
+    - cron: "15 10 * * *"
 
 permissions:
   contents: write
@@ -92,8 +94,8 @@ jobs:
           echo "Starting update_gold.py..."
           echo ""
           echo "Scheduled runs:"
-          echo "AM : 08:30 IST"
-          echo "PM : 17:00 IST"
+          echo "AM : ~9:30 IST (window opens 9:15)"
+          echo "PM : ~4:30 IST (window opens 16:15)"
           echo ""
           echo "During monitoring:"
           echo "LiveChennai + GoodReturns checked every 10 seconds."
@@ -144,6 +146,12 @@ jobs:
             echo "alert_state.json missing - will be created on first health check"
           fi
 
+          if [ -f data/health_status.json ]; then
+            echo "health_status.json: OK"
+          else
+            echo "health_status.json missing - will be created on first health check"
+          fi
+
       # ----------------------------------------------------
       # SHOW LIVE DATA
       # ----------------------------------------------------
@@ -185,6 +193,22 @@ jobs:
           fi
 
       # ----------------------------------------------------
+      # SHOW HEALTH STATUS
+      # ----------------------------------------------------
+      - name: Show health status
+        shell: bash
+        run: |
+          echo "============================================================"
+          echo "HEALTH STATUS"
+          echo "============================================================"
+
+          if [ -f data/health_status.json ]; then
+            cat data/health_status.json
+          else
+            echo "No health_status.json yet."
+          fi
+
+      # ----------------------------------------------------
       # SAVE UPDATED DATA
       # ----------------------------------------------------
       - name: Save updated data
@@ -198,6 +222,7 @@ jobs:
           git add data/monitoring_windows.json
           git add data/summary.json 2>/dev/null || true
           git add data/alert_state.json 2>/dev/null || true
+          git add data/health_status.json 2>/dev/null || true
 
           if git diff --cached --quiet; then
             echo "No data changes to commit."
