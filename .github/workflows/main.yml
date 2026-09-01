@@ -80,6 +80,7 @@ jobs:
           GITHUB_ACTIONS: "true"
           GITHUB_EVENT_NAME: ${{ github.event_name }}
           FORCE_FETCH: ${{ steps.mode.outputs.force_fetch }}
+          ALERT_WEBHOOK_URL: ${{ secrets.ALERT_WEBHOOK_URL }}
         shell: bash
         run: |
           echo "============================================================"
@@ -131,6 +132,18 @@ jobs:
             echo '{}' > data/monitoring_windows.json
           fi
 
+          if [ -f data/summary.json ]; then
+            echo "summary.json: OK"
+          else
+            echo "summary.json missing - will be created once history exists"
+          fi
+
+          if [ -f data/alert_state.json ]; then
+            echo "alert_state.json: OK"
+          else
+            echo "alert_state.json missing - will be created on first health check"
+          fi
+
       # ----------------------------------------------------
       # SHOW LIVE DATA
       # ----------------------------------------------------
@@ -156,6 +169,22 @@ jobs:
           cat data/monitoring_windows.json
 
       # ----------------------------------------------------
+      # SHOW SUMMARY STATS
+      # ----------------------------------------------------
+      - name: Show summary stats
+        shell: bash
+        run: |
+          echo "============================================================"
+          echo "SUMMARY STATS"
+          echo "============================================================"
+
+          if [ -f data/summary.json ]; then
+            cat data/summary.json
+          else
+            echo "No summary.json yet."
+          fi
+
+      # ----------------------------------------------------
       # SAVE UPDATED DATA
       # ----------------------------------------------------
       - name: Save updated data
@@ -167,6 +196,8 @@ jobs:
           git add data/live.json
           git add data/history.json
           git add data/monitoring_windows.json
+          git add data/summary.json 2>/dev/null || true
+          git add data/alert_state.json 2>/dev/null || true
 
           if git diff --cached --quiet; then
             echo "No data changes to commit."
