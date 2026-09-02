@@ -1,230 +1,2103 @@
-name: Monitor and Update Chennai 22K Gold
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#faf7f0" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#14120e" media="(prefers-color-scheme: dark)">
+<meta name="description" content="22K Gold Price Tracker & Valuation Dashboard">
 
-on:
-  workflow_dispatch:
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Gold 22k rate">
 
-  schedule:
-    # Window opens 9:15 IST (03:45 UTC)
-    - cron: "45 3 * * *"
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg">
 
-    # Window opens 16:15 IST (10:45 UTC)
-    - cron: "45 10 * * *"
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,440;9..144,600;9..144,680&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-permissions:
-  contents: write
+<title>Gold 22k rate</title>
 
-jobs:
-  update:
-    runs-on: ubuntu-latest
-    timeout-minutes: 210
+<style>
+:root {
+  color-scheme: light dark;
+  --font-display: "Fraunces", "Iowan Old Style", "Georgia", serif;
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 
-    steps:
+  --r-xs: 3px;
+  --r-sm: 5px;
+  --r-md: 8px;
+  --r-lg: 12px;
+  --r-full: 9999px;
 
-      # ----------------------------------------------------
-      # CHECKOUT
-      # ----------------------------------------------------
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 1
+  --paper: #faf7f0;
+  --paper-raised: #ffffff;
+  --paper-sunken: #f2ede1;
 
-      # ----------------------------------------------------
-      # PYTHON
-      # ----------------------------------------------------
-      - name: Set up Python
-        uses: actions/setup-python@v6
-        with:
-          python-version: "3.12"
+  --rule: #ddd4c2;
+  --rule-strong: #c7bba3;
 
-      # ----------------------------------------------------
-      # PIP CACHE
-      # ----------------------------------------------------
-      - name: Cache pip packages
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-requests-bs4
-          restore-keys: |
-            ${{ runner.os }}-pip-
+  --ink: #1c1712;
+  --ink-soft: #6b6255;
+  --ink-faint: #a89d88;
 
-      # ----------------------------------------------------
-      # DEPENDENCIES
-      # ----------------------------------------------------
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install requests beautifulsoup4
+  --gold: #9c7a3c;
+  --gold-deep: #6b5223;
+  --gold-tint: rgba(156, 122, 60, 0.1);
+  --gold-line: rgba(156, 122, 60, 0.35);
 
-      # ----------------------------------------------------
-      # DETERMINE FETCH MODE
-      # ----------------------------------------------------
-      - name: Determine fetch mode
-        id: mode
-        shell: bash
-        run: |
-          echo "Event: ${{ github.event_name }}"
+  --good: #3f6e4a;
+  --good-bg: #e3ecdf;
+  --bad: #a13f34;
+  --bad-bg: #f3e2de;
 
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            echo "force_fetch=true" >> "$GITHUB_OUTPUT"
-            echo "Manual Fetch button detected."
-          else
-            echo "force_fetch=false" >> "$GITHUB_OUTPUT"
-            echo "Scheduled run detected."
-          fi
+  --shadow-card: 0 1px 2px rgba(28, 23, 18, 0.04), 0 8px 24px -12px rgba(28, 23, 18, 0.12);
+  --transition: 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+}
 
-      # ----------------------------------------------------
-      # MONITOR AND UPDATE
-      # ----------------------------------------------------
-      - name: Monitor and update Chennai 22K rate
-        env:
-          GITHUB_ACTIONS: "true"
-          GITHUB_EVENT_NAME: ${{ github.event_name }}
-          FORCE_FETCH: ${{ steps.mode.outputs.force_fetch }}
-          ALERT_WEBHOOK_URL: ${{ secrets.ALERT_WEBHOOK_URL }}
-        shell: bash
-        run: |
-          echo "============================================================"
-          echo "CHENNAI 22K GOLD RATE MONITOR"
-          echo "============================================================"
-          echo "Event: $GITHUB_EVENT_NAME"
-          echo "Force fetch: $FORCE_FETCH"
-          echo ""
-          echo "Starting update_gold.py..."
-          echo ""
-          echo "Scheduled runs:"
-          echo "AM : ~9:30 IST (window opens 9:15)"
-          echo "PM : ~4:30 IST (window opens 16:15)"
-          echo ""
-          echo "During monitoring:"
-          echo "LiveChennai + GoodReturns checked every 10 seconds."
-          echo "============================================================"
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #14120e;
+    --paper-raised: #1c1912;
+    --paper-sunken: #100e0a;
+    --rule: #2a2620;
+    --rule-strong: #3a342a;
+    --ink: #f2ede2;
+    --ink-soft: #a89d88;
+    --ink-faint: #6b6255;
+    --gold: #c9a356;
+    --gold-deep: #e8c988;
+    --gold-tint: rgba(201, 163, 86, 0.12);
+    --gold-line: rgba(201, 163, 86, 0.3);
+    --good: #7bab84;
+    --good-bg: rgba(63, 110, 74, 0.18);
+    --bad: #d18376;
+    --bad-bg: rgba(161, 63, 52, 0.18);
+    --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px -12px rgba(0, 0, 0, 0.5);
+  }
+}
 
-          python update_gold.py
+html[data-theme="light"] {
+  --paper: #faf7f0; --paper-raised: #ffffff; --paper-sunken: #f2ede1;
+  --rule: #ddd4c2; --rule-strong: #c7bba3;
+  --ink: #1c1712; --ink-soft: #6b6255; --ink-faint: #a89d88;
+  --gold: #9c7a3c; --gold-deep: #6b5223;
+  --gold-tint: rgba(156, 122, 60, 0.1); --gold-line: rgba(156, 122, 60, 0.35);
+  --good: #3f6e4a; --good-bg: #e3ecdf; --bad: #a13f34; --bad-bg: #f3e2de;
+  --shadow-card: 0 1px 2px rgba(28, 23, 18, 0.04), 0 8px 24px -12px rgba(28, 23, 18, 0.12);
+}
 
-      # ----------------------------------------------------
-      # VERIFY DATA
-      # ----------------------------------------------------
-      - name: Verify generated data
-        shell: bash
-        run: |
-          echo "============================================================"
-          echo "VERIFYING GENERATED DATA"
-          echo "============================================================"
+html[data-theme="dark"] {
+  --paper: #14120e; --paper-raised: #1c1912; --paper-sunken: #100e0a;
+  --rule: #2a2620; --rule-strong: #3a342a;
+  --ink: #f2ede2; --ink-soft: #a89d88; --ink-faint: #6b6255;
+  --gold: #c9a356; --gold-deep: #e8c988;
+  --gold-tint: rgba(201, 163, 86, 0.12); --gold-line: rgba(201, 163, 86, 0.3);
+  --good: #7bab84; --good-bg: rgba(63, 110, 74, 0.18); --bad: #d18376; --bad-bg: rgba(161, 63, 52, 0.18);
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px -12px rgba(0, 0, 0, 0.5);
+}
 
-          if [ -f data/live.json ]; then
-            echo "live.json: OK"
-          else
-            echo "ERROR: data/live.json is missing"
-            exit 1
-          fi
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
-          if [ -f data/history.json ]; then
-            echo "history.json: OK"
-          else
-            echo "history.json missing - creating empty file"
-            echo "[]" > data/history.json
-          fi
+html {
+  font-family: var(--font-sans);
+  background-color: var(--paper);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+  touch-action: pan-y;
+}
 
-          if [ -f data/monitoring_windows.json ]; then
-            echo "monitoring_windows.json: OK"
-          else
-            echo "monitoring_windows.json missing - creating file"
-            echo '{}' > data/monitoring_windows.json
-          fi
+body { display: flex; justify-content: center; min-height: 100vh; overflow-x: hidden; user-select: none; -webkit-user-select: none; }
+input, select { user-select: auto; -webkit-user-select: auto; }
+button, input, select { font-family: inherit; color: inherit; border: none; background: none; outline: none; }
 
-          if [ -f data/summary.json ]; then
-            echo "summary.json: OK"
-          else
-            echo "summary.json missing - will be created once history exists"
-          fi
+.num, td, .amount { font-variant-numeric: tabular-nums lining-nums; }
 
-          if [ -f data/alert_state.json ]; then
-            echo "alert_state.json: OK"
-          else
-            echo "alert_state.json missing - will be created on first health check"
-          fi
+.app {
+  width: 100%;
+  max-width: 600px;
+  padding: calc(20px + env(safe-area-inset-top)) 20px calc(40px + env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
 
-          if [ -f data/health_status.json ]; then
-            echo "health_status.json: OK"
-          else
-            echo "health_status.json missing - will be created on first health check"
-          fi
+/* Masthead & Brand Badge */
+.masthead {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--ink);
+}
 
-      # ----------------------------------------------------
-      # SHOW LIVE DATA
-      # ----------------------------------------------------
-      - name: Show current live data
-        shell: bash
-        run: |
-          echo "============================================================"
-          echo "CURRENT LIVE DATA"
-          echo "============================================================"
+.brand-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
 
-          cat data/live.json
+.brand-badge {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--r-sm);
+  background: linear-gradient(135deg, var(--gold), var(--gold-deep));
+  color: #ffffff;
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(156, 122, 60, 0.35);
+  flex-shrink: 0;
+  user-select: none;
+}
 
-      # ----------------------------------------------------
-      # SHOW MONITORING WINDOW
-      # ----------------------------------------------------
-      - name: Show monitoring window
-        shell: bash
-        run: |
-          echo "============================================================"
-          echo "MONITORING WINDOW"
-          echo "============================================================"
+.masthead-title {
+  font-family: var(--font-display);
+  font-size: clamp(20px, 5.5vw, 26px);
+  font-weight: 600;
+  font-style: italic;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  line-height: 1;
+}
 
-          cat data/monitoring_windows.json
+.masthead-actions { display: flex; align-items: center; gap: 8px; }
 
-      # ----------------------------------------------------
-      # SHOW SUMMARY STATS
-      # ----------------------------------------------------
-      - name: Show summary stats
-        shell: bash
-        run: |
-          echo "============================================================"
-          echo "SUMMARY STATS"
-          echo "============================================================"
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 26px;
+  padding: 0 11px;
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--r-full);
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--ink-soft);
+  white-space: nowrap;
+  max-width: 150px;
+}
+.status-pill span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--good); flex-shrink: 0; animation: pulse-ring 2s infinite; }
+.status-pill.offline .status-dot { background: var(--bad); animation: none; }
+.status-pill.syncing .status-dot { background: var(--gold); animation: spin 0.8s linear infinite; border-radius: 1px; }
 
-          if [ -f data/summary.json ]; then
-            cat data/summary.json
-          else
-            echo "No summary.json yet."
-          fi
+@keyframes pulse-ring { 0% { transform: scale(0.9); opacity: 0.75; } 50% { transform: scale(1.2); opacity: 1; } 100% { transform: scale(0.9); opacity: 0.75; } }
+@keyframes spin { to { transform: rotate(360deg); } }
 
-      # ----------------------------------------------------
-      # SHOW HEALTH STATUS
-      # ----------------------------------------------------
-      - name: Show health status
-        shell: bash
-        run: |
-          echo "============================================================"
-          echo "HEALTH STATUS"
-          echo "============================================================"
+.theme-toggle {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 26px; height: 26px; flex-shrink: 0;
+  border: 1px solid var(--rule-strong); border-radius: 50%;
+  color: var(--ink-soft); cursor: pointer; transition: all var(--transition);
+}
+.theme-toggle:active { transform: scale(0.9); background: var(--paper-sunken); }
+.theme-toggle svg { width: 13px; height: 13px; }
+.theme-toggle .icon-sun { display: none; }
+.theme-toggle .icon-moon { display: block; }
+html[data-theme="dark"] .theme-toggle .icon-sun { display: block; }
+html[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
 
-          if [ -f data/health_status.json ]; then
-            cat data/health_status.json
-          else
-            echo "No health_status.json yet."
-          fi
+/* Collapsible Feed Health Status */
+.health-collapsible {
+  background: var(--paper-raised);
+  border: 1px solid var(--rule);
+  border-radius: var(--r-sm);
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+}
+.health-collapsible summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+}
+.health-collapsible summary::-webkit-details-marker { display: none; }
+.health-summary-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding-right: 10px;
+}
+.health-summary-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.feed-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--good); flex-shrink: 0; }
+.health-collapsible.status-stale .feed-dot { background: var(--gold); }
+.health-collapsible.status-disagreeing .feed-dot { background: var(--bad); }
+.health-title { font-size: 12px; font-weight: 700; color: var(--ink); }
+.health-badge {
+  font-size: 9.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 3px 8px;
+  border-radius: var(--r-full);
+  background: var(--good-bg);
+  color: var(--good);
+}
+.health-collapsible.status-stale .health-badge { background: var(--gold-tint); color: var(--gold-deep); }
+.health-collapsible.status-disagreeing .health-badge { background: var(--bad-bg); color: var(--bad); }
+.health-collapsible .collapsible-content {
+  padding: 10px 14px;
+  border-top: 1px dashed var(--rule);
+  font-size: 11.5px;
+  color: var(--ink-soft);
+  line-height: 1.45;
+  background: var(--paper-sunken);
+}
 
-      # ----------------------------------------------------
-      # SAVE UPDATED DATA
-      # ----------------------------------------------------
-      - name: Save updated data
-        shell: bash
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+/* Notice Banners */
+.notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 1px solid var(--bad);
+  border-left-width: 3px;
+  color: var(--bad);
+  background: var(--bad-bg);
+  width: 100%;
+  cursor: pointer;
+}
+.notice[hidden] { display: none !important; }
+.notice.notice-gold { border-color: var(--gold-line); background: var(--gold-tint); color: var(--gold-deep); cursor: default; }
+.notice-body { display: flex; flex-direction: column; gap: 2px; width: 100%; }
+.notice-body strong { font-size: 12.5px; font-weight: 700; display: flex; justify-content: space-between; }
+.notice-body p { font-size: 11.5px; font-weight: 500; line-height: 1.4; color: var(--ink-soft); }
+.notice-dismiss { font-size: 9.5px; opacity: 0.75; font-weight: 600; }
 
-          git add data/live.json
-          git add data/history.json
-          git add data/monitoring_windows.json
-          git add data/summary.json 2>/dev/null || true
-          git add data/alert_state.json 2>/dev/null || true
-          git add data/health_status.json 2>/dev/null || true
+/* Hero Section */
+.hero {
+  background: var(--paper-raised);
+  border: 1px solid var(--rule);
+  border-radius: var(--r-lg);
+  padding: 26px 22px 20px;
+  box-shadow: var(--shadow-card);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  text-align: center;
+  position: relative;
+}
+.hero-eyebrow {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 13.5px;
+  font-weight: 440;
+  color: var(--gold-deep);
+}
+.hero-price {
+  font-family: var(--font-display);
+  font-size: clamp(42px, 11vw, 62px);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  color: var(--ink);
+}
+.hero-rule {
+  width: 100%;
+  height: 1px;
+  background: var(--rule);
+  margin: 2px 0;
+}
+.hero-foot {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  gap: 16px;
+}
+.hero-foot-col { display: flex; flex-direction: column; gap: 2px; flex: 1; text-align: left; }
+.hero-foot-col:last-child { text-align: right; }
+.hero-foot-label { font-size: 10px; font-weight: 600; color: var(--ink-faint); }
+.hero-foot-val { font-family: var(--font-display); font-size: 15px; font-weight: 600; color: var(--ink); display: flex; align-items: center; gap: 5px; }
+.hero-foot-col:last-child .hero-foot-val { justify-content: flex-end; }
+.hero-foot-sub { font-size: 10.5px; font-weight: 500; color: var(--ink-soft); }
 
-          if git diff --cached --quiet; then
-            echo "No data changes to commit."
-          else
-            git commit -m "Update Chennai 22K gold rate"
-            git push
-          fi
+.share-link {
+  position: absolute;
+  top: 18px; right: 18px;
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 11px; font-weight: 600; color: var(--ink-soft);
+  cursor: pointer; padding: 4px;
+}
+
+/* Sections & Panels */
+.section { display: flex; flex-direction: column; gap: 10px; width: 100%; }
+.section-head { display: flex; align-items: baseline; justify-content: space-between; }
+.section-head h3 {
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 600;
+  font-style: italic;
+  color: var(--ink);
+}
+.section-head span { font-size: 11px; font-weight: 500; color: var(--ink-faint); }
+
+.panel {
+  background: var(--paper-raised);
+  border: 1px solid var(--rule);
+  border-radius: var(--r-md);
+  padding: 14px 16px;
+  width: 100%;
+}
+
+.purity-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  width: 100%;
+  padding: 10px 0;
+}
+.purity-cell {
+  display: flex; flex-direction: column; gap: 3px;
+  padding: 0 10px;
+  border-right: 1px solid var(--rule);
+  text-align: center;
+}
+.purity-cell:last-child { border-right: none; }
+.purity-cell small { font-size: 10px; font-weight: 600; color: var(--ink-faint); }
+.purity-cell b { font-family: var(--font-display); font-size: 14.5px; font-weight: 600; color: var(--ink); }
+
+.ledger { display: flex; flex-direction: column; width: 100%; }
+.ledger-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 10px 2px;
+  border-bottom: 1px solid var(--rule);
+  gap: 12px;
+}
+.ledger-row:last-child { border-bottom: none; }
+.ledger-key { font-size: 12px; font-weight: 500; color: var(--ink-soft); flex-shrink: 0; }
+.ledger-val { font-family: var(--font-display); font-size: 14px; font-weight: 600; color: var(--ink); text-align: right; }
+.ledger-val-stack { display: flex; flex-direction: column; align-items: flex-end; gap: 1px; }
+.ledger-val-stack small { font-size: 10px; font-weight: 500; color: var(--ink-soft); }
+
+/* AM / PM Timeline */
+.timeline-horizontal { display: grid; grid-template-columns: 1fr 1fr; gap: 0; width: 100%; }
+.timeline-card {
+  padding: 10px 14px;
+  display: flex; flex-direction: column; gap: 4px;
+  border-right: 1px solid var(--rule);
+}
+.timeline-card:last-child { border-right: none; }
+.timeline-card-header { display: flex; align-items: center; justify-content: space-between; }
+.timeline-card-header .lbl { font-size: 10px; font-weight: 600; color: var(--ink-faint); }
+.timeline-node { width: 7px; height: 7px; border-radius: 50%; background: var(--rule-strong); flex-shrink: 0; }
+.timeline-card.is-active .timeline-node { background: var(--gold); }
+.timeline-card b { font-family: var(--font-display); font-size: 16.5px; font-weight: 600; color: var(--ink); }
+.timeline-card small { font-size: 11px; font-weight: 500; color: var(--ink-soft); }
+.next-fix-line { display: flex; align-items: center; gap: 6px; margin-top: 4px; padding: 10px 14px 0; border-top: 1px solid var(--rule); font-size: 11px; font-weight: 500; color: var(--ink-faint); }
+.next-fix-line[hidden] { display: none !important; }
+.next-fix-line svg { width: 12px; height: 12px; flex-shrink: 0; }
+
+/* Chart Panel */
+.chart-panel { display: flex; flex-direction: column; gap: 14px; }
+.segment-ctrl {
+  display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 0;
+  border: 1px solid var(--rule); border-radius: var(--r-sm); overflow: hidden;
+}
+.segment-ctrl button {
+  height: 28px; font-size: 10.5px; font-weight: 600; color: var(--ink-soft);
+  cursor: pointer; border-right: 1px solid var(--rule);
+  display: flex; align-items: center; justify-content: center;
+}
+.segment-ctrl button:last-child { border-right: none; }
+.segment-ctrl button.active { background: var(--ink); color: var(--paper); font-weight: 700; }
+
+.chart-header-metrics { display: flex; justify-content: space-between; align-items: flex-end; padding-bottom: 12px; border-bottom: 1px solid var(--rule); }
+.primary-metric span { display: block; font-size: 10px; font-weight: 600; color: var(--ink-faint); margin-bottom: 3px; }
+.primary-metric strong { font-family: var(--font-display); font-size: 19px; font-weight: 600; }
+.primary-metric strong.positive { color: var(--good); }
+.primary-metric strong.negative { color: var(--bad); }
+.secondary-metrics { display: flex; gap: 16px; }
+.sec-metric { display: flex; flex-direction: column; align-items: flex-end; }
+.sec-metric span { font-size: 9.5px; font-weight: 600; color: var(--ink-faint); margin-bottom: 3px; }
+.sec-metric b { font-family: var(--font-display); font-size: 14px; font-weight: 600; color: var(--ink); }
+
+.chartwrap { width: 100%; height: 200px; position: relative; touch-action: none; margin: 2px 0; }
+.chartwrap canvas { width: 100%; height: 100%; display: block; }
+.chartmeta { display: flex; justify-content: space-between; align-items: center; font-size: 10px; font-weight: 500; color: var(--ink-faint); border-top: 1px solid var(--rule); padding-top: 10px; }
+.chart-legend { display: inline-flex; align-items: center; gap: 4px; font-size: 9.5px; font-weight: 600; color: var(--ink-faint); }
+.chart-legend i { display: inline-block; width: 5px; height: 5px; border-radius: 50%; }
+.chart-legend i.dot-am { background: #6b8cae; }
+.chart-legend i.dot-pm { background: var(--gold); margin-left: 6px; }
+
+/* Collapsibles */
+details.collapsible { background: var(--paper-raised); border: 1px solid var(--rule); border-radius: var(--r-md); overflow: hidden; width: 100%; }
+details.collapsible summary { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; cursor: pointer; list-style: none; user-select: none; }
+details.collapsible summary::-webkit-details-marker { display: none; }
+.summary-title { display: flex; align-items: baseline; justify-content: space-between; width: 100%; padding-right: 12px; }
+.summary-title h3 { font-family: var(--font-display); font-size: 15.5px; font-weight: 600; font-style: italic; color: var(--ink); }
+.summary-title span { font-size: 11px; font-weight: 500; color: var(--ink-faint); }
+.chevron { font-size: 10px; color: var(--ink-faint); transition: transform var(--transition); flex-shrink: 0; }
+details[open] .chevron { transform: rotate(180deg); }
+.collapsible-content { padding: 0 16px 16px; border-top: 1px solid var(--rule); padding-top: 14px; display: flex; flex-direction: column; gap: 14px; }
+
+.horizon-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; }
+.horizon-box { display: flex; flex-direction: column; gap: 3px; padding: 8px 4px; border-right: 1px solid var(--rule); border-bottom: 1px solid var(--rule); text-align: center; }
+.horizon-box:nth-child(3n) { border-right: none; }
+.horizon-box:nth-last-child(-n+3) { border-bottom: none; }
+.horizon-box small { font-size: 9.5px; font-weight: 600; color: var(--ink-faint); }
+.horizon-box b { font-family: var(--font-display); font-size: 14px; font-weight: 600; color: var(--ink); }
+
+.change-pill { display: inline-flex; align-items: center; gap: 4px; font-size: 11.5px; font-weight: 700; padding: 4px 10px; border-radius: var(--r-full); }
+.change-pill.up { background: var(--good-bg); color: var(--good); }
+.change-pill.down { background: var(--bad-bg); color: var(--bad); }
+.change-pill.same { background: var(--paper-sunken); color: var(--ink-soft); }
+.change-pill.mini { font-size: 9.5px; padding: 2px 7px; }
+
+#change8.change-pill {
+  background: none; padding: 0; font-size: 13px; font-weight: 600;
+  display: inline-flex; align-items: center; gap: 5px;
+}
+#change8.change-pill.up { color: var(--good); }
+#change8.change-pill.down { color: var(--bad); }
+#change8.change-pill.same { color: var(--ink-faint); }
+
+.last-box { display: flex; justify-content: space-between; align-items: center; }
+.last-box h4 { font-family: var(--font-display); font-size: 13px; font-weight: 600; font-style: italic; color: var(--ink); margin-bottom: 2px; }
+.last-box p { font-size: 11px; font-weight: 500; color: var(--ink-soft); }
+.last-box .amount { font-family: var(--font-display); font-size: 18px; font-weight: 600; }
+
+/* Compare Dates */
+.compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%; }
+.compare-field { display: flex; flex-direction: column; }
+.compare-field label { font-size: 10.5px; font-weight: 600; color: var(--ink-faint); margin-bottom: 6px; }
+.compare-result-panel { margin-top: 4px; padding-top: 14px; border-top: 1px solid var(--rule); display: flex; flex-direction: column; gap: 8px; }
+.compare-result-label { font-size: 10.5px; font-weight: 600; color: var(--ink-faint); }
+.compare-result-card {
+  min-height: 54px; padding: 12px 14px; background: var(--paper-sunken);
+  border: 1px solid var(--rule); border-radius: var(--r-sm);
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+}
+.compare-result-top { font-family: var(--font-display); font-size: 14px; font-weight: 600; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.compare-result-sub { font-size: 11.5px; font-weight: 700; padding: 5px 10px; border-radius: var(--r-full); background: var(--paper-raised); color: var(--ink-soft); white-space: nowrap; flex-shrink: 0; }
+.compare-result-sub.positive { color: var(--good); background: var(--good-bg); }
+.compare-result-sub.negative { color: var(--bad); background: var(--bad-bg); }
+
+/* Calculator */
+.calc-suite { display: flex; flex-direction: column; gap: 16px; }
+.calc-segmented-mode { display: flex; border: 1px solid var(--rule); border-radius: var(--r-sm); overflow: hidden; }
+.calc-mode-btn { flex: 1; height: 36px; font-size: 11.5px; font-weight: 600; color: var(--ink-soft); cursor: pointer; border-right: 1px solid var(--rule); }
+.calc-mode-btn:last-child { border-right: none; }
+.calc-mode-btn.active { background: var(--ink); color: var(--paper); }
+
+.calc-group { display: flex; flex-direction: column; gap: 6px; }
+.calc-group-label { font-size: 10.5px; font-weight: 600; color: var(--ink-faint); }
+.chip-container { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip {
+  height: 28px; padding: 0 11px; border: 1px solid var(--rule);
+  border-radius: var(--r-full); font-size: 11px; font-weight: 600; color: var(--ink-soft); cursor: pointer;
+}
+.chip.active { background: var(--gold-tint); border-color: var(--gold-line); color: var(--gold-deep); }
+
+.calc-grid-form { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.calc-field { display: flex; flex-direction: column; }
+.calc-field label { font-size: 10.5px; font-weight: 600; color: var(--ink-faint); margin-bottom: 6px; }
+.calc-input {
+  width: 100%; height: 40px; padding: 0 12px;
+  background: var(--paper-sunken); border: 1px solid var(--rule); border-radius: var(--r-xs);
+  font-size: 13px; font-weight: 600; color: var(--ink);
+  display: flex; align-items: center; transition: border-color var(--transition);
+}
+.calc-input:focus { background: var(--paper-raised); border-color: var(--gold); }
+input[type="date"].calc-input { color-scheme: light; line-height: normal; }
+html[data-theme="dark"] input[type="date"].calc-input { color-scheme: dark; }
+@media (prefers-color-scheme: dark) { input[type="date"].calc-input { color-scheme: dark; } }
+html[data-theme="light"] input[type="date"].calc-input { color-scheme: light; }
+input[type="date"].calc-input::-webkit-calendar-picker-indicator { cursor: pointer; opacity: 0.6; }
+select.calc-input {
+  cursor: pointer; appearance: none; -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b6255' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 12px center; padding-right: 30px;
+}
+
+.exchange-drawer { border-top: 1px solid var(--rule); padding-top: 14px; display: flex; flex-direction: column; gap: 10px; }
+.exchange-header { font-size: 10.5px; font-weight: 600; color: var(--ink-faint); }
+
+.receipt-card { border: 1px solid var(--rule); border-radius: var(--r-sm); padding: 14px; background: var(--paper-sunken); }
+.receipt-title { font-family: var(--font-display); font-size: 13px; font-weight: 600; font-style: italic; color: var(--ink); margin-bottom: 8px; }
+.receipt-line { display: flex; justify-content: space-between; font-size: 12px; font-weight: 500; color: var(--ink-soft); padding: 4px 0; }
+.receipt-line.deduction span:last-child { color: var(--good); }
+.receipt-total { display: flex; justify-content: space-between; align-items: baseline; margin-top: 8px; padding-top: 10px; border-top: 1px solid var(--rule); }
+.receipt-total .label { font-size: 12px; font-weight: 600; color: var(--ink); }
+.receipt-total .final-val { font-family: var(--font-display); font-size: 21px; font-weight: 600; color: var(--gold-deep); }
+.quote-btn { width: 100%; height: 40px; margin-top: 12px; background: var(--ink); color: var(--paper); border-radius: var(--r-xs); font-size: 12px; font-weight: 700; cursor: pointer; }
+.quote-btn:active { opacity: 0.85; }
+
+/* Historical Log Table */
+.table-wrap { padding: 0; overflow: hidden; }
+.history-table { width: 100%; border-collapse: collapse; max-height: 360px; display: block; overflow-y: auto; }
+.history-table thead, .history-table tbody { display: table; width: 100%; table-layout: fixed; }
+.history-table th {
+  position: sticky; top: 0; background: var(--paper-sunken); padding: 10px 8px;
+  font-size: 10px; font-weight: 600; color: var(--ink-faint); border-bottom: 1px solid var(--rule); text-align: center;
+}
+.history-table td { padding: 11px 8px; border-bottom: 1px solid var(--rule); font-weight: 600; text-align: center; color: var(--ink); font-family: var(--font-display); }
+.history-table tr:last-child td { border-bottom: none; }
+.history-table tr:hover td { background-color: var(--paper-sunken); }
+.history-table th:nth-child(1), .history-table td:nth-child(1),
+.history-table th:nth-child(2), .history-table td:nth-child(2),
+.history-table th:nth-child(3), .history-table td:nth-child(3) { width: 33.333%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* Pull to Refresh */
+.pulldown {
+  position: fixed;
+  top: env(safe-area-inset-top);
+  left: 50%;
+  transform: translate(-50%, -70px);
+  background: var(--paper-raised);
+  border: 1px solid var(--rule-strong);
+  padding: 7px 15px;
+  border-radius: var(--r-full);
+  box-shadow: var(--shadow-card);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ink-soft);
+  z-index: 150;
+  opacity: 0;
+  transition: opacity var(--transition);
+}
+.pulldown.visible { opacity: 1; }
+.pulldownicon { display: inline-flex; }
+.pulldownicon .icon-spin { display: none; }
+.pulldown.loading .icon-idle { display: none; }
+.pulldown.loading .icon-spin { display: block; animation: spin 0.7s linear infinite; }
+.pulldown.ready .pulldownicon { transform: rotate(180deg); }
+
+footer { text-align: center; font-size: 10.5px; font-weight: 500; color: var(--ink-faint); padding-top: 6px; }
+
+.toast {
+  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px);
+  background: var(--ink); color: var(--paper); font-size: 12.5px; font-weight: 600;
+  padding: 11px 18px; border-radius: var(--r-full); opacity: 0; pointer-events: none;
+  transition: all var(--transition); z-index: 100; white-space: nowrap; box-shadow: var(--shadow-card);
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+  <div class="pulldown" id="pulldown" aria-hidden="true">
+    <span class="pulldownicon" id="pulldownIcon">
+      <svg class="icon-idle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="13" height="13"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><polyline points="21 3 21 9 15 9"/></svg>
+      <svg class="icon-spin" viewBox="0 0 24 24" fill="none" width="13" height="13"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="34 22"/></svg>
+    </span>
+    <span id="pulldownText">Pull to refresh</span>
+  </div>
+
+  <header class="masthead">
+    <div class="brand-wrap">
+      <div class="brand-badge" aria-hidden="true">Au</div>
+      <div class="masthead-title">Gold 22k rate</div>
+    </div>
+    <div class="masthead-actions">
+      <div class="status-pill" id="status">
+        <span class="status-dot"></span>
+        <span id="statusText">Checking live feed…</span>
+      </div>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle dark mode">
+        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Collapsible Feed Health Status -->
+  <details class="collapsible health-collapsible" id="healthCard" hidden>
+    <summary>
+      <div class="health-summary-inner">
+        <div class="health-summary-left">
+          <span class="feed-dot" id="healthDot"></span>
+          <span class="health-title" id="healthTitle">Feed healthy</span>
+        </div>
+        <span class="health-badge" id="healthBadge">OK</span>
+      </div>
+      <span class="chevron">▼</span>
+    </summary>
+    <div class="collapsible-content" id="healthSub">
+      All sources reporting normally.
+    </div>
+  </details>
+
+  <div class="notice" id="parserWarning" hidden onclick="this.hidden = true;">
+    <div class="notice-body">
+      <strong id="warningTitle">Notice <span class="notice-dismiss">Tap to dismiss</span></strong>
+      <p id="warningDesc">Checking feed connection…</p>
+    </div>
+  </div>
+
+  <div class="notice notice-gold" id="staleWarning" hidden>
+    <div class="notice-body">
+      <strong>Showing previous close</strong>
+      <p id="staleDesc">No new fix published yet today — next update expected around 10:20 AM IST.</p>
+    </div>
+  </div>
+
+  <div hidden><button id="fetchNow"></button></div>
+
+  <!-- Hero Section -->
+  <section class="hero" id="heroCard">
+    <span class="share-link" id="shareBtn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+      Share
+    </span>
+
+    <span class="hero-eyebrow">One sovereign, eight grams</span>
+    <div class="hero-price" id="hero8">₹ —</div>
+    <div id="change8" class="change-pill same">No change</div>
+
+    <div class="hero-rule"></div>
+
+    <div class="hero-foot">
+      <div class="hero-foot-col">
+        <span class="hero-foot-label">Rate per gram</span>
+        <div class="hero-foot-val" id="hero1">₹ — <span id="change1" class="change-pill mini same"></span></div>
+        <span class="hero-foot-sub">1 gram benchmark</span>
+      </div>
+      <div class="hero-foot-col">
+        <span class="hero-foot-label">Market date</span>
+        <div class="hero-foot-val" id="today">—</div>
+        <span class="hero-foot-sub" id="todayTime">—</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Purity ledger row -->
+  <div class="panel purity-row">
+    <div class="purity-cell">
+      <small>24K · 99.9%</small>
+      <b id="purity24">₹ —</b>
+    </div>
+    <div class="purity-cell">
+      <small>22K · 91.6%</small>
+      <b id="purity22">₹ —</b>
+    </div>
+    <div class="purity-cell">
+      <small>18K · 75.0%</small>
+      <b id="purity18">₹ —</b>
+    </div>
+  </div>
+
+  <!-- Session / Peak / Floor -->
+  <div class="panel">
+    <div class="ledger">
+      <div class="ledger-row">
+        <span class="ledger-key">Current session</span>
+        <span class="ledger-val" id="session">—</span>
+      </div>
+      <div class="ledger-row">
+        <span class="ledger-key">3-year peak</span>
+        <span class="ledger-val-stack">
+          <span class="ledger-val" id="high">—</span>
+          <small id="highDate">—</small>
+        </span>
+      </div>
+      <div class="ledger-row">
+        <span class="ledger-key">3-year floor</span>
+        <span class="ledger-val-stack">
+          <span class="ledger-val" id="low">—</span>
+          <small id="lowDate">—</small>
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Today's Market Activity -->
+  <section class="section">
+    <div class="section-head">
+      <h3>Today's market</h3>
+    </div>
+    <div class="panel">
+      <div class="timeline-horizontal">
+         <div class="timeline-card" id="amCard">
+            <div class="timeline-card-header">
+               <span class="lbl">Morning Fix (AM)</span>
+               <div class="timeline-node" id="amNode"></div>
+            </div>
+            <b id="amRate">Pending</b>
+            <small id="amTime">—</small>
+         </div>
+         <div class="timeline-card" id="pmCard">
+            <div class="timeline-card-header">
+               <span class="lbl">Evening Fix (PM)</span>
+               <div class="timeline-node" id="pmNode"></div>
+            </div>
+            <b id="pmRate">Pending</b>
+            <small id="pmTime">—</small>
+         </div>
+      </div>
+      <div class="next-fix-line" id="nextFixLine" hidden>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <span id="nextFixText">—</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Price History Trend Chart -->
+  <section class="section">
+    <div class="section-head">
+      <h3>Price history</h3>
+      <span id="chartCount">—</span>
+    </div>
+
+    <div class="panel chart-panel">
+      <div class="segment-ctrl" id="ranges">
+        <button data-range="7">7D</button>
+        <button class="active" data-range="30">30D</button>
+        <button data-range="90">3M</button>
+        <button data-range="180">6M</button>
+        <button data-range="365">1Y</button>
+        <button data-range="1095">3Y</button>
+        <button data-range="all">ALL</button>
+      </div>
+
+      <div class="chart-header-metrics">
+        <div class="primary-metric">
+          <span id="chartMetricLabel">Period Performance</span>
+          <strong id="periodChange">—</strong>
+        </div>
+        <div class="secondary-metrics">
+          <div class="sec-metric">
+            <span>High</span>
+            <b id="periodHigh">—</b>
+          </div>
+          <div class="sec-metric">
+            <span>Low</span>
+            <b id="periodLow">—</b>
+          </div>
+        </div>
+      </div>
+
+      <div class="chartwrap">
+        <canvas id="chart"></canvas>
+      </div>
+      <div class="chartmeta">
+        <span id="chartStart">—</span>
+        <span class="chart-legend"><i class="dot-am"></i>AM<i class="dot-pm"></i>PM</span>
+        <span id="chartEnd">—</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Multi-Horizon & Indicators -->
+  <div style="display:flex; flex-direction:column; gap: 12px;">
+    <details class="collapsible">
+      <summary><div class="summary-title"><h3>Returns by period</h3><span>Multi-horizon</span></div><span class="chevron">▼</span></summary>
+      <div class="collapsible-content">
+        <div class="horizon-grid">
+          <div class="horizon-box"><small>1W</small><b id="ret1W">—</b></div>
+          <div class="horizon-box"><small>1M</small><b id="ret1M">—</b></div>
+          <div class="horizon-box"><small>3M</small><b id="ret3M">—</b></div>
+          <div class="horizon-box"><small>6M</small><b id="ret6M">—</b></div>
+          <div class="horizon-box"><small>1Y</small><b id="ret1Y">—</b></div>
+          <div class="horizon-box"><small>3Y</small><b id="ret3Y">—</b></div>
+        </div>
+      </div>
+    </details>
+
+    <details class="collapsible">
+      <summary><div class="summary-title"><h3>Moving average</h3><span>30-day trend</span></div><span class="chevron">▼</span></summary>
+      <div class="collapsible-content">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <div><span style="font-size:10.5px; font-weight:600; color:var(--ink-faint);">30-day average</span><br><b id="smaValue" style="font-family: var(--font-display); font-size:16px; font-weight:600; margin-top:2px; display:block;">₹ —</b></div>
+          <div class="change-pill same" id="smaPill">Calculating…</div>
+        </div>
+      </div>
+    </details>
+    
+    <div class="panel last-box">
+      <div>
+        <h4>Last movement</h4>
+        <p id="lastDate">Analyzing…</p>
+        <p id="lastTime" style="font-size:11px; margin-top:1px;">—</p>
+      </div>
+      <div class="amount" id="lastAmount">—</div>
+    </div>
+  </div>
+
+  <!-- Compare Historical Dates -->
+  <details class="collapsible">
+    <summary><div class="summary-title"><h3>Compare dates</h3><span>Tap to open</span></div><span class="chevron">▼</span></summary>
+    <div class="collapsible-content">
+      <div class="compare-grid">
+        <div class="compare-field">
+          <label>Earlier Date</label>
+          <input class="calc-input" type="date" id="dateA">
+        </div>
+        <div class="compare-field">
+          <label>Later Date</label>
+          <input class="calc-input" type="date" id="dateB">
+        </div>
+      </div>
+      <div class="compare-result-panel">
+        <span class="compare-result-label">Net comparison</span>
+        <div class="compare-result-card" id="compareResult">
+          <span class="compare-result-top">Select two dates</span>
+          <span class="compare-result-sub">—</span>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <!-- Jewelry Purchase & Exchange Suite -->
+  <section class="section">
+    <div class="section-head">
+      <h3>Jewelry calculator</h3>
+    </div>
+    <div class="panel">
+      <div class="calc-suite">
+        
+        <div class="calc-segmented-mode">
+          <button class="calc-mode-btn active" type="button" data-mode="value">Calculate Price by Weight</button>
+          <button class="calc-mode-btn" type="button" data-mode="grams">Calculate Weight by Budget</button>
+          <select id="calcMode" hidden>
+            <option value="value" selected>Calculate Price for Weight</option>
+            <option value="grams">Calculate Weight for Budget</option>
+          </select>
+        </div>
+
+        <div class="calc-group">
+          <span class="calc-group-label">Standard Gold Weight</span>
+          <div class="chip-container" id="weightChips">
+            <button class="chip" data-val="1" type="button">1g</button>
+            <button class="chip" data-val="4" type="button">4g (Half)</button>
+            <button class="chip active" data-val="8" type="button">8g (1 Sov)</button>
+            <button class="chip" data-val="16" type="button">16g (2 Sov)</button>
+            <button class="chip" data-val="24" type="button">24g (3 Sov)</button>
+            <button class="chip" data-val="50" type="button">50g</button>
+            <button class="chip" data-val="100" type="button">100g</button>
+          </div>
+        </div>
+
+        <div class="calc-group">
+          <span class="calc-group-label">Jewelry Category & Making Charges</span>
+          <div class="chip-container" id="makingChips">
+            <button class="chip" data-val="3.0" type="button">Coin (3%)</button>
+            <button class="chip active" data-val="8.0" type="button">Plain Jewelry (8%)</button>
+            <button class="chip" data-val="12.0" type="button">Stone / Studded (12%)</button>
+            <button class="chip" data-val="16.0" type="button">Antique / Temple (16%)</button>
+          </div>
+        </div>
+
+        <div class="calc-grid-form">
+          <div class="calc-field" id="weightField">
+            <label>Gold Weight (Grams)</label>
+            <input class="calc-input" id="weight" type="number" inputmode="decimal" value="8" step="0.01">
+          </div>
+          <div class="calc-field" id="budgetField" style="display: none;">
+            <label>Total Budget (₹)</label>
+            <input class="calc-input" id="budget" type="number" inputmode="decimal" value="100000" step="100">
+          </div>
+          <div class="calc-field">
+            <label>Making Charge (%)</label>
+            <input class="calc-input" id="making" type="number" inputmode="decimal" value="8.0" step="0.1">
+          </div>
+          <div class="calc-field">
+            <label>GST on Jewelry (%)</label>
+            <input class="calc-input" id="gstRate" type="number" inputmode="decimal" value="3.0" step="0.1">
+          </div>
+          <div class="calc-field">
+            <label>Hallmarking / Fee (₹)</label>
+            <input class="calc-input" id="flatFee" type="number" inputmode="decimal" value="45" step="1">
+          </div>
+        </div>
+
+        <div class="exchange-drawer">
+          <span class="exchange-header">Old Gold Scrap Exchange (Optional)</span>
+          <div class="calc-grid-form">
+            <div class="calc-field">
+              <label>Scrap Weight (g)</label>
+              <input class="calc-input" id="oldWeight" type="number" inputmode="decimal" value="0" step="0.01">
+            </div>
+            <div class="calc-field">
+              <label>Scrap Purity</label>
+              <select class="calc-input" id="oldPurity">
+                <option value="22" selected>22K (91.6% Pure)</option>
+                <option value="18">18K (75.0% Pure)</option>
+                <option value="24">24K (99.9% Pure)</option>
+                <option value="20">84.0% Standard Melt</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="receipt-card">
+          <div class="receipt-title">Itemized Purchase Quotation</div>
+          <div class="receipt-line"><span>Base 22K Gold Cost:</span><span id="receiptBase">₹ 0</span></div>
+          <div class="receipt-line"><span id="receiptMakingLabel">Making Charges (8%):</span><span id="receiptMaking">₹ 0</span></div>
+          <div class="receipt-line"><span id="receiptGstLabel">GST (3%):</span><span id="receiptGst">₹ 0</span></div>
+          <div class="receipt-line"><span>Hallmarking / Flat Fees:</span><span id="receiptFee">₹ 0</span></div>
+          <div class="receipt-line deduction" id="receiptOldGoldLine" style="display:none;"><span>Old Gold Exchange Credit:</span><span id="receiptOldGold">-₹ 0</span></div>
+          
+          <div class="receipt-total">
+            <span class="label" id="receiptTotalLabel">Net Payable Amount</span>
+            <span class="final-val" id="calcResult">₹ —</span>
+          </div>
+          <div style="font-size:10.5px; font-weight:600; color:var(--ink-faint); text-align:right; margin-top:2px;" id="calcSub">Based on live 22K rate.</div>
+
+          <button class="quote-btn" id="copyQuoteBtn" type="button">Copy Quotation Slip</button>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Historical Log Table -->
+  <section class="section">
+    <div class="section-head">
+      <h3>Historical Log</h3>
+      <span id="historyCount">—</span>
+    </div>
+    <div class="panel table-wrap">
+      <table class="history-table">
+        <thead><tr><th>Date</th><th>Per Gram</th><th>1 Sov (8g)</th></tr></thead>
+        <tbody id="historyBody"><tr><td colspan="3" style="text-align:center; padding: 20px 0;">Loading records…</td></tr></tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer>
+    <div>Gold 22k rate · Institutional Terminal</div>
+    <div style="margin-top:2px; font-weight:500;">LiveChennai + GoodReturns Live Feeds</div>
+  </footer>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const LIVE_URL = "data/live.json";
+const HISTORY_URL = "data/history.json";
+const HEALTH_URL = "data/health_status.json";
+const WINDOWS_URL = "data/monitoring_windows.json";
+const WORKER_URL = "https://gold-price-fetch.subramanilrs.workers.dev/";
+
+let live = null;
+let history = [];
+let selectedRange = 30;
+let fetchBusy = false;
+let scrubIndex = -1;
+
+const $ = id => document.getElementById(id);
+
+(function setupThemeToggle() {
+  const root = document.documentElement;
+  const metaLight = document.querySelector('meta[name="theme-color"][media*="light"]');
+  const metaDark = document.querySelector('meta[name="theme-color"][media*="dark"]');
+
+  function applyTheme(theme) {
+    if (theme === "light" || theme === "dark") {
+      root.setAttribute("data-theme", theme);
+    } else {
+      root.removeAttribute("data-theme");
+    }
+    const isDark = theme === "dark" || (!theme && window.matchMedia("(prefers-color-scheme: dark)").matches);
+    const color = isDark ? "#14120e" : "#faf7f0";
+    if (metaLight) metaLight.setAttribute("content", color);
+    if (metaDark) metaDark.setAttribute("content", color);
+    if (typeof drawChart === "function") requestAnimationFrame(drawChart);
+  }
+
+  const saved = localStorage.getItem("gold_theme");
+  applyTheme(saved);
+
+  const btn = $("themeToggle");
+  if (btn) {
+    btn.onclick = () => {
+      haptic(8);
+      const current = root.getAttribute("data-theme") ||
+        (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+      const next = current === "dark" ? "light" : "dark";
+      localStorage.setItem("gold_theme", next);
+      applyTheme(next);
+    };
+  }
+})();
+
+let audioCtx = null;
+function playTick(freq = 800, duration = 0.015) {
+  try {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = "sine";
+    osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+    gain.gain.setValueAtTime(0.03, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start();
+    osc.stop(audioCtx.currentTime + duration);
+  } catch(e) {}
+}
+
+const haptic = (ms = 10, freq = 800) => {
+  if ("vibrate" in navigator) { try { navigator.vibrate(ms); } catch (_) {} }
+  playTick(freq);
+};
+
+const money = n => Number.isFinite(Number(n)) ? "₹ " + Math.round(Number(n)).toLocaleString("en-IN") : "₹ —";
+
+const dateText = s => {
+  if (!s) return "—";
+  const d = new Date(String(s) + "T00:00:00");
+  return isNaN(d.getTime()) ? String(s) : d.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
+};
+
+const timeText = s => {
+  if (!s) return "—";
+  const parts = String(s).split(":");
+  if (parts.length < 2) return String(s);
+  let hour = Number(parts[0]);
+  if (!Number.isFinite(hour)) return String(s);
+  const ap = hour >= 12 ? "PM" : "AM";
+  hour = hour % 12 || 12;
+  return hour + ":" + parts[1] + " " + ap;
+};
+
+const esc = s => String(s ?? "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;");
+
+function setStatus(text, offline = false, syncing = false) {
+  const elText = $("statusText");
+  const elStatus = $("status");
+  if (elText) elText.textContent = text;
+  if (elStatus) {
+    elStatus.classList.toggle("offline", offline);
+    elStatus.classList.toggle("syncing", syncing);
+  }
+}
+
+function toast(text) {
+  const el = $("toast");
+  if (!el) return;
+  el.textContent = text;
+  el.classList.add("show");
+  setTimeout(() => el.classList.remove("show"), 2200);
+}
+
+function sleep(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
+
+function checkParserHealth(data, networkError = false) {
+  const warningBox = $("parserWarning");
+  if (!warningBox) return;
+
+  if (networkError && !navigator.onLine) {
+    const title = $("warningTitle");
+    const desc = $("warningDesc");
+    if (title) title.innerHTML = `Offline Mode <span class="notice-dismiss">Tap to dismiss</span>`;
+    if (desc) desc.textContent = "Device offline. Displaying saved market records.";
+    warningBox.hidden = false;
+    return;
+  }
+  
+  if (!data) {
+    warningBox.hidden = true;
+    return;
+  }
+
+  let hasFailed = false, reasons = [];
+  if (data.error || data.parsing_failed) { hasFailed = true; reasons.push(data.error || "Parser feed issue"); }
+  if (Array.isArray(data.failed_sources) && data.failed_sources.length > 0) { hasFailed = true; reasons.push(`Failed: ${data.failed_sources.join(", ")}`); }
+  if (data.status === "degraded") { hasFailed = true; reasons.push("Operating in fallback mode"); }
+
+  if (hasFailed) {
+    const title = $("warningTitle");
+    const desc = $("warningDesc");
+    if (title) title.innerHTML = `Source Notice <span class="notice-dismiss">Tap to dismiss</span>`;
+    if (desc) desc.textContent = reasons.join(" · ") + ". Displaying last verified benchmark.";
+    warningBox.hidden = false;
+  } else {
+    warningBox.hidden = true;
+  }
+}
+
+async function getJSON(url) {
+  const response = await fetch(url + (url.includes("?") ? "&" : "?") + "v=" + Date.now(), { cache: "no-store" });
+  if (!response.ok) throw new Error("HTTP " + response.status);
+  return response.json();
+}
+
+function normalize(array) {
+  return Array.isArray(array) ? array.filter(i => i && i.date && Number.isFinite(Number(i.rate_22k))).map(i => ({ ...i, rate_22k: Number(i.rate_22k) })) : [];
+}
+
+function computeLastMovement() {
+  if (!history || history.length < 1 || !live) return;
+  let fullData = [...history];
+  if (fullData[fullData.length - 1].date !== live.date) fullData.push(live);
+  else fullData[fullData.length - 1] = live;
+
+  let lastChangeItem = null, oldRate = null;
+  for (let i = fullData.length - 1; i > 0; i--) {
+    let r1 = Number(fullData[i].rate_22k), r0 = Number(fullData[i - 1].rate_22k);
+    if (r1 !== r0) { lastChangeItem = fullData[i]; oldRate = r0; break; }
+  }
+
+  const lastDateEl = $("lastDate");
+  const lastAmtEl = $("lastAmount");
+  const lastTimeEl = $("lastTime");
+
+  if (lastChangeItem && oldRate) {
+    let amount = Number(lastChangeItem.rate_22k) - oldRate;
+    if (lastDateEl) lastDateEl.textContent = "Price shifted on " + dateText(lastChangeItem.date);
+    if (lastAmtEl) {
+      lastAmtEl.textContent = (amount > 0 ? "▲ " : "▼ ") + money(Math.abs(amount));
+      lastAmtEl.className = "amount " + (amount > 0 ? "positive" : "negative");
+    }
+    if (lastTimeEl) lastTimeEl.textContent = "Previous rate was " + money(oldRate);
+  } else {
+    if (lastDateEl) lastDateEl.textContent = "No recent shifts";
+    if (lastTimeEl) lastTimeEl.textContent = "Market is flat";
+    if (lastAmtEl) {
+      lastAmtEl.textContent = "—";
+      lastAmtEl.className = "amount";
+    }
+  }
+}
+
+// Indian Standard Time (IST) Date Formatter (UTC+5:30)
+function getTodayISTDateStr() {
+  const parts = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Asia/Kolkata',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit'
+  }).format(new Date());
+  return parts; // Returns YYYY-MM-DD in IST
+}
+
+function renderLive(d) {
+  if (!d) return;
+  live = d;
+  const rate = Number(d.rate_22k);
+  const rate8 = Number.isFinite(Number(d.rate_8g)) ? Number(d.rate_8g) : rate * 8;
+
+  if ($("hero8")) $("hero8").textContent = money(rate8);
+  if ($("hero1")) $("hero1").innerHTML = `${money(rate)} <span id="change1" class="change-pill mini same"></span>`;
+  if ($("today")) $("today").textContent = dateText(d.date);
+  
+  const isFreshToday = d.date === getTodayISTDateStr();
+  if ($("todayTime")) $("todayTime").textContent = timeText(d.time) + (isFreshToday ? "" : " · Previous Close");
+  if ($("staleWarning")) $("staleWarning").hidden = isFreshToday;
+
+  let currentSession = d.session;
+  if (!currentSession) {
+    if (d.time) {
+      const hr = parseInt(String(d.time).split(":")[0], 10);
+      currentSession = hr < 14 ? "AM" : "PM";
+    } else {
+      currentSession = "PM";
+    }
+  }
+  if ($("session")) $("session").textContent = currentSession + " Fix";
+
+  if ($("purity22")) $("purity22").textContent = money(rate) + "/g";
+  if ($("purity24")) $("purity24").textContent = money(Math.round(rate * (24 / 22))) + "/g";
+  if ($("purity18")) $("purity18").textContent = money(Math.round(rate * (18 / 22))) + "/g";
+
+  let change1 = Number(d.change);
+  if (!Number.isFinite(change1)) change1 = Number.isFinite(Number(d.previous_rate_22k)) ? rate - Number(d.previous_rate_22k) : 0;
+  const change8 = change1 * 8;
+
+  if ($("change1")) {
+    $("change1").textContent = change1 > 0 ? "+" + money(change1) : change1 < 0 ? "-" + money(Math.abs(change1)) : "Flat";
+    $("change1").className = "change-pill mini " + (change1 > 0 ? "up" : change1 < 0 ? "down" : "same");
+  }
+  
+  if ($("change8")) {
+    $("change8").textContent = change8 > 0 ? "▲ +" + money(change8) + " Today" : change8 < 0 ? "▼ -" + money(Math.abs(change8)) + " Today" : "No change";
+    $("change8").className = "change-pill " + (change8 > 0 ? "up" : change8 < 0 ? "down" : "same");
+  }
+
+  renderTodayTimeline();
+}
+
+function renderTodayTimeline() {
+  if (!live) return;
+  const today = live.date;
+  const isFreshToday = today === getTodayISTDateStr();
+
+  // If the record date is from a previous calendar day in IST, fixes are Pending
+  if (!isFreshToday) {
+    if ($("amRate")) $("amRate").textContent = "Pending";
+    if ($("amTime")) $("amTime").textContent = "—";
+    if ($("pmRate")) $("pmRate").textContent = "Pending";
+    if ($("pmTime")) $("pmTime").textContent = "—";
+    if ($("amCard")) $("amCard").classList.remove("is-active");
+    if ($("pmCard")) $("pmCard").classList.remove("is-active");
+    return;
+  }
+
+  let am = null, pm = null;
+
+  // 1. Direct properties check
+  if (live.am_rate || live.amRate || live.morning_rate || live.rate_am) {
+    am = {
+      rate_22k: Number(live.am_rate || live.amRate || live.morning_rate || live.rate_am),
+      time: live.am_time || live.amTime || "10:30"
+    };
+  }
+  if (live.pm_rate || live.pmRate || live.evening_rate || live.rate_pm) {
+    pm = {
+      rate_22k: Number(live.pm_rate || live.pmRate || live.evening_rate || live.rate_pm),
+      time: live.pm_time || live.pmTime || "17:00"
+    };
+  }
+
+  // 2. Intraday array check
+  if (Array.isArray(live.intraday)) {
+    const amEntry = live.intraday.find(i => (i.date === today || !i.date) && (i.session === "AM" || String(i.session).toUpperCase().includes("AM") || String(i.session).toUpperCase().includes("MORNING")));
+    if (amEntry && amEntry.rate_22k) am = { rate_22k: Number(amEntry.rate_22k), time: amEntry.time || "10:30" };
+    
+    const pmEntry = live.intraday.find(i => (i.date === today || !i.date) && (i.session === "PM" || String(i.session).toUpperCase().includes("PM") || String(i.session).toUpperCase().includes("EVENING")));
+    if (pmEntry && pmEntry.rate_22k) pm = { rate_22k: Number(pmEntry.rate_22k), time: pmEntry.time || "17:00" };
+  }
+
+  const sessionUpper = String(live.session || "").toUpperCase();
+  const timeHour = live.time ? parseInt(String(live.time).split(":")[0], 10) : null;
+
+  if (!am && (sessionUpper === "AM" || sessionUpper.includes("MORNING"))) {
+    am = { rate_22k: Number(live.rate_22k), time: live.time || "10:30" };
+  }
+  if (!pm && (sessionUpper === "PM" || sessionUpper.includes("EVENING"))) {
+    pm = { rate_22k: Number(live.rate_22k), time: live.time || "17:00" };
+  }
+
+  // 3. Deterministic Morning AM Fix Resolution
+  // When PM Fix is delivered and AM isn't saved as a separate entry:
+  // AM Rate = rate_22k - change (or previous_rate_22k)
+  if (pm && !am) {
+    let derivedAm = null;
+    if (Number.isFinite(Number(live.previous_rate_22k)) && Number(live.previous_rate_22k) > 0) {
+      derivedAm = Number(live.previous_rate_22k);
+    } else if (Number.isFinite(Number(live.change))) {
+      derivedAm = Number(live.rate_22k) - Number(live.change);
+    } else if (live.morning_rate) {
+      derivedAm = Number(live.morning_rate);
+    }
+    
+    if (derivedAm) {
+      am = { rate_22k: derivedAm, time: "10:30" };
+    }
+  }
+
+  // 4. Timestamp-based attribution fallback
+  if (!am && !pm && live.rate_22k) {
+    if (timeHour !== null && timeHour < 14) {
+      am = { rate_22k: Number(live.rate_22k), time: live.time || "10:30" };
+    } else {
+      pm = { rate_22k: Number(live.rate_22k), time: live.time || "17:00" };
+      if (live.previous_rate_22k) {
+        am = { rate_22k: Number(live.previous_rate_22k), time: "10:30" };
+      }
+    }
+  }
+
+  if ($("amRate")) $("amRate").textContent = am && Number.isFinite(am.rate_22k) ? money(am.rate_22k) : "Pending";
+  if ($("amTime")) $("amTime").textContent = am ? timeText(am.time) : "—";
+
+  if ($("pmRate")) $("pmRate").textContent = pm && Number.isFinite(pm.rate_22k) ? money(pm.rate_22k) : "Pending";
+  if ($("pmTime")) $("pmTime").textContent = pm ? timeText(pm.time) : "—";
+
+  // Light up only the single latest active fix
+  const isPmActive = Boolean(pm && Number.isFinite(pm.rate_22k));
+  const isAmActive = Boolean(am && Number.isFinite(am.rate_22k) && !isPmActive);
+
+  if ($("amCard")) $("amCard").classList.toggle("is-active", isAmActive);
+  if ($("pmCard")) $("pmCard").classList.toggle("is-active", isPmActive);
+}
+
+function updateFintechMetrics() {
+  if (!history.length || !live) return;
+  const currentRate = Number(live.rate_22k), values = history.map(i => Number(i.rate_22k));
+
+  const calcReturn = (days) => {
+    if (history.length < 2) return null;
+    const pastVal = Number(history[Math.max(0, history.length - 1 - days)].rate_22k);
+    return pastVal ? ((currentRate - pastVal) / pastVal) * 100 : null;
+  };
+
+  [{ id: "ret1W", d: 7 }, { id: "ret1M", d: 30 }, { id: "ret3M", d: 90 }, { id: "ret6M", d: 180 }, { id: "ret1Y", d: 365 }, { id: "ret3Y", d: 1095 }].forEach(h => {
+    const ret = calcReturn(h.d);
+    if ($(h.id)) $(h.id).textContent = ret === null ? "—" : (ret >= 0 ? "+" : "") + ret.toFixed(1) + "%";
+  });
+
+  const smaPeriod = Math.min(30, history.length);
+  const sma = values.slice(-smaPeriod).reduce((a, b) => a + b, 0) / smaPeriod;
+  const smaDiff = currentRate - sma, smaPct = (smaDiff / sma) * 100;
+
+  if ($("smaValue")) $("smaValue").textContent = money(sma);
+  if ($("smaPill")) {
+    $("smaPill").className = "change-pill " + (smaDiff >= 0 ? "up" : "down");
+    $("smaPill").textContent = (smaDiff >= 0 ? "▲ +" : "▼ -") + money(Math.abs(smaDiff)) + ` (${smaPct.toFixed(1)}%)`;
+  }
+}
+
+function drawSpline(ctx, pts) {
+  if (pts.length < 2) return;
+  ctx.beginPath();
+  ctx.moveTo(pts[0].x, pts[0].y);
+  for (let i = 0; i < pts.length - 1; i++) {
+    const p0 = pts[i === 0 ? i : i - 1];
+    const p1 = pts[i];
+    const p2 = pts[i + 1];
+    const p3 = pts[i + 2 < pts.length ? i + 2 : i + 1];
+    ctx.bezierCurveTo(
+      p1.x + (p2.x - p0.x) / 6,
+      p1.y + (p2.y - p0.y) / 6,
+      p2.x - (p3.x - p1.x) / 6,
+      p2.y - (p3.y - p1.y) / 6,
+      p2.x,
+      p2.y
+    );
+  }
+}
+
+function drawChart() {
+  const canvas = $("chart");
+  if (!canvas || !canvas.parentElement) return;
+  const width = canvas.parentElement.clientWidth, height = canvas.parentElement.clientHeight, dpr = window.devicePixelRatio || 1;
+  if (!width || !height) return;
+  canvas.width = Math.round(width * dpr); canvas.height = Math.round(height * dpr);
+  const ctx = canvas.getContext("2d");
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, width, height);
+
+  const data = selectedRange === "all" ? history : history.slice(Math.max(0, history.length - Number(selectedRange)));
+  if ($("chartCount")) $("chartCount").textContent = data.length.toLocaleString() + " records";
+
+  const styles = getComputedStyle(document.body);
+  const colorGold = styles.getPropertyValue('--gold').trim() || '#9c7a3c';
+  const colorTextTertiary = styles.getPropertyValue('--ink-faint').trim() || '#a89d88';
+  const colorTextMain = styles.getPropertyValue('--ink').trim() || '#1c1712';
+
+  if (data.length < 2) return;
+
+  const values = data.map(i => Number(i.rate_22k));
+  const min0 = Math.min(...values), max0 = Math.max(...values);
+  const pad = Math.max(60, (max0 - min0) * 0.16);
+  const min = min0 - pad, max = max0 + pad;
+
+  const L = 52, R = 12, T = 16, B = 22;
+  const plotW = width - L - R, plotH = height - T - B;
+
+  const py = val => T + (1 - ((val - min) / (max - min))) * plotH;
+  const points = values.map((val, i) => ({ x: L + (i / (values.length - 1)) * plotW, y: py(val) }));
+
+  ctx.font = "600 10px var(--font-sans)";
+  ctx.textAlign = "right";
+  ctx.lineWidth = 1;
+
+  for (let i = 0; i <= 4; i++) {
+    const gy = T + (plotH * i / 4);
+    ctx.strokeStyle = "rgba(148, 163, 184, 0.12)";
+    ctx.setLineDash([]);
+    ctx.beginPath();
+    ctx.moveTo(L, gy);
+    ctx.lineTo(width - R, gy);
+    ctx.stroke();
+
+    const gridVal = max - ((max - min) * i / 4);
+    ctx.fillStyle = colorTextTertiary;
+    ctx.fillText(Math.round(gridVal).toLocaleString("en-IN"), L - 8, gy + 3.5);
+  }
+
+  drawSpline(ctx, points);
+  ctx.lineTo(points[points.length - 1].x, height - B);
+  ctx.lineTo(points[0].x, height - B);
+  ctx.closePath();
+  const fillGrad = ctx.createLinearGradient(0, T, 0, height - B);
+  fillGrad.addColorStop(0, "rgba(217, 119, 6, 0.22)");
+  fillGrad.addColorStop(0.7, "rgba(217, 119, 6, 0.04)");
+  fillGrad.addColorStop(1, "rgba(217, 119, 6, 0)");
+  ctx.fillStyle = fillGrad;
+  ctx.fill();
+
+  drawSpline(ctx, points);
+  ctx.strokeStyle = colorGold;
+  ctx.lineWidth = 2.4;
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
+  ctx.stroke();
+
+  if (data.length <= 60) {
+    data.forEach((rec, i) => {
+      let session = rec.session;
+      if (!session) {
+        const hr = rec.time ? parseInt(String(rec.time).split(":")[0], 10) : null;
+        session = (hr !== null && hr < 14) ? "AM" : "PM";
+      }
+      ctx.beginPath();
+      ctx.arc(points[i].x, points[i].y, 2.4, 0, Math.PI * 2);
+      ctx.fillStyle = session === "AM" ? "#38bdf8" : colorGold;
+      ctx.fill();
+    });
+  }
+
+  const activeIdx = (scrubIndex >= 0 && scrubIndex < data.length) ? scrubIndex : data.length - 1;
+  const activePt = points[activeIdx];
+
+  if (scrubIndex >= 0) {
+    ctx.strokeStyle = colorGold;
+    ctx.lineWidth = 1.2;
+    ctx.setLineDash([4, 4]);
+    ctx.beginPath();
+    ctx.moveTo(activePt.x, T);
+    ctx.lineTo(activePt.x, height - B);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    const badgeText = `${dateText(data[activeIdx].date)}: ${money(values[activeIdx])}/g`;
+    ctx.font = "800 11px var(--font-sans)";
+    ctx.fillStyle = colorTextMain;
+    ctx.textAlign = "right";
+    ctx.fillText(badgeText, width - R, T + 10);
+  }
+
+  ctx.fillStyle = colorGold;
+  ctx.beginPath();
+  ctx.arc(activePt.x, activePt.y, scrubIndex >= 0 ? 5.5 : 4, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = styles.getPropertyValue('--paper-raised').trim() || '#ffffff';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  if ($("chartStart")) $("chartStart").textContent = "From: " + dateText(data[0].date);
+  if ($("chartEnd")) $("chartEnd").textContent = "To: " + dateText(data[data.length - 1].date);
+  
+  const delta = values[values.length - 1] - values[0];
+  const pct = values[0] ? (delta / values[0] * 100) : 0;
+
+  if (scrubIndex >= 0) {
+    if ($("chartMetricLabel")) $("chartMetricLabel").textContent = "Selected Benchmark";
+    if ($("periodChange")) {
+      $("periodChange").textContent = money(values[activeIdx]) + "/g";
+      $("periodChange").className = "";
+    }
+  } else {
+    if ($("chartMetricLabel")) $("chartMetricLabel").textContent = "Period Performance";
+    if ($("periodChange")) {
+      $("periodChange").textContent = (delta >= 0 ? "+" : "") + money(delta) + ` (${(pct >= 0 ? "+" : "")}${pct.toFixed(1)}%)`;
+      $("periodChange").className = delta > 0 ? "positive" : delta < 0 ? "negative" : "";
+    }
+  }
+  if ($("periodHigh")) $("periodHigh").textContent = money(max0);
+  if ($("periodLow")) $("periodLow").textContent = money(min0);
+}
+
+(function setupChartScrub() {
+  const canvas = $("chart");
+  if (!canvas) return;
+  const handle = e => {
+    const data = selectedRange === "all" ? history : history.slice(Math.max(0, history.length - Number(selectedRange)));
+    if (data.length < 2) return;
+    const r = canvas.getBoundingClientRect();
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const x = clientX - r.left;
+    const L = 52, plotW = r.width - L - 12;
+    const ratio = Math.max(0, Math.min(1, (x - L) / plotW));
+    const idx = Math.round(ratio * (data.length - 1));
+    if (idx !== scrubIndex) {
+      scrubIndex = idx;
+      haptic(5, 1200);
+      drawChart();
+    }
+  };
+  const end = () => {
+    if (scrubIndex !== -1) {
+      scrubIndex = -1;
+      drawChart();
+    }
+  };
+  canvas.addEventListener("touchstart", handle, { passive: true });
+  canvas.addEventListener("touchmove", handle, { passive: true });
+  canvas.addEventListener("touchend", end);
+  canvas.addEventListener("mousemove", e => { if (e.buttons === 1) handle(e); });
+  canvas.addEventListener("mouseup", end);
+  canvas.addEventListener("mouseleave", end);
+})();
+
+function calculate() {
+  if (!live || !$("calcMode")) return;
+  const rate = Number(live.rate_22k);
+  if (!rate) return;
+
+  const mode = $("calcMode").value;
+  const weight = Math.max(0, Number($("weight")?.value) || 0);
+  const budget = Math.max(0, Number($("budget")?.value) || 0);
+  const makingPct = Math.max(0, Number($("making")?.value) || 0);
+  const gstPct = Math.max(0, Number($("gstRate")?.value) || 0);
+  const flatFee = Math.max(0, Number($("flatFee")?.value) || 0);
+  const oldWeight = Math.max(0, Number($("oldWeight")?.value) || 0);
+  const oldPurity = Number($("oldPurity")?.value) || 22;
+  const oldGoldCredit = oldWeight > 0 ? (oldWeight * (rate * (oldPurity / 22))) : 0;
+
+  if (mode === "value") {
+    if ($("weightField")) $("weightField").style.display = "flex";
+    if ($("budgetField")) $("budgetField").style.display = "none";
+  } else {
+    if ($("weightField")) $("weightField").style.display = "none";
+    if ($("budgetField")) $("budgetField").style.display = "flex";
+  }
+
+  if ($("receiptMakingLabel")) $("receiptMakingLabel").textContent = `Making Charges (${makingPct}%):`;
+  if ($("receiptGstLabel")) $("receiptGstLabel").textContent = `GST (${gstPct}%):`;
+  if ($("receiptOldGoldLine")) $("receiptOldGoldLine").style.display = oldGoldCredit > 0 ? "flex" : "none";
+  if (oldGoldCredit > 0 && $("receiptOldGold")) $("receiptOldGold").textContent = "- " + money(oldGoldCredit);
+
+  if (mode === "value") {
+    const goldVal = rate * weight;
+    const makeAmt = goldVal * (makingPct / 100);
+    const sub = goldVal + makeAmt + flatFee;
+    const gstAmt = sub * (gstPct / 100);
+    const grandTotal = Math.max(0, sub + gstAmt - oldGoldCredit);
+
+    if ($("receiptBase")) $("receiptBase").textContent = money(goldVal);
+    if ($("receiptMaking")) $("receiptMaking").textContent = money(makeAmt);
+    if ($("receiptGst")) $("receiptGst").textContent = money(gstAmt);
+    if ($("receiptFee")) $("receiptFee").textContent = money(flatFee);
+    if ($("receiptTotalLabel")) $("receiptTotalLabel").textContent = "Net Payable Amount";
+    if ($("calcResult")) $("calcResult").textContent = money(grandTotal);
+    if ($("calcSub")) $("calcSub").textContent = `For ${weight.toLocaleString("en-IN")}g gold at ₹ ${rate.toLocaleString("en-IN")}/g benchmark`;
+  } else {
+    const effB = (budget + oldGoldCredit) / (1 + gstPct / 100) - flatFee;
+    const goldBase = effB > 0 ? effB / (1 + makingPct / 100) : 0;
+    const grams = rate > 0 ? goldBase / rate : 0;
+    const makeAmt = goldBase * (makingPct / 100);
+    const sub = goldBase + makeAmt + flatFee;
+    const gstAmt = sub * (gstPct / 100);
+
+    if ($("receiptBase")) $("receiptBase").textContent = money(goldBase);
+    if ($("receiptMaking")) $("receiptMaking").textContent = money(makeAmt);
+    if ($("receiptGst")) $("receiptGst").textContent = money(gstAmt);
+    if ($("receiptFee")) $("receiptFee").textContent = money(flatFee);
+    if ($("receiptTotalLabel")) $("receiptTotalLabel").textContent = "Purchasable Gold Weight";
+    if ($("calcResult")) $("calcResult").textContent = grams.toFixed(3) + " g";
+    if ($("calcSub")) $("calcSub").textContent = `Fits budget ${money(budget)} after all taxes & deductions`;
+  }
+}
+
+document.querySelectorAll(".calc-mode-btn").forEach(btn => {
+  btn.onclick = () => {
+    haptic(10);
+    document.querySelectorAll(".calc-mode-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    if ($("calcMode")) $("calcMode").value = btn.dataset.mode;
+    calculate();
+  };
+});
+
+document.querySelectorAll("#weightChips .chip").forEach(c => c.onclick = () => {
+  haptic(10);
+  document.querySelectorAll("#weightChips .chip").forEach(x => x.classList.remove("active"));
+  c.classList.add("active");
+  if ($("weight")) $("weight").value = c.dataset.val;
+  if ($("calcMode")) $("calcMode").value = "value";
+  document.querySelectorAll(".calc-mode-btn").forEach(b => b.classList.toggle("active", b.dataset.mode === "value"));
+  calculate();
+});
+
+document.querySelectorAll("#makingChips .chip").forEach(c => c.onclick = () => {
+  haptic(10);
+  document.querySelectorAll("#makingChips .chip").forEach(x => x.classList.remove("active"));
+  c.classList.add("active");
+  if ($("making")) $("making").value = c.dataset.val;
+  calculate();
+});
+
+function generateShareCardBlob() {
+  return new Promise((resolve) => {
+    if (!live) return resolve(null);
+    const isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const cvs = document.createElement("canvas"), ctx = cvs.getContext("2d"), w = 1080, h = 1350;
+    cvs.width = w; cvs.height = h;
+    const r1 = Number(live.rate_22k), r8 = r1 * 8, c1 = Number(live.change) || 0, c8 = c1 * 8;
+
+    const bgApp = isDark ? "#14120e" : "#faf7f0";
+    const bgSurface = isDark ? "#1c1912" : "#ffffff";
+    const borderCard = isDark ? "rgba(255, 255, 255, 0.08)" : "rgba(15, 23, 42, 0.08)";
+    const textMain = isDark ? "#f2ede2" : "#1c1712";
+    const textSec = isDark ? "#a89d88" : "#6b6255";
+    const textTert = isDark ? "#6b6255" : "#a89d88";
+    const goldColor = isDark ? "#c9a356" : "#9c7a3c";
+    const goodColor = isDark ? "#7bab84" : "#3f6e4a";
+    const badColor = isDark ? "#d18376" : "#a13f34";
+
+    ctx.fillStyle = bgApp;
+    ctx.fillRect(0, 0, w, h);
+
+    const gl = ctx.createRadialGradient(w/2, 340, 40, w/2, 340, 480);
+    gl.addColorStop(0, isDark ? "rgba(201, 163, 86, 0.12)" : "rgba(156, 122, 60, 0.08)");
+    gl.addColorStop(1, isDark ? "rgba(20, 18, 14, 0)" : "rgba(250, 247, 240, 0)");
+    ctx.fillStyle = gl;
+    ctx.fillRect(0, 0, w, h);
+
+    ctx.strokeStyle = borderCard;
+    ctx.lineWidth = 2;
+    ctx.strokeRect(36, 36, w - 72, h - 72);
+
+    ctx.fillStyle = bgSurface;
+    ctx.beginPath();
+    ctx.roundRect(72, 72, w - 144, 76, 38);
+    ctx.fill();
+    ctx.strokeStyle = borderCard;
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    ctx.fillStyle = goldColor;
+    ctx.font = "800 24px 'Fraunces'";
+    ctx.textAlign = "left";
+    ctx.fillText("Au · GOLD 22K RATE", 104, 119);
+
+    ctx.fillStyle = textSec;
+    ctx.font = "600 20px 'Inter'";
+    ctx.textAlign = "right";
+    ctx.fillText(`${dateText(live.date)} · ${$("session")?.textContent || "IST Market"}`, w - 104, 118);
+
+    ctx.fillStyle = bgSurface;
+    ctx.beginPath();
+    ctx.roundRect(72, 172, w - 144, 380, 24);
+    ctx.fill();
+    ctx.strokeStyle = borderCard;
+    ctx.stroke();
+
+    ctx.fillStyle = goldColor;
+    ctx.font = "600 22px 'Fraunces'";
+    ctx.textAlign = "center";
+    ctx.fillText("1 SOVEREIGN (8 GRAMS) 22K", w/2, 230);
+
+    ctx.fillStyle = textMain;
+    ctx.font = "600 92px 'Fraunces'";
+    ctx.fillText(money(r8), w/2, 345);
+
+    ctx.font = "600 26px 'Inter'";
+    if (c8 > 0) {
+      ctx.fillStyle = goodColor;
+      ctx.fillText(`▲ +${money(c8)} Today`, w/2, 420);
+    } else if (c8 < 0) {
+      ctx.fillStyle = badColor;
+      ctx.fillText(`▼ -${money(Math.abs(c8))} Today`, w/2, 420);
+    } else {
+      ctx.fillStyle = textSec;
+      ctx.fillText("• Flat Market Today", w/2, 420);
+    }
+
+    ctx.fillStyle = borderCard;
+    ctx.fillRect(72, 460, w - 144, 1.5);
+
+    ctx.fillStyle = textSec;
+    ctx.font = "600 20px 'Inter'";
+    ctx.textAlign = "left";
+    ctx.fillText(`Rate Per Gram: ${money(r1)}/g`, 108, 514);
+
+    ctx.textAlign = "right";
+    ctx.fillText(`Standard 22K 91.6% Pure`, w - 108, 514);
+
+    const gy = 576, cw = (w - 144 - 24) / 3;
+    const purities = [
+      { l: "24K (99.9%)", v: money(Math.round(r1 * (24 / 22))), s: "Fine Gold" },
+      { l: "22K (91.6%)", v: money(r1), s: "Jewelry Standard" },
+      { l: "18K (75.0%)", v: money(Math.round(r1 * (18 / 22))), s: "Hallmarked" }
+    ];
+
+    purities.forEach((item, i) => {
+      const x = 72 + i * (cw + 12);
+      ctx.fillStyle = bgSurface;
+      ctx.beginPath();
+      ctx.roundRect(x, gy, cw, 220, 16);
+      ctx.fill();
+      ctx.strokeStyle = borderCard;
+      ctx.stroke();
+
+      ctx.fillStyle = textTert;
+      ctx.font = "600 18px 'Inter'";
+      ctx.textAlign = "center";
+      ctx.fillText(item.l, x + cw/2, gy + 52);
+
+      ctx.fillStyle = textMain;
+      ctx.font = "600 38px 'Fraunces'";
+      ctx.fillText(item.v, x + cw/2, gy + 120);
+
+      ctx.fillStyle = goldColor;
+      ctx.font = "600 19px 'Inter'";
+      ctx.fillText(item.s, x + cw/2, gy + 172);
+    });
+
+    const ty = 820, tw = (w - 144 - 16) / 2;
+    
+    ctx.fillStyle = bgSurface;
+    ctx.beginPath();
+    ctx.roundRect(72, ty, tw, 200, 16);
+    ctx.fill();
+    ctx.strokeStyle = $("amCard")?.classList.contains("is-active") ? goldColor : borderCard;
+    ctx.lineWidth = $("amCard")?.classList.contains("is-active") ? 2 : 1;
+    ctx.stroke();
+
+    ctx.fillStyle = textTert;
+    ctx.font = "600 19px 'Inter'";
+    ctx.textAlign = "left";
+    ctx.fillText("MORNING FIX (AM)", 100, ty + 48);
+
+    ctx.fillStyle = textMain;
+    ctx.font = "600 34px 'Fraunces'";
+    ctx.fillText($("amRate")?.textContent || "Pending", 100, ty + 110);
+
+    ctx.fillStyle = textTert;
+    ctx.font = "500 19px 'Inter'";
+    ctx.fillText($("amTime")?.textContent || "—", 100, ty + 158);
+
+    const px = 72 + tw + 16;
+    ctx.fillStyle = bgSurface;
+    ctx.beginPath();
+    ctx.roundRect(px, ty, tw, 200, 16);
+    ctx.fill();
+    ctx.strokeStyle = $("pmCard")?.classList.contains("is-active") ? goldColor : borderCard;
+    ctx.lineWidth = $("pmCard")?.classList.contains("is-active") ? 2 : 1;
+    ctx.stroke();
+
+    ctx.fillStyle = textTert;
+    ctx.font = "600 19px 'Inter'";
+    ctx.textAlign = "left";
+    ctx.fillText("EVENING FIX (PM)", px + 28, ty + 48);
+
+    ctx.fillStyle = textMain;
+    ctx.font = "600 34px 'Fraunces'";
+    ctx.fillText($("pmRate")?.textContent || "Pending", px + 28, ty + 110);
+
+    ctx.fillStyle = textTert;
+    ctx.font = "500 19px 'Inter'";
+    ctx.fillText($("pmTime")?.textContent || "—", px + 28, ty + 158);
+
+    ctx.fillStyle = textTert;
+    ctx.font = "500 20px 'Inter'";
+    ctx.textAlign = "center";
+    ctx.fillText("Gold 22k Terminal · LiveChennai + GoodReturns Feed", w/2, 1180);
+
+    cvs.toBlob(resolve, "image/png");
+  });
+}
+
+if ($("shareBtn")) {
+  $("shareBtn").onclick = async () => {
+    haptic(15);
+    if (!live) return;
+    const shareText = `💰 Gold 22K Rate (${dateText(live.date)})\n• 1 Gram: ${money(live.rate_22k)}\n• 1 Sovereign: ${money(live.rate_8g || live.rate_22k*8)}\nTrack live at: ${window.location.href}`;
+    try {
+      toast("Generating snapshot…");
+      const blob = await generateShareCardBlob();
+      if (blob && navigator.canShare && navigator.canShare({ files: [new File([blob], "gold.png", { type: "image/png" })] })) {
+        await navigator.share({ title: "Gold 22k", text: shareText, files: [new File([blob], `gold-${live.date}.png`, { type: "image/png" })] });
+      } else if (navigator.share) {
+        await navigator.share({ title: "Gold 22k", text: shareText });
+      } else {
+        navigator.clipboard?.writeText(shareText);
+        toast("Copied to clipboard!");
+      }
+    } catch(e) {
+      if (e.name !== "AbortError") {
+        navigator.clipboard?.writeText(shareText);
+        toast("Copied text!");
+      }
+    }
+  };
+}
+
+if ($("copyQuoteBtn")) {
+  $("copyQuoteBtn").onclick = async () => {
+    haptic(15);
+    if (!live) return;
+    const txt = `📜 GOLD PURCHASE ESTIMATE\nDate: ${dateText(live.date)}\n----------------------\n• Base Rate: ${money(live.rate_22k)}/g\n• Weight: ${$("weight")?.value || 8}g\n• Making (${$("making")?.value || 8}%): ${$("receiptMaking")?.textContent || "₹ 0"}\n• GST (${$("gstRate")?.value || 3}%): ${$("receiptGst")?.textContent || "₹ 0"}\n• Exchange: ${$("receiptOldGold")?.textContent || "-₹ 0"}\n----------------------\nNET TOTAL: ${$("calcResult")?.textContent || "—"}`;
+    navigator.clipboard?.writeText(txt);
+    toast("Quotation Copied!");
+  };
+}
+
+function renderStats() {
+  if (!history.length) return;
+  const vals = history.map(i => Number(i.rate_22k)), hi = Math.max(...vals), lo = Math.min(...vals);
+  if ($("high")) $("high").textContent = money(hi);
+  if ($("low")) $("low").textContent = money(lo);
+  if ($("highDate")) $("highDate").textContent = dateText(history.find(i => Number(i.rate_22k) === hi)?.date);
+  if ($("lowDate")) $("lowDate").textContent = dateText(history.find(i => Number(i.rate_22k) === lo)?.date);
+  if ($("historyCount")) $("historyCount").textContent = history.length.toLocaleString("en-IN") + " records";
+
+  if ($("historyBody")) {
+    $("historyBody").innerHTML = [...history].reverse().slice(0, 300).map(i => `<tr><td>${esc(dateText(i.date))}</td><td>${money(i.rate_22k)}</td><td>${money(i.rate_22k*8)}</td></tr>`).join("");
+  }
+  
+  if ($("dateA") && !$("dateA").value) $("dateA").value = history[0]?.date || "";
+  if ($("dateB") && !$("dateB").value) $("dateB").value = history[history.length-1]?.date || "";
+
+  compareDates();
+  updateFintechMetrics();
+  computeLastMovement();
+  drawChart();
+}
+
+function compareDates() {
+  if (!$("dateA") || !$("dateB") || !$("compareResult")) return;
+  const a = history.find(i => i.date === $("dateA").value);
+  const b = history.find(i => i.date === $("dateB").value);
+  
+  if (!a || !b) {
+    $("compareResult").innerHTML = `<span class="compare-result-top">Select valid dates</span><span class="compare-result-sub">—</span>`;
+    return;
+  }
+  const diff = b.rate_22k - a.rate_22k, pct = a.rate_22k ? (diff/a.rate_22k*100) : 0;
+  const isPos = diff > 0, isNeg = diff < 0;
+  
+  $("compareResult").innerHTML = `
+    <span class="compare-result-top">${money(a.rate_22k)} → ${money(b.rate_22k)}</span>
+    <span class="compare-result-sub ${isPos ? 'positive' : isNeg ? 'negative' : ''}">
+      ${diff >= 0 ? '+' : ''}${money(diff)}/g (${diff >= 0 ? '+' : ''}${pct.toFixed(2)}%)
+    </span>
+  `;
+}
+
+async function loadPublishedData(silent = false) {
+  const prevRate = live ? Number(live.rate_22k) : null;
+  const [latest, historical] = await Promise.all([getJSON(LIVE_URL), getJSON(HISTORY_URL)]);
+  history = normalize(historical);
+  renderLive(latest);
+  renderStats();
+  calculate();
+  checkParserHealth(latest);
+  localStorage.setItem("gold_live_backup", JSON.stringify(latest));
+  localStorage.setItem("gold_history_backup", JSON.stringify(history));
+
+  if (silent && prevRate !== null && Number.isFinite(Number(latest.rate_22k)) && Number(latest.rate_22k) !== prevRate) {
+    const dir = Number(latest.rate_22k) > prevRate ? "▲" : "▼";
+    toast(`Gold Rate Updated ${dir} ${money(latest.rate_22k)}/g`);
+  }
+
+  getJSON(HEALTH_URL).then(renderHealth).catch(() => {});
+  getJSON(WINDOWS_URL).then(renderNextFix).catch(() => {});
+
+  return latest;
+}
+
+function renderHealth(h) {
+  const card = $("healthCard");
+  if (!card || !h || !h.status) return;
+
+  card.hidden = false;
+  card.className = "collapsible health-collapsible status-" + h.status;
+
+  if (h.status === "ok") {
+    if ($("healthTitle")) $("healthTitle").textContent = "Feed healthy";
+    if ($("healthSub")) $("healthSub").textContent = h.sources_agree === false ? "Sources briefly differ — consensus price is active." : "LiveChennai and GoodReturns feeds are responsive and synchronized.";
+    if ($("healthBadge")) $("healthBadge").textContent = "OK";
+  } else if (h.status === "stale") {
+    if ($("healthTitle")) $("healthTitle").textContent = "Feed updating slowly";
+    const hrs = Number(h.hours_since_last_checked);
+    if ($("healthSub")) $("healthSub").textContent = Number.isFinite(hrs) ? `No new check in ${hrs.toFixed(1)}h. Displaying last verified benchmark.` : "Checking connection…";
+    if ($("healthBadge")) $("healthBadge").textContent = "Stale";
+  } else if (h.status === "disagreeing") {
+    if ($("healthTitle")) $("healthTitle").textContent = "Sources disagreeing";
+    if ($("healthSub")) $("healthSub").textContent = "LiveChennai and GoodReturns don't match. Serving consensus price.";
+    if ($("healthBadge")) $("healthBadge").textContent = "Check";
+  }
+}
+
+function renderNextFix(w) {
+  const line = $("nextFixLine");
+  if (!line || !w || !w.windows) return;
+
+  const active = w.active_window;
+  const upcomingName = active === "AM" ? "PM" : "AM";
+  const upcoming = w.windows[upcomingName];
+  if (!upcoming || !upcoming.predicted_fix_time) return;
+
+  line.hidden = false;
+
+  if (active) {
+    if ($("nextFixText")) $("nextFixText").textContent = `Monitoring ${active} fix now — checking every ${w.poll_seconds || 10}s`;
+  } else {
+    const label = upcomingName === "AM" ? "Morning" : "Evening";
+    if ($("nextFixText")) $("nextFixText").textContent = `${label} fix expected around ${upcoming.predicted_fix_time} IST`;
+  }
+}
+
+async function manualFetch() {
+  if (fetchBusy) return;
+  fetchBusy = true;
+  haptic(15);
+  setStatus("Connecting to Edge Worker…", false, true);
+  try {
+    const oldTs = live ? (live.last_checked_at || live.date+"|"+live.time) : "";
+    await fetch(WORKER_URL, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ force: true }) });
+    setStatus("Parsing live benchmark sources…", false, true);
+    let latest = await getJSON(LIVE_URL);
+    for (let i = 0; i < 8 && (latest.last_checked_at || latest.date + "|" + latest.time) === oldTs; i++) {
+      await sleep(1500);
+      latest = await getJSON(LIVE_URL);
+    }
+    history = normalize(await getJSON(HISTORY_URL));
+    renderLive(latest);
+    renderStats();
+    calculate();
+    localStorage.setItem("gold_live_backup", JSON.stringify(latest));
+    localStorage.setItem("gold_history_backup", JSON.stringify(history));
+    setStatus("Synced at " + timeText(latest.time));
+    toast("Market Synced");
+  } catch(e) { 
+    setStatus("Using offline cache", true, false); 
+    checkParserHealth({ error: "Live sync failed. Showing cached data." }); 
+    toast("Sync Failed"); 
+  }
+  finally { 
+    fetchBusy = false; 
+  }
+}
+
+if ($("fetchNow")) $("fetchNow").onclick = manualFetch;
+
+document.querySelectorAll("#ranges button").forEach(b => b.onclick = () => {
+  haptic(8);
+  document.querySelectorAll("#ranges button").forEach(x => x.classList.remove("active"));
+  b.classList.add("active");
+  selectedRange = b.dataset.range === "all" ? "all" : Number(b.dataset.range);
+  drawChart();
+});
+
+["dateA", "dateB"].forEach(id => {
+  if ($(id)) $(id).addEventListener("change", compareDates);
+});
+
+["weight", "budget", "making", "gstRate", "flatFee", "oldWeight", "oldPurity"].forEach(id => {
+  if ($(id)) $(id).addEventListener("input", calculate);
+});
+
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") loadPublishedData(true).catch(()=>{}); });
+window.addEventListener("pageshow", () => { loadPublishedData(true).catch(()=>{}); });
+window.addEventListener("resize", drawChart);
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', drawChart);
+
+setInterval(() => {
+  if (document.visibilityState === "visible" && !fetchBusy) {
+    loadPublishedData(true).catch(() => {});
+  }
+}, 5 * 60 * 1000);
+
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker
+      .register("sw.js")
+      .then((reg) => reg.update())
+      .catch((e) => console.warn("Service worker register skipped:", e));
+  });
+}
+
+(function setupPullToRefresh() {
+  const PULL_THRESHOLD = 64, PULL_MAX = 90;
+  const pulldown = $("pulldown"), pulldownText = $("pulldownText");
+  let startY = null, dragging = false, ready = false;
+
+  function atTop() { return (window.scrollY || 0) <= 0 && (document.scrollingElement ? document.scrollingElement.scrollTop : 0) <= 0; }
+  
+  function resetPulldown() {
+    if (!pulldown) return;
+    pulldown.classList.remove("visible", "ready", "loading");
+    pulldown.style.transform = "";
+    if (pulldownText) pulldownText.textContent = "Pull to refresh";
+    startY = null; dragging = false; ready = false;
+  }
+
+  document.addEventListener("touchstart", event => {
+    if (fetchBusy || event.target.closest(".table-wrap") || !atTop()) return;
+    startY = event.touches[0].clientY;
+    dragging = true; ready = false;
+  }, { passive: true });
+
+  document.addEventListener("touchmove", event => {
+    if (!dragging || startY === null) return;
+    if (!atTop()) { resetPulldown(); return; }
+    
+    const delta = event.touches[0].clientY - startY;
+    if (delta <= 0) return;
+    if (event.cancelable) event.preventDefault();
+    
+    const pulled = Math.min(delta * 0.5, PULL_MAX);
+    if (pulldown) {
+      pulldown.classList.add("visible");
+      pulldown.style.transform = `translate(-50%, ${pulled - 70}px)`;
+      ready = pulled >= PULL_THRESHOLD * 0.5;
+      pulldown.classList.toggle("ready", ready);
+    }
+    if (pulldownText) pulldownText.textContent = ready ? "Release to sync" : "Pull to refresh";
+    setStatus(ready ? "Release to sync market" : "Pulling to refresh…", false, true);
+  }, { passive: false });
+
+  document.addEventListener("touchend", () => {
+    if (!dragging) return;
+    if (ready && !fetchBusy) {
+      if (pulldown) {
+        pulldown.classList.add("loading");
+        pulldown.classList.remove("ready");
+        pulldown.style.transform = "translate(-50%, 14px)";
+      }
+      if (pulldownText) pulldownText.textContent = "Syncing…";
+      manualFetch().finally(resetPulldown);
+    } else {
+      resetPulldown();
+      setStatus("Synced at " + (live ? timeText(live.time) : "live"));
+    }
+    dragging = false; startY = null;
+  }, { passive: true });
+
+  document.addEventListener("touchcancel", resetPulldown, { passive: true });
+})();
+
+(async function init() {
+  try { 
+    setStatus("Checking live feed…", false, true);
+    await loadPublishedData(); 
+    setStatus("Synced at " + (live ? timeText(live.time) : "live")); 
+  }
+  catch(e) {
+    try {
+      const savedHistory = JSON.parse(localStorage.getItem("gold_history_backup") || "[]");
+      const savedLive = JSON.parse(localStorage.getItem("gold_live_backup") || "null");
+      if (Array.isArray(savedHistory) && savedHistory.length > 0) {
+        history = normalize(savedHistory);
+      }
+      if (savedLive) {
+        renderLive(savedLive);
+      }
+      if (history.length) renderStats();
+      calculate();
+      setStatus("Cached data loaded");
+    } catch(err) {
+      setStatus("Offline", true);
+    }
+  }
+})();
+</script>
+</body>
+</html>
