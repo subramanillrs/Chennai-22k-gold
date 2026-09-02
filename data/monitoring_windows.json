@@ -1,26 +1,18 @@
 {
-  "generated_at": "2026-08-30T01:48:16.251460+05:30",
   "timezone": "Asia/Kolkata",
-  "learning_method": "30-day priority, 90-day fallback",
-  "historical_observations": 4,
-  "three_month_observations": 4,
-  "thirty_day_observations": 4,
-  "price_change_observations_90d": 0,
-  "price_change_observations_30d": 0,
-  "timestamp_learning_available": false,
+  "updated_at": "2026-09-02T23:56:08.509631+05:30",
   "windows": {
-    "am": {
-      "start": "08:30",
-      "end": "11:30"
+    "AM": {
+      "predicted_fix_time": "09:53",
+      "polling_starts": "15 min before",
+      "duration_minutes": 85
     },
-    "pm": {
-      "start": "17:00",
-      "end": "20:00"
+    "PM": {
+      "predicted_fix_time": "19:34",
+      "polling_starts": "15 min before",
+      "duration_minutes": 85
     }
   },
-  "basis": {
-    "am": "fallback",
-    "pm": "fallback"
-  },
-  "poll_interval_seconds": 10
+  "active_window": null,
+  "poll_seconds": 10
 }
