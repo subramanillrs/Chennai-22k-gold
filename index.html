@@ -126,7 +126,7 @@ button, input, select { font-family: inherit; color: inherit; border: none; back
   gap: 18px;
 }
 
-/* Masthead */
+/* Masthead & Brand Badge */
 .masthead {
   display: flex;
   justify-content: space-between;
@@ -157,6 +157,7 @@ button, input, select { font-family: inherit; color: inherit; border: none; back
   justify-content: center;
   box-shadow: 0 2px 6px rgba(156, 122, 60, 0.35);
   flex-shrink: 0;
+  user-select: none;
 }
 
 .masthead-title {
@@ -281,7 +282,7 @@ html[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
 .notice-body p { font-size: 11.5px; font-weight: 500; line-height: 1.4; color: var(--ink-soft); }
 .notice-dismiss { font-size: 9.5px; opacity: 0.75; font-weight: 600; }
 
-/* Hero Card */
+/* Hero Section */
 .hero {
   background: var(--paper-raised);
   border: 1px solid var(--rule);
@@ -1249,7 +1250,6 @@ function renderTodayTimeline() {
 
   let am = null, pm = null;
 
-  // Direct properties
   if (live.am_rate || live.amRate || live.morning_rate || live.rate_am) {
     am = {
       rate_22k: Number(live.am_rate || live.amRate || live.morning_rate || live.rate_am),
@@ -1263,7 +1263,6 @@ function renderTodayTimeline() {
     };
   }
 
-  // Intraday array check
   if (Array.isArray(live.intraday)) {
     const amEntry = live.intraday.find(i => (i.date === today || !i.date) && (i.session === "AM" || String(i.session).toUpperCase().includes("AM") || String(i.session).toUpperCase().includes("MORNING")));
     if (amEntry && amEntry.rate_22k) am = { rate_22k: Number(amEntry.rate_22k), time: amEntry.time || "10:30" };
@@ -1282,8 +1281,7 @@ function renderTodayTimeline() {
     pm = { rate_22k: Number(live.rate_22k), time: live.time || "17:00" };
   }
 
-  // Key Fix: If evening (PM) is published and AM is not explicitly present,
-  // derive the morning benchmark from previous_rate_22k or opening_rate
+  // Auto-derive AM benchmark if only PM rate was delivered
   if (pm && !am) {
     if (live.morning_rate || live.opening_rate || live.previous_rate_22k) {
       am = { rate_22k: Number(live.morning_rate || live.opening_rate || live.previous_rate_22k), time: "10:30" };
@@ -1874,7 +1872,6 @@ async function loadPublishedData(silent = false) {
 
   if (silent && prevRate !== null && Number.isFinite(Number(latest.rate_22k)) && Number(latest.rate_22k) !== prevRate) {
     const dir = Number(latest.rate_22k) > prevRate ? "▲" : "▼";
-    haptic(25, 900);
     toast(`Gold Rate Updated ${dir} ${money(latest.rate_22k)}/g`);
   }
 
@@ -1892,18 +1889,18 @@ function renderHealth(h) {
   card.className = "collapsible health-collapsible status-" + h.status;
 
   if (h.status === "ok") {
-    if ($("healthTitle")) $("healthTitle").textContent = "Feed healthy";
-    if ($("healthSub")) $("healthSub").textContent = h.sources_agree === false ? "Sources briefly differ — consensus price is active." : "LiveChennai and GoodReturns feeds are responsive and synchronized.";
-    if ($("healthBadge")) $("healthBadge").textContent = "OK";
+    $("healthTitle").textContent = "Feed healthy";
+    $("healthSub").textContent = h.sources_agree === false ? "Sources briefly differ — consensus price is active." : "LiveChennai and GoodReturns feeds are responsive and synchronized.";
+    $("healthBadge").textContent = "OK";
   } else if (h.status === "stale") {
-    if ($("healthTitle")) $("healthTitle").textContent = "Feed updating slowly";
+    $("healthTitle").textContent = "Feed updating slowly";
     const hrs = Number(h.hours_since_last_checked);
-    if ($("healthSub")) $("healthSub").textContent = Number.isFinite(hrs) ? `No new check in ${hrs.toFixed(1)}h. Displaying last verified benchmark.` : "Checking connection…";
-    if ($("healthBadge")) $("healthBadge").textContent = "Stale";
+    $("healthSub").textContent = Number.isFinite(hrs) ? `No new check in ${hrs.toFixed(1)}h. Displaying last verified benchmark.` : "Checking connection…";
+    $("healthBadge").textContent = "Stale";
   } else if (h.status === "disagreeing") {
-    if ($("healthTitle")) $("healthTitle").textContent = "Sources disagreeing";
-    if ($("healthSub")) $("healthSub").textContent = "LiveChennai and GoodReturns don't match. Serving consensus price.";
-    if ($("healthBadge")) $("healthBadge").textContent = "Check";
+    $("healthTitle").textContent = "Sources disagreeing";
+    $("healthSub").textContent = "LiveChennai and GoodReturns don't match. Serving consensus price.";
+    $("healthBadge").textContent = "Check";
   }
 }
 
@@ -1919,10 +1916,10 @@ function renderNextFix(w) {
   line.hidden = false;
 
   if (active) {
-    if ($("nextFixText")) $("nextFixText").textContent = `Monitoring ${active} fix now — checking every ${w.poll_seconds || 10}s`;
+    $("nextFixText").textContent = `Monitoring ${active} fix now — checking every ${w.poll_seconds || 10}s`;
   } else {
     const label = upcomingName === "AM" ? "Morning" : "Evening";
-    if ($("nextFixText")) $("nextFixText").textContent = `${label} fix expected around ${upcoming.predicted_fix_time} IST`;
+    $("nextFixText").textContent = `${label} fix expected around ${upcoming.predicted_fix_time} IST`;
   }
 }
 
