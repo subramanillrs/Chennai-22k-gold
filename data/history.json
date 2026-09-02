@@ -11386,5 +11386,18 @@
     "agreement": true,
     "livechennai_rate": 14175,
     "goodreturns_rate": 14175
+  },
+  {
+    "date": "2026-09-02",
+    "time": "19:34:19",
+    "timestamp": "2026-09-02T19:34:19.311675+05:30",
+    "session": null,
+    "rate_22k": 13935,
+    "rate_8g": 111480,
+    "changed": true,
+    "source": "GoodReturns",
+    "agreement": false,
+    "livechennai_rate": null,
+    "goodreturns_rate": 13935
   }
 ]
