@@ -654,7 +654,7 @@ footer { text-align: center; font-size: 10.5px; font-weight: 500; color: var(--i
   <div class="notice notice-gold" id="staleWarning" hidden>
     <div class="notice-body">
       <strong>Showing previous close</strong>
-      <p>No new fix published yet today — next update expected around 8:30 AM IST.</p>
+      <p id="staleDesc">No new fix published yet today — next update expected around 10:20 AM IST.</p>
     </div>
   </div>
 
@@ -1181,6 +1181,17 @@ function computeLastMovement() {
   }
 }
 
+// Indian Standard Time (IST) Date Formatter (UTC+5:30)
+function getTodayISTDateStr() {
+  const parts = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Asia/Kolkata',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit'
+  }).format(new Date());
+  return parts; // Returns YYYY-MM-DD in IST
+}
+
 function renderLive(d) {
   if (!d) return;
   live = d;
@@ -1191,7 +1202,7 @@ function renderLive(d) {
   if ($("hero1")) $("hero1").innerHTML = `${money(rate)} <span id="change1" class="change-pill mini same"></span>`;
   if ($("today")) $("today").textContent = dateText(d.date);
   
-  const isFreshToday = d.date === todayLocalDateStr();
+  const isFreshToday = d.date === getTodayISTDateStr();
   if ($("todayTime")) $("todayTime").textContent = timeText(d.time) + (isFreshToday ? "" : " · Previous Close");
   if ($("staleWarning")) $("staleWarning").hidden = isFreshToday;
 
@@ -1227,17 +1238,12 @@ function renderLive(d) {
   renderTodayTimeline();
 }
 
-function todayLocalDateStr() {
-  const d0 = new Date();
-  const y = d0.getFullYear(), m = String(d0.getMonth() + 1).padStart(2, "0"), day = String(d0.getDate()).padStart(2, "0");
-  return `${y}-${m}-${day}`;
-}
-
 function renderTodayTimeline() {
   if (!live) return;
   const today = live.date;
-  const isFreshToday = today === todayLocalDateStr();
+  const isFreshToday = today === getTodayISTDateStr();
 
+  // If the record date is from a previous calendar day in IST, fixes are Pending
   if (!isFreshToday) {
     if ($("amRate")) $("amRate").textContent = "Pending";
     if ($("amTime")) $("amTime").textContent = "—";
@@ -1250,6 +1256,7 @@ function renderTodayTimeline() {
 
   let am = null, pm = null;
 
+  // 1. Direct properties check
   if (live.am_rate || live.amRate || live.morning_rate || live.rate_am) {
     am = {
       rate_22k: Number(live.am_rate || live.amRate || live.morning_rate || live.rate_am),
@@ -1263,6 +1270,7 @@ function renderTodayTimeline() {
     };
   }
 
+  // 2. Intraday array check
   if (Array.isArray(live.intraday)) {
     const amEntry = live.intraday.find(i => (i.date === today || !i.date) && (i.session === "AM" || String(i.session).toUpperCase().includes("AM") || String(i.session).toUpperCase().includes("MORNING")));
     if (amEntry && amEntry.rate_22k) am = { rate_22k: Number(amEntry.rate_22k), time: amEntry.time || "10:30" };
@@ -1281,13 +1289,25 @@ function renderTodayTimeline() {
     pm = { rate_22k: Number(live.rate_22k), time: live.time || "17:00" };
   }
 
-  // Auto-derive AM benchmark if only PM rate was delivered
+  // 3. Deterministic Morning AM Fix Resolution
+  // When PM Fix is delivered and AM isn't saved as a separate entry:
+  // AM Rate = rate_22k - change (or previous_rate_22k)
   if (pm && !am) {
-    if (live.morning_rate || live.opening_rate || live.previous_rate_22k) {
-      am = { rate_22k: Number(live.morning_rate || live.opening_rate || live.previous_rate_22k), time: "10:30" };
+    let derivedAm = null;
+    if (Number.isFinite(Number(live.previous_rate_22k)) && Number(live.previous_rate_22k) > 0) {
+      derivedAm = Number(live.previous_rate_22k);
+    } else if (Number.isFinite(Number(live.change))) {
+      derivedAm = Number(live.rate_22k) - Number(live.change);
+    } else if (live.morning_rate) {
+      derivedAm = Number(live.morning_rate);
+    }
+    
+    if (derivedAm) {
+      am = { rate_22k: derivedAm, time: "10:30" };
     }
   }
 
+  // 4. Timestamp-based attribution fallback
   if (!am && !pm && live.rate_22k) {
     if (timeHour !== null && timeHour < 14) {
       am = { rate_22k: Number(live.rate_22k), time: live.time || "10:30" };
@@ -1305,6 +1325,7 @@ function renderTodayTimeline() {
   if ($("pmRate")) $("pmRate").textContent = pm && Number.isFinite(pm.rate_22k) ? money(pm.rate_22k) : "Pending";
   if ($("pmTime")) $("pmTime").textContent = pm ? timeText(pm.time) : "—";
 
+  // Light up only the single latest active fix
   const isPmActive = Boolean(pm && Number.isFinite(pm.rate_22k));
   const isAmActive = Boolean(am && Number.isFinite(am.rate_22k) && !isPmActive);
 
@@ -1889,18 +1910,18 @@ function renderHealth(h) {
   card.className = "collapsible health-collapsible status-" + h.status;
 
   if (h.status === "ok") {
-    $("healthTitle").textContent = "Feed healthy";
-    $("healthSub").textContent = h.sources_agree === false ? "Sources briefly differ — consensus price is active." : "LiveChennai and GoodReturns feeds are responsive and synchronized.";
-    $("healthBadge").textContent = "OK";
+    if ($("healthTitle")) $("healthTitle").textContent = "Feed healthy";
+    if ($("healthSub")) $("healthSub").textContent = h.sources_agree === false ? "Sources briefly differ — consensus price is active." : "LiveChennai and GoodReturns feeds are responsive and synchronized.";
+    if ($("healthBadge")) $("healthBadge").textContent = "OK";
   } else if (h.status === "stale") {
-    $("healthTitle").textContent = "Feed updating slowly";
+    if ($("healthTitle")) $("healthTitle").textContent = "Feed updating slowly";
     const hrs = Number(h.hours_since_last_checked);
-    $("healthSub").textContent = Number.isFinite(hrs) ? `No new check in ${hrs.toFixed(1)}h. Displaying last verified benchmark.` : "Checking connection…";
-    $("healthBadge").textContent = "Stale";
+    if ($("healthSub")) $("healthSub").textContent = Number.isFinite(hrs) ? `No new check in ${hrs.toFixed(1)}h. Displaying last verified benchmark.` : "Checking connection…";
+    if ($("healthBadge")) $("healthBadge").textContent = "Stale";
   } else if (h.status === "disagreeing") {
-    $("healthTitle").textContent = "Sources disagreeing";
-    $("healthSub").textContent = "LiveChennai and GoodReturns don't match. Serving consensus price.";
-    $("healthBadge").textContent = "Check";
+    if ($("healthTitle")) $("healthTitle").textContent = "Sources disagreeing";
+    if ($("healthSub")) $("healthSub").textContent = "LiveChennai and GoodReturns don't match. Serving consensus price.";
+    if ($("healthBadge")) $("healthBadge").textContent = "Check";
   }
 }
 
@@ -1916,10 +1937,10 @@ function renderNextFix(w) {
   line.hidden = false;
 
   if (active) {
-    $("nextFixText").textContent = `Monitoring ${active} fix now — checking every ${w.poll_seconds || 10}s`;
+    if ($("nextFixText")) $("nextFixText").textContent = `Monitoring ${active} fix now — checking every ${w.poll_seconds || 10}s`;
   } else {
     const label = upcomingName === "AM" ? "Morning" : "Evening";
-    $("nextFixText").textContent = `${label} fix expected around ${upcoming.predicted_fix_time} IST`;
+    if ($("nextFixText")) $("nextFixText").textContent = `${label} fix expected around ${upcoming.predicted_fix_time} IST`;
   }
 }
 
