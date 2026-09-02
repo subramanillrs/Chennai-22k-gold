@@ -18,7 +18,7 @@ permissions:
 jobs:
   update:
     runs-on: ubuntu-latest
-    timeout-minutes: 210
+    timeout-minutes: 390
 
     steps:
 
@@ -227,6 +227,7 @@ jobs:
           if git diff --cached --quiet; then
             echo "No data changes to commit."
           else
+            git pull --rebase origin HEAD || true
             git commit -m "Update Chennai 22K gold rate"
             git push
           fi
