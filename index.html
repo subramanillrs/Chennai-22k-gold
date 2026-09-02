@@ -1107,7 +1107,52 @@ async function getJSON(url) {
 }
 
 function normalize(array) {
-  return Array.isArray(array) ? array.filter(i => i && i.date && Number.isFinite(Number(i.rate_22k))).map(i => ({ ...i, rate_22k: Number(i.rate_22k) })) : [];
+  if (!Array.isArray(array)) return [];
+  return array
+    .filter(i => i && i.date && Number.isFinite(Number(i.rate_22k)))
+    .map(i => {
+      const out = { ...i, rate_22k: Number(i.rate_22k) };
+      if (!out.time && out.timestamp) {
+        const dt = new Date(out.timestamp);
+        if (!Number.isNaN(dt.getTime())) out.time = dt.toISOString().slice(11, 19);
+      }
+      if (!out.session) {
+        const hr = out.time ? parseInt(String(out.time).split(':')[0], 10) : NaN;
+        if (Number.isFinite(hr)) out.session = (hr >= 6 && hr < 14) ? 'AM' : (hr >= 14 ? 'PM' : null);
+      }
+      return out;
+    });
+}
+
+function recordTimestamp(rec) {
+  if (!rec) return 0;
+  if (rec.timestamp) {
+    const t = new Date(rec.timestamp).getTime();
+    if (Number.isFinite(t)) return t;
+  }
+  if (rec.date) {
+    const t = new Date(`${rec.date}T${rec.time || '23:59:59'}+05:30`).getTime();
+    if (Number.isFinite(t)) return t;
+  }
+  return 0;
+}
+
+function dailyBenchmarks(records = history) {
+  const byDate = new Map();
+  for (const rec of normalize(records)) {
+    const existing = byDate.get(rec.date);
+    if (!existing || recordTimestamp(rec) >= recordTimestamp(existing)) byDate.set(rec.date, rec);
+  }
+  return [...byDate.values()].sort((a, b) => a.date.localeCompare(b.date));
+}
+
+function latestSnapshot(liveData, records) {
+  const normalizedHistory = normalize(records);
+  const latestHistory = normalizedHistory.length ? normalizedHistory.reduce((a, b) => recordTimestamp(b) > recordTimestamp(a) ? b : a) : null;
+  if (!liveData || !Number.isFinite(Number(liveData.rate_22k))) return latestHistory;
+  return latestHistory && recordTimestamp(latestHistory) > recordTimestamp(liveData)
+    ? { ...liveData, ...latestHistory, rate_8g: Number(latestHistory.rate_22k) * 8 }
+    : liveData;
 }
 
 function getTodayISTDateStr() {
@@ -1184,9 +1229,12 @@ function renderLive(d) {
   }
   if ($("session")) $("session").textContent = currentSession + " Fix";
 
+  const fineness22 = 0.916;
+  const purity24Rate = rate * (0.999 / fineness22);
+  const purity18Rate = rate * (0.750 / fineness22);
   if ($("purity22")) $("purity22").textContent = money(rate) + "/g";
-  if ($("purity24")) $("purity24").textContent = money(Math.round(rate * (24 / 22))) + "/g";
-  if ($("purity18")) $("purity18").textContent = money(Math.round(rate * (18 / 22))) + "/g";
+  if ($("purity24")) $("purity24").textContent = money(Math.round(purity24Rate)) + "/g";
+  if ($("purity18")) $("purity18").textContent = money(Math.round(purity18Rate)) + "/g";
 
   let change1 = Number(d.change);
   if (!Number.isFinite(change1)) change1 = Number.isFinite(Number(d.previous_rate_22k)) ? rate - Number(d.previous_rate_22k) : 0;
@@ -1257,13 +1305,14 @@ function renderTodayTimeline() {
 }
 
 function getFilteredHistory(range) {
-  if (range === "all" || !history.length) return history;
+  if (!history.length) return [];
+  const daily = dailyBenchmarks(history);
+  if (range === "all") return daily;
   const days = Number(range);
-  const now = new Date();
-  const cutoff = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
-  const cutoffStr = cutoff.toISOString().slice(0, 10);
-  const filtered = history.filter(h => h.date >= cutoffStr);
-  return filtered.length >= 2 ? filtered : history.slice(-Math.max(2, Math.min(history.length, days)));
+  const cutoff = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
+  const cutoffStr = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Kolkata', year: 'numeric', month: '2-digit', day: '2-digit' }).format(cutoff);
+  const filtered = daily.filter(h => h.date >= cutoffStr);
+  return filtered.length >= 2 ? filtered : daily.slice(-Math.max(2, Math.min(daily.length, days)));
 }
 
 function updateFintechMetrics() {
@@ -1271,8 +1320,9 @@ function updateFintechMetrics() {
   const currentRate = Number(live.rate_22k);
 
   const calcReturnByDays = (days) => {
-    const targetDate = new Date(new Date().getTime() - days * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
-    const pastRecords = history.filter(h => h.date <= targetDate);
+    const targetDate = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Kolkata', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date(Date.now() - days * 24 * 60 * 60 * 1000));
+    const daily = dailyBenchmarks(history);
+    const pastRecords = daily.filter(h => h.date <= targetDate);
     if (!pastRecords.length) return null;
     const pastVal = Number(pastRecords[pastRecords.length - 1].rate_22k);
     return pastVal ? ((currentRate - pastVal) / pastVal) * 100 : null;
@@ -1493,7 +1543,8 @@ function calculate() {
   const flatFee = Math.max(0, Number($("flatFee")?.value) || 0);
   const oldWeight = Math.max(0, Number($("oldWeight")?.value) || 0);
   const oldPurity = Number($("oldPurity")?.value) || 22;
-  const oldGoldCredit = oldWeight > 0 ? (oldWeight * (rate * (oldPurity / 22))) : 0;
+  const purityFraction = ({ 18: 0.750, 20: 0.840, 22: 0.916, 24: 0.999 })[oldPurity] || 0.916;
+  const oldGoldCredit = oldWeight > 0 ? oldWeight * rate * (purityFraction / 0.916) : 0;
 
   if (mode === "value") {
     if ($("weightField")) $("weightField").style.display = "flex";
@@ -1604,14 +1655,15 @@ if ($("copyQuoteBtn")) {
 
 function renderStats() {
   if (!history.length) return;
-  const vals = history.map(i => Number(i.rate_22k));
+  const daily = dailyBenchmarks(history);
+  const vals = daily.map(i => Number(i.rate_22k));
   const hi = vals.reduce((a, b) => Math.max(a, b), -Infinity);
   const lo = vals.reduce((a, b) => Math.min(a, b), Infinity);
 
   if ($("high")) $("high").textContent = money(hi);
   if ($("low")) $("low").textContent = money(lo);
-  if ($("highDate")) $("highDate").textContent = dateText(history.find(i => Number(i.rate_22k) === hi)?.date);
-  if ($("lowDate")) $("lowDate").textContent = dateText(history.find(i => Number(i.rate_22k) === lo)?.date);
+  if ($("highDate")) $("highDate").textContent = dateText(daily.find(i => Number(i.rate_22k) === hi)?.date);
+  if ($("lowDate")) $("lowDate").textContent = dateText(daily.find(i => Number(i.rate_22k) === lo)?.date);
   if ($("historyCount")) $("historyCount").textContent = history.length.toLocaleString("en-IN") + " records";
 
   if ($("historyBody")) {
@@ -1629,8 +1681,9 @@ function renderStats() {
 
 function compareDates() {
   if (!$("dateA") || !$("dateB") || !$("compareResult")) return;
-  const a = [...history].reverse().find(i => i.date === $("dateA").value);
-  const b = [...history].reverse().find(i => i.date === $("dateB").value);
+  const daily = dailyBenchmarks(history);
+  const a = daily.find(i => i.date === $("dateA").value);
+  const b = daily.find(i => i.date === $("dateB").value);
 
   if (!a || !b) {
     $("compareResult").innerHTML = `<span class="compare-result-top">Select valid dates</span><span class="compare-result-sub">—</span>`;
@@ -1649,8 +1702,9 @@ function compareDates() {
 
 async function loadPublishedData(silent = false) {
   const prevRate = live ? Number(live.rate_22k) : null;
-  const [latest, historical] = await Promise.all([getJSON(LIVE_URL), getJSON(HISTORY_URL)]);
+  const [publishedLive, historical] = await Promise.all([getJSON(LIVE_URL), getJSON(HISTORY_URL)]);
   history = normalize(historical);
+  const latest = latestSnapshot(publishedLive, history);
   renderLive(latest);
   renderStats();
   calculate();
@@ -1674,23 +1728,31 @@ function renderHealth(h) {
   if (!card || !h || !h.status) return;
 
   card.hidden = false;
-  card.className = "collapsible health-collapsible status-" + h.status;
+  const status = String(h.status).toLowerCase();
+  card.className = "collapsible health-collapsible status-" + status;
 
-  if (h.status === "ok") {
-    if ($("healthTitle")) $("healthTitle").textContent = "Feed healthy";
-    if ($("healthSub")) $("healthSub").textContent = h.sources_agree === false ? "Sources briefly differ — consensus price active." : "LiveChennai and GoodReturns feeds are synchronized.";
-    if ($("healthBadge")) $("healthBadge").textContent = "OK";
-  } else if (h.status === "stale") {
-    if ($("healthTitle")) $("healthTitle").textContent = "Feed updating slowly";
-    const hrs = Number(h.hours_since_last_checked);
-    if ($("healthSub")) $("healthSub").textContent = Number.isFinite(hrs) ? `No new check in ${hrs.toFixed(1)}h. Displaying last verified benchmark.` : "Checking connection…";
-    if ($("healthBadge")) $("healthBadge").textContent = "Stale";
-  } else if (h.status === "disagreeing") {
-    if ($("healthTitle")) $("healthTitle").textContent = "Sources disagreeing";
-    if ($("healthSub")) $("healthSub").textContent = "LiveChennai and GoodReturns don't match. Serving verified benchmark.";
-    if ($("healthBadge")) $("healthBadge").textContent = "Check";
+  if (status === "ok") {
+    $("healthTitle") && ($("healthTitle").textContent = "Feed healthy");
+    $("healthSub") && ($("healthSub").textContent = "LiveChennai and GoodReturns feeds are synchronized.");
+    $("healthBadge") && ($("healthBadge").textContent = "OK");
+  } else if (status === "stale") {
+    $("healthTitle") && ($("healthTitle").textContent = "Feed updating slowly");
+    const hrs = Number(h.age_hours ?? h.hours_since_last_checked);
+    $("healthSub") && ($("healthSub").textContent = Number.isFinite(hrs) ? `No new verified update in ${hrs.toFixed(1)}h. Displaying last verified benchmark.` : "The published benchmark is stale.");
+    $("healthBadge") && ($("healthBadge").textContent = "Stale");
+  } else if (status === "degraded" || status === "disagreeing") {
+    $("healthTitle") && ($("healthTitle").textContent = "Feed degraded");
+    const count = Number(h.source_count);
+    const detail = count === 1 ? "Only one source is reporting." : "Source values disagree or verification is incomplete.";
+    $("healthSub") && ($("healthSub").textContent = detail + " Serving the last verified benchmark where required.");
+    $("healthBadge") && ($("healthBadge").textContent = "Check");
+  } else {
+    $("healthTitle") && ($("healthTitle").textContent = "Feed offline");
+    $("healthSub") && ($("healthSub").textContent = "No usable source data is currently available. Displaying cached records if present.");
+    $("healthBadge") && ($("healthBadge").textContent = "Offline");
   }
 }
+
 
 function renderNextFix(w) {
   const line = $("nextFixLine");
@@ -1726,6 +1788,7 @@ async function manualFetch() {
       latest = await getJSON(LIVE_URL);
     }
     history = normalize(await getJSON(HISTORY_URL));
+    latest = latestSnapshot(latest, history);
     renderLive(latest);
     renderStats();
     calculate();
