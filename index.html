@@ -1177,7 +1177,7 @@ function renderLive(d) {
   if (!currentSession) {
     if (d.time) {
       const hr = parseInt(String(d.time).split(":")[0], 10);
-      currentSession = (hr >= 8 && hr < 14) ? "AM" : "PM";
+      currentSession = (hr >= 6 && hr < 14) ? "AM" : "PM";
     } else {
       currentSession = "PM";
     }
@@ -1222,7 +1222,7 @@ function renderTodayTimeline() {
   let am = null, pm = null;
 
   const todayHistory = history.filter(h => h.date === today);
-  const amHist = todayHistory.find(h => h.session === "AM" || (h.time && (() => { const hr = parseInt(h.time.split(":")[0], 10); return hr >= 8 && hr < 14; })()));
+  const amHist = todayHistory.find(h => h.session === "AM" || (h.time && (() => { const hr = parseInt(h.time.split(":")[0], 10); return hr >= 6 && hr < 14; })()));
   const pmHist = [...todayHistory].reverse().find(h => h.session === "PM" || (h.time && parseInt(h.time.split(":")[0], 10) >= 14));
 
   if (amHist) am = { rate_22k: Number(amHist.rate_22k), time: amHist.time || "10:30" };
@@ -1231,11 +1231,16 @@ function renderTodayTimeline() {
   const sessionUpper = String(live.session || "").toUpperCase();
   const timeHour = live.time ? parseInt(String(live.time).split(":")[0], 10) : null;
 
-  if (!am && (sessionUpper === "AM" || (timeHour !== null && timeHour >= 8 && timeHour < 14))) {
+  if (!am && (sessionUpper === "AM" || (timeHour !== null && timeHour >= 6 && timeHour < 14))) {
     am = { rate_22k: Number(live.rate_22k), time: live.time || "10:30" };
   }
   if (!pm && (sessionUpper === "PM" || (timeHour !== null && timeHour >= 14))) {
     pm = { rate_22k: Number(live.rate_22k), time: live.time || "17:00" };
+  }
+
+  if (!am && pm) {
+    const openingRate = Number(live.previous_rate_22k) || Number(live.rate_22k);
+    am = { rate_22k: openingRate, time: "10:30" };
   }
 
   if ($("amRate")) $("amRate").textContent = am && Number.isFinite(am.rate_22k) ? money(am.rate_22k) : "Pending";
@@ -1383,7 +1388,7 @@ function drawChart() {
       let session = rec.session;
       if (!session) {
         const hr = rec.time ? parseInt(String(rec.time).split(":")[0], 10) : null;
-        session = (hr !== null && hr >= 8 && hr < 14) ? "AM" : "PM";
+        session = (hr !== null && hr >= 6 && hr < 14) ? "AM" : "PM";
       }
       ctx.beginPath();
       ctx.arc(points[i].x, points[i].y, 2.4, 0, Math.PI * 2);
@@ -1579,8 +1584,21 @@ if ($("copyQuoteBtn")) {
       txt = `📜 GOLD BUDGET ESTIMATE\nDate: ${dateText(live.date)}\n----------------------\n• Base Rate: ${money(live.rate_22k)}/g\n• Budget: ${money($("budget")?.value || 0)}\n• Making (${$("making")?.value || 8}%): ${$("receiptMaking")?.textContent || "₹ 0"}\n• GST (${$("gstRate")?.value || 3}%): ${$("receiptGst")?.textContent || "₹ 0"}\n• Exchange: ${oldAmt}\n----------------------\nESTIMATED GOLD WEIGHT: ${$("calcResult")?.textContent || "—"}`;
     }
 
-    navigator.clipboard?.writeText(txt);
-    toast("Quotation Copied!");
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(txt);
+      } else {
+        const area = document.createElement("textarea");
+        area.value = txt;
+        document.body.appendChild(area);
+        area.select();
+        document.execCommand("copy");
+        document.body.removeChild(area);
+      }
+      toast("Quotation Copied!");
+    } catch (_) {
+      toast("Copy Failed");
+    }
   };
 }
 
