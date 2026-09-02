@@ -75,7 +75,7 @@ ALERT_COOLDOWN_HOURS = 12
 # the feed goes stale or sources disagree for too long. Left unset,
 # alert_state.json is still tracked/updated, but no network call is
 # made and health_status.json reports webhook_configured: false.
-WEBHOOK_URL = os.environ.get("WEBHOOK_URL", "").strip()
+WEBHOOK_URL = os.environ.get("WEBHOOK_URL", os.environ.get("ALERT_WEBHOOK_URL", "")).strip()
 
 SESSION = requests.Session()
 SESSION.headers.update(
