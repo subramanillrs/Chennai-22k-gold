@@ -92,6 +92,16 @@ PM_PREDICTION_MAX = (21, 0)
 # reject it rather than saving it as if it were legitimate.
 MAX_DAILY_CHANGE_PCT = 8
 
+# LiveChennai and GoodReturns are independently maintained and often
+# round or refresh at slightly different moments, so exact equality
+# between them is too strict a bar for "agreement" — a genuine ₹15-25
+# gap between two correct quotes is normal and was previously enough
+# to freeze live.json indefinitely (see SOURCE_AGREEMENT_TOLERANCE
+# usage in select_rate). Sources within this rupee amount of each
+# other are treated as agreeing; anything wider is treated as a real
+# disagreement worth freezing on.
+SOURCE_AGREEMENT_TOLERANCE = 50
+
 
 # ============================================================
 # ALERTING / HEALTH CHECK
@@ -752,17 +762,27 @@ def select_rate(
     if (
         live_rate is not None
         and good_rate is not None
-        and live_rate == good_rate
+        and abs(live_rate - good_rate) <= SOURCE_AGREEMENT_TOLERANCE
     ):
 
-        print(
-            "Sources agree."
-        )
+        agreed_rate = round((live_rate + good_rate) / 2)
 
-        if not _rate_is_plausible(live_rate, previous_rate):
+        if live_rate == good_rate:
+            print(
+                "Sources agree."
+            )
+        else:
+            print(
+                f"Sources within tolerance "
+                f"(±{format_rupees(SOURCE_AGREEMENT_TOLERANCE)}): "
+                f"treating as agreement, using average "
+                f"{format_rupees(agreed_rate)}."
+            )
+
+        if not _rate_is_plausible(agreed_rate, previous_rate):
 
             print(
-                f"WARNING: Both sources agree on {format_rupees(live_rate)}, "
+                f"WARNING: Both sources agree on {format_rupees(agreed_rate)}, "
                 f"but that's a >{MAX_DAILY_CHANGE_PCT}% jump from the last "
                 f"saved rate {format_rupees(previous_rate)}. Both parsers "
                 "may be reading the wrong field. Keeping previous rate."
@@ -778,9 +798,13 @@ def select_rate(
                 }
 
         return {
-            "rate_22k": live_rate,
+            "rate_22k": agreed_rate,
             "agreement": True,
-            "source": "LiveChennai + GoodReturns",
+            "source": (
+                "LiveChennai + GoodReturns"
+                if live_rate == good_rate
+                else "LiveChennai + GoodReturns (within tolerance)"
+            ),
             "livechennai": live,
             "goodreturns": good
         }
@@ -868,12 +892,14 @@ def select_rate(
     if (
         live_rate is not None
         and good_rate is not None
-        and live_rate != good_rate
+        and abs(live_rate - good_rate) > SOURCE_AGREEMENT_TOLERANCE
     ):
 
         print("")
         print(
-            "WARNING: SOURCES DISAGREE"
+            "WARNING: SOURCES DISAGREE "
+            f"(gap {format_rupees(abs(live_rate - good_rate))} exceeds "
+            f"tolerance of {format_rupees(SOURCE_AGREEMENT_TOLERANCE)})"
         )
 
         print(
