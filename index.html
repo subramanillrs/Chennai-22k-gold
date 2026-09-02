@@ -32,7 +32,6 @@
   --r-lg: 12px;
   --r-full: 9999px;
 
-  /* Ledger palette — warm ivory paper, ink text, antique gold-leaf accent */
   --paper: #faf7f0;
   --paper-raised: #ffffff;
   --paper-sunken: #f2ede1;
@@ -89,6 +88,7 @@ html[data-theme="light"] {
   --good: #3f6e4a; --good-bg: #e3ecdf; --bad: #a13f34; --bad-bg: #f3e2de;
   --shadow-card: 0 1px 2px rgba(28, 23, 18, 0.04), 0 8px 24px -12px rgba(28, 23, 18, 0.12);
 }
+
 html[data-theme="dark"] {
   --paper: #14120e; --paper-raised: #1c1912; --paper-sunken: #100e0a;
   --rule: #2a2620; --rule-strong: #3a342a;
@@ -123,28 +123,53 @@ button, input, select { font-family: inherit; color: inherit; border: none; back
   padding: calc(20px + env(safe-area-inset-top)) 20px calc(40px + env(safe-area-inset-bottom));
   display: flex;
   flex-direction: column;
-  gap: 22px;
+  gap: 18px;
 }
 
-/* ============= Masthead ============= */
+/* Masthead */
 .masthead {
   display: flex;
   justify-content: space-between;
-  align-items: flex-end;
+  align-items: center;
   width: 100%;
-  padding-bottom: 14px;
+  padding-bottom: 12px;
   border-bottom: 2px solid var(--ink);
 }
+
+.brand-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.brand-badge {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--r-sm);
+  background: linear-gradient(135deg, var(--gold), var(--gold-deep));
+  color: #ffffff;
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(156, 122, 60, 0.35);
+  flex-shrink: 0;
+}
+
 .masthead-title {
   font-family: var(--font-display);
-  font-size: clamp(22px, 6.4vw, 28px);
+  font-size: clamp(20px, 5.5vw, 26px);
   font-weight: 600;
   font-style: italic;
   letter-spacing: -0.01em;
   color: var(--ink);
   line-height: 1;
 }
-.masthead-actions { display: flex; align-items: center; gap: 10px; }
+
+.masthead-actions { display: flex; align-items: center; gap: 8px; }
 
 .status-pill {
   display: inline-flex;
@@ -164,10 +189,8 @@ button, input, select { font-family: inherit; color: inherit; border: none; back
 .status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--good); flex-shrink: 0; animation: pulse-ring 2s infinite; }
 .status-pill.offline .status-dot { background: var(--bad); animation: none; }
 .status-pill.syncing .status-dot { background: var(--gold); animation: spin 0.8s linear infinite; border-radius: 1px; }
-.status-pill.hunting .status-dot { background: var(--gold); animation: pulse-fast 0.6s infinite alternate; }
 
 @keyframes pulse-ring { 0% { transform: scale(0.9); opacity: 0.75; } 50% { transform: scale(1.2); opacity: 1; } 100% { transform: scale(0.9); opacity: 0.75; } }
-@keyframes pulse-fast { 0% { transform: scale(0.8); opacity: 0.55; } 100% { transform: scale(1.3); opacity: 1; } }
 @keyframes spin { to { transform: rotate(360deg); } }
 
 .theme-toggle {
@@ -183,24 +206,62 @@ button, input, select { font-family: inherit; color: inherit; border: none; back
 html[data-theme="dark"] .theme-toggle .icon-sun { display: block; }
 html[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
 
-/* ============= Feed line (health + next fix) ============= */
-.feed-line {
+/* Collapsible Feed Health Status */
+.health-collapsible {
+  background: var(--paper-raised);
+  border: 1px solid var(--rule);
+  border-radius: var(--r-sm);
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+}
+.health-collapsible summary {
   display: flex;
   align-items: center;
-  gap: 10px;
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--ink-soft);
-  padding: 2px 0;
+  justify-content: space-between;
+  padding: 10px 14px;
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
 }
-.feed-line[hidden] { display: none !important; }
+.health-collapsible summary::-webkit-details-marker { display: none; }
+.health-summary-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding-right: 10px;
+}
+.health-summary-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
 .feed-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--good); flex-shrink: 0; }
-.feed-line.status-stale .feed-dot { background: var(--gold); }
-.feed-line.status-disagreeing .feed-dot { background: var(--bad); }
-.feed-line b { font-weight: 700; color: var(--ink); }
-.feed-sep { color: var(--rule-strong); }
+.health-collapsible.status-stale .feed-dot { background: var(--gold); }
+.health-collapsible.status-disagreeing .feed-dot { background: var(--bad); }
+.health-title { font-size: 12px; font-weight: 700; color: var(--ink); }
+.health-badge {
+  font-size: 9.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 3px 8px;
+  border-radius: var(--r-full);
+  background: var(--good-bg);
+  color: var(--good);
+}
+.health-collapsible.status-stale .health-badge { background: var(--gold-tint); color: var(--gold-deep); }
+.health-collapsible.status-disagreeing .health-badge { background: var(--bad-bg); color: var(--bad); }
+.health-collapsible .collapsible-content {
+  padding: 10px 14px;
+  border-top: 1px dashed var(--rule);
+  font-size: 11.5px;
+  color: var(--ink-soft);
+  line-height: 1.45;
+  background: var(--paper-sunken);
+}
 
-/* ============= Notice banners ============= */
+/* Notice Banners */
 .notice {
   display: flex;
   align-items: flex-start;
@@ -218,55 +279,51 @@ html[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
 .notice-body { display: flex; flex-direction: column; gap: 2px; width: 100%; }
 .notice-body strong { font-size: 12.5px; font-weight: 700; display: flex; justify-content: space-between; }
 .notice-body p { font-size: 11.5px; font-weight: 500; line-height: 1.4; color: var(--ink-soft); }
-.notice-dismiss { font-size: 9.5px; opacity: 0.75; text-transform: none; font-weight: 600; }
+.notice-dismiss { font-size: 9.5px; opacity: 0.75; font-weight: 600; }
 
-/* ============= Hero — the one bold moment ============= */
+/* Hero Card */
 .hero {
   background: var(--paper-raised);
   border: 1px solid var(--rule);
   border-radius: var(--r-lg);
-  padding: 30px 26px 26px;
+  padding: 26px 22px 20px;
   box-shadow: var(--shadow-card);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 16px;
+  gap: 14px;
   width: 100%;
   text-align: center;
   position: relative;
 }
-
 .hero-eyebrow {
   font-family: var(--font-display);
   font-style: italic;
-  font-size: 14px;
+  font-size: 13.5px;
   font-weight: 440;
   color: var(--gold-deep);
 }
-
 .hero-price {
   font-family: var(--font-display);
-  font-size: clamp(44px, 12vw, 66px);
+  font-size: clamp(42px, 11vw, 62px);
   font-weight: 600;
   letter-spacing: -0.02em;
   line-height: 1;
   color: var(--ink);
 }
-
 .hero-rule {
   width: 100%;
   height: 1px;
   background: var(--rule);
-  margin: 4px 0;
+  margin: 2px 0;
 }
-
 .hero-foot {
   display: flex;
   justify-content: space-between;
   width: 100%;
   gap: 16px;
 }
-.hero-foot-col { display: flex; flex-direction: column; gap: 2px; flex: 1; }
+.hero-foot-col { display: flex; flex-direction: column; gap: 2px; flex: 1; text-align: left; }
 .hero-foot-col:last-child { text-align: right; }
 .hero-foot-label { font-size: 10px; font-weight: 600; color: var(--ink-faint); }
 .hero-foot-val { font-family: var(--font-display); font-size: 15px; font-weight: 600; color: var(--ink); display: flex; align-items: center; gap: 5px; }
@@ -275,35 +332,13 @@ html[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
 
 .share-link {
   position: absolute;
-  top: 20px; right: 20px;
+  top: 18px; right: 18px;
   display: inline-flex; align-items: center; gap: 5px;
-  font-size: 10.5px; font-weight: 600; color: var(--ink-soft);
+  font-size: 11px; font-weight: 600; color: var(--ink-soft);
   cursor: pointer; padding: 4px;
 }
 
-/* ============= Ledger row list (replaces bordered SaaS cards) ============= */
-.ledger {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-}
-.ledger-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  padding: 11px 2px;
-  border-bottom: 1px solid var(--rule);
-  gap: 12px;
-}
-.ledger-row:last-child { border-bottom: none; }
-.ledger-key { font-size: 12.5px; font-weight: 500; color: var(--ink-soft); flex-shrink: 0; }
-.ledger-val { font-family: var(--font-display); font-size: 14.5px; font-weight: 600; color: var(--ink); text-align: right; }
-.ledger-val small { font-family: var(--font-sans); font-size: 10.5px; font-weight: 500; color: var(--ink-soft); display: block; margin-top: 1px; }
-.ledger-val-stack { display: flex; flex-direction: column; align-items: flex-end; gap: 1px; }
-.ledger-val-stack .ledger-val { text-align: right; }
-.ledger-val-stack small { font-size: 10.5px; font-weight: 500; color: var(--ink-soft); }
-
-/* ============= Section headings ============= */
+/* Sections & Panels */
 .section { display: flex; flex-direction: column; gap: 10px; width: 100%; }
 .section-head { display: flex; align-items: baseline; justify-content: space-between; }
 .section-head h3 {
@@ -319,30 +354,45 @@ html[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
   background: var(--paper-raised);
   border: 1px solid var(--rule);
   border-radius: var(--r-md);
-  padding: 16px;
+  padding: 14px 16px;
   width: 100%;
 }
 
-/* Purity ledger row (3-up) */
 .purity-row {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   width: 100%;
+  padding: 10px 0;
 }
 .purity-cell {
   display: flex; flex-direction: column; gap: 3px;
-  padding: 4px 10px;
+  padding: 0 10px;
   border-right: 1px solid var(--rule);
   text-align: center;
 }
 .purity-cell:last-child { border-right: none; }
 .purity-cell small { font-size: 10px; font-weight: 600; color: var(--ink-faint); }
-.purity-cell b { font-family: var(--font-display); font-size: 15px; font-weight: 600; color: var(--ink); }
+.purity-cell b { font-family: var(--font-display); font-size: 14.5px; font-weight: 600; color: var(--ink); }
 
-/* Timeline cards (AM/PM) */
+.ledger { display: flex; flex-direction: column; width: 100%; }
+.ledger-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 10px 2px;
+  border-bottom: 1px solid var(--rule);
+  gap: 12px;
+}
+.ledger-row:last-child { border-bottom: none; }
+.ledger-key { font-size: 12px; font-weight: 500; color: var(--ink-soft); flex-shrink: 0; }
+.ledger-val { font-family: var(--font-display); font-size: 14px; font-weight: 600; color: var(--ink); text-align: right; }
+.ledger-val-stack { display: flex; flex-direction: column; align-items: flex-end; gap: 1px; }
+.ledger-val-stack small { font-size: 10px; font-weight: 500; color: var(--ink-soft); }
+
+/* AM / PM Timeline */
 .timeline-horizontal { display: grid; grid-template-columns: 1fr 1fr; gap: 0; width: 100%; }
 .timeline-card {
-  padding: 12px 14px;
+  padding: 10px 14px;
   display: flex; flex-direction: column; gap: 4px;
   border-right: 1px solid var(--rule);
 }
@@ -351,13 +401,13 @@ html[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
 .timeline-card-header .lbl { font-size: 10px; font-weight: 600; color: var(--ink-faint); }
 .timeline-node { width: 7px; height: 7px; border-radius: 50%; background: var(--rule-strong); flex-shrink: 0; }
 .timeline-card.is-active .timeline-node { background: var(--gold); }
-.timeline-card b { font-family: var(--font-display); font-size: 17px; font-weight: 600; color: var(--ink); }
+.timeline-card b { font-family: var(--font-display); font-size: 16.5px; font-weight: 600; color: var(--ink); }
 .timeline-card small { font-size: 11px; font-weight: 500; color: var(--ink-soft); }
 .next-fix-line { display: flex; align-items: center; gap: 6px; margin-top: 4px; padding: 10px 14px 0; border-top: 1px solid var(--rule); font-size: 11px; font-weight: 500; color: var(--ink-faint); }
 .next-fix-line[hidden] { display: none !important; }
 .next-fix-line svg { width: 12px; height: 12px; flex-shrink: 0; }
 
-/* ============= Chart ============= */
+/* Chart Panel */
 .chart-panel { display: flex; flex-direction: column; gap: 14px; }
 .segment-ctrl {
   display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 0;
@@ -389,16 +439,16 @@ html[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
 .chart-legend i.dot-am { background: #6b8cae; }
 .chart-legend i.dot-pm { background: var(--gold); margin-left: 6px; }
 
-/* ============= Collapsibles ============= */
+/* Collapsibles */
 details.collapsible { background: var(--paper-raised); border: 1px solid var(--rule); border-radius: var(--r-md); overflow: hidden; width: 100%; }
-details.collapsible summary { display: flex; align-items: center; justify-content: space-between; padding: 15px 16px; cursor: pointer; list-style: none; user-select: none; }
+details.collapsible summary { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; cursor: pointer; list-style: none; user-select: none; }
 details.collapsible summary::-webkit-details-marker { display: none; }
 .summary-title { display: flex; align-items: baseline; justify-content: space-between; width: 100%; padding-right: 12px; }
-.summary-title h3 { font-family: var(--font-display); font-size: 16px; font-weight: 600; font-style: italic; color: var(--ink); }
+.summary-title h3 { font-family: var(--font-display); font-size: 15.5px; font-weight: 600; font-style: italic; color: var(--ink); }
 .summary-title span { font-size: 11px; font-weight: 500; color: var(--ink-faint); }
 .chevron { font-size: 10px; color: var(--ink-faint); transition: transform var(--transition); flex-shrink: 0; }
 details[open] .chevron { transform: rotate(180deg); }
-.collapsible-content { padding: 0 16px 18px; border-top: 1px solid var(--rule); padding-top: 16px; display: flex; flex-direction: column; gap: 16px; }
+.collapsible-content { padding: 0 16px 16px; border-top: 1px solid var(--rule); padding-top: 14px; display: flex; flex-direction: column; gap: 14px; }
 
 .horizon-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; }
 .horizon-box { display: flex; flex-direction: column; gap: 3px; padding: 8px 4px; border-right: 1px solid var(--rule); border-bottom: 1px solid var(--rule); text-align: center; }
@@ -413,9 +463,6 @@ details[open] .chevron { transform: rotate(180deg); }
 .change-pill.same { background: var(--paper-sunken); color: var(--ink-soft); }
 .change-pill.mini { font-size: 9.5px; padding: 2px 7px; }
 
-/* #change8 lives in the hero and is styled as quiet text, not a pill,
-   to match the editorial hero treatment — same up/down/same classes
-   the JS already sets, just a different visual treatment here. */
 #change8.change-pill {
   background: none; padding: 0; font-size: 13px; font-weight: 600;
   display: inline-flex; align-items: center; gap: 5px;
@@ -429,35 +476,35 @@ details[open] .chevron { transform: rotate(180deg); }
 .last-box p { font-size: 11px; font-weight: 500; color: var(--ink-soft); }
 .last-box .amount { font-family: var(--font-display); font-size: 18px; font-weight: 600; }
 
-/* ============= Compare Historical Dates ============= */
+/* Compare Dates */
 .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%; }
 .compare-field { display: flex; flex-direction: column; }
 .compare-field label { font-size: 10.5px; font-weight: 600; color: var(--ink-faint); margin-bottom: 6px; }
-.compare-result-panel { margin-top: 4px; padding-top: 16px; border-top: 1px solid var(--rule); display: flex; flex-direction: column; gap: 8px; }
+.compare-result-panel { margin-top: 4px; padding-top: 14px; border-top: 1px solid var(--rule); display: flex; flex-direction: column; gap: 8px; }
 .compare-result-label { font-size: 10.5px; font-weight: 600; color: var(--ink-faint); }
 .compare-result-card {
-  min-height: 56px; padding: 12px 14px; background: var(--paper-sunken);
+  min-height: 54px; padding: 12px 14px; background: var(--paper-sunken);
   border: 1px solid var(--rule); border-radius: var(--r-sm);
   display: flex; align-items: center; justify-content: space-between; gap: 12px;
 }
 .compare-result-top { font-family: var(--font-display); font-size: 14px; font-weight: 600; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.compare-result-sub { font-size: 11.5px; font-weight: 700; padding: 6px 10px; border-radius: var(--r-full); background: var(--paper-raised); color: var(--ink-soft); white-space: nowrap; flex-shrink: 0; }
+.compare-result-sub { font-size: 11.5px; font-weight: 700; padding: 5px 10px; border-radius: var(--r-full); background: var(--paper-raised); color: var(--ink-soft); white-space: nowrap; flex-shrink: 0; }
 .compare-result-sub.positive { color: var(--good); background: var(--good-bg); }
 .compare-result-sub.negative { color: var(--bad); background: var(--bad-bg); }
 
-/* ============= Jewelry Calculator Suite ============= */
-.calc-suite { display: flex; flex-direction: column; gap: 18px; }
+/* Calculator */
+.calc-suite { display: flex; flex-direction: column; gap: 16px; }
 .calc-segmented-mode { display: flex; border: 1px solid var(--rule); border-radius: var(--r-sm); overflow: hidden; }
 .calc-mode-btn { flex: 1; height: 36px; font-size: 11.5px; font-weight: 600; color: var(--ink-soft); cursor: pointer; border-right: 1px solid var(--rule); }
 .calc-mode-btn:last-child { border-right: none; }
 .calc-mode-btn.active { background: var(--ink); color: var(--paper); }
 
-.calc-group { display: flex; flex-direction: column; gap: 8px; }
+.calc-group { display: flex; flex-direction: column; gap: 6px; }
 .calc-group-label { font-size: 10.5px; font-weight: 600; color: var(--ink-faint); }
 .chip-container { display: flex; flex-wrap: wrap; gap: 6px; }
 .chip {
-  height: 30px; padding: 0 12px; border: 1px solid var(--rule);
-  border-radius: var(--r-full); font-size: 11.5px; font-weight: 600; color: var(--ink-soft); cursor: pointer;
+  height: 28px; padding: 0 11px; border: 1px solid var(--rule);
+  border-radius: var(--r-full); font-size: 11px; font-weight: 600; color: var(--ink-soft); cursor: pointer;
 }
 .chip.active { background: var(--gold-tint); border-color: var(--gold-line); color: var(--gold-deep); }
 
@@ -465,9 +512,9 @@ details[open] .chevron { transform: rotate(180deg); }
 .calc-field { display: flex; flex-direction: column; }
 .calc-field label { font-size: 10.5px; font-weight: 600; color: var(--ink-faint); margin-bottom: 6px; }
 .calc-input {
-  width: 100%; height: 42px; padding: 0 12px;
+  width: 100%; height: 40px; padding: 0 12px;
   background: var(--paper-sunken); border: 1px solid var(--rule); border-radius: var(--r-xs);
-  font-size: 13.5px; font-weight: 600; color: var(--ink);
+  font-size: 13px; font-weight: 600; color: var(--ink);
   display: flex; align-items: center; transition: border-color var(--transition);
 }
 .calc-input:focus { background: var(--paper-raised); border-color: var(--gold); }
@@ -482,20 +529,20 @@ select.calc-input {
   background-repeat: no-repeat; background-position: right 12px center; padding-right: 30px;
 }
 
-.exchange-drawer { border-top: 1px solid var(--rule); padding-top: 16px; display: flex; flex-direction: column; gap: 10px; }
+.exchange-drawer { border-top: 1px solid var(--rule); padding-top: 14px; display: flex; flex-direction: column; gap: 10px; }
 .exchange-header { font-size: 10.5px; font-weight: 600; color: var(--ink-faint); }
 
-.receipt-card { border: 1px solid var(--rule); border-radius: var(--r-sm); padding: 16px; background: var(--paper-sunken); }
-.receipt-title { font-family: var(--font-display); font-size: 13px; font-weight: 600; font-style: italic; color: var(--ink); margin-bottom: 10px; }
-.receipt-line { display: flex; justify-content: space-between; font-size: 12px; font-weight: 500; color: var(--ink-soft); padding: 5px 0; }
+.receipt-card { border: 1px solid var(--rule); border-radius: var(--r-sm); padding: 14px; background: var(--paper-sunken); }
+.receipt-title { font-family: var(--font-display); font-size: 13px; font-weight: 600; font-style: italic; color: var(--ink); margin-bottom: 8px; }
+.receipt-line { display: flex; justify-content: space-between; font-size: 12px; font-weight: 500; color: var(--ink-soft); padding: 4px 0; }
 .receipt-line.deduction span:last-child { color: var(--good); }
-.receipt-total { display: flex; justify-content: space-between; align-items: baseline; margin-top: 8px; padding-top: 12px; border-top: 1px solid var(--rule); }
+.receipt-total { display: flex; justify-content: space-between; align-items: baseline; margin-top: 8px; padding-top: 10px; border-top: 1px solid var(--rule); }
 .receipt-total .label { font-size: 12px; font-weight: 600; color: var(--ink); }
-.receipt-total .final-val { font-family: var(--font-display); font-size: 22px; font-weight: 600; color: var(--gold-deep); }
-.quote-btn { width: 100%; height: 42px; margin-top: 14px; background: var(--ink); color: var(--paper); border-radius: var(--r-xs); font-size: 12.5px; font-weight: 700; cursor: pointer; }
+.receipt-total .final-val { font-family: var(--font-display); font-size: 21px; font-weight: 600; color: var(--gold-deep); }
+.quote-btn { width: 100%; height: 40px; margin-top: 12px; background: var(--ink); color: var(--paper); border-radius: var(--r-xs); font-size: 12px; font-weight: 700; cursor: pointer; }
 .quote-btn:active { opacity: 0.85; }
 
-/* ============= Historical Log Table ============= */
+/* Historical Log Table */
 .table-wrap { padding: 0; overflow: hidden; }
 .history-table { width: 100%; border-collapse: collapse; max-height: 360px; display: block; overflow-y: auto; }
 .history-table thead, .history-table tbody { display: table; width: 100%; table-layout: fixed; }
@@ -510,7 +557,7 @@ select.calc-input {
 .history-table th:nth-child(2), .history-table td:nth-child(2),
 .history-table th:nth-child(3), .history-table td:nth-child(3) { width: 33.333%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-/* ============= Pull to refresh ============= */
+/* Pull to Refresh */
 .pulldown {
   position: fixed;
   top: env(safe-area-inset-top);
@@ -538,7 +585,6 @@ select.calc-input {
 .pulldown.loading .icon-spin { display: block; animation: spin 0.7s linear infinite; }
 .pulldown.ready .pulldownicon { transform: rotate(180deg); }
 
-/* ============= Footer & toast ============= */
 footer { text-align: center; font-size: 10.5px; font-weight: 500; color: var(--ink-faint); padding-top: 6px; }
 
 .toast {
@@ -548,10 +594,6 @@ footer { text-align: center; font-size: 10.5px; font-weight: 500; color: var(--i
   transition: all var(--transition); z-index: 100; white-space: nowrap; box-shadow: var(--shadow-card);
 }
 .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-
-@media (prefers-reduced-motion: reduce) {
-  * { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
-}
 </style>
 </head>
 
@@ -568,7 +610,10 @@ footer { text-align: center; font-size: 10.5px; font-weight: 500; color: var(--i
   </div>
 
   <header class="masthead">
-    <div class="masthead-title">Gold 22k rate</div>
+    <div class="brand-wrap">
+      <div class="brand-badge" aria-hidden="true">Au</div>
+      <div class="masthead-title">Gold 22k rate</div>
+    </div>
     <div class="masthead-actions">
       <div class="status-pill" id="status">
         <span class="status-dot"></span>
@@ -581,13 +626,22 @@ footer { text-align: center; font-size: 10.5px; font-weight: 500; color: var(--i
     </div>
   </header>
 
-  <!-- Feed health, shown as a quiet inline line, not a boxed card -->
-  <div class="feed-line" id="healthCard" hidden>
-    <span class="feed-dot" id="healthDot"></span>
-    <b id="healthTitle">Feed healthy</b>
-    <span class="feed-sep">·</span>
-    <span id="healthSub">All sources reporting normally</span>
-  </div>
+  <!-- Collapsible Feed Health Status -->
+  <details class="collapsible health-collapsible" id="healthCard" hidden>
+    <summary>
+      <div class="health-summary-inner">
+        <div class="health-summary-left">
+          <span class="feed-dot" id="healthDot"></span>
+          <span class="health-title" id="healthTitle">Feed healthy</span>
+        </div>
+        <span class="health-badge" id="healthBadge">OK</span>
+      </div>
+      <span class="chevron">▼</span>
+    </summary>
+    <div class="collapsible-content" id="healthSub">
+      All sources reporting normally.
+    </div>
+  </details>
 
   <div class="notice" id="parserWarning" hidden onclick="this.hidden = true;">
     <div class="notice-body">
@@ -605,7 +659,7 @@ footer { text-align: center; font-size: 10.5px; font-weight: 500; color: var(--i
 
   <div hidden><button id="fetchNow"></button></div>
 
-  <!-- Hero — the one bold, characteristic moment on the page -->
+  <!-- Hero Section -->
   <section class="hero" id="heroCard">
     <span class="share-link" id="shareBtn">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
@@ -648,7 +702,7 @@ footer { text-align: center; font-size: 10.5px; font-weight: 500; color: var(--i
     </div>
   </div>
 
-  <!-- Session / peak / floor as ledger rows -->
+  <!-- Session / Peak / Floor -->
   <div class="panel">
     <div class="ledger">
       <div class="ledger-row">
@@ -749,7 +803,7 @@ footer { text-align: center; font-size: 10.5px; font-weight: 500; color: var(--i
     </div>
   </section>
 
-  <!-- Multi-Horizon & Indicators Group -->
+  <!-- Multi-Horizon & Indicators -->
   <div style="display:flex; flex-direction:column; gap: 12px;">
     <details class="collapsible">
       <summary><div class="summary-title"><h3>Returns by period</h3><span>Multi-horizon</span></div><span class="chevron">▼</span></summary>
@@ -785,7 +839,7 @@ footer { text-align: center; font-size: 10.5px; font-weight: 500; color: var(--i
     </div>
   </div>
 
-  <!-- Compare Historical Dates — collapsed by default, opens on tap -->
+  <!-- Compare Historical Dates -->
   <details class="collapsible">
     <summary><div class="summary-title"><h3>Compare dates</h3><span>Tap to open</span></div><span class="chevron">▼</span></summary>
     <div class="collapsible-content">
@@ -817,7 +871,6 @@ footer { text-align: center; font-size: 10.5px; font-weight: 500; color: var(--i
     <div class="panel">
       <div class="calc-suite">
         
-        <!-- Calculation Mode Switcher -->
         <div class="calc-segmented-mode">
           <button class="calc-mode-btn active" type="button" data-mode="value">Calculate Price by Weight</button>
           <button class="calc-mode-btn" type="button" data-mode="grams">Calculate Weight by Budget</button>
@@ -827,7 +880,6 @@ footer { text-align: center; font-size: 10.5px; font-weight: 500; color: var(--i
           </select>
         </div>
 
-        <!-- Standard Gold Weight Presets -->
         <div class="calc-group">
           <span class="calc-group-label">Standard Gold Weight</span>
           <div class="chip-container" id="weightChips">
@@ -841,7 +893,6 @@ footer { text-align: center; font-size: 10.5px; font-weight: 500; color: var(--i
           </div>
         </div>
 
-        <!-- Category & Making Charges -->
         <div class="calc-group">
           <span class="calc-group-label">Jewelry Category & Making Charges</span>
           <div class="chip-container" id="makingChips">
@@ -852,7 +903,6 @@ footer { text-align: center; font-size: 10.5px; font-weight: 500; color: var(--i
           </div>
         </div>
 
-        <!-- Parameter Input Grid -->
         <div class="calc-grid-form">
           <div class="calc-field" id="weightField">
             <label>Gold Weight (Grams)</label>
@@ -876,7 +926,6 @@ footer { text-align: center; font-size: 10.5px; font-weight: 500; color: var(--i
           </div>
         </div>
 
-        <!-- Scrap Gold Exchange Drawer -->
         <div class="exchange-drawer">
           <span class="exchange-header">Old Gold Scrap Exchange (Optional)</span>
           <div class="calc-grid-form">
@@ -896,7 +945,6 @@ footer { text-align: center; font-size: 10.5px; font-weight: 500; color: var(--i
           </div>
         </div>
 
-        <!-- Detailed Itemized Receipt Card -->
         <div class="receipt-card">
           <div class="receipt-title">Itemized Purchase Quotation</div>
           <div class="receipt-line"><span>Base 22K Gold Cost:</span><span id="receiptBase">₹ 0</span></div>
@@ -918,7 +966,7 @@ footer { text-align: center; font-size: 10.5px; font-weight: 500; color: var(--i
     </div>
   </section>
 
-  <!-- Redesigned Historical Log Table -->
+  <!-- Historical Log Table -->
   <section class="section">
     <div class="section-head">
       <h3>Historical Log</h3>
@@ -956,9 +1004,6 @@ let scrubIndex = -1;
 
 const $ = id => document.getElementById(id);
 
-/* Theme toggle — manual override persisted in localStorage.
-   Falls back to the OS preference (handled purely by CSS media query)
-   until the user makes an explicit choice. */
 (function setupThemeToggle() {
   const root = document.documentElement;
   const metaLight = document.querySelector('meta[name="theme-color"][media*="light"]');
@@ -971,7 +1016,7 @@ const $ = id => document.getElementById(id);
       root.removeAttribute("data-theme");
     }
     const isDark = theme === "dark" || (!theme && window.matchMedia("(prefers-color-scheme: dark)").matches);
-    const color = isDark ? "#030712" : "#f8fafc";
+    const color = isDark ? "#14120e" : "#faf7f0";
     if (metaLight) metaLight.setAttribute("content", color);
     if (metaDark) metaDark.setAttribute("content", color);
     if (typeof drawChart === "function") requestAnimationFrame(drawChart);
@@ -980,14 +1025,17 @@ const $ = id => document.getElementById(id);
   const saved = localStorage.getItem("gold_theme");
   applyTheme(saved);
 
-  $("themeToggle").onclick = () => {
-    haptic(8);
-    const current = root.getAttribute("data-theme") ||
-      (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
-    const next = current === "dark" ? "light" : "dark";
-    localStorage.setItem("gold_theme", next);
-    applyTheme(next);
-  };
+  const btn = $("themeToggle");
+  if (btn) {
+    btn.onclick = () => {
+      haptic(8);
+      const current = root.getAttribute("data-theme") ||
+        (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+      const next = current === "dark" ? "light" : "dark";
+      localStorage.setItem("gold_theme", next);
+      applyTheme(next);
+    };
+  }
 })();
 
 let audioCtx = null;
@@ -1035,15 +1083,21 @@ const timeText = s => {
 const esc = s => String(s ?? "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;");
 
 function setStatus(text, offline = false, syncing = false) {
-  $("statusText").textContent = text;
-  $("status").classList.toggle("offline", offline);
-  $("status").classList.toggle("syncing", syncing);
+  const elText = $("statusText");
+  const elStatus = $("status");
+  if (elText) elText.textContent = text;
+  if (elStatus) {
+    elStatus.classList.toggle("offline", offline);
+    elStatus.classList.toggle("syncing", syncing);
+  }
 }
 
 function toast(text) {
-  $("toast").textContent = text;
-  $("toast").classList.add("show");
-  setTimeout(() => $("toast").classList.remove("show"), 2200);
+  const el = $("toast");
+  if (!el) return;
+  el.textContent = text;
+  el.classList.add("show");
+  setTimeout(() => el.classList.remove("show"), 2200);
 }
 
 function sleep(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
@@ -1053,8 +1107,10 @@ function checkParserHealth(data, networkError = false) {
   if (!warningBox) return;
 
   if (networkError && !navigator.onLine) {
-    $("warningTitle").innerHTML = `Offline Mode <span class="notice-dismiss">Tap to dismiss</span>`;
-    $("warningDesc").textContent = "Device offline. Displaying saved market records.";
+    const title = $("warningTitle");
+    const desc = $("warningDesc");
+    if (title) title.innerHTML = `Offline Mode <span class="notice-dismiss">Tap to dismiss</span>`;
+    if (desc) desc.textContent = "Device offline. Displaying saved market records.";
     warningBox.hidden = false;
     return;
   }
@@ -1070,8 +1126,10 @@ function checkParserHealth(data, networkError = false) {
   if (data.status === "degraded") { hasFailed = true; reasons.push("Operating in fallback mode"); }
 
   if (hasFailed) {
-    $("warningTitle").innerHTML = `Source Notice <span class="notice-dismiss">Tap to dismiss</span>`;
-    $("warningDesc").textContent = reasons.join(" · ") + ". Displaying last verified benchmark.";
+    const title = $("warningTitle");
+    const desc = $("warningDesc");
+    if (title) title.innerHTML = `Source Notice <span class="notice-dismiss">Tap to dismiss</span>`;
+    if (desc) desc.textContent = reasons.join(" · ") + ". Displaying last verified benchmark.";
     warningBox.hidden = false;
   } else {
     warningBox.hidden = true;
@@ -1100,17 +1158,25 @@ function computeLastMovement() {
     if (r1 !== r0) { lastChangeItem = fullData[i]; oldRate = r0; break; }
   }
 
+  const lastDateEl = $("lastDate");
+  const lastAmtEl = $("lastAmount");
+  const lastTimeEl = $("lastTime");
+
   if (lastChangeItem && oldRate) {
     let amount = Number(lastChangeItem.rate_22k) - oldRate;
-    $("lastDate").textContent = "Price shifted on " + dateText(lastChangeItem.date);
-    $("lastAmount").textContent = (amount > 0 ? "▲ " : "▼ ") + money(Math.abs(amount));
-    $("lastAmount").className = "amount " + (amount > 0 ? "positive" : "negative");
-    $("lastTime").textContent = "Previous rate was " + money(oldRate);
+    if (lastDateEl) lastDateEl.textContent = "Price shifted on " + dateText(lastChangeItem.date);
+    if (lastAmtEl) {
+      lastAmtEl.textContent = (amount > 0 ? "▲ " : "▼ ") + money(Math.abs(amount));
+      lastAmtEl.className = "amount " + (amount > 0 ? "positive" : "negative");
+    }
+    if (lastTimeEl) lastTimeEl.textContent = "Previous rate was " + money(oldRate);
   } else {
-    $("lastDate").textContent = "No recent shifts";
-    $("lastTime").textContent = "Market is flat";
-    $("lastAmount").textContent = "—";
-    $("lastAmount").className = "amount";
+    if (lastDateEl) lastDateEl.textContent = "No recent shifts";
+    if (lastTimeEl) lastTimeEl.textContent = "Market is flat";
+    if (lastAmtEl) {
+      lastAmtEl.textContent = "—";
+      lastAmtEl.className = "amount";
+    }
   }
 }
 
@@ -1120,20 +1186,14 @@ function renderLive(d) {
   const rate = Number(d.rate_22k);
   const rate8 = Number.isFinite(Number(d.rate_8g)) ? Number(d.rate_8g) : rate * 8;
 
-  $("hero8").textContent = money(rate8);
-  $("hero1").innerHTML = `${money(rate)} <span id="change1" class="change-pill mini same"></span>`;
-  $("today").textContent = dateText(d.date);
+  if ($("hero8")) $("hero8").textContent = money(rate8);
+  if ($("hero1")) $("hero1").innerHTML = `${money(rate)} <span id="change1" class="change-pill mini same"></span>`;
+  if ($("today")) $("today").textContent = dateText(d.date);
+  
   const isFreshToday = d.date === todayLocalDateStr();
-  $("todayTime").textContent = timeText(d.time) + (isFreshToday ? "" : " · Previous Close");
+  if ($("todayTime")) $("todayTime").textContent = timeText(d.time) + (isFreshToday ? "" : " · Previous Close");
   if ($("staleWarning")) $("staleWarning").hidden = isFreshToday;
 
-  // International-standard rule: a "session" is only real when the SOURCE says
-  // so (via d.session, or the timestamp on the data itself). We never infer a
-  // fresh AM session purely from the client's current wall-clock time — that's
-  // what caused the AM card to light up at 1 AM using yesterday's PM figure.
-  // Until the source actually publishes a new fix, we keep showing the last
-  // known session (PM = previous close), the same way a stock ticker shows
-  // "previous close" outside market hours instead of guessing a new session.
   let currentSession = d.session;
   if (!currentSession) {
     if (d.time) {
@@ -1143,21 +1203,25 @@ function renderLive(d) {
       currentSession = "PM";
     }
   }
-  $("session").textContent = currentSession + " Fix";
+  if ($("session")) $("session").textContent = currentSession + " Fix";
 
-  $("purity22").textContent = money(rate) + "/g";
-  $("purity24").textContent = money(Math.round(rate * (24 / 22))) + "/g";
-  $("purity18").textContent = money(Math.round(rate * (18 / 22))) + "/g";
+  if ($("purity22")) $("purity22").textContent = money(rate) + "/g";
+  if ($("purity24")) $("purity24").textContent = money(Math.round(rate * (24 / 22))) + "/g";
+  if ($("purity18")) $("purity18").textContent = money(Math.round(rate * (18 / 22))) + "/g";
 
   let change1 = Number(d.change);
   if (!Number.isFinite(change1)) change1 = Number.isFinite(Number(d.previous_rate_22k)) ? rate - Number(d.previous_rate_22k) : 0;
   const change8 = change1 * 8;
 
-  $("change1").textContent = change1 > 0 ? "+" + money(change1) : change1 < 0 ? "-" + money(Math.abs(change1)) : "Flat";
-  $("change1").className = "change-pill mini " + (change1 > 0 ? "up" : change1 < 0 ? "down" : "same");
+  if ($("change1")) {
+    $("change1").textContent = change1 > 0 ? "+" + money(change1) : change1 < 0 ? "-" + money(Math.abs(change1)) : "Flat";
+    $("change1").className = "change-pill mini " + (change1 > 0 ? "up" : change1 < 0 ? "down" : "same");
+  }
   
-  $("change8").textContent = change8 > 0 ? "▲ +" + money(change8) + " Today" : change8 < 0 ? "▼ -" + money(Math.abs(change8)) + " Today" : "No change";
-  $("change8").className = "change-pill " + (change8 > 0 ? "up" : change8 < 0 ? "down" : "same");
+  if ($("change8")) {
+    $("change8").textContent = change8 > 0 ? "▲ +" + money(change8) + " Today" : change8 < 0 ? "▼ -" + money(Math.abs(change8)) + " Today" : "No change";
+    $("change8").className = "change-pill " + (change8 > 0 ? "up" : change8 < 0 ? "down" : "same");
+  }
 
   renderTodayTimeline();
 }
@@ -1171,26 +1235,21 @@ function todayLocalDateStr() {
 function renderTodayTimeline() {
   if (!live) return;
   const today = live.date;
-
-  // If the most recent published rate isn't actually dated today, then by
-  // definition NEITHER of today's fixes has happened yet — the hero card can
-  // still show that rate as the last available price, but the "Today's
-  // Market Activity" panel should read Pending/Pending rather than lighting
-  // up a fix (AM or PM) that belongs to a previous day.
   const isFreshToday = today === todayLocalDateStr();
+
   if (!isFreshToday) {
-    $("amRate").textContent = "Pending";
-    $("amTime").textContent = "—";
-    $("pmRate").textContent = "Pending";
-    $("pmTime").textContent = "—";
-    $("amCard").classList.remove("is-active");
-    $("pmCard").classList.remove("is-active");
+    if ($("amRate")) $("amRate").textContent = "Pending";
+    if ($("amTime")) $("amTime").textContent = "—";
+    if ($("pmRate")) $("pmRate").textContent = "Pending";
+    if ($("pmTime")) $("pmTime").textContent = "—";
+    if ($("amCard")) $("amCard").classList.remove("is-active");
+    if ($("pmCard")) $("pmCard").classList.remove("is-active");
     return;
   }
 
   let am = null, pm = null;
 
-  // 1. Direct structured properties
+  // Direct properties
   if (live.am_rate || live.amRate || live.morning_rate || live.rate_am) {
     am = {
       rate_22k: Number(live.am_rate || live.amRate || live.morning_rate || live.rate_am),
@@ -1204,7 +1263,7 @@ function renderTodayTimeline() {
     };
   }
 
-  // 2. Intraday array
+  // Intraday array check
   if (Array.isArray(live.intraday)) {
     const amEntry = live.intraday.find(i => (i.date === today || !i.date) && (i.session === "AM" || String(i.session).toUpperCase().includes("AM") || String(i.session).toUpperCase().includes("MORNING")));
     if (amEntry && amEntry.rate_22k) am = { rate_22k: Number(amEntry.rate_22k), time: amEntry.time || "10:30" };
@@ -1213,30 +1272,6 @@ function renderTodayTimeline() {
     if (pmEntry && pmEntry.rate_22k) pm = { rate_22k: Number(pmEntry.rate_22k), time: pmEntry.time || "17:00" };
   }
 
-  // 3. LocalStorage cache fallback
-  try {
-    const cached = JSON.parse(localStorage.getItem("gold_live_backup"));
-    if (cached && cached.date === today) {
-      if (!am && (cached.session === "AM" || cached.am_rate || cached.amRate)) {
-        am = { rate_22k: Number(cached.am_rate || cached.amRate || cached.rate_22k), time: cached.am_time || cached.time || "10:30" };
-      }
-      if (!pm && (cached.session === "PM" || cached.pm_rate || cached.pmRate)) {
-        pm = { rate_22k: Number(cached.pm_rate || cached.pmRate || cached.rate_22k), time: cached.pm_time || cached.time || "17:00" };
-      }
-      if (Array.isArray(cached.intraday)) {
-        if (!am) {
-          const cAm = cached.intraday.find(i => (i.date === today || !i.date) && (i.session === "AM" || String(i.session).toUpperCase().includes("AM")));
-          if (cAm && cAm.rate_22k) am = { rate_22k: Number(cAm.rate_22k), time: cAm.time || "10:30" };
-        }
-        if (!pm) {
-          const cPm = cached.intraday.find(i => (i.date === today || !i.date) && (i.session === "PM" || String(i.session).toUpperCase().includes("PM")));
-          if (cPm && cPm.rate_22k) pm = { rate_22k: Number(cPm.rate_22k), time: cPm.time || "17:00" };
-        }
-      }
-    }
-  } catch(e) {}
-
-  // 4. Session & time attribution
   const sessionUpper = String(live.session || "").toUpperCase();
   const timeHour = live.time ? parseInt(String(live.time).split(":")[0], 10) : null;
 
@@ -1247,17 +1282,14 @@ function renderTodayTimeline() {
     pm = { rate_22k: Number(live.rate_22k), time: live.time || "17:00" };
   }
 
-  // 5. If PM is published, derive opening AM if available
+  // Key Fix: If evening (PM) is published and AM is not explicitly present,
+  // derive the morning benchmark from previous_rate_22k or opening_rate
   if (pm && !am) {
     if (live.morning_rate || live.opening_rate || live.previous_rate_22k) {
       am = { rate_22k: Number(live.morning_rate || live.opening_rate || live.previous_rate_22k), time: "10:30" };
     }
   }
 
-  // 6. Time-based heuristic — anchored ONLY to the data's own timestamp
-  // (live.time), never to the client's current wall-clock. We already know
-  // live.date === today at this point, so this purely decides whether
-  // today's single published rate so far is the AM or PM fix.
   if (!am && !pm && live.rate_22k) {
     if (timeHour !== null && timeHour < 14) {
       am = { rate_22k: Number(live.rate_22k), time: live.time || "10:30" };
@@ -1269,18 +1301,17 @@ function renderTodayTimeline() {
     }
   }
 
-  $("amRate").textContent = am && Number.isFinite(am.rate_22k) ? money(am.rate_22k) : "Pending";
-  $("amTime").textContent = am ? timeText(am.time) : "—";
+  if ($("amRate")) $("amRate").textContent = am && Number.isFinite(am.rate_22k) ? money(am.rate_22k) : "Pending";
+  if ($("amTime")) $("amTime").textContent = am ? timeText(am.time) : "—";
 
-  $("pmRate").textContent = pm && Number.isFinite(pm.rate_22k) ? money(pm.rate_22k) : "Pending";
-  $("pmTime").textContent = pm ? timeText(pm.time) : "—";
+  if ($("pmRate")) $("pmRate").textContent = pm && Number.isFinite(pm.rate_22k) ? money(pm.rate_22k) : "Pending";
+  if ($("pmTime")) $("pmTime").textContent = pm ? timeText(pm.time) : "—";
 
-  // Light up ONLY the single latest active fix
   const isPmActive = Boolean(pm && Number.isFinite(pm.rate_22k));
   const isAmActive = Boolean(am && Number.isFinite(am.rate_22k) && !isPmActive);
 
-  $("amCard").classList.toggle("is-active", isAmActive);
-  $("pmCard").classList.toggle("is-active", isPmActive);
+  if ($("amCard")) $("amCard").classList.toggle("is-active", isAmActive);
+  if ($("pmCard")) $("pmCard").classList.toggle("is-active", isPmActive);
 }
 
 function updateFintechMetrics() {
@@ -1295,16 +1326,18 @@ function updateFintechMetrics() {
 
   [{ id: "ret1W", d: 7 }, { id: "ret1M", d: 30 }, { id: "ret3M", d: 90 }, { id: "ret6M", d: 180 }, { id: "ret1Y", d: 365 }, { id: "ret3Y", d: 1095 }].forEach(h => {
     const ret = calcReturn(h.d);
-    $(h.id).textContent = ret === null ? "—" : (ret >= 0 ? "+" : "") + ret.toFixed(1) + "%";
+    if ($(h.id)) $(h.id).textContent = ret === null ? "—" : (ret >= 0 ? "+" : "") + ret.toFixed(1) + "%";
   });
 
   const smaPeriod = Math.min(30, history.length);
   const sma = values.slice(-smaPeriod).reduce((a, b) => a + b, 0) / smaPeriod;
   const smaDiff = currentRate - sma, smaPct = (smaDiff / sma) * 100;
 
-  $("smaValue").textContent = money(sma);
-  $("smaPill").className = "change-pill " + (smaDiff >= 0 ? "up" : "down");
-  $("smaPill").textContent = (smaDiff >= 0 ? "▲ +" : "▼ -") + money(Math.abs(smaDiff)) + ` (${smaPct.toFixed(1)}%)`;
+  if ($("smaValue")) $("smaValue").textContent = money(sma);
+  if ($("smaPill")) {
+    $("smaPill").className = "change-pill " + (smaDiff >= 0 ? "up" : "down");
+    $("smaPill").textContent = (smaDiff >= 0 ? "▲ +" : "▼ -") + money(Math.abs(smaDiff)) + ` (${smaPct.toFixed(1)}%)`;
+  }
 }
 
 function drawSpline(ctx, pts) {
@@ -1327,10 +1360,9 @@ function drawSpline(ctx, pts) {
   }
 }
 
-/* Premium Financial Terminal Chart */
 function drawChart() {
   const canvas = $("chart");
-  if (!canvas) return;
+  if (!canvas || !canvas.parentElement) return;
   const width = canvas.parentElement.clientWidth, height = canvas.parentElement.clientHeight, dpr = window.devicePixelRatio || 1;
   if (!width || !height) return;
   canvas.width = Math.round(width * dpr); canvas.height = Math.round(height * dpr);
@@ -1339,7 +1371,7 @@ function drawChart() {
   ctx.clearRect(0, 0, width, height);
 
   const data = selectedRange === "all" ? history : history.slice(Math.max(0, history.length - Number(selectedRange)));
-  $("chartCount").textContent = data.length.toLocaleString() + " records";
+  if ($("chartCount")) $("chartCount").textContent = data.length.toLocaleString() + " records";
 
   const styles = getComputedStyle(document.body);
   const colorGold = styles.getPropertyValue('--gold').trim() || '#9c7a3c';
@@ -1359,7 +1391,6 @@ function drawChart() {
   const py = val => T + (1 - ((val - min) / (max - min))) * plotH;
   const points = values.map((val, i) => ({ x: L + (i / (values.length - 1)) * plotW, y: py(val) }));
 
-  // Horizontal Grid Lines & Y-Axis Scale
   ctx.font = "600 10px var(--font-sans)";
   ctx.textAlign = "right";
   ctx.lineWidth = 1;
@@ -1378,7 +1409,6 @@ function drawChart() {
     ctx.fillText(Math.round(gridVal).toLocaleString("en-IN"), L - 8, gy + 3.5);
   }
 
-  // Smooth Area Gradient
   drawSpline(ctx, points);
   ctx.lineTo(points[points.length - 1].x, height - B);
   ctx.lineTo(points[0].x, height - B);
@@ -1390,7 +1420,6 @@ function drawChart() {
   ctx.fillStyle = fillGrad;
   ctx.fill();
 
-  // Glow Stroke
   drawSpline(ctx, points);
   ctx.strokeStyle = colorGold;
   ctx.lineWidth = 2.4;
@@ -1398,10 +1427,6 @@ function drawChart() {
   ctx.lineJoin = "round";
   ctx.stroke();
 
-  // AM / PM Fix Markers — small dots along the line, colored by session.
-  // Uses the "session" field the backend now writes; falls back to a
-  // simple hour check for older records saved before that field existed.
-  // Skipped when there are too many points to keep the line readable.
   if (data.length <= 60) {
     data.forEach((rec, i) => {
       let session = rec.session;
@@ -1416,7 +1441,6 @@ function drawChart() {
     });
   }
 
-  // Active or Latest Indicator Point
   const activeIdx = (scrubIndex >= 0 && scrubIndex < data.length) ? scrubIndex : data.length - 1;
   const activePt = points[activeIdx];
 
@@ -1445,23 +1469,27 @@ function drawChart() {
   ctx.lineWidth = 2;
   ctx.stroke();
 
-  $("chartStart").textContent = "From: " + dateText(data[0].date);
-  $("chartEnd").textContent = "To: " + dateText(data[data.length - 1].date);
+  if ($("chartStart")) $("chartStart").textContent = "From: " + dateText(data[0].date);
+  if ($("chartEnd")) $("chartEnd").textContent = "To: " + dateText(data[data.length - 1].date);
   
   const delta = values[values.length - 1] - values[0];
   const pct = values[0] ? (delta / values[0] * 100) : 0;
 
   if (scrubIndex >= 0) {
-    $("chartMetricLabel").textContent = "Selected Benchmark";
-    $("periodChange").textContent = money(values[activeIdx]) + "/g";
-    $("periodChange").className = "";
+    if ($("chartMetricLabel")) $("chartMetricLabel").textContent = "Selected Benchmark";
+    if ($("periodChange")) {
+      $("periodChange").textContent = money(values[activeIdx]) + "/g";
+      $("periodChange").className = "";
+    }
   } else {
-    $("chartMetricLabel").textContent = "Period Performance";
-    $("periodChange").textContent = (delta >= 0 ? "+" : "") + money(delta) + ` (${(pct >= 0 ? "+" : "")}${pct.toFixed(1)}%)`;
-    $("periodChange").className = delta > 0 ? "positive" : delta < 0 ? "negative" : "";
+    if ($("chartMetricLabel")) $("chartMetricLabel").textContent = "Period Performance";
+    if ($("periodChange")) {
+      $("periodChange").textContent = (delta >= 0 ? "+" : "") + money(delta) + ` (${(pct >= 0 ? "+" : "")}${pct.toFixed(1)}%)`;
+      $("periodChange").className = delta > 0 ? "positive" : delta < 0 ? "negative" : "";
+    }
   }
-  $("periodHigh").textContent = money(max0);
-  $("periodLow").textContent = money(min0);
+  if ($("periodHigh")) $("periodHigh").textContent = money(max0);
+  if ($("periodLow")) $("periodLow").textContent = money(min0);
 }
 
 (function setupChartScrub() {
@@ -1496,34 +1524,33 @@ function drawChart() {
   canvas.addEventListener("mouseleave", end);
 })();
 
-/* Valuation Suite Logic */
 function calculate() {
-  if (!live) return;
+  if (!live || !$("calcMode")) return;
   const rate = Number(live.rate_22k);
   if (!rate) return;
 
   const mode = $("calcMode").value;
-  const weight = Math.max(0, Number($("weight").value) || 0);
-  const budget = Math.max(0, Number($("budget").value) || 0);
-  const makingPct = Math.max(0, Number($("making").value) || 0);
-  const gstPct = Math.max(0, Number($("gstRate").value) || 0);
-  const flatFee = Math.max(0, Number($("flatFee").value) || 0);
-  const oldWeight = Math.max(0, Number($("oldWeight").value) || 0);
-  const oldPurity = Number($("oldPurity").value) || 22;
+  const weight = Math.max(0, Number($("weight")?.value) || 0);
+  const budget = Math.max(0, Number($("budget")?.value) || 0);
+  const makingPct = Math.max(0, Number($("making")?.value) || 0);
+  const gstPct = Math.max(0, Number($("gstRate")?.value) || 0);
+  const flatFee = Math.max(0, Number($("flatFee")?.value) || 0);
+  const oldWeight = Math.max(0, Number($("oldWeight")?.value) || 0);
+  const oldPurity = Number($("oldPurity")?.value) || 22;
   const oldGoldCredit = oldWeight > 0 ? (oldWeight * (rate * (oldPurity / 22))) : 0;
 
   if (mode === "value") {
-    $("weightField").style.display = "flex";
-    $("budgetField").style.display = "none";
+    if ($("weightField")) $("weightField").style.display = "flex";
+    if ($("budgetField")) $("budgetField").style.display = "none";
   } else {
-    $("weightField").style.display = "none";
-    $("budgetField").style.display = "flex";
+    if ($("weightField")) $("weightField").style.display = "none";
+    if ($("budgetField")) $("budgetField").style.display = "flex";
   }
 
-  $("receiptMakingLabel").textContent = `Making Charges (${makingPct}%):`;
-  $("receiptGstLabel").textContent = `GST (${gstPct}%):`;
-  $("receiptOldGoldLine").style.display = oldGoldCredit > 0 ? "flex" : "none";
-  if (oldGoldCredit > 0) $("receiptOldGold").textContent = "- " + money(oldGoldCredit);
+  if ($("receiptMakingLabel")) $("receiptMakingLabel").textContent = `Making Charges (${makingPct}%):`;
+  if ($("receiptGstLabel")) $("receiptGstLabel").textContent = `GST (${gstPct}%):`;
+  if ($("receiptOldGoldLine")) $("receiptOldGoldLine").style.display = oldGoldCredit > 0 ? "flex" : "none";
+  if (oldGoldCredit > 0 && $("receiptOldGold")) $("receiptOldGold").textContent = "- " + money(oldGoldCredit);
 
   if (mode === "value") {
     const goldVal = rate * weight;
@@ -1532,13 +1559,13 @@ function calculate() {
     const gstAmt = sub * (gstPct / 100);
     const grandTotal = Math.max(0, sub + gstAmt - oldGoldCredit);
 
-    $("receiptBase").textContent = money(goldVal);
-    $("receiptMaking").textContent = money(makeAmt);
-    $("receiptGst").textContent = money(gstAmt);
-    $("receiptFee").textContent = money(flatFee);
-    $("receiptTotalLabel").textContent = "Net Payable Amount";
-    $("calcResult").textContent = money(grandTotal);
-    $("calcSub").textContent = `For ${weight.toLocaleString("en-IN")}g gold at ₹ ${rate.toLocaleString("en-IN")}/g benchmark`;
+    if ($("receiptBase")) $("receiptBase").textContent = money(goldVal);
+    if ($("receiptMaking")) $("receiptMaking").textContent = money(makeAmt);
+    if ($("receiptGst")) $("receiptGst").textContent = money(gstAmt);
+    if ($("receiptFee")) $("receiptFee").textContent = money(flatFee);
+    if ($("receiptTotalLabel")) $("receiptTotalLabel").textContent = "Net Payable Amount";
+    if ($("calcResult")) $("calcResult").textContent = money(grandTotal);
+    if ($("calcSub")) $("calcSub").textContent = `For ${weight.toLocaleString("en-IN")}g gold at ₹ ${rate.toLocaleString("en-IN")}/g benchmark`;
   } else {
     const effB = (budget + oldGoldCredit) / (1 + gstPct / 100) - flatFee;
     const goldBase = effB > 0 ? effB / (1 + makingPct / 100) : 0;
@@ -1547,13 +1574,13 @@ function calculate() {
     const sub = goldBase + makeAmt + flatFee;
     const gstAmt = sub * (gstPct / 100);
 
-    $("receiptBase").textContent = money(goldBase);
-    $("receiptMaking").textContent = money(makeAmt);
-    $("receiptGst").textContent = money(gstAmt);
-    $("receiptFee").textContent = money(flatFee);
-    $("receiptTotalLabel").textContent = "Purchasable Gold Weight";
-    $("calcResult").textContent = grams.toFixed(3) + " g";
-    $("calcSub").textContent = `Fits budget ${money(budget)} after all taxes & deductions`;
+    if ($("receiptBase")) $("receiptBase").textContent = money(goldBase);
+    if ($("receiptMaking")) $("receiptMaking").textContent = money(makeAmt);
+    if ($("receiptGst")) $("receiptGst").textContent = money(gstAmt);
+    if ($("receiptFee")) $("receiptFee").textContent = money(flatFee);
+    if ($("receiptTotalLabel")) $("receiptTotalLabel").textContent = "Purchasable Gold Weight";
+    if ($("calcResult")) $("calcResult").textContent = grams.toFixed(3) + " g";
+    if ($("calcSub")) $("calcSub").textContent = `Fits budget ${money(budget)} after all taxes & deductions`;
   }
 }
 
@@ -1562,7 +1589,7 @@ document.querySelectorAll(".calc-mode-btn").forEach(btn => {
     haptic(10);
     document.querySelectorAll(".calc-mode-btn").forEach(b => b.classList.remove("active"));
     btn.classList.add("active");
-    $("calcMode").value = btn.dataset.mode;
+    if ($("calcMode")) $("calcMode").value = btn.dataset.mode;
     calculate();
   };
 });
@@ -1571,8 +1598,8 @@ document.querySelectorAll("#weightChips .chip").forEach(c => c.onclick = () => {
   haptic(10);
   document.querySelectorAll("#weightChips .chip").forEach(x => x.classList.remove("active"));
   c.classList.add("active");
-  $("weight").value = c.dataset.val;
-  $("calcMode").value = "value";
+  if ($("weight")) $("weight").value = c.dataset.val;
+  if ($("calcMode")) $("calcMode").value = "value";
   document.querySelectorAll(".calc-mode-btn").forEach(b => b.classList.toggle("active", b.dataset.mode === "value"));
   calculate();
 });
@@ -1581,11 +1608,10 @@ document.querySelectorAll("#makingChips .chip").forEach(c => c.onclick = () => {
   haptic(10);
   document.querySelectorAll("#makingChips .chip").forEach(x => x.classList.remove("active"));
   c.classList.add("active");
-  $("making").value = c.dataset.val;
+  if ($("making")) $("making").value = c.dataset.val;
   calculate();
 });
 
-/* Theme-Adaptive Canvas Snapshot Generator */
 function generateShareCardBlob() {
   return new Promise((resolve) => {
     if (!live) return resolve(null);
@@ -1594,34 +1620,29 @@ function generateShareCardBlob() {
     cvs.width = w; cvs.height = h;
     const r1 = Number(live.rate_22k), r8 = r1 * 8, c1 = Number(live.change) || 0, c8 = c1 * 8;
 
-    // Adaptive Theme Palette
-    const bgApp = isDark ? "#030712" : "#f8fafc";
-    const bgSurface = isDark ? "#0b0f19" : "#ffffff";
+    const bgApp = isDark ? "#14120e" : "#faf7f0";
+    const bgSurface = isDark ? "#1c1912" : "#ffffff";
     const borderCard = isDark ? "rgba(255, 255, 255, 0.08)" : "rgba(15, 23, 42, 0.08)";
-    const textMain = isDark ? "#f8fafc" : "#0f172a";
-    const textSec = isDark ? "#94a3b8" : "#475569";
-    const textTert = isDark ? "#64748b" : "#94a3b8";
-    const goldColor = isDark ? "#fbbf24" : "#d97706";
-    const goodColor = isDark ? "#34d399" : "#059669";
-    const badColor = isDark ? "#f87171" : "#dc2626";
+    const textMain = isDark ? "#f2ede2" : "#1c1712";
+    const textSec = isDark ? "#a89d88" : "#6b6255";
+    const textTert = isDark ? "#6b6255" : "#a89d88";
+    const goldColor = isDark ? "#c9a356" : "#9c7a3c";
+    const goodColor = isDark ? "#7bab84" : "#3f6e4a";
+    const badColor = isDark ? "#d18376" : "#a13f34";
 
-    // 1. Base Canvas Fill
     ctx.fillStyle = bgApp;
     ctx.fillRect(0, 0, w, h);
 
-    // Subtle Gold Ambient Glow
     const gl = ctx.createRadialGradient(w/2, 340, 40, w/2, 340, 480);
-    gl.addColorStop(0, isDark ? "rgba(251, 191, 36, 0.12)" : "rgba(217, 119, 6, 0.08)");
-    gl.addColorStop(1, isDark ? "rgba(3, 7, 18, 0)" : "rgba(248, 250, 252, 0)");
+    gl.addColorStop(0, isDark ? "rgba(201, 163, 86, 0.12)" : "rgba(156, 122, 60, 0.08)");
+    gl.addColorStop(1, isDark ? "rgba(20, 18, 14, 0)" : "rgba(250, 247, 240, 0)");
     ctx.fillStyle = gl;
     ctx.fillRect(0, 0, w, h);
 
-    // Outer Frame
     ctx.strokeStyle = borderCard;
     ctx.lineWidth = 2;
     ctx.strokeRect(36, 36, w - 72, h - 72);
 
-    // 2. Top Header Bar
     ctx.fillStyle = bgSurface;
     ctx.beginPath();
     ctx.roundRect(72, 72, w - 144, 76, 38);
@@ -1631,16 +1652,15 @@ function generateShareCardBlob() {
     ctx.stroke();
 
     ctx.fillStyle = goldColor;
-    ctx.font = "800 24px 'Plus Jakarta Sans'";
+    ctx.font = "800 24px 'Fraunces'";
     ctx.textAlign = "left";
-    ctx.fillText("GOLD 22K RATE", 104, 119);
+    ctx.fillText("Au · GOLD 22K RATE", 104, 119);
 
     ctx.fillStyle = textSec;
-    ctx.font = "700 20px 'Plus Jakarta Sans'";
+    ctx.font = "600 20px 'Inter'";
     ctx.textAlign = "right";
-    ctx.fillText(`${dateText(live.date)} · ${$("session").textContent}`, w - 104, 118);
+    ctx.fillText(`${dateText(live.date)} · ${$("session")?.textContent || "IST Market"}`, w - 104, 118);
 
-    // 3. Main Hero Sovereign Card
     ctx.fillStyle = bgSurface;
     ctx.beginPath();
     ctx.roundRect(72, 172, w - 144, 380, 24);
@@ -1649,15 +1669,15 @@ function generateShareCardBlob() {
     ctx.stroke();
 
     ctx.fillStyle = goldColor;
-    ctx.font = "800 22px 'Plus Jakarta Sans'";
+    ctx.font = "600 22px 'Fraunces'";
     ctx.textAlign = "center";
     ctx.fillText("1 SOVEREIGN (8 GRAMS) 22K", w/2, 230);
 
     ctx.fillStyle = textMain;
-    ctx.font = "800 92px 'Plus Jakarta Sans'";
+    ctx.font = "600 92px 'Fraunces'";
     ctx.fillText(money(r8), w/2, 345);
 
-    ctx.font = "700 26px 'Plus Jakarta Sans'";
+    ctx.font = "600 26px 'Inter'";
     if (c8 > 0) {
       ctx.fillStyle = goodColor;
       ctx.fillText(`▲ +${money(c8)} Today`, w/2, 420);
@@ -1673,14 +1693,13 @@ function generateShareCardBlob() {
     ctx.fillRect(72, 460, w - 144, 1.5);
 
     ctx.fillStyle = textSec;
-    ctx.font = "700 20px 'Plus Jakarta Sans'";
+    ctx.font = "600 20px 'Inter'";
     ctx.textAlign = "left";
     ctx.fillText(`Rate Per Gram: ${money(r1)}/g`, 108, 514);
 
     ctx.textAlign = "right";
     ctx.fillText(`Standard 22K 91.6% Pure`, w - 108, 514);
 
-    // 4. Three Purity Columns
     const gy = 576, cw = (w - 144 - 24) / 3;
     const purities = [
       { l: "24K (99.9%)", v: money(Math.round(r1 * (24 / 22))), s: "Fine Gold" },
@@ -1698,70 +1717,66 @@ function generateShareCardBlob() {
       ctx.stroke();
 
       ctx.fillStyle = textTert;
-      ctx.font = "800 18px 'Plus Jakarta Sans'";
+      ctx.font = "600 18px 'Inter'";
       ctx.textAlign = "center";
       ctx.fillText(item.l, x + cw/2, gy + 52);
 
       ctx.fillStyle = textMain;
-      ctx.font = "800 38px 'Plus Jakarta Sans'";
+      ctx.font = "600 38px 'Fraunces'";
       ctx.fillText(item.v, x + cw/2, gy + 120);
 
       ctx.fillStyle = goldColor;
-      ctx.font = "600 19px 'Plus Jakarta Sans'";
+      ctx.font = "600 19px 'Inter'";
       ctx.fillText(item.s, x + cw/2, gy + 172);
     });
 
-    // 5. Timeline Fix Cards
     const ty = 820, tw = (w - 144 - 16) / 2;
     
-    // AM Box
     ctx.fillStyle = bgSurface;
     ctx.beginPath();
     ctx.roundRect(72, ty, tw, 200, 16);
     ctx.fill();
-    ctx.strokeStyle = $("amCard").classList.contains("is-active") ? goldColor : borderCard;
-    ctx.lineWidth = $("amCard").classList.contains("is-active") ? 2 : 1;
+    ctx.strokeStyle = $("amCard")?.classList.contains("is-active") ? goldColor : borderCard;
+    ctx.lineWidth = $("amCard")?.classList.contains("is-active") ? 2 : 1;
     ctx.stroke();
 
     ctx.fillStyle = textTert;
-    ctx.font = "800 19px 'Plus Jakarta Sans'";
+    ctx.font = "600 19px 'Inter'";
     ctx.textAlign = "left";
     ctx.fillText("MORNING FIX (AM)", 100, ty + 48);
 
     ctx.fillStyle = textMain;
-    ctx.font = "800 34px 'Plus Jakarta Sans'";
-    ctx.fillText($("amRate").textContent, 100, ty + 110);
+    ctx.font = "600 34px 'Fraunces'";
+    ctx.fillText($("amRate")?.textContent || "Pending", 100, ty + 110);
 
     ctx.fillStyle = textTert;
-    ctx.font = "600 19px 'Plus Jakarta Sans'";
-    ctx.fillText($("amTime").textContent, 100, ty + 158);
+    ctx.font = "500 19px 'Inter'";
+    ctx.fillText($("amTime")?.textContent || "—", 100, ty + 158);
 
-    // PM Box
     const px = 72 + tw + 16;
     ctx.fillStyle = bgSurface;
     ctx.beginPath();
     ctx.roundRect(px, ty, tw, 200, 16);
     ctx.fill();
-    ctx.strokeStyle = $("pmCard").classList.contains("is-active") ? goldColor : borderCard;
-    ctx.lineWidth = $("pmCard").classList.contains("is-active") ? 2 : 1;
+    ctx.strokeStyle = $("pmCard")?.classList.contains("is-active") ? goldColor : borderCard;
+    ctx.lineWidth = $("pmCard")?.classList.contains("is-active") ? 2 : 1;
     ctx.stroke();
 
     ctx.fillStyle = textTert;
-    ctx.font = "800 19px 'Plus Jakarta Sans'";
+    ctx.font = "600 19px 'Inter'";
     ctx.textAlign = "left";
     ctx.fillText("EVENING FIX (PM)", px + 28, ty + 48);
 
     ctx.fillStyle = textMain;
-    ctx.font = "800 34px 'Plus Jakarta Sans'";
-    ctx.fillText($("pmRate").textContent, px + 28, ty + 110);
+    ctx.font = "600 34px 'Fraunces'";
+    ctx.fillText($("pmRate")?.textContent || "Pending", px + 28, ty + 110);
 
     ctx.fillStyle = textTert;
-    ctx.font = "600 19px 'Plus Jakarta Sans'";
-    ctx.fillText($("pmTime").textContent, px + 28, ty + 158);
+    ctx.font = "500 19px 'Inter'";
+    ctx.fillText($("pmTime")?.textContent || "—", px + 28, ty + 158);
 
-    // 6. Footer
     ctx.fillStyle = textTert;
-    ctx.font = "700 20px 'Plus Jakarta Sans'";
+    ctx.font = "500 20px 'Inter'";
     ctx.textAlign = "center";
     ctx.fillText("Gold 22k Terminal · LiveChennai + GoodReturns Feed", w/2, 1180);
 
@@ -1769,49 +1784,56 @@ function generateShareCardBlob() {
   });
 }
 
-$("shareBtn").onclick = async () => {
-  haptic(15);
-  if (!live) return;
-  const shareText = `💰 Gold 22K Rate (${dateText(live.date)})\n• 1 Gram: ${money(live.rate_22k)}\n• 1 Sovereign: ${money(live.rate_8g || live.rate_22k*8)}\nTrack live at: ${window.location.href}`;
-  try {
-    toast("Generating snapshot…");
-    const blob = await generateShareCardBlob();
-    if (blob && navigator.canShare && navigator.canShare({ files: [new File([blob], "gold.png", { type: "image/png" })] })) {
-      await navigator.share({ title: "Gold 22k", text: shareText, files: [new File([blob], `gold-${live.date}.png`, { type: "image/png" })] });
-    } else if (navigator.share) {
-      await navigator.share({ title: "Gold 22k", text: shareText });
-    } else {
-      navigator.clipboard?.writeText(shareText);
-      toast("Copied to clipboard!");
+if ($("shareBtn")) {
+  $("shareBtn").onclick = async () => {
+    haptic(15);
+    if (!live) return;
+    const shareText = `💰 Gold 22K Rate (${dateText(live.date)})\n• 1 Gram: ${money(live.rate_22k)}\n• 1 Sovereign: ${money(live.rate_8g || live.rate_22k*8)}\nTrack live at: ${window.location.href}`;
+    try {
+      toast("Generating snapshot…");
+      const blob = await generateShareCardBlob();
+      if (blob && navigator.canShare && navigator.canShare({ files: [new File([blob], "gold.png", { type: "image/png" })] })) {
+        await navigator.share({ title: "Gold 22k", text: shareText, files: [new File([blob], `gold-${live.date}.png`, { type: "image/png" })] });
+      } else if (navigator.share) {
+        await navigator.share({ title: "Gold 22k", text: shareText });
+      } else {
+        navigator.clipboard?.writeText(shareText);
+        toast("Copied to clipboard!");
+      }
+    } catch(e) {
+      if (e.name !== "AbortError") {
+        navigator.clipboard?.writeText(shareText);
+        toast("Copied text!");
+      }
     }
-  } catch(e) {
-    if (e.name !== "AbortError") {
-      navigator.clipboard?.writeText(shareText);
-      toast("Copied text!");
-    }
-  }
-};
+  };
+}
 
-$("copyQuoteBtn").onclick = async () => {
-  haptic(15);
-  if (!live) return;
-  const txt = `📜 GOLD PURCHASE ESTIMATE\nDate: ${dateText(live.date)}\n----------------------\n• Base Rate: ${money(live.rate_22k)}/g\n• Weight: ${$("weight").value}g\n• Making (${$("making").value}%): ${$("receiptMaking").textContent}\n• GST (${$("gstRate").value}%): ${$("receiptGst").textContent}\n• Exchange: ${$("receiptOldGold").textContent}\n----------------------\nNET TOTAL: ${$("calcResult").textContent}`;
-  navigator.clipboard?.writeText(txt);
-  toast("Quotation Copied!");
-};
+if ($("copyQuoteBtn")) {
+  $("copyQuoteBtn").onclick = async () => {
+    haptic(15);
+    if (!live) return;
+    const txt = `📜 GOLD PURCHASE ESTIMATE\nDate: ${dateText(live.date)}\n----------------------\n• Base Rate: ${money(live.rate_22k)}/g\n• Weight: ${$("weight")?.value || 8}g\n• Making (${$("making")?.value || 8}%): ${$("receiptMaking")?.textContent || "₹ 0"}\n• GST (${$("gstRate")?.value || 3}%): ${$("receiptGst")?.textContent || "₹ 0"}\n• Exchange: ${$("receiptOldGold")?.textContent || "-₹ 0"}\n----------------------\nNET TOTAL: ${$("calcResult")?.textContent || "—"}`;
+    navigator.clipboard?.writeText(txt);
+    toast("Quotation Copied!");
+  };
+}
 
 function renderStats() {
   if (!history.length) return;
   const vals = history.map(i => Number(i.rate_22k)), hi = Math.max(...vals), lo = Math.min(...vals);
-  $("high").textContent = money(hi);
-  $("low").textContent = money(lo);
-  $("highDate").textContent = dateText(history.find(i => Number(i.rate_22k) === hi)?.date);
-  $("lowDate").textContent = dateText(history.find(i => Number(i.rate_22k) === lo)?.date);
-  $("historyCount").textContent = history.length.toLocaleString("en-IN") + " records";
+  if ($("high")) $("high").textContent = money(hi);
+  if ($("low")) $("low").textContent = money(lo);
+  if ($("highDate")) $("highDate").textContent = dateText(history.find(i => Number(i.rate_22k) === hi)?.date);
+  if ($("lowDate")) $("lowDate").textContent = dateText(history.find(i => Number(i.rate_22k) === lo)?.date);
+  if ($("historyCount")) $("historyCount").textContent = history.length.toLocaleString("en-IN") + " records";
 
-  $("historyBody").innerHTML = [...history].reverse().slice(0, 300).map(i => `<tr><td>${esc(dateText(i.date))}</td><td>${money(i.rate_22k)}</td><td>${money(i.rate_22k*8)}</td></tr>`).join("");
-  if (!$("dateA").value) $("dateA").value = history[0]?.date || "";
-  if (!$("dateB").value) $("dateB").value = history[history.length-1]?.date || "";
+  if ($("historyBody")) {
+    $("historyBody").innerHTML = [...history].reverse().slice(0, 300).map(i => `<tr><td>${esc(dateText(i.date))}</td><td>${money(i.rate_22k)}</td><td>${money(i.rate_22k*8)}</td></tr>`).join("");
+  }
+  
+  if ($("dateA") && !$("dateA").value) $("dateA").value = history[0]?.date || "";
+  if ($("dateB") && !$("dateB").value) $("dateB").value = history[history.length-1]?.date || "";
 
   compareDates();
   updateFintechMetrics();
@@ -1820,7 +1842,10 @@ function renderStats() {
 }
 
 function compareDates() {
-  const a = history.find(i => i.date === $("dateA").value), b = history.find(i => i.date === $("dateB").value);
+  if (!$("dateA") || !$("dateB") || !$("compareResult")) return;
+  const a = history.find(i => i.date === $("dateA").value);
+  const b = history.find(i => i.date === $("dateB").value);
+  
   if (!a || !b) {
     $("compareResult").innerHTML = `<span class="compare-result-top">Select valid dates</span><span class="compare-result-sub">—</span>`;
     return;
@@ -1843,19 +1868,16 @@ async function loadPublishedData(silent = false) {
   renderLive(latest);
   renderStats();
   calculate();
+  checkParserHealth(latest);
   localStorage.setItem("gold_live_backup", JSON.stringify(latest));
   localStorage.setItem("gold_history_backup", JSON.stringify(history));
 
-  // Rate-changed notification — only for quiet background refreshes
-  // (auto-poll, tab refocus), not the very first load on app open.
   if (silent && prevRate !== null && Number.isFinite(Number(latest.rate_22k)) && Number(latest.rate_22k) !== prevRate) {
     const dir = Number(latest.rate_22k) > prevRate ? "▲" : "▼";
+    haptic(25, 900);
     toast(`Gold Rate Updated ${dir} ${money(latest.rate_22k)}/g`);
   }
 
-  // Feed health is best-effort — the file may not exist yet on a repo
-  // that hasn't deployed the health-check backend, so failure here
-  // must never break the rest of the app.
   getJSON(HEALTH_URL).then(renderHealth).catch(() => {});
   getJSON(WINDOWS_URL).then(renderNextFix).catch(() => {});
 
@@ -1867,18 +1889,21 @@ function renderHealth(h) {
   if (!card || !h || !h.status) return;
 
   card.hidden = false;
-  card.className = "feed-line status-" + h.status;
+  card.className = "collapsible health-collapsible status-" + h.status;
 
   if (h.status === "ok") {
-    $("healthTitle").textContent = "Feed healthy";
-    $("healthSub").textContent = h.sources_agree === false ? "sources briefly differ, auto-resolving" : "both sources reporting normally";
+    if ($("healthTitle")) $("healthTitle").textContent = "Feed healthy";
+    if ($("healthSub")) $("healthSub").textContent = h.sources_agree === false ? "Sources briefly differ — consensus price is active." : "LiveChennai and GoodReturns feeds are responsive and synchronized.";
+    if ($("healthBadge")) $("healthBadge").textContent = "OK";
   } else if (h.status === "stale") {
-    $("healthTitle").textContent = "Feed stale";
+    if ($("healthTitle")) $("healthTitle").textContent = "Feed updating slowly";
     const hrs = Number(h.hours_since_last_checked);
-    $("healthSub").textContent = Number.isFinite(hrs) ? `no successful check in ${hrs.toFixed(1)}h` : "checking connection…";
+    if ($("healthSub")) $("healthSub").textContent = Number.isFinite(hrs) ? `No new check in ${hrs.toFixed(1)}h. Displaying last verified benchmark.` : "Checking connection…";
+    if ($("healthBadge")) $("healthBadge").textContent = "Stale";
   } else if (h.status === "disagreeing") {
-    $("healthTitle").textContent = "Sources disagreeing";
-    $("healthSub").textContent = "LiveChennai and GoodReturns don't match";
+    if ($("healthTitle")) $("healthTitle").textContent = "Sources disagreeing";
+    if ($("healthSub")) $("healthSub").textContent = "LiveChennai and GoodReturns don't match. Serving consensus price.";
+    if ($("healthBadge")) $("healthBadge").textContent = "Check";
   }
 }
 
@@ -1886,7 +1911,7 @@ function renderNextFix(w) {
   const line = $("nextFixLine");
   if (!line || !w || !w.windows) return;
 
-  const active = w.active_window; // "AM" | "PM" | null
+  const active = w.active_window;
   const upcomingName = active === "AM" ? "PM" : "AM";
   const upcoming = w.windows[upcomingName];
   if (!upcoming || !upcoming.predicted_fix_time) return;
@@ -1894,10 +1919,10 @@ function renderNextFix(w) {
   line.hidden = false;
 
   if (active) {
-    $("nextFixText").textContent = `Monitoring ${active} fix now — checking every ${w.poll_seconds || 10}s`;
+    if ($("nextFixText")) $("nextFixText").textContent = `Monitoring ${active} fix now — checking every ${w.poll_seconds || 10}s`;
   } else {
     const label = upcomingName === "AM" ? "Morning" : "Evening";
-    $("nextFixText").textContent = `${label} fix expected around ${upcoming.predicted_fix_time} IST`;
+    if ($("nextFixText")) $("nextFixText").textContent = `${label} fix expected around ${upcoming.predicted_fix_time} IST`;
   }
 }
 
@@ -1933,7 +1958,8 @@ async function manualFetch() {
   }
 }
 
-$("fetchNow").onclick = manualFetch;
+if ($("fetchNow")) $("fetchNow").onclick = manualFetch;
+
 document.querySelectorAll("#ranges button").forEach(b => b.onclick = () => {
   haptic(8);
   document.querySelectorAll("#ranges button").forEach(x => x.classList.remove("active"));
@@ -1941,17 +1967,20 @@ document.querySelectorAll("#ranges button").forEach(b => b.onclick = () => {
   selectedRange = b.dataset.range === "all" ? "all" : Number(b.dataset.range);
   drawChart();
 });
-["dateA", "dateB"].forEach(id => $(id).addEventListener("change", compareDates));
-["weight", "budget", "making", "gstRate", "flatFee", "oldWeight", "oldPurity"].forEach(id => $(id).addEventListener("input", calculate));
+
+["dateA", "dateB"].forEach(id => {
+  if ($(id)) $(id).addEventListener("change", compareDates);
+});
+
+["weight", "budget", "making", "gstRate", "flatFee", "oldWeight", "oldPurity"].forEach(id => {
+  if ($(id)) $(id).addEventListener("input", calculate);
+});
 
 document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") loadPublishedData(true).catch(()=>{}); });
 window.addEventListener("pageshow", () => { loadPublishedData(true).catch(()=>{}); });
 window.addEventListener("resize", drawChart);
 window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', drawChart);
 
-// Quiet background refresh every 5 minutes while the tab is open and
-// visible, so a new AM/PM fix shows up (with a toast) without the user
-// having to background/reopen the app or pull-to-refresh manually.
 setInterval(() => {
   if (document.visibilityState === "visible" && !fetchBusy) {
     loadPublishedData(true).catch(() => {});
@@ -1975,9 +2004,10 @@ if ("serviceWorker" in navigator) {
   function atTop() { return (window.scrollY || 0) <= 0 && (document.scrollingElement ? document.scrollingElement.scrollTop : 0) <= 0; }
   
   function resetPulldown() {
+    if (!pulldown) return;
     pulldown.classList.remove("visible", "ready", "loading");
     pulldown.style.transform = "";
-    pulldownText.textContent = "Pull to refresh";
+    if (pulldownText) pulldownText.textContent = "Pull to refresh";
     startY = null; dragging = false; ready = false;
   }
 
@@ -1996,22 +2026,25 @@ if ("serviceWorker" in navigator) {
     if (event.cancelable) event.preventDefault();
     
     const pulled = Math.min(delta * 0.5, PULL_MAX);
-    pulldown.classList.add("visible");
-    pulldown.style.transform = `translate(-50%, ${pulled - 70}px)`;
-    ready = pulled >= PULL_THRESHOLD * 0.5;
-    
-    pulldown.classList.toggle("ready", ready);
-    pulldownText.textContent = ready ? "Release to sync" : "Pull to refresh";
+    if (pulldown) {
+      pulldown.classList.add("visible");
+      pulldown.style.transform = `translate(-50%, ${pulled - 70}px)`;
+      ready = pulled >= PULL_THRESHOLD * 0.5;
+      pulldown.classList.toggle("ready", ready);
+    }
+    if (pulldownText) pulldownText.textContent = ready ? "Release to sync" : "Pull to refresh";
     setStatus(ready ? "Release to sync market" : "Pulling to refresh…", false, true);
   }, { passive: false });
 
   document.addEventListener("touchend", () => {
     if (!dragging) return;
     if (ready && !fetchBusy) {
-      pulldown.classList.add("loading");
-      pulldown.classList.remove("ready");
-      pulldown.style.transform = "translate(-50%, 14px)";
-      pulldownText.textContent = "Syncing…";
+      if (pulldown) {
+        pulldown.classList.add("loading");
+        pulldown.classList.remove("ready");
+        pulldown.style.transform = "translate(-50%, 14px)";
+      }
+      if (pulldownText) pulldownText.textContent = "Syncing…";
       manualFetch().finally(resetPulldown);
     } else {
       resetPulldown();
