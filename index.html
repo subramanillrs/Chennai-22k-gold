@@ -126,7 +126,6 @@ button, input, select { font-family: inherit; color: inherit; border: none; back
   gap: 18px;
 }
 
-/* Masthead & Brand Badge */
 .masthead {
   display: flex;
   justify-content: space-between;
@@ -157,7 +156,6 @@ button, input, select { font-family: inherit; color: inherit; border: none; back
   justify-content: center;
   box-shadow: 0 2px 6px rgba(156, 122, 60, 0.35);
   flex-shrink: 0;
-  user-select: none;
 }
 
 .masthead-title {
@@ -207,7 +205,6 @@ button, input, select { font-family: inherit; color: inherit; border: none; back
 html[data-theme="dark"] .theme-toggle .icon-sun { display: block; }
 html[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
 
-/* Collapsible Feed Health Status */
 .health-collapsible {
   background: var(--paper-raised);
   border: 1px solid var(--rule);
@@ -232,11 +229,7 @@ html[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
   width: 100%;
   padding-right: 10px;
 }
-.health-summary-left {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
+.health-summary-left { display: flex; align-items: center; gap: 8px; }
 .feed-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--good); flex-shrink: 0; }
 .health-collapsible.status-stale .feed-dot { background: var(--gold); }
 .health-collapsible.status-disagreeing .feed-dot { background: var(--bad); }
@@ -262,7 +255,6 @@ html[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
   background: var(--paper-sunken);
 }
 
-/* Notice Banners */
 .notice {
   display: flex;
   align-items: flex-start;
@@ -282,7 +274,6 @@ html[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
 .notice-body p { font-size: 11.5px; font-weight: 500; line-height: 1.4; color: var(--ink-soft); }
 .notice-dismiss { font-size: 9.5px; opacity: 0.75; font-weight: 600; }
 
-/* Hero Section */
 .hero {
   background: var(--paper-raised);
   border: 1px solid var(--rule);
@@ -312,18 +303,8 @@ html[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
   line-height: 1;
   color: var(--ink);
 }
-.hero-rule {
-  width: 100%;
-  height: 1px;
-  background: var(--rule);
-  margin: 2px 0;
-}
-.hero-foot {
-  display: flex;
-  justify-content: space-between;
-  width: 100%;
-  gap: 16px;
-}
+.hero-rule { width: 100%; height: 1px; background: var(--rule); margin: 2px 0; }
+.hero-foot { display: flex; justify-content: space-between; width: 100%; gap: 16px; }
 .hero-foot-col { display: flex; flex-direction: column; gap: 2px; flex: 1; text-align: left; }
 .hero-foot-col:last-child { text-align: right; }
 .hero-foot-label { font-size: 10px; font-weight: 600; color: var(--ink-faint); }
@@ -339,7 +320,6 @@ html[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
   cursor: pointer; padding: 4px;
 }
 
-/* Sections & Panels */
 .section { display: flex; flex-direction: column; gap: 10px; width: 100%; }
 .section-head { display: flex; align-items: baseline; justify-content: space-between; }
 .section-head h3 {
@@ -390,7 +370,6 @@ html[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
 .ledger-val-stack { display: flex; flex-direction: column; align-items: flex-end; gap: 1px; }
 .ledger-val-stack small { font-size: 10px; font-weight: 500; color: var(--ink-soft); }
 
-/* AM / PM Timeline */
 .timeline-horizontal { display: grid; grid-template-columns: 1fr 1fr; gap: 0; width: 100%; }
 .timeline-card {
   padding: 10px 14px;
@@ -408,7 +387,6 @@ html[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
 .next-fix-line[hidden] { display: none !important; }
 .next-fix-line svg { width: 12px; height: 12px; flex-shrink: 0; }
 
-/* Chart Panel */
 .chart-panel { display: flex; flex-direction: column; gap: 14px; }
 .segment-ctrl {
   display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 0;
@@ -440,7 +418,6 @@ html[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
 .chart-legend i.dot-am { background: #6b8cae; }
 .chart-legend i.dot-pm { background: var(--gold); margin-left: 6px; }
 
-/* Collapsibles */
 details.collapsible { background: var(--paper-raised); border: 1px solid var(--rule); border-radius: var(--r-md); overflow: hidden; width: 100%; }
 details.collapsible summary { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; cursor: pointer; list-style: none; user-select: none; }
 details.collapsible summary::-webkit-details-marker { display: none; }
@@ -477,7 +454,6 @@ details[open] .chevron { transform: rotate(180deg); }
 .last-box p { font-size: 11px; font-weight: 500; color: var(--ink-soft); }
 .last-box .amount { font-family: var(--font-display); font-size: 18px; font-weight: 600; }
 
-/* Compare Dates */
 .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%; }
 .compare-field { display: flex; flex-direction: column; }
 .compare-field label { font-size: 10.5px; font-weight: 600; color: var(--ink-faint); margin-bottom: 6px; }
@@ -493,7 +469,6 @@ details[open] .chevron { transform: rotate(180deg); }
 .compare-result-sub.positive { color: var(--good); background: var(--good-bg); }
 .compare-result-sub.negative { color: var(--bad); background: var(--bad-bg); }
 
-/* Calculator */
 .calc-suite { display: flex; flex-direction: column; gap: 16px; }
 .calc-segmented-mode { display: flex; border: 1px solid var(--rule); border-radius: var(--r-sm); overflow: hidden; }
 .calc-mode-btn { flex: 1; height: 36px; font-size: 11.5px; font-weight: 600; color: var(--ink-soft); cursor: pointer; border-right: 1px solid var(--rule); }
@@ -543,7 +518,6 @@ select.calc-input {
 .quote-btn { width: 100%; height: 40px; margin-top: 12px; background: var(--ink); color: var(--paper); border-radius: var(--r-xs); font-size: 12px; font-weight: 700; cursor: pointer; }
 .quote-btn:active { opacity: 0.85; }
 
-/* Historical Log Table */
 .table-wrap { padding: 0; overflow: hidden; }
 .history-table { width: 100%; border-collapse: collapse; max-height: 360px; display: block; overflow-y: auto; }
 .history-table thead, .history-table tbody { display: table; width: 100%; table-layout: fixed; }
@@ -558,7 +532,6 @@ select.calc-input {
 .history-table th:nth-child(2), .history-table td:nth-child(2),
 .history-table th:nth-child(3), .history-table td:nth-child(3) { width: 33.333%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-/* Pull to Refresh */
 .pulldown {
   position: fixed;
   top: env(safe-area-inset-top);
@@ -621,13 +594,12 @@ footer { text-align: center; font-size: 10.5px; font-weight: 500; color: var(--i
         <span id="statusText">Checking live feed…</span>
       </div>
       <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle dark mode">
-        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
         <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"/></svg>
       </button>
     </div>
   </header>
 
-  <!-- Collapsible Feed Health Status -->
   <details class="collapsible health-collapsible" id="healthCard" hidden>
     <summary>
       <div class="health-summary-inner">
@@ -654,13 +626,12 @@ footer { text-align: center; font-size: 10.5px; font-weight: 500; color: var(--i
   <div class="notice notice-gold" id="staleWarning" hidden>
     <div class="notice-body">
       <strong>Showing previous close</strong>
-      <p id="staleDesc">No new fix published yet today — next update expected around 10:20 AM IST.</p>
+      <p id="staleDesc">No new fix published yet today — next update expected during active trading window.</p>
     </div>
   </div>
 
   <div hidden><button id="fetchNow"></button></div>
 
-  <!-- Hero Section -->
   <section class="hero" id="heroCard">
     <span class="share-link" id="shareBtn">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
@@ -687,7 +658,6 @@ footer { text-align: center; font-size: 10.5px; font-weight: 500; color: var(--i
     </div>
   </section>
 
-  <!-- Purity ledger row -->
   <div class="panel purity-row">
     <div class="purity-cell">
       <small>24K · 99.9%</small>
@@ -703,7 +673,6 @@ footer { text-align: center; font-size: 10.5px; font-weight: 500; color: var(--i
     </div>
   </div>
 
-  <!-- Session / Peak / Floor -->
   <div class="panel">
     <div class="ledger">
       <div class="ledger-row">
@@ -727,7 +696,6 @@ footer { text-align: center; font-size: 10.5px; font-weight: 500; color: var(--i
     </div>
   </div>
 
-  <!-- Today's Market Activity -->
   <section class="section">
     <div class="section-head">
       <h3>Today's market</h3>
@@ -758,7 +726,6 @@ footer { text-align: center; font-size: 10.5px; font-weight: 500; color: var(--i
     </div>
   </section>
 
-  <!-- Price History Trend Chart -->
   <section class="section">
     <div class="section-head">
       <h3>Price history</h3>
@@ -804,7 +771,6 @@ footer { text-align: center; font-size: 10.5px; font-weight: 500; color: var(--i
     </div>
   </section>
 
-  <!-- Multi-Horizon & Indicators -->
   <div style="display:flex; flex-direction:column; gap: 12px;">
     <details class="collapsible">
       <summary><div class="summary-title"><h3>Returns by period</h3><span>Multi-horizon</span></div><span class="chevron">▼</span></summary>
@@ -829,7 +795,7 @@ footer { text-align: center; font-size: 10.5px; font-weight: 500; color: var(--i
         </div>
       </div>
     </details>
-    
+
     <div class="panel last-box">
       <div>
         <h4>Last movement</h4>
@@ -840,7 +806,6 @@ footer { text-align: center; font-size: 10.5px; font-weight: 500; color: var(--i
     </div>
   </div>
 
-  <!-- Compare Historical Dates -->
   <details class="collapsible">
     <summary><div class="summary-title"><h3>Compare dates</h3><span>Tap to open</span></div><span class="chevron">▼</span></summary>
     <div class="collapsible-content">
@@ -864,14 +829,13 @@ footer { text-align: center; font-size: 10.5px; font-weight: 500; color: var(--i
     </div>
   </details>
 
-  <!-- Jewelry Purchase & Exchange Suite -->
   <section class="section">
     <div class="section-head">
       <h3>Jewelry calculator</h3>
     </div>
     <div class="panel">
       <div class="calc-suite">
-        
+
         <div class="calc-segmented-mode">
           <button class="calc-mode-btn active" type="button" data-mode="value">Calculate Price by Weight</button>
           <button class="calc-mode-btn" type="button" data-mode="grams">Calculate Weight by Budget</button>
@@ -881,7 +845,7 @@ footer { text-align: center; font-size: 10.5px; font-weight: 500; color: var(--i
           </select>
         </div>
 
-        <div class="calc-group">
+        <div class="calc-group" id="weightChipsGroup">
           <span class="calc-group-label">Standard Gold Weight</span>
           <div class="chip-container" id="weightChips">
             <button class="chip" data-val="1" type="button">1g</button>
@@ -953,7 +917,7 @@ footer { text-align: center; font-size: 10.5px; font-weight: 500; color: var(--i
           <div class="receipt-line"><span id="receiptGstLabel">GST (3%):</span><span id="receiptGst">₹ 0</span></div>
           <div class="receipt-line"><span>Hallmarking / Flat Fees:</span><span id="receiptFee">₹ 0</span></div>
           <div class="receipt-line deduction" id="receiptOldGoldLine" style="display:none;"><span>Old Gold Exchange Credit:</span><span id="receiptOldGold">-₹ 0</span></div>
-          
+
           <div class="receipt-total">
             <span class="label" id="receiptTotalLabel">Net Payable Amount</span>
             <span class="final-val" id="calcResult">₹ —</span>
@@ -967,7 +931,6 @@ footer { text-align: center; font-size: 10.5px; font-weight: 500; color: var(--i
     </div>
   </section>
 
-  <!-- Historical Log Table -->
   <section class="section">
     <div class="section-head">
       <h3>Historical Log</h3>
@@ -1115,7 +1078,7 @@ function checkParserHealth(data, networkError = false) {
     warningBox.hidden = false;
     return;
   }
-  
+
   if (!data) {
     warningBox.hidden = true;
     return;
@@ -1147,16 +1110,32 @@ function normalize(array) {
   return Array.isArray(array) ? array.filter(i => i && i.date && Number.isFinite(Number(i.rate_22k))).map(i => ({ ...i, rate_22k: Number(i.rate_22k) })) : [];
 }
 
+function getTodayISTDateStr() {
+  return new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Asia/Kolkata',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit'
+  }).format(new Date());
+}
+
 function computeLastMovement() {
   if (!history || history.length < 1 || !live) return;
-  let fullData = [...history];
-  if (fullData[fullData.length - 1].date !== live.date) fullData.push(live);
-  else fullData[fullData.length - 1] = live;
+  const fullData = [...history];
+  const lastRec = fullData[fullData.length - 1];
+
+  if (!lastRec || lastRec.date !== live.date || Number(lastRec.rate_22k) !== Number(live.rate_22k)) {
+    fullData.push(live);
+  }
 
   let lastChangeItem = null, oldRate = null;
   for (let i = fullData.length - 1; i > 0; i--) {
     let r1 = Number(fullData[i].rate_22k), r0 = Number(fullData[i - 1].rate_22k);
-    if (r1 !== r0) { lastChangeItem = fullData[i]; oldRate = r0; break; }
+    if (r1 !== r0) {
+      lastChangeItem = fullData[i];
+      oldRate = r0;
+      break;
+    }
   }
 
   const lastDateEl = $("lastDate");
@@ -1181,17 +1160,6 @@ function computeLastMovement() {
   }
 }
 
-// Indian Standard Time (IST) Date Formatter (UTC+5:30)
-function getTodayISTDateStr() {
-  const parts = new Intl.DateTimeFormat('en-CA', {
-    timeZone: 'Asia/Kolkata',
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit'
-  }).format(new Date());
-  return parts; // Returns YYYY-MM-DD in IST
-}
-
 function renderLive(d) {
   if (!d) return;
   live = d;
@@ -1201,7 +1169,7 @@ function renderLive(d) {
   if ($("hero8")) $("hero8").textContent = money(rate8);
   if ($("hero1")) $("hero1").innerHTML = `${money(rate)} <span id="change1" class="change-pill mini same"></span>`;
   if ($("today")) $("today").textContent = dateText(d.date);
-  
+
   const isFreshToday = d.date === getTodayISTDateStr();
   if ($("todayTime")) $("todayTime").textContent = timeText(d.time) + (isFreshToday ? "" : " · Previous Close");
   if ($("staleWarning")) $("staleWarning").hidden = isFreshToday;
@@ -1229,7 +1197,7 @@ function renderLive(d) {
     $("change1").textContent = change1 > 0 ? "+" + money(change1) : change1 < 0 ? "-" + money(Math.abs(change1)) : "Flat";
     $("change1").className = "change-pill mini " + (change1 > 0 ? "up" : change1 < 0 ? "down" : "same");
   }
-  
+
   if ($("change8")) {
     $("change8").textContent = change8 > 0 ? "▲ +" + money(change8) + " Today" : change8 < 0 ? "▼ -" + money(Math.abs(change8)) + " Today" : "No change";
     $("change8").className = "change-pill " + (change8 > 0 ? "up" : change8 < 0 ? "down" : "same");
@@ -1243,7 +1211,6 @@ function renderTodayTimeline() {
   const today = live.date;
   const isFreshToday = today === getTodayISTDateStr();
 
-  // If the record date is from a previous calendar day in IST, fixes are Pending
   if (!isFreshToday) {
     if ($("amRate")) $("amRate").textContent = "Pending";
     if ($("amTime")) $("amTime").textContent = "—";
@@ -1256,67 +1223,28 @@ function renderTodayTimeline() {
 
   let am = null, pm = null;
 
-  // 1. Direct properties check
-  if (live.am_rate || live.amRate || live.morning_rate || live.rate_am) {
-    am = {
-      rate_22k: Number(live.am_rate || live.amRate || live.morning_rate || live.rate_am),
-      time: live.am_time || live.amTime || "10:30"
-    };
+  if (live.am_rate || live.amRate || live.morning_rate) {
+    am = { rate_22k: Number(live.am_rate || live.amRate || live.morning_rate), time: live.am_time || "10:30" };
   }
-  if (live.pm_rate || live.pmRate || live.evening_rate || live.rate_pm) {
-    pm = {
-      rate_22k: Number(live.pm_rate || live.pmRate || live.evening_rate || live.rate_pm),
-      time: live.pm_time || live.pmTime || "17:00"
-    };
+  if (live.pm_rate || live.pmRate || live.evening_rate) {
+    pm = { rate_22k: Number(live.pm_rate || live.pmRate || live.evening_rate), time: live.pm_time || "17:00" };
   }
 
-  // 2. Intraday array check
-  if (Array.isArray(live.intraday)) {
-    const amEntry = live.intraday.find(i => (i.date === today || !i.date) && (i.session === "AM" || String(i.session).toUpperCase().includes("AM") || String(i.session).toUpperCase().includes("MORNING")));
-    if (amEntry && amEntry.rate_22k) am = { rate_22k: Number(amEntry.rate_22k), time: amEntry.time || "10:30" };
-    
-    const pmEntry = live.intraday.find(i => (i.date === today || !i.date) && (i.session === "PM" || String(i.session).toUpperCase().includes("PM") || String(i.session).toUpperCase().includes("EVENING")));
-    if (pmEntry && pmEntry.rate_22k) pm = { rate_22k: Number(pmEntry.rate_22k), time: pmEntry.time || "17:00" };
-  }
+  const todayHistory = history.filter(h => h.date === today);
+  const amHist = todayHistory.find(h => h.session === "AM" || (h.time && parseInt(h.time.split(":")[0], 10) < 14));
+  const pmHist = todayHistory.find(h => h.session === "PM" || (h.time && parseInt(h.time.split(":")[0], 10) >= 14));
+
+  if (!am && amHist) am = { rate_22k: Number(amHist.rate_22k), time: amHist.time || "10:30" };
+  if (!pm && pmHist) pm = { rate_22k: Number(pmHist.rate_22k), time: pmHist.time || "17:00" };
 
   const sessionUpper = String(live.session || "").toUpperCase();
   const timeHour = live.time ? parseInt(String(live.time).split(":")[0], 10) : null;
 
-  if (!am && (sessionUpper === "AM" || sessionUpper.includes("MORNING"))) {
+  if (!am && (sessionUpper === "AM" || (timeHour !== null && timeHour < 14))) {
     am = { rate_22k: Number(live.rate_22k), time: live.time || "10:30" };
   }
-  if (!pm && (sessionUpper === "PM" || sessionUpper.includes("EVENING"))) {
+  if (!pm && (sessionUpper === "PM" || (timeHour !== null && timeHour >= 14))) {
     pm = { rate_22k: Number(live.rate_22k), time: live.time || "17:00" };
-  }
-
-  // 3. Deterministic Morning AM Fix Resolution
-  // When PM Fix is delivered and AM isn't saved as a separate entry:
-  // AM Rate = rate_22k - change (or previous_rate_22k)
-  if (pm && !am) {
-    let derivedAm = null;
-    if (Number.isFinite(Number(live.previous_rate_22k)) && Number(live.previous_rate_22k) > 0) {
-      derivedAm = Number(live.previous_rate_22k);
-    } else if (Number.isFinite(Number(live.change))) {
-      derivedAm = Number(live.rate_22k) - Number(live.change);
-    } else if (live.morning_rate) {
-      derivedAm = Number(live.morning_rate);
-    }
-    
-    if (derivedAm) {
-      am = { rate_22k: derivedAm, time: "10:30" };
-    }
-  }
-
-  // 4. Timestamp-based attribution fallback
-  if (!am && !pm && live.rate_22k) {
-    if (timeHour !== null && timeHour < 14) {
-      am = { rate_22k: Number(live.rate_22k), time: live.time || "10:30" };
-    } else {
-      pm = { rate_22k: Number(live.rate_22k), time: live.time || "17:00" };
-      if (live.previous_rate_22k) {
-        am = { rate_22k: Number(live.previous_rate_22k), time: "10:30" };
-      }
-    }
   }
 
   if ($("amRate")) $("amRate").textContent = am && Number.isFinite(am.rate_22k) ? money(am.rate_22k) : "Pending";
@@ -1325,7 +1253,6 @@ function renderTodayTimeline() {
   if ($("pmRate")) $("pmRate").textContent = pm && Number.isFinite(pm.rate_22k) ? money(pm.rate_22k) : "Pending";
   if ($("pmTime")) $("pmTime").textContent = pm ? timeText(pm.time) : "—";
 
-  // Light up only the single latest active fix
   const isPmActive = Boolean(pm && Number.isFinite(pm.rate_22k));
   const isAmActive = Boolean(am && Number.isFinite(am.rate_22k) && !isPmActive);
 
@@ -1333,23 +1260,36 @@ function renderTodayTimeline() {
   if ($("pmCard")) $("pmCard").classList.toggle("is-active", isPmActive);
 }
 
+function getFilteredHistory(range) {
+  if (range === "all" || !history.length) return history;
+  const days = Number(range);
+  const now = new Date();
+  const cutoff = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
+  const cutoffStr = cutoff.toISOString().slice(0, 10);
+  const filtered = history.filter(h => h.date >= cutoffStr);
+  return filtered.length >= 2 ? filtered : history.slice(-Math.max(2, Math.min(history.length, days)));
+}
+
 function updateFintechMetrics() {
   if (!history.length || !live) return;
-  const currentRate = Number(live.rate_22k), values = history.map(i => Number(i.rate_22k));
+  const currentRate = Number(live.rate_22k);
 
-  const calcReturn = (days) => {
-    if (history.length < 2) return null;
-    const pastVal = Number(history[Math.max(0, history.length - 1 - days)].rate_22k);
+  const calcReturnByDays = (days) => {
+    const targetDate = new Date(new Date().getTime() - days * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+    const pastRecords = history.filter(h => h.date <= targetDate);
+    if (!pastRecords.length) return null;
+    const pastVal = Number(pastRecords[pastRecords.length - 1].rate_22k);
     return pastVal ? ((currentRate - pastVal) / pastVal) * 100 : null;
   };
 
   [{ id: "ret1W", d: 7 }, { id: "ret1M", d: 30 }, { id: "ret3M", d: 90 }, { id: "ret6M", d: 180 }, { id: "ret1Y", d: 365 }, { id: "ret3Y", d: 1095 }].forEach(h => {
-    const ret = calcReturn(h.d);
+    const ret = calcReturnByDays(h.d);
     if ($(h.id)) $(h.id).textContent = ret === null ? "—" : (ret >= 0 ? "+" : "") + ret.toFixed(1) + "%";
   });
 
-  const smaPeriod = Math.min(30, history.length);
-  const sma = values.slice(-smaPeriod).reduce((a, b) => a + b, 0) / smaPeriod;
+  const recent30 = getFilteredHistory(30);
+  const vals30 = recent30.map(i => Number(i.rate_22k));
+  const sma = vals30.reduce((a, b) => a + b, 0) / vals30.length;
   const smaDiff = currentRate - sma, smaPct = (smaDiff / sma) * 100;
 
   if ($("smaValue")) $("smaValue").textContent = money(sma);
@@ -1389,7 +1329,7 @@ function drawChart() {
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   ctx.clearRect(0, 0, width, height);
 
-  const data = selectedRange === "all" ? history : history.slice(Math.max(0, history.length - Number(selectedRange)));
+  const data = getFilteredHistory(selectedRange);
   if ($("chartCount")) $("chartCount").textContent = data.length.toLocaleString() + " records";
 
   const styles = getComputedStyle(document.body);
@@ -1490,7 +1430,7 @@ function drawChart() {
 
   if ($("chartStart")) $("chartStart").textContent = "From: " + dateText(data[0].date);
   if ($("chartEnd")) $("chartEnd").textContent = "To: " + dateText(data[data.length - 1].date);
-  
+
   const delta = values[values.length - 1] - values[0];
   const pct = values[0] ? (delta / values[0] * 100) : 0;
 
@@ -1515,7 +1455,7 @@ function drawChart() {
   const canvas = $("chart");
   if (!canvas) return;
   const handle = e => {
-    const data = selectedRange === "all" ? history : history.slice(Math.max(0, history.length - Number(selectedRange)));
+    const data = getFilteredHistory(selectedRange);
     if (data.length < 2) return;
     const r = canvas.getBoundingClientRect();
     const clientX = e.touches ? e.touches[0].clientX : e.clientX;
@@ -1561,9 +1501,11 @@ function calculate() {
   if (mode === "value") {
     if ($("weightField")) $("weightField").style.display = "flex";
     if ($("budgetField")) $("budgetField").style.display = "none";
+    if ($("weightChipsGroup")) $("weightChipsGroup").style.display = "flex";
   } else {
     if ($("weightField")) $("weightField").style.display = "none";
     if ($("budgetField")) $("budgetField").style.display = "flex";
+    if ($("weightChipsGroup")) $("weightChipsGroup").style.display = "none";
   }
 
   if ($("receiptMakingLabel")) $("receiptMakingLabel").textContent = `Making Charges (${makingPct}%):`;
@@ -1631,208 +1573,19 @@ document.querySelectorAll("#makingChips .chip").forEach(c => c.onclick = () => {
   calculate();
 });
 
-function generateShareCardBlob() {
-  return new Promise((resolve) => {
-    if (!live) return resolve(null);
-    const isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const cvs = document.createElement("canvas"), ctx = cvs.getContext("2d"), w = 1080, h = 1350;
-    cvs.width = w; cvs.height = h;
-    const r1 = Number(live.rate_22k), r8 = r1 * 8, c1 = Number(live.change) || 0, c8 = c1 * 8;
-
-    const bgApp = isDark ? "#14120e" : "#faf7f0";
-    const bgSurface = isDark ? "#1c1912" : "#ffffff";
-    const borderCard = isDark ? "rgba(255, 255, 255, 0.08)" : "rgba(15, 23, 42, 0.08)";
-    const textMain = isDark ? "#f2ede2" : "#1c1712";
-    const textSec = isDark ? "#a89d88" : "#6b6255";
-    const textTert = isDark ? "#6b6255" : "#a89d88";
-    const goldColor = isDark ? "#c9a356" : "#9c7a3c";
-    const goodColor = isDark ? "#7bab84" : "#3f6e4a";
-    const badColor = isDark ? "#d18376" : "#a13f34";
-
-    ctx.fillStyle = bgApp;
-    ctx.fillRect(0, 0, w, h);
-
-    const gl = ctx.createRadialGradient(w/2, 340, 40, w/2, 340, 480);
-    gl.addColorStop(0, isDark ? "rgba(201, 163, 86, 0.12)" : "rgba(156, 122, 60, 0.08)");
-    gl.addColorStop(1, isDark ? "rgba(20, 18, 14, 0)" : "rgba(250, 247, 240, 0)");
-    ctx.fillStyle = gl;
-    ctx.fillRect(0, 0, w, h);
-
-    ctx.strokeStyle = borderCard;
-    ctx.lineWidth = 2;
-    ctx.strokeRect(36, 36, w - 72, h - 72);
-
-    ctx.fillStyle = bgSurface;
-    ctx.beginPath();
-    ctx.roundRect(72, 72, w - 144, 76, 38);
-    ctx.fill();
-    ctx.strokeStyle = borderCard;
-    ctx.lineWidth = 1.5;
-    ctx.stroke();
-
-    ctx.fillStyle = goldColor;
-    ctx.font = "800 24px 'Fraunces'";
-    ctx.textAlign = "left";
-    ctx.fillText("Au · GOLD 22K RATE", 104, 119);
-
-    ctx.fillStyle = textSec;
-    ctx.font = "600 20px 'Inter'";
-    ctx.textAlign = "right";
-    ctx.fillText(`${dateText(live.date)} · ${$("session")?.textContent || "IST Market"}`, w - 104, 118);
-
-    ctx.fillStyle = bgSurface;
-    ctx.beginPath();
-    ctx.roundRect(72, 172, w - 144, 380, 24);
-    ctx.fill();
-    ctx.strokeStyle = borderCard;
-    ctx.stroke();
-
-    ctx.fillStyle = goldColor;
-    ctx.font = "600 22px 'Fraunces'";
-    ctx.textAlign = "center";
-    ctx.fillText("1 SOVEREIGN (8 GRAMS) 22K", w/2, 230);
-
-    ctx.fillStyle = textMain;
-    ctx.font = "600 92px 'Fraunces'";
-    ctx.fillText(money(r8), w/2, 345);
-
-    ctx.font = "600 26px 'Inter'";
-    if (c8 > 0) {
-      ctx.fillStyle = goodColor;
-      ctx.fillText(`▲ +${money(c8)} Today`, w/2, 420);
-    } else if (c8 < 0) {
-      ctx.fillStyle = badColor;
-      ctx.fillText(`▼ -${money(Math.abs(c8))} Today`, w/2, 420);
-    } else {
-      ctx.fillStyle = textSec;
-      ctx.fillText("• Flat Market Today", w/2, 420);
-    }
-
-    ctx.fillStyle = borderCard;
-    ctx.fillRect(72, 460, w - 144, 1.5);
-
-    ctx.fillStyle = textSec;
-    ctx.font = "600 20px 'Inter'";
-    ctx.textAlign = "left";
-    ctx.fillText(`Rate Per Gram: ${money(r1)}/g`, 108, 514);
-
-    ctx.textAlign = "right";
-    ctx.fillText(`Standard 22K 91.6% Pure`, w - 108, 514);
-
-    const gy = 576, cw = (w - 144 - 24) / 3;
-    const purities = [
-      { l: "24K (99.9%)", v: money(Math.round(r1 * (24 / 22))), s: "Fine Gold" },
-      { l: "22K (91.6%)", v: money(r1), s: "Jewelry Standard" },
-      { l: "18K (75.0%)", v: money(Math.round(r1 * (18 / 22))), s: "Hallmarked" }
-    ];
-
-    purities.forEach((item, i) => {
-      const x = 72 + i * (cw + 12);
-      ctx.fillStyle = bgSurface;
-      ctx.beginPath();
-      ctx.roundRect(x, gy, cw, 220, 16);
-      ctx.fill();
-      ctx.strokeStyle = borderCard;
-      ctx.stroke();
-
-      ctx.fillStyle = textTert;
-      ctx.font = "600 18px 'Inter'";
-      ctx.textAlign = "center";
-      ctx.fillText(item.l, x + cw/2, gy + 52);
-
-      ctx.fillStyle = textMain;
-      ctx.font = "600 38px 'Fraunces'";
-      ctx.fillText(item.v, x + cw/2, gy + 120);
-
-      ctx.fillStyle = goldColor;
-      ctx.font = "600 19px 'Inter'";
-      ctx.fillText(item.s, x + cw/2, gy + 172);
-    });
-
-    const ty = 820, tw = (w - 144 - 16) / 2;
-    
-    ctx.fillStyle = bgSurface;
-    ctx.beginPath();
-    ctx.roundRect(72, ty, tw, 200, 16);
-    ctx.fill();
-    ctx.strokeStyle = $("amCard")?.classList.contains("is-active") ? goldColor : borderCard;
-    ctx.lineWidth = $("amCard")?.classList.contains("is-active") ? 2 : 1;
-    ctx.stroke();
-
-    ctx.fillStyle = textTert;
-    ctx.font = "600 19px 'Inter'";
-    ctx.textAlign = "left";
-    ctx.fillText("MORNING FIX (AM)", 100, ty + 48);
-
-    ctx.fillStyle = textMain;
-    ctx.font = "600 34px 'Fraunces'";
-    ctx.fillText($("amRate")?.textContent || "Pending", 100, ty + 110);
-
-    ctx.fillStyle = textTert;
-    ctx.font = "500 19px 'Inter'";
-    ctx.fillText($("amTime")?.textContent || "—", 100, ty + 158);
-
-    const px = 72 + tw + 16;
-    ctx.fillStyle = bgSurface;
-    ctx.beginPath();
-    ctx.roundRect(px, ty, tw, 200, 16);
-    ctx.fill();
-    ctx.strokeStyle = $("pmCard")?.classList.contains("is-active") ? goldColor : borderCard;
-    ctx.lineWidth = $("pmCard")?.classList.contains("is-active") ? 2 : 1;
-    ctx.stroke();
-
-    ctx.fillStyle = textTert;
-    ctx.font = "600 19px 'Inter'";
-    ctx.textAlign = "left";
-    ctx.fillText("EVENING FIX (PM)", px + 28, ty + 48);
-
-    ctx.fillStyle = textMain;
-    ctx.font = "600 34px 'Fraunces'";
-    ctx.fillText($("pmRate")?.textContent || "Pending", px + 28, ty + 110);
-
-    ctx.fillStyle = textTert;
-    ctx.font = "500 19px 'Inter'";
-    ctx.fillText($("pmTime")?.textContent || "—", px + 28, ty + 158);
-
-    ctx.fillStyle = textTert;
-    ctx.font = "500 20px 'Inter'";
-    ctx.textAlign = "center";
-    ctx.fillText("Gold 22k Terminal · LiveChennai + GoodReturns Feed", w/2, 1180);
-
-    cvs.toBlob(resolve, "image/png");
-  });
-}
-
-if ($("shareBtn")) {
-  $("shareBtn").onclick = async () => {
-    haptic(15);
-    if (!live) return;
-    const shareText = `💰 Gold 22K Rate (${dateText(live.date)})\n• 1 Gram: ${money(live.rate_22k)}\n• 1 Sovereign: ${money(live.rate_8g || live.rate_22k*8)}\nTrack live at: ${window.location.href}`;
-    try {
-      toast("Generating snapshot…");
-      const blob = await generateShareCardBlob();
-      if (blob && navigator.canShare && navigator.canShare({ files: [new File([blob], "gold.png", { type: "image/png" })] })) {
-        await navigator.share({ title: "Gold 22k", text: shareText, files: [new File([blob], `gold-${live.date}.png`, { type: "image/png" })] });
-      } else if (navigator.share) {
-        await navigator.share({ title: "Gold 22k", text: shareText });
-      } else {
-        navigator.clipboard?.writeText(shareText);
-        toast("Copied to clipboard!");
-      }
-    } catch(e) {
-      if (e.name !== "AbortError") {
-        navigator.clipboard?.writeText(shareText);
-        toast("Copied text!");
-      }
-    }
-  };
-}
-
 if ($("copyQuoteBtn")) {
   $("copyQuoteBtn").onclick = async () => {
     haptic(15);
     if (!live) return;
-    const txt = `📜 GOLD PURCHASE ESTIMATE\nDate: ${dateText(live.date)}\n----------------------\n• Base Rate: ${money(live.rate_22k)}/g\n• Weight: ${$("weight")?.value || 8}g\n• Making (${$("making")?.value || 8}%): ${$("receiptMaking")?.textContent || "₹ 0"}\n• GST (${$("gstRate")?.value || 3}%): ${$("receiptGst")?.textContent || "₹ 0"}\n• Exchange: ${$("receiptOldGold")?.textContent || "-₹ 0"}\n----------------------\nNET TOTAL: ${$("calcResult")?.textContent || "—"}`;
+    const mode = $("calcMode")?.value || "value";
+    let txt = "";
+
+    if (mode === "value") {
+      txt = `📜 GOLD PURCHASE ESTIMATE\nDate: ${dateText(live.date)}\n----------------------\n• Base Rate: ${money(live.rate_22k)}/g\n• Weight: ${$("weight")?.value || 8}g\n• Making (${$("making")?.value || 8}%): ${$("receiptMaking")?.textContent || "₹ 0"}\n• GST (${$("gstRate")?.value || 3}%): ${$("receiptGst")?.textContent || "₹ 0"}\n• Exchange: ${$("receiptOldGold")?.textContent || "-₹ 0"}\n----------------------\nNET TOTAL: ${$("calcResult")?.textContent || "—"}`;
+    } else {
+      txt = `📜 GOLD BUDGET ESTIMATE\nDate: ${dateText(live.date)}\n----------------------\n• Base Rate: ${money(live.rate_22k)}/g\n• Budget: ${money($("budget")?.value || 0)}\n• Making (${$("making")?.value || 8}%): ${$("receiptMaking")?.textContent || "₹ 0"}\n• GST (${$("gstRate")?.value || 3}%): ${$("receiptGst")?.textContent || "₹ 0"}\n• Exchange: ${$("receiptOldGold")?.textContent || "-₹ 0"}\n----------------------\nESTIMATED GOLD WEIGHT: ${$("calcResult")?.textContent || "—"}`;
+    }
+
     navigator.clipboard?.writeText(txt);
     toast("Quotation Copied!");
   };
@@ -1850,7 +1603,7 @@ function renderStats() {
   if ($("historyBody")) {
     $("historyBody").innerHTML = [...history].reverse().slice(0, 300).map(i => `<tr><td>${esc(dateText(i.date))}</td><td>${money(i.rate_22k)}</td><td>${money(i.rate_22k*8)}</td></tr>`).join("");
   }
-  
+
   if ($("dateA") && !$("dateA").value) $("dateA").value = history[0]?.date || "";
   if ($("dateB") && !$("dateB").value) $("dateB").value = history[history.length-1]?.date || "";
 
@@ -1864,14 +1617,14 @@ function compareDates() {
   if (!$("dateA") || !$("dateB") || !$("compareResult")) return;
   const a = history.find(i => i.date === $("dateA").value);
   const b = history.find(i => i.date === $("dateB").value);
-  
+
   if (!a || !b) {
     $("compareResult").innerHTML = `<span class="compare-result-top">Select valid dates</span><span class="compare-result-sub">—</span>`;
     return;
   }
   const diff = b.rate_22k - a.rate_22k, pct = a.rate_22k ? (diff/a.rate_22k*100) : 0;
   const isPos = diff > 0, isNeg = diff < 0;
-  
+
   $("compareResult").innerHTML = `
     <span class="compare-result-top">${money(a.rate_22k)} → ${money(b.rate_22k)}</span>
     <span class="compare-result-sub ${isPos ? 'positive' : isNeg ? 'negative' : ''}">
@@ -1911,7 +1664,7 @@ function renderHealth(h) {
 
   if (h.status === "ok") {
     if ($("healthTitle")) $("healthTitle").textContent = "Feed healthy";
-    if ($("healthSub")) $("healthSub").textContent = h.sources_agree === false ? "Sources briefly differ — consensus price is active." : "LiveChennai and GoodReturns feeds are responsive and synchronized.";
+    if ($("healthSub")) $("healthSub").textContent = h.sources_agree === false ? "Sources briefly differ — consensus price is active." : "LiveChennai and GoodReturns feeds are synchronized.";
     if ($("healthBadge")) $("healthBadge").textContent = "OK";
   } else if (h.status === "stale") {
     if ($("healthTitle")) $("healthTitle").textContent = "Feed updating slowly";
@@ -1966,13 +1719,12 @@ async function manualFetch() {
     localStorage.setItem("gold_history_backup", JSON.stringify(history));
     setStatus("Synced at " + timeText(latest.time));
     toast("Market Synced");
-  } catch(e) { 
-    setStatus("Using offline cache", true, false); 
-    checkParserHealth({ error: "Live sync failed. Showing cached data." }); 
-    toast("Sync Failed"); 
-  }
-  finally { 
-    fetchBusy = false; 
+  } catch(e) {
+    setStatus("Using offline cache", true, false);
+    checkParserHealth({ error: "Live sync failed. Showing cached data." });
+    toast("Sync Failed");
+  } finally {
+    fetchBusy = false;
   }
 }
 
@@ -2007,10 +1759,7 @@ setInterval(() => {
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
-    navigator.serviceWorker
-      .register("sw.js?v=" + Date.now())
-      .then((reg) => reg.update())
-      .catch((e) => console.warn("Service worker register skipped:", e));
+    navigator.serviceWorker.register("sw.js").catch(e => console.warn("SW skipped:", e));
   });
 }
 
@@ -2020,7 +1769,7 @@ if ("serviceWorker" in navigator) {
   let startY = null, dragging = false, ready = false;
 
   function atTop() { return (window.scrollY || 0) <= 0 && (document.scrollingElement ? document.scrollingElement.scrollTop : 0) <= 0; }
-  
+
   function resetPulldown() {
     if (!pulldown) return;
     pulldown.classList.remove("visible", "ready", "loading");
@@ -2038,11 +1787,11 @@ if ("serviceWorker" in navigator) {
   document.addEventListener("touchmove", event => {
     if (!dragging || startY === null) return;
     if (!atTop()) { resetPulldown(); return; }
-    
+
     const delta = event.touches[0].clientY - startY;
     if (delta <= 0) return;
     if (event.cancelable) event.preventDefault();
-    
+
     const pulled = Math.min(delta * 0.5, PULL_MAX);
     if (pulldown) {
       pulldown.classList.add("visible");
@@ -2066,7 +1815,7 @@ if ("serviceWorker" in navigator) {
       manualFetch().finally(resetPulldown);
     } else {
       resetPulldown();
-      setStatus("Synced at " + (live ? timeText(live.time) : "live"));
+      if (live) setStatus("Synced at " + timeText(live.time));
     }
     dragging = false; startY = null;
   }, { passive: true });
@@ -2075,21 +1824,16 @@ if ("serviceWorker" in navigator) {
 })();
 
 (async function init() {
-  try { 
+  try {
     setStatus("Checking live feed…", false, true);
-    await loadPublishedData(); 
-    setStatus("Synced at " + (live ? timeText(live.time) : "live")); 
-  }
-  catch(e) {
+    await loadPublishedData();
+    setStatus("Synced at " + (live ? timeText(live.time) : "live"));
+  } catch(e) {
     try {
       const savedHistory = JSON.parse(localStorage.getItem("gold_history_backup") || "[]");
       const savedLive = JSON.parse(localStorage.getItem("gold_live_backup") || "null");
-      if (Array.isArray(savedHistory) && savedHistory.length > 0) {
-        history = normalize(savedHistory);
-      }
-      if (savedLive) {
-        renderLive(savedLive);
-      }
+      if (Array.isArray(savedHistory) && savedHistory.length > 0) history = normalize(savedHistory);
+      if (savedLive) renderLive(savedLive);
       if (history.length) renderStats();
       calculate();
       setStatus("Cached data loaded");
