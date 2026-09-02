@@ -132,7 +132,6 @@ button, input, select { font-family: inherit; color: inherit; border: none; back
   align-items: center;
   width: 100%;
   padding-bottom: 12px;
-  border-bottom: 2px solid var(--ink);
 }
 
 .brand-wrap {
@@ -160,15 +159,19 @@ button, input, select { font-family: inherit; color: inherit; border: none; back
 
 .masthead-title {
   font-family: var(--font-display);
-  font-size: clamp(20px, 5.5vw, 26px);
+  font-size: clamp(18px, 5vw, 26px);
   font-weight: 600;
   font-style: italic;
   letter-spacing: -0.01em;
   color: var(--ink);
   line-height: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.masthead-actions { display: flex; align-items: center; gap: 8px; }
+.masthead-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
 
 .status-pill {
   display: inline-flex;
@@ -182,7 +185,9 @@ button, input, select { font-family: inherit; color: inherit; border: none; back
   font-weight: 600;
   color: var(--ink-soft);
   white-space: nowrap;
-  max-width: 150px;
+  max-width: 118px;
+  flex-shrink: 1;
+  min-width: 0;
 }
 .status-pill span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--good); flex-shrink: 0; animation: pulse-ring 2s infinite; }
@@ -278,7 +283,7 @@ html[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
   background: var(--paper-raised);
   border: 1px solid var(--rule);
   border-radius: var(--r-lg);
-  padding: 26px 22px 20px;
+  padding: 44px 22px 20px;
   box-shadow: var(--shadow-card);
   display: flex;
   flex-direction: column;
@@ -302,13 +307,18 @@ html[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
   letter-spacing: -0.02em;
   line-height: 1;
   color: var(--ink);
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 0.14em;
+  width: 100%;
 }
 .hero-rule { width: 100%; height: 1px; background: var(--rule); margin: 2px 0; }
 .hero-foot { display: flex; justify-content: space-between; width: 100%; gap: 16px; }
-.hero-foot-col { display: flex; flex-direction: column; gap: 2px; flex: 1; text-align: left; }
+.hero-foot-col { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; text-align: left; }
 .hero-foot-col:last-child { text-align: right; }
 .hero-foot-label { font-size: 10px; font-weight: 600; color: var(--ink-faint); }
-.hero-foot-val { font-family: var(--font-display); font-size: 15px; font-weight: 600; color: var(--ink); display: flex; align-items: center; gap: 5px; }
+.hero-foot-val { font-family: var(--font-display); font-size: 15px; font-weight: 600; color: var(--ink); display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
 .hero-foot-col:last-child .hero-foot-val { justify-content: flex-end; }
 .hero-foot-sub { font-size: 10.5px; font-weight: 500; color: var(--ink-soft); }
 
@@ -471,16 +481,19 @@ details[open] .chevron { transform: rotate(180deg); }
 
 .calc-suite { display: flex; flex-direction: column; gap: 16px; }
 .calc-segmented-mode { display: flex; border: 1px solid var(--rule); border-radius: var(--r-sm); overflow: hidden; }
-.calc-mode-btn { flex: 1; height: 36px; font-size: 11.5px; font-weight: 600; color: var(--ink-soft); cursor: pointer; border-right: 1px solid var(--rule); }
+.calc-mode-btn { flex: 1; height: 36px; padding: 0 6px; font-size: 11.5px; font-weight: 600; color: var(--ink-soft); cursor: pointer; border-right: 1px solid var(--rule); text-align: center; line-height: 1.2; }
 .calc-mode-btn:last-child { border-right: none; }
 .calc-mode-btn.active { background: var(--ink); color: var(--paper); }
 
 .calc-group { display: flex; flex-direction: column; gap: 6px; }
 .calc-group-label { font-size: 10.5px; font-weight: 600; color: var(--ink-faint); }
 .chip-container { display: flex; flex-wrap: wrap; gap: 6px; }
+#weightChips { display: grid; grid-template-columns: repeat(4, 1fr); }
+#weightChips .chip { width: 100%; }
 .chip {
   height: 28px; padding: 0 11px; border: 1px solid var(--rule);
   border-radius: var(--r-full); font-size: 11px; font-weight: 600; color: var(--ink-soft); cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
 }
 .chip.active { background: var(--gold-tint); border-color: var(--gold-line); color: var(--gold-deep); }
 
@@ -679,20 +692,6 @@ footer { text-align: center; font-size: 10.5px; font-weight: 500; color: var(--i
         <span class="ledger-key">Current session</span>
         <span class="ledger-val" id="session">—</span>
       </div>
-      <div class="ledger-row">
-        <span class="ledger-key">3-year peak</span>
-        <span class="ledger-val-stack">
-          <span class="ledger-val" id="high">—</span>
-          <small id="highDate">—</small>
-        </span>
-      </div>
-      <div class="ledger-row">
-        <span class="ledger-key">3-year floor</span>
-        <span class="ledger-val-stack">
-          <span class="ledger-val" id="low">—</span>
-          <small id="lowDate">—</small>
-        </span>
-      </div>
     </div>
   </div>
 
@@ -831,14 +830,14 @@ footer { text-align: center; font-size: 10.5px; font-weight: 500; color: var(--i
 
   <section class="section">
     <div class="section-head">
-      <h3>Jewelry calculator</h3>
+      <h3>Jewellery calculator</h3>
     </div>
     <div class="panel">
       <div class="calc-suite">
 
         <div class="calc-segmented-mode">
-          <button class="calc-mode-btn active" type="button" data-mode="value">Calculate Price by Weight</button>
-          <button class="calc-mode-btn" type="button" data-mode="grams">Calculate Weight by Budget</button>
+          <button class="calc-mode-btn active" type="button" data-mode="value">By Weight</button>
+          <button class="calc-mode-btn" type="button" data-mode="grams">By Budget</button>
           <select id="calcMode" hidden>
             <option value="value" selected>Calculate Price for Weight</option>
             <option value="grams">Calculate Weight for Budget</option>
@@ -846,65 +845,62 @@ footer { text-align: center; font-size: 10.5px; font-weight: 500; color: var(--i
         </div>
 
         <div class="calc-group" id="weightChipsGroup">
-          <span class="calc-group-label">Standard Gold Weight</span>
+          <span class="calc-group-label">Gold weight</span>
           <div class="chip-container" id="weightChips">
             <button class="chip" data-val="1" type="button">1g</button>
-            <button class="chip" data-val="4" type="button">4g (Half)</button>
-            <button class="chip active" data-val="8" type="button">8g (1 Sov)</button>
-            <button class="chip" data-val="16" type="button">16g (2 Sov)</button>
-            <button class="chip" data-val="24" type="button">24g (3 Sov)</button>
-            <button class="chip" data-val="50" type="button">50g</button>
-            <button class="chip" data-val="100" type="button">100g</button>
+            <button class="chip" data-val="4" type="button">4g</button>
+            <button class="chip active" data-val="8" type="button">8g · 1 Sov</button>
+            <button class="chip" data-val="16" type="button">16g · 2 Sov</button>
           </div>
         </div>
 
         <div class="calc-group">
-          <span class="calc-group-label">Jewelry Category & Making Charges</span>
+          <span class="calc-group-label">Making charge</span>
           <div class="chip-container" id="makingChips">
-            <button class="chip" data-val="3.0" type="button">Coin (3%)</button>
-            <button class="chip active" data-val="8.0" type="button">Plain Jewelry (8%)</button>
-            <button class="chip" data-val="12.0" type="button">Stone / Studded (12%)</button>
-            <button class="chip" data-val="16.0" type="button">Antique / Temple (16%)</button>
+            <button class="chip" data-val="3.0" type="button">Coin · 3%</button>
+            <button class="chip active" data-val="8.0" type="button">Plain · 8%</button>
+            <button class="chip" data-val="12.0" type="button">Studded · 12%</button>
+            <button class="chip" data-val="16.0" type="button">Antique · 16%</button>
           </div>
         </div>
 
         <div class="calc-grid-form">
           <div class="calc-field" id="weightField">
-            <label>Gold Weight (Grams)</label>
+            <label>Weight (g)</label>
             <input class="calc-input" id="weight" type="number" inputmode="decimal" value="8" step="0.01">
           </div>
           <div class="calc-field" id="budgetField" style="display: none;">
-            <label>Total Budget (₹)</label>
+            <label>Budget (₹)</label>
             <input class="calc-input" id="budget" type="number" inputmode="decimal" value="100000" step="100">
           </div>
           <div class="calc-field">
-            <label>Making Charge (%)</label>
+            <label>Making charge (%)</label>
             <input class="calc-input" id="making" type="number" inputmode="decimal" value="8.0" step="0.1">
           </div>
           <div class="calc-field">
-            <label>GST on Jewelry (%)</label>
+            <label>GST (%)</label>
             <input class="calc-input" id="gstRate" type="number" inputmode="decimal" value="3.0" step="0.1">
           </div>
           <div class="calc-field">
-            <label>Hallmarking / Fee (₹)</label>
+            <label>Hallmarking fee (₹)</label>
             <input class="calc-input" id="flatFee" type="number" inputmode="decimal" value="45" step="1">
           </div>
         </div>
 
         <div class="exchange-drawer">
-          <span class="exchange-header">Old Gold Scrap Exchange (Optional)</span>
+          <span class="exchange-header">Old gold exchange (optional)</span>
           <div class="calc-grid-form">
             <div class="calc-field">
-              <label>Scrap Weight (g)</label>
+              <label>Scrap weight (g)</label>
               <input class="calc-input" id="oldWeight" type="number" inputmode="decimal" value="0" step="0.01">
             </div>
             <div class="calc-field">
-              <label>Scrap Purity</label>
+              <label>Scrap purity</label>
               <select class="calc-input" id="oldPurity">
-                <option value="22" selected>22K (91.6% Pure)</option>
-                <option value="18">18K (75.0% Pure)</option>
-                <option value="24">24K (99.9% Pure)</option>
-                <option value="20">84.0% Standard Melt</option>
+                <option value="22" selected>22K · 91.6%</option>
+                <option value="18">18K · 75.0%</option>
+                <option value="24">24K · 99.9%</option>
+                <option value="20">Standard melt · 84%</option>
               </select>
             </div>
           </div>
@@ -1386,7 +1382,7 @@ function drawChart() {
   ctx.clearRect(0, 0, width, height);
 
   const data = getFilteredHistory(selectedRange);
-  if ($("chartCount")) $("chartCount").textContent = data.length.toLocaleString() + " records";
+  if ($("chartCount")) $("chartCount").textContent = data.length.toLocaleString("en-IN") + " records";
 
   const styles = getComputedStyle(document.body);
   const colorGold = styles.getPropertyValue('--gold').trim() || '#9c7a3c';
