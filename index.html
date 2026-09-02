@@ -1084,10 +1084,20 @@ function checkParserHealth(data, networkError = false) {
     return;
   }
 
+  // `data` here is the real health_status.json payload (status,
+  // age_hours, source_count, single_source, agreement), except for
+  // the network-failure fallback call which passes a plain
+  // { error: "..." } object -- handle both shapes.
   let hasFailed = false, reasons = [];
-  if (data.error || data.parsing_failed) { hasFailed = true; reasons.push(data.error || "Parser feed issue"); }
-  if (Array.isArray(data.failed_sources) && data.failed_sources.length > 0) { hasFailed = true; reasons.push(`Failed: ${data.failed_sources.join(", ")}`); }
-  if (data.status === "degraded") { hasFailed = true; reasons.push("Operating in fallback mode"); }
+  if (data.error) { hasFailed = true; reasons.push(data.error); }
+
+  const status = data.status;
+  if (status === "offline") { hasFailed = true; reasons.push("No usable source data"); }
+  else if (status === "stale") { hasFailed = true; reasons.push("Feed updating slowly"); }
+  else if (status === "degraded") {
+    hasFailed = true;
+    reasons.push(data.single_source ? "Only one source reporting" : "Sources disagree or unverified");
+  }
 
   if (hasFailed) {
     const title = $("warningTitle");
@@ -1187,7 +1197,7 @@ function computeLastMovement() {
   const lastAmtEl = $("lastAmount");
   const lastTimeEl = $("lastTime");
 
-  if (lastChangeItem && oldRate) {
+  if (lastChangeItem && Number.isFinite(oldRate)) {
     let amount = Number(lastChangeItem.rate_22k) - oldRate;
     if (lastDateEl) lastDateEl.textContent = "Price shifted on " + dateText(lastChangeItem.date);
     if (lastAmtEl) {
@@ -1708,7 +1718,6 @@ async function loadPublishedData(silent = false) {
   renderLive(latest);
   renderStats();
   calculate();
-  checkParserHealth(latest);
   localStorage.setItem("gold_live_backup", JSON.stringify(latest));
   localStorage.setItem("gold_history_backup", JSON.stringify(history));
 
@@ -1717,7 +1726,13 @@ async function loadPublishedData(silent = false) {
     toast(`Gold Rate Updated ${dir} ${money(latest.rate_22k)}/g`);
   }
 
-  getJSON(HEALTH_URL).then(renderHealth).catch(() => {});
+  // checkParserHealth() and renderHealth() both need the real
+  // health_status.json payload (status/age/source_count/etc.) --
+  // fetch it once here and feed both, rather than checking `latest`
+  // (which never carries those fields) against the wrong data.
+  getJSON(HEALTH_URL)
+    .then(h => { checkParserHealth(h); renderHealth(h); })
+    .catch(() => { checkParserHealth(null); });
   getJSON(WINDOWS_URL).then(renderNextFix).catch(() => {});
 
   return latest;
