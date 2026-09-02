@@ -1,62 +1,230 @@
-const CACHE_NAME = "g22-live-cache";
-const OFFLINE_ASSETS = [
-  "./",
-  "./index.html",
-  "./manifest.webmanifest",
-  "./icon.svg"
-];
+name: Monitor and Update Chennai 22K Gold
 
-// 1. Install & immediately force activation
-self.addEventListener("install", (event) => {
-  self.skipWaiting();
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(OFFLINE_ASSETS))
-  );
-});
+on:
+  workflow_dispatch:
 
-// 2. Activate: Clear out any old caches and claim all open clients immediately
-self.addEventListener("activate", (event) => {
-  event.waitUntil(
-    caches.keys().then((keys) =>
-      Promise.all(
-        keys.map((key) => {
-          if (key !== CACHE_NAME) {
-            return caches.delete(key);
-          }
-        })
-      )
-    ).then(() => self.clients.claim())
-  );
-});
+  schedule:
+    # Window opens 9:15 IST (03:45 UTC)
+    - cron: "45 3 * * *"
 
-// 3. NETWORK-FIRST: Always fetch fresh code/data from GitHub first
-self.addEventListener("fetch", (event) => {
-  // Only intercept GET requests (allow Cloudflare POST requests to pass through)
-  if (event.request.method !== "GET") return;
+    # Window opens 16:15 IST (10:45 UTC)
+    - cron: "45 10 * * *"
 
-  event.respondWith(
-    fetch(event.request)
-      .then((networkResponse) => {
-        // If we get a valid response from GitHub, update the cache for offline use
-        if (networkResponse && networkResponse.status === 200) {
-          const responseClone = networkResponse.clone();
-          caches.open(CACHE_NAME).then((cache) => {
-            const cleanUrl = event.request.url.split('?')[0];
-            cache.put(cleanUrl, responseClone);
-          });
-        }
-        return networkResponse;
-      })
-      .catch(() => {
-        // Only if network fails (offline), load from cache using ignoreSearch
-        return caches.match(event.request, { ignoreSearch: true }).then((cachedResponse) => {
-          if (cachedResponse) {
-            return cachedResponse;
-          }
-          if (event.request.mode === "navigate") {
-            return caches.match("./index.html");
-          }
-        });
-      })
-  );
-});
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 210
+
+    steps:
+
+      # ----------------------------------------------------
+      # CHECKOUT
+      # ----------------------------------------------------
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      # ----------------------------------------------------
+      # PYTHON
+      # ----------------------------------------------------
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      # ----------------------------------------------------
+      # PIP CACHE
+      # ----------------------------------------------------
+      - name: Cache pip packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-requests-bs4
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      # ----------------------------------------------------
+      # DEPENDENCIES
+      # ----------------------------------------------------
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests beautifulsoup4
+
+      # ----------------------------------------------------
+      # DETERMINE FETCH MODE
+      # ----------------------------------------------------
+      - name: Determine fetch mode
+        id: mode
+        shell: bash
+        run: |
+          echo "Event: ${{ github.event_name }}"
+
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "force_fetch=true" >> "$GITHUB_OUTPUT"
+            echo "Manual Fetch button detected."
+          else
+            echo "force_fetch=false" >> "$GITHUB_OUTPUT"
+            echo "Scheduled run detected."
+          fi
+
+      # ----------------------------------------------------
+      # MONITOR AND UPDATE
+      # ----------------------------------------------------
+      - name: Monitor and update Chennai 22K rate
+        env:
+          GITHUB_ACTIONS: "true"
+          GITHUB_EVENT_NAME: ${{ github.event_name }}
+          FORCE_FETCH: ${{ steps.mode.outputs.force_fetch }}
+          ALERT_WEBHOOK_URL: ${{ secrets.ALERT_WEBHOOK_URL }}
+        shell: bash
+        run: |
+          echo "============================================================"
+          echo "CHENNAI 22K GOLD RATE MONITOR"
+          echo "============================================================"
+          echo "Event: $GITHUB_EVENT_NAME"
+          echo "Force fetch: $FORCE_FETCH"
+          echo ""
+          echo "Starting update_gold.py..."
+          echo ""
+          echo "Scheduled runs:"
+          echo "AM : ~9:30 IST (window opens 9:15)"
+          echo "PM : ~4:30 IST (window opens 16:15)"
+          echo ""
+          echo "During monitoring:"
+          echo "LiveChennai + GoodReturns checked every 10 seconds."
+          echo "============================================================"
+
+          python update_gold.py
+
+      # ----------------------------------------------------
+      # VERIFY DATA
+      # ----------------------------------------------------
+      - name: Verify generated data
+        shell: bash
+        run: |
+          echo "============================================================"
+          echo "VERIFYING GENERATED DATA"
+          echo "============================================================"
+
+          if [ -f data/live.json ]; then
+            echo "live.json: OK"
+          else
+            echo "ERROR: data/live.json is missing"
+            exit 1
+          fi
+
+          if [ -f data/history.json ]; then
+            echo "history.json: OK"
+          else
+            echo "history.json missing - creating empty file"
+            echo "[]" > data/history.json
+          fi
+
+          if [ -f data/monitoring_windows.json ]; then
+            echo "monitoring_windows.json: OK"
+          else
+            echo "monitoring_windows.json missing - creating file"
+            echo '{}' > data/monitoring_windows.json
+          fi
+
+          if [ -f data/summary.json ]; then
+            echo "summary.json: OK"
+          else
+            echo "summary.json missing - will be created once history exists"
+          fi
+
+          if [ -f data/alert_state.json ]; then
+            echo "alert_state.json: OK"
+          else
+            echo "alert_state.json missing - will be created on first health check"
+          fi
+
+          if [ -f data/health_status.json ]; then
+            echo "health_status.json: OK"
+          else
+            echo "health_status.json missing - will be created on first health check"
+          fi
+
+      # ----------------------------------------------------
+      # SHOW LIVE DATA
+      # ----------------------------------------------------
+      - name: Show current live data
+        shell: bash
+        run: |
+          echo "============================================================"
+          echo "CURRENT LIVE DATA"
+          echo "============================================================"
+
+          cat data/live.json
+
+      # ----------------------------------------------------
+      # SHOW MONITORING WINDOW
+      # ----------------------------------------------------
+      - name: Show monitoring window
+        shell: bash
+        run: |
+          echo "============================================================"
+          echo "MONITORING WINDOW"
+          echo "============================================================"
+
+          cat data/monitoring_windows.json
+
+      # ----------------------------------------------------
+      # SHOW SUMMARY STATS
+      # ----------------------------------------------------
+      - name: Show summary stats
+        shell: bash
+        run: |
+          echo "============================================================"
+          echo "SUMMARY STATS"
+          echo "============================================================"
+
+          if [ -f data/summary.json ]; then
+            cat data/summary.json
+          else
+            echo "No summary.json yet."
+          fi
+
+      # ----------------------------------------------------
+      # SHOW HEALTH STATUS
+      # ----------------------------------------------------
+      - name: Show health status
+        shell: bash
+        run: |
+          echo "============================================================"
+          echo "HEALTH STATUS"
+          echo "============================================================"
+
+          if [ -f data/health_status.json ]; then
+            cat data/health_status.json
+          else
+            echo "No health_status.json yet."
+          fi
+
+      # ----------------------------------------------------
+      # SAVE UPDATED DATA
+      # ----------------------------------------------------
+      - name: Save updated data
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add data/live.json
+          git add data/history.json
+          git add data/monitoring_windows.json
+          git add data/summary.json 2>/dev/null || true
+          git add data/alert_state.json 2>/dev/null || true
+          git add data/health_status.json 2>/dev/null || true
+
+          if git diff --cached --quiet; then
+            echo "No data changes to commit."
+          else
+            git commit -m "Update Chennai 22K gold rate"
+            git push
+          fi
