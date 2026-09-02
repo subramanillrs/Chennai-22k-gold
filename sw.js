@@ -41,14 +41,16 @@ self.addEventListener("fetch", (event) => {
         if (networkResponse && networkResponse.status === 200) {
           const responseClone = networkResponse.clone();
           caches.open(CACHE_NAME).then((cache) => {
-            cache.put(event.request, responseClone);
+            // Fix: Strip cache-busting query parameters to prevent storage leak
+            const cleanUrl = event.request.url.split('?')[0];
+            cache.put(cleanUrl, responseClone);
           });
         }
         return networkResponse;
       })
       .catch(() => {
-        // Only if network fails (offline), load from cache
-        return caches.match(event.request).then((cachedResponse) => {
+        // Only if network fails (offline), load from cache using ignoreSearch
+        return caches.match(event.request, { ignoreSearch: true }).then((cachedResponse) => {
           if (cachedResponse) {
             return cachedResponse;
           }
