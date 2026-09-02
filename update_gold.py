@@ -114,10 +114,7 @@ def clean_number(text):
     cleaned = re.sub(r"\b(?:24|22|18|20)\s*(?:k|carat|karat)\b", " ", cleaned, flags=re.IGNORECASE)
     cleaned = re.sub(r"\b(?:1|4|8|10|100)\s*(?:g|gm|gram|grams)\b", " ", cleaned, flags=re.IGNORECASE)
 
-    matches = re.findall(r"\d+(?:\.\d+)?", cleaned) or re.findall(r"\d+(?:\.\d+)?", str(text))
-    if not matches:
-        return None
-
+    matches = re.findall(r"\d+(?:\.\d+)?", cleaned)
     for m in matches:
         try:
             val = int(float(m))
@@ -126,10 +123,7 @@ def clean_number(text):
         except (ValueError, TypeError):
             continue
 
-    try:
-        return int(float(matches[0]))
-    except (ValueError, TypeError):
-        return None
+    return None
 
 
 def load_json(path, default):
@@ -170,21 +164,40 @@ def _hours_since(iso_string, now):
 
 def extract_livechennai_22k(soup):
     for table in soup.find_all("table"):
-        header_text = " ".join(table.get_text(" ", strip=True).split()[:20]).lower()
-        if "standard gold" in header_text or "22 k" in header_text or "22k" in header_text:
-            for row in table.find_all("tr"):
-                row_text = row.get_text(" ", strip=True).lower()
-                if "22 k" in row_text or "22k" in row_text or "1 gram" in row_text:
-                    for cell in row.find_all(["td", "th"]):
-                        val = clean_number(cell.get_text(" ", strip=True))
-                        if valid_gold_rate(val):
-                            return val
+        rows = table.find_all("tr")
+        if not rows:
+            continue
+
+        header_cells = [c.get_text(" ", strip=True).lower() for c in rows[0].find_all(["th", "td"])]
+        col_22k_idx = -1
+        for idx, h in enumerate(header_cells):
+            if ("22" in h or "standard" in h) and ("1" in h or "gm" in h or "gram" in h or "gold" in h):
+                if "8" not in h and "24" not in h:
+                    col_22k_idx = idx
+                    break
+
+        if col_22k_idx != -1 and len(rows) > 1:
+            for r in rows[1:]:
+                cells = r.find_all(["td", "th"])
+                if col_22k_idx < len(cells):
+                    val = clean_number(cells[col_22k_idx].get_text(" ", strip=True))
+                    if valid_gold_rate(val):
+                        return val
+
+        for row in rows:
+            row_text = row.get_text(" ", strip=True).lower()
+            if ("22 k" in row_text or "22k" in row_text or "22 carat" in row_text) and "24" not in row_text:
+                for cell in row.find_all(["td", "th"]):
+                    val = clean_number(cell.get_text(" ", strip=True))
+                    if valid_gold_rate(val):
+                        return val
 
     page_text = re.sub(r"\s+", " ", soup.get_text(" ", strip=True))
     patterns = [
-        r"Today's\s+22K\s+Rate\s*₹?\s*([\d,]+)",
-        r"22K\s+(?:Gold|Rate).{0,60}?₹\s*([\d,]+)",
-        r"22\s*Carat\s+gold\s+rate.{0,60}?₹\s*([\d,]+)",
+        r"Today(?:'s)?\s+22\s*K\s*(?:Rate|Gold)?[^0-9\r\n]{0,30}(?:₹|Rs\.?|INR)?\s*([\d,]+)",
+        r"22\s*K(?:arat|orat)?\s*(?:\(1\s*g\)|1\s*gm?|1\s*gram|Gold|Rate)?[^0-9\r\n]{0,30}(?:₹|Rs\.?|INR)?\s*([\d,]+)",
+        r"22\s*Carat\s+gold\s+rate[^0-9\r\n]{0,30}(?:₹|Rs\.?|INR)?\s*([\d,]+)",
+        r"1\s*Gram\s*(?:\(22\s*K\)|22\s*K)[^0-9\r\n]{0,30}(?:₹|Rs\.?|INR)?\s*([\d,]+)",
     ]
 
     for pattern in patterns:
@@ -216,9 +229,18 @@ def fetch_livechennai():
 
 def extract_goodreturns_22k(soup):
     for table in soup.find_all("table"):
+        table_context = ""
+        prev = table.find_previous(["h1", "h2", "h3", "h4", "caption", "div"])
+        if prev:
+            table_context = prev.get_text(" ", strip=True).lower()
+        table_text = table.get_text(" ", strip=True).lower()
+
+        is_22k_table = ("22" in table_context or "22" in table_text) and "24" not in table_context
+
         for row in table.find_all("tr"):
-            row_text = row.get_text(" ", strip=True)
-            if re.search(r"22\s*k|22\s*karat", row_text, re.IGNORECASE):
+            row_text = row.get_text(" ", strip=True).lower()
+            if (is_22k_table and ("1 gram" in row_text or "1g" in row_text or "1 gm" in row_text)) or \
+               (("22 k" in row_text or "22k" in row_text or "22 carat" in row_text) and "8" not in row_text):
                 for cell in row.find_all(["td", "th"]):
                     val = clean_number(cell.get_text(" ", strip=True))
                     if valid_gold_rate(val):
@@ -226,10 +248,9 @@ def extract_goodreturns_22k(soup):
 
     page_text = re.sub(r"\s+", " ", soup.get_text(" ", strip=True))
     patterns = [
-        r"22K\s+Gold\s*/g\s*₹?\s*([\d,]+)",
-        r"22K\s+Gold\s+/?g\s*₹?\s*([\d,]+)",
-        r"22K\s+Gold.{0,80}?₹\s*([\d,]+)",
-        r"22\s*karat\s+gold.{0,100}?₹\s*([\d,]+)",
+        r"22\s*K\s+Gold\s*/\s*g[^0-9\r\n]{0,30}(?:₹|Rs\.?|INR)?\s*([\d,]+)",
+        r"22\s*(?:K|Carat|Karat)\s*Gold[^0-9\r\n]{0,50}(?:₹|Rs\.?|INR)?\s*([\d,]+)",
+        r"1\s*Gram[^0-9\r\n]{0,30}(?:₹|Rs\.?|INR)?\s*([\d,]+)",
     ]
 
     for pattern in patterns:
@@ -362,13 +383,21 @@ def get_previous_rate():
     return None
 
 
+def get_yesterday_close(today_str):
+    records = extract_history_records(load_json(HISTORY_FILE, []))
+    prior = [r for r in records if isinstance(r, dict) and r.get("date") and r.get("date") < today_str and valid_gold_rate(r.get("rate_22k"))]
+    if prior:
+        return int(prior[-1]["rate_22k"])
+    return None
+
+
 def session_for_time(dt, previous_session=None):
     hour = dt.hour + dt.minute / 60.0
     if 6.0 <= hour < 14.0:
         return "AM"
-    if 14.0 <= hour <= 23.5:
+    if 14.0 <= hour <= 23.99:
         return "PM"
-    return previous_session or ("AM" if hour < 14.0 else "PM")
+    return previous_session or "PM"
 
 # ============================================================
 # PERSISTENCE
@@ -390,12 +419,13 @@ def save_history(rate, selected, changed):
     records = extract_history_records(existing)
     current = now_ist()
     today = current.strftime("%Y-%m-%d")
+    current_session = session_for_time(current)
 
     rec = {
         "date": today,
         "time": current.strftime("%H:%M:%S"),
         "timestamp": current.isoformat(),
-        "session": session_for_time(current),
+        "session": current_session,
         "rate_22k": int(rate),
         "rate_8g": int(rate * 8),
         "changed": bool(changed),
@@ -405,8 +435,29 @@ def save_history(rate, selected, changed):
         "goodreturns_rate": selected["goodreturns"]["rate_22k"] if selected.get("goodreturns") else None,
     }
 
-    if not records or records[-1].get("rate_22k") != int(rate) or records[-1].get("date") != today:
+    should_append = False
+    if not records:
+        should_append = True
+    elif records[-1].get("date") != today:
+        should_append = True
+    elif records[-1].get("session") != current_session:
+        should_append = True
+    elif records[-1].get("rate_22k") != int(rate):
+        should_append = True
+
+    if should_append:
         records.append(rec)
+    else:
+        records[-1].update(
+            {
+                "time": rec["time"],
+                "timestamp": rec["timestamp"],
+                "source": rec["source"],
+                "agreement": rec["agreement"],
+                "livechennai_rate": rec["livechennai_rate"],
+                "goodreturns_rate": rec["goodreturns_rate"],
+            }
+        )
 
     if isinstance(existing, dict):
         existing["records"] = records
@@ -421,10 +472,22 @@ def save_live(rate, selected, changed):
     if not isinstance(live, dict):
         live = {}
 
-    prev_rate = live.get("rate_22k")
+    today = current.strftime("%Y-%m-%d")
+    yesterday_close = get_yesterday_close(today)
+    previous_rate = yesterday_close or live.get("previous_rate_22k") or live.get("rate_22k") or rate
+
     live["rate_22k"] = int(rate)
     live["rate_8g"] = int(rate * 8)
+    live["currency"] = "INR"
+    live["city"] = "Chennai"
+    live["purity"] = "22K"
+    live["date"] = today
+    live["time"] = current.strftime("%H:%M:%S")
+    live["timestamp"] = current.isoformat()
+    live["session"] = session_for_time(current, live.get("session"))
     live["changed"] = bool(changed)
+    live["previous_rate_22k"] = int(previous_rate)
+    live["change"] = int(rate) - int(previous_rate)
     live["source"] = selected.get("source", "Unknown")
     live["agreement"] = selected.get("agreement")
     live["sources_agree"] = selected.get("agreement") is True
@@ -444,15 +507,6 @@ def save_live(rate, selected, changed):
     ]
     live["last_checked"] = current.isoformat()
     live["last_checked_at"] = current.isoformat()
-
-    if changed or "date" not in live:
-        live["date"] = current.strftime("%Y-%m-%d")
-        live["time"] = current.strftime("%H:%M:%S")
-        live["timestamp"] = current.isoformat()
-        live["session"] = session_for_time(current, live.get("session"))
-        if prev_rate and valid_gold_rate(prev_rate):
-            live["previous_rate_22k"] = int(prev_rate)
-            live["change"] = int(rate) - int(prev_rate)
 
     save_json(LIVE_FILE, live)
 
@@ -535,7 +589,7 @@ def run_health_check():
             "checked_at": now.isoformat(),
             "status": status,
             "hours_since_last_checked": round(hours_since_checked, 2) if hours_since_checked is not None else 0.0,
-            "sources_agree": live.get("agreement") is True,
+            "sources_agree": live.get("sources_agree", True),
             "disagree_since": state.get("disagree_since"),
             "webhook_configured": bool(os.environ.get("ALERT_WEBHOOK_URL")),
             "current_rate_22k": live.get("rate_22k"),
@@ -627,17 +681,19 @@ def predict_session_times(now=None):
         elif r.get("session") == "PM":
             pm_m.append(mins)
 
-    if len(am_m) < MIN_SAMPLES_FOR_PREDICTION or len(pm_m) < MIN_SAMPLES_FOR_PREDICTION:
+    if len(am_m) < MIN_SAMPLES_FOR_PREDICTION:
         for r in load_json(SEED_FILE, []):
-            if not isinstance(r, dict):
-                continue
-            mins = _parse_time_to_minutes(r.get("time"))
-            if mins is None:
-                continue
-            if r.get("session") == "AM" and len(am_m) < MIN_SAMPLES_FOR_PREDICTION:
-                am_m.append(mins)
-            elif r.get("session") == "PM" and len(pm_m) < MIN_SAMPLES_FOR_PREDICTION:
-                pm_m.append(mins)
+            if isinstance(r, dict) and r.get("session") == "AM":
+                m = _parse_time_to_minutes(r.get("time"))
+                if m is not None:
+                    am_m.append(m)
+
+    if len(pm_m) < MIN_SAMPLES_FOR_PREDICTION:
+        for r in load_json(SEED_FILE, []):
+            if isinstance(r, dict) and r.get("session") == "PM":
+                m = _parse_time_to_minutes(r.get("time"))
+                if m is not None:
+                    pm_m.append(m)
 
     res = {}
     if len(am_m) >= MIN_SAMPLES_FOR_PREDICTION:
@@ -741,10 +797,15 @@ def normal_fetch():
 
 def monitor_window(window):
     prev_rate = get_previous_rate()
+    last_selected = None
 
     while True:
         now = now_ist()
         if now >= window["end"]:
+            if last_selected:
+                rate = last_selected["rate_22k"]
+                save_live(rate, last_selected, False)
+                save_history(rate, last_selected, False)
             save_window_info(None)
             return False
 
@@ -752,6 +813,7 @@ def monitor_window(window):
         selected = select_rate(live, good, prev_rate)
 
         if selected:
+            last_selected = selected
             rate = selected["rate_22k"]
             if prev_rate is not None and rate != prev_rate:
                 save_live(rate, selected, True)
@@ -762,6 +824,10 @@ def monitor_window(window):
 
         remaining = (window["end"] - now_ist()).total_seconds()
         if remaining <= 0:
+            if last_selected:
+                rate = last_selected["rate_22k"]
+                save_live(rate, last_selected, False)
+                save_history(rate, last_selected, False)
             save_window_info(None)
             return False
 
