@@ -70,6 +70,13 @@ ALERT_STALE_HOURS = 20
 ALERT_DISAGREE_HOURS = 3
 ALERT_COOLDOWN_HOURS = 12
 
+# Optional: set the WEBHOOK_URL environment variable (e.g. a Slack
+# incoming webhook or generic POST endpoint) to receive alerts when
+# the feed goes stale or sources disagree for too long. Left unset,
+# alert_state.json is still tracked/updated, but no network call is
+# made and health_status.json reports webhook_configured: false.
+WEBHOOK_URL = os.environ.get("WEBHOOK_URL", "").strip()
+
 SESSION = requests.Session()
 SESSION.headers.update(
     {
@@ -195,16 +202,46 @@ def _hours_since(iso_string, now):
         return None
 
 
+# Broad AM/PM day-half split used to label *any* timestamp (live
+# rate updates, legacy history records, etc.) as morning or evening.
+# This is intentionally wider than the learned/predicted monitoring
+# windows (AM_PREDICTION_MIN/MAX, PM_PREDICTION_MIN/MAX) which decide
+# *when to poll*. Keep this as the single source of truth for the
+# AM/PM cut -- predict_session_times() reuses it instead of
+# re-encoding the same hours separately, so the two can't drift.
+DAY_HALF_SPLIT_HOUR = 14
+DAY_HALF_AM_START_HOUR = 6
+
+
 def session_for_time(dt):
     hour = dt.hour
 
-    if 6 <= hour < 14:
+    if DAY_HALF_AM_START_HOUR <= hour < DAY_HALF_SPLIT_HOUR:
         return "AM"
 
-    if 14 <= hour <= 23:
+    if DAY_HALF_SPLIT_HOUR <= hour <= 23:
         return "PM"
 
     return None
+
+
+def session_for_minutes(mins):
+    """Same AM/PM split as session_for_time, but from a minutes-since-
+    midnight integer (used by the history-based prediction learner,
+    which works in minutes rather than datetimes)."""
+    if mins is None:
+        return ""
+
+    am_start = DAY_HALF_AM_START_HOUR * 60
+    split = DAY_HALF_SPLIT_HOUR * 60
+
+    if am_start <= mins < split:
+        return "AM"
+
+    if split <= mins <= 23 * 60 + 59:
+        return "PM"
+
+    return ""
 
 
 # ============================================================
@@ -981,9 +1018,30 @@ def save_history(
     if should_append:
         records.append(rec)
     else:
-        # Preserve the existing record while
-        # refreshing the current observation fields.
-        records[-1].update(rec)
+        # Refresh the current observation's timing fields, but never
+        # let a less-verified reading (e.g. a single source, or
+        # sources disagreeing) downgrade a record that was already
+        # confirmed by both sources agreeing. The rate is identical
+        # either way (that's why should_append is False) -- only the
+        # verification metadata could regress.
+        existing_rec = (
+            records[-1]
+            if isinstance(records[-1], dict)
+            else {}
+        )
+
+        was_agreed = existing_rec.get("agreement") is True
+        now_agreed = rec.get("agreement") is True
+
+        if was_agreed and not now_agreed:
+            # Keep the stronger verification info, just bump the
+            # timestamp/time so the record reflects it was re-checked.
+            existing_rec["time"] = rec["time"]
+            existing_rec["timestamp"] = rec["timestamp"]
+            records[-1] = existing_rec
+        else:
+            existing_rec.update(rec)
+            records[-1] = existing_rec
 
     if isinstance(existing, dict):
         existing["records"] = records
@@ -1109,12 +1167,163 @@ def run_health_check():
         ),
     }
 
+    health["webhook_configured"] = bool(WEBHOOK_URL)
+
     save_json(
         HEALTH_FILE,
         health,
     )
 
     return health
+
+
+# ============================================================
+# ALERTING
+# ============================================================
+
+def send_webhook_alert(message, health):
+    """POST a short alert payload to WEBHOOK_URL, if configured.
+
+    Failures here are logged and swallowed -- alerting must never
+    take down the main fetch pipeline.
+    """
+    if not WEBHOOK_URL:
+        return False
+
+    payload = {
+        "text": message,
+        "status": health.get("status"),
+        "age_hours": health.get("age_hours"),
+        "source_count": health.get("source_count"),
+        "agreement": health.get("agreement"),
+        "rate_22k": health.get("rate_22k"),
+        "checked_at": health.get("checked_at"),
+    }
+
+    try:
+        resp = SESSION.post(
+            WEBHOOK_URL,
+            json=payload,
+            timeout=REQUEST_TIMEOUT,
+        )
+        resp.raise_for_status()
+        return True
+
+    except Exception as exc:
+        print(f"Webhook alert failed: {exc}")
+        return False
+
+
+def run_alert_check(health):
+    """Track staleness/disagreement over time and fire cooldown-gated
+    webhook alerts. Always updates alert_state.json so the frontend
+    (or a future dashboard) can show alert history even without a
+    webhook configured.
+    """
+    now = now_ist()
+
+    state = load_json(
+        ALERT_FILE,
+        {
+            "disagree_since": None,
+            "last_disagree_alert_at": None,
+            "last_stale_alert_at": None,
+        },
+    )
+
+    if not isinstance(state, dict):
+        state = {
+            "disagree_since": None,
+            "last_disagree_alert_at": None,
+            "last_stale_alert_at": None,
+        }
+
+    status = health.get("status")
+    agreement = health.get("agreement")
+    source_count = health.get("source_count", 0)
+
+    # --------------------------------------------------------
+    # Disagreement tracking: only "degraded due to disagreement"
+    # (both sources up, values differ) counts -- a single-source
+    # or offline state is a different failure mode and shouldn't
+    # extend a disagreement streak.
+    # --------------------------------------------------------
+    is_disagreeing = (
+        status == "degraded"
+        and source_count >= 2
+        and agreement is False
+    )
+
+    if is_disagreeing:
+        if not state.get("disagree_since"):
+            state["disagree_since"] = now.isoformat()
+    else:
+        state["disagree_since"] = None
+
+    disagree_hours = _hours_since(
+        state.get("disagree_since"),
+        now,
+    )
+
+    cooldown_ok_disagree = True
+    last_disagree_alert = state.get("last_disagree_alert_at")
+    if last_disagree_alert:
+        since_last = _hours_since(last_disagree_alert, now)
+        cooldown_ok_disagree = (
+            since_last is None
+            or since_last >= ALERT_COOLDOWN_HOURS
+        )
+
+    if (
+        is_disagreeing
+        and disagree_hours is not None
+        and disagree_hours >= ALERT_DISAGREE_HOURS
+        and cooldown_ok_disagree
+    ):
+        sent = send_webhook_alert(
+            f"Gold rate sources have disagreed for "
+            f"{disagree_hours:.1f}h (LiveChennai vs GoodReturns).",
+            health,
+        )
+        state["last_disagree_alert_at"] = now.isoformat()
+        if not WEBHOOK_URL:
+            print(
+                "ALERT (no webhook configured): sources disagree "
+                f"for {disagree_hours:.1f}h"
+            )
+        elif not sent:
+            print("ALERT: disagree webhook attempt failed")
+
+    # --------------------------------------------------------
+    # Staleness alerting, independent of disagreement.
+    # --------------------------------------------------------
+    cooldown_ok_stale = True
+    last_stale_alert = state.get("last_stale_alert_at")
+    if last_stale_alert:
+        since_last = _hours_since(last_stale_alert, now)
+        cooldown_ok_stale = (
+            since_last is None
+            or since_last >= ALERT_COOLDOWN_HOURS
+        )
+
+    if status == "stale" and cooldown_ok_stale:
+        age = health.get("age_hours")
+        sent = send_webhook_alert(
+            f"Gold rate feed is stale "
+            f"({age if age is not None else '?'}h since last update).",
+            health,
+        )
+        state["last_stale_alert_at"] = now.isoformat()
+        if not WEBHOOK_URL:
+            print(
+                "ALERT (no webhook configured): feed stale "
+                f"({age}h)"
+            )
+        elif not sent:
+            print("ALERT: stale webhook attempt failed")
+
+    save_json(ALERT_FILE, state)
+    return state
 
 
 # ============================================================
@@ -1383,22 +1592,7 @@ def predict_session_times(
             "AM",
             "PM",
         }:
-            if (
-                6 * 60
-                <= mins
-                < 14 * 60
-            ):
-                session = "AM"
-
-            elif (
-                14 * 60
-                <= mins
-                <= 23 * 60 + 59
-            ):
-                session = "PM"
-
-            else:
-                session = ""
+            session = session_for_minutes(mins)
 
         if session == "AM":
             am_m.append(mins)
@@ -1975,11 +2169,21 @@ if __name__ == "__main__":
 
     finally:
         try:
-            run_health_check()
+            health = run_health_check()
 
         except Exception as exc:
             print(
                 f"Health check failed: {exc}"
+            )
+            health = None
+
+        try:
+            if health:
+                run_alert_check(health)
+
+        except Exception as exc:
+            print(
+                f"Alert check failed: {exc}"
             )
 
         try:
