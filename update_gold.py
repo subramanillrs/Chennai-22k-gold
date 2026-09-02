@@ -306,32 +306,39 @@ def extract_livechennai_22k(soup):
     for table in soup.find_all("table"):
         rows = table.find_all("tr")
 
-        if not rows:
+        if len(rows) < 3:
             continue
 
-        header_cells = [
-            c.get_text(" ", strip=True).lower()
-            for c in rows[0].find_all(["th", "td"])
-        ]
+        # LiveChennai's rate table has a two-row header using
+        # colspan: row 0 = "Date" | "Pure Gold (24 k)" (colspan=2)
+        # | "Standard Gold (22 K)" (colspan=2); row 1 = "" | "1 Gm"
+        # | "8 Gm" | "1 Gm" | "8 Gm". Expand colspans on row 0 so
+        # its column positions line up with the real data columns,
+        # then use row 1 to pick the "22K, 1 Gm" column precisely.
+        def expanded_header(row):
+            cells = row.find_all(["th", "td"])
+            out = []
+            for c in cells:
+                span = int(c.get("colspan", 1) or 1)
+                text = c.get_text(" ", strip=True).lower()
+                out.extend([text] * span)
+            return out
+
+        top = expanded_header(rows[0])
+        sub = expanded_header(rows[1])
 
         col_22k_idx = -1
-
-        for idx, h in enumerate(header_cells):
+        for idx in range(min(len(top), len(sub))):
             if (
-                ("22" in h or "standard" in h)
-                and (
-                    "1" in h
-                    or "gm" in h
-                    or "gram" in h
-                    or "gold" in h
-                )
+                ("22" in top[idx] or "standard" in top[idx])
+                and "24" not in top[idx]
+                and ("1" in sub[idx] and "8" not in sub[idx])
             ):
-                if "8" not in h and "24" not in h:
-                    col_22k_idx = idx
-                    break
+                col_22k_idx = idx
+                break
 
-        if col_22k_idx != -1 and len(rows) > 1:
-            for r in rows[1:]:
+        if col_22k_idx != -1:
+            for r in rows[2:]:
                 cells = r.find_all(["td", "th"])
 
                 if col_22k_idx < len(cells):
@@ -448,6 +455,44 @@ def fetch_livechennai():
 
 def extract_goodreturns_22k(soup):
     for table in soup.find_all("table"):
+        rows = table.find_all("tr")
+
+        if len(rows) < 2:
+            continue
+
+        # GoodReturns' "Today Gold Price Per Gram" table is
+        # transposed from LiveChennai's: rows are gram weights
+        # (1, 8, 10, 100...) and columns are karats (24K, 22K, 18K).
+        # Find the 22K column from the header row, then the "1 gram"
+        # data row, and read that cell.
+        header_cells = rows[0].find_all(["th", "td"])
+        header_text = [
+            c.get_text(" ", strip=True).lower()
+            for c in header_cells
+        ]
+
+        col_22k_idx = -1
+        for idx, h in enumerate(header_text):
+            if "22" in h and "24" not in h and "18" not in h:
+                col_22k_idx = idx
+                break
+
+        if col_22k_idx != -1:
+            for r in rows[1:]:
+                cells = r.find_all(["td", "th"])
+                if not cells:
+                    continue
+
+                row_label = cells[0].get_text(" ", strip=True).lower()
+                is_one_gram_row = row_label in ("1", "1g", "1 g", "1gm", "1 gm", "1 gram")
+
+                if is_one_gram_row and col_22k_idx < len(cells):
+                    val = clean_number(
+                        cells[col_22k_idx].get_text(" ", strip=True)
+                    )
+                    if valid_gold_rate(val):
+                        return val
+
         table_context = ""
 
         prev = table.find_previous(
