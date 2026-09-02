@@ -1,10 +1,10 @@
 {
-  "checked_at": "2026-09-02T22:38:23.389135+05:30",
+  "checked_at": "2026-09-02T20:12:24.928965+05:30",
   "status": "ok",
   "hours_since_last_checked": 0.0,
   "sources_agree": true,
   "disagree_since": null,
   "webhook_configured": false,
-  "current_rate_22k": 13942,
+  "current_rate_22k": 13943,
   "current_rate_date": "2026-09-02"
 }
