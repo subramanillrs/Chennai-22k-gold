@@ -1,26 +1,26 @@
 {
-  "rate_22k": 13935,
-  "rate_8g": 111480,
+  "rate_22k": 13942,
+  "rate_8g": 111536,
   "currency": "INR",
   "city": "Chennai",
   "purity": "22K",
   "date": "2026-09-02",
-  "time": "19:34:19",
-  "timestamp": "2026-09-02T19:34:19.305587+05:30",
-  "changed": false,
-  "previous_rate_22k": 14175,
+  "time": "22:32:26",
+  "timestamp": "2026-09-02T22:32:26.489904+05:30",
+  "changed": true,
+  "previous_rate_22k": 13935,
   "sources": {
     "livechennai": {
       "source": "LiveChennai",
       "rate_22k": 13950,
       "url": "https://www.livechennai.com/gold_silverrate.asp",
-      "fetched_at": "2026-09-02T20:12:24.907801+05:30"
+      "fetched_at": "2026-09-02T22:32:26.489521+05:30"
     },
     "goodreturns": {
       "source": "GoodReturns",
       "rate_22k": 13935,
       "url": "https://www.goodreturns.in/gold-rates/chennai.html",
-      "fetched_at": "2026-09-02T20:12:24.655215+05:30"
+      "fetched_at": "2026-09-02T22:32:26.014825+05:30"
     }
   },
   "source_update_times": [
@@ -31,10 +31,10 @@
     14505
   ],
   "sources_agree": true,
-  "last_checked_at": "2026-09-02T20:12:24.908139+05:30",
-  "source": "Previous rate - sources disagree",
-  "last_checked": "2026-09-02T20:12:24.908139+05:30",
-  "agreement": false,
+  "last_checked_at": "2026-09-02T22:32:26.489904+05:30",
+  "source": "LiveChennai + GoodReturns (within tolerance)",
+  "last_checked": "2026-09-02T22:32:26.489904+05:30",
+  "agreement": true,
   "session": "PM",
-  "change": -240
+  "change": 7
 }
