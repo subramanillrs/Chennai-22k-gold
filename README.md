@@ -14,6 +14,6 @@ Settings -> Actions -> General -> Workflow permissions -> Read and write permiss
 
 Then Actions -> Update 22K Gold Rate -> Run workflow once.
 
-The scheduled workflow runs at 11:00 AM and 5:00 PM IST (05:30 and 11:30 UTC). Opening the PWA always fetches the latest same-origin `data/live.json`, so it no longer depends on browser CORS.
+The scheduled workflow runs at 08:45 AM and 3:45 PM IST (03:15 and 10:15 UTC), about 30 minutes before the predicted AM (~9:30) and PM (~4:30) fix times, so the monitoring window is open in time. Opening the PWA always fetches the latest same-origin `data/live.json`, so it no longer depends on browser CORS.
 
 The free GoldPrice.dev /v1/carat endpoint is documented as no-auth and free.
