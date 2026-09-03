@@ -1707,8 +1707,10 @@ def predict_session_times(
             pm_m.append(mins)
 
     # --------------------------------------------------------
-    # Seed data is only used when real historical samples
-    # are insufficient.
+    # Seed data establishes the trusted baseline fix time for each
+    # session. Real historical samples are only trusted to move the
+    # prediction away from that baseline once there are ENOUGH of
+    # them to outvote a stray outlier.
     # --------------------------------------------------------
 
     seed = load_json(
@@ -1719,75 +1721,75 @@ def predict_session_times(
     if not isinstance(seed, list):
         seed = []
 
-    if len(am_m) < MIN_SAMPLES_FOR_PREDICTION:
+    def _seed_minutes(session_name):
+        out = []
         for r in seed:
             if (
                 isinstance(r, dict)
-                and str(
-                    r.get(
-                        "session",
-                        "",
-                    )
-                ).upper()
-                == "AM"
+                and str(r.get("session", "")).upper() == session_name
             ):
-                m = _parse_time_to_minutes(
-                    r.get("time")
-                )
-
+                m = _parse_time_to_minutes(r.get("time"))
                 if m is not None:
-                    am_m.append(m)
+                    out.append(m)
+        return out
 
-    if len(pm_m) < MIN_SAMPLES_FOR_PREDICTION:
-        for r in seed:
-            if (
-                isinstance(r, dict)
-                and str(
-                    r.get(
-                        "session",
-                        "",
-                    )
-                ).upper()
-                == "PM"
-            ):
-                m = _parse_time_to_minutes(
-                    r.get("time")
-                )
+    seed_am_m = _seed_minutes("AM")
+    seed_pm_m = _seed_minutes("PM")
 
-                if m is not None:
-                    pm_m.append(m)
+    # BUGFIX: the previous version treated MIN_SAMPLES_FOR_PREDICTION
+    # as a simple gate -- below it, use ONLY seed data; at or above it,
+    # use ONLY real data (dropping the seed entirely). That let as few
+    # as 3 real samples -- including anomalous ones, like a monitoring
+    # window that legitimately ran late -- override a well-established
+    # seed baseline outright, and let 1-2 real samples get silently
+    # blended with all 4+ seed samples with no protection against the
+    # real samples being outliers.
+    #
+    # Now: always start from the seed median as the trusted baseline,
+    # then only let it drift if there are enough real, in-bounds
+    # samples clustered near each other (not just near the bound
+    # filter's wide 7-hour window) to be believable. This makes a lone
+    # anomalous real sample (e.g. one very late monitoring run)
+    # powerless to relabel the learned fix time on its own.
+    def _resolve_session_minutes(real_m, seed_m, fallback_hm):
+        seed_med = _median(seed_m)
+
+        if len(real_m) < MIN_SAMPLES_FOR_PREDICTION:
+            # Not enough real samples to trust on their own. Blend
+            # them with the seed baseline (real samples nudge the
+            # estimate, but can't dominate it), or fall back to seed
+            # alone if there are no real samples yet.
+            if not real_m:
+                base = seed_med
+            elif seed_med is not None:
+                base = _median(seed_m + real_m)
+            else:
+                base = _median(real_m)
+        else:
+            # Enough real samples exist. Trust them, but only if they
+            # broadly agree with each other (low spread) -- otherwise
+            # something is off (e.g. a mix of genuine and drifted
+            # observations) and the seed baseline is safer.
+            real_med = _median(real_m)
+            spread = max(real_m) - min(real_m)
+
+            if seed_med is not None and spread > WINDOW_DURATION_MINUTES:
+                base = seed_med
+            else:
+                base = real_med
+
+        if base is None:
+            return fallback_hm
+
+        return (int(base // 60), int(base % 60))
 
     res = {}
 
-    if len(am_m) >= MIN_SAMPLES_FOR_PREDICTION:
-        med = _median(am_m)
+    am_hm = _resolve_session_minutes(am_m, seed_am_m, FALLBACK_AM_TIME)
+    res["AM"] = _clamp_hm(am_hm, AM_PREDICTION_MIN, AM_PREDICTION_MAX)
 
-        res["AM"] = _clamp_hm(
-            (
-                int(med // 60),
-                int(med % 60),
-            ),
-            AM_PREDICTION_MIN,
-            AM_PREDICTION_MAX,
-        )
-
-    else:
-        res["AM"] = FALLBACK_AM_TIME
-
-    if len(pm_m) >= MIN_SAMPLES_FOR_PREDICTION:
-        med = _median(pm_m)
-
-        res["PM"] = _clamp_hm(
-            (
-                int(med // 60),
-                int(med % 60),
-            ),
-            PM_PREDICTION_MIN,
-            PM_PREDICTION_MAX,
-        )
-
-    else:
-        res["PM"] = FALLBACK_PM_TIME
+    pm_hm = _resolve_session_minutes(pm_m, seed_pm_m, FALLBACK_PM_TIME)
+    res["PM"] = _clamp_hm(pm_hm, PM_PREDICTION_MIN, PM_PREDICTION_MAX)
 
     print(
         "Predicted session times: "
