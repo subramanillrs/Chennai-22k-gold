@@ -1770,18 +1770,59 @@ function renderNextFix(w) {
   if (!line || !w || !w.windows) return;
 
   const active = w.active_window;
-  const upcomingName = active === "AM" ? "PM" : "AM";
+
+  if (active) {
+    line.hidden = false;
+    if ($("nextFixText")) $("nextFixText").textContent = `Monitoring ${active} fix now — checking periodically`;
+    return;
+  }
+
+  // BUGFIX: previously this always picked "whichever session isn't
+  // currently active" as the upcoming one, defaulting to "AM" when
+  // nothing is active. That's wrong for the common case of it being
+  // mid-day (after the AM fix, before the PM window opens) -- it
+  // would incorrectly claim the *morning* fix is still ahead. Compare
+  // each window's predicted_fix_time against the current IST clock
+  // time instead, and pick whichever is genuinely next.
+  const am = w.windows.AM;
+  const pm = w.windows.PM;
+  if (!am || !am.predicted_fix_time || !pm || !pm.predicted_fix_time) return;
+
+  const nowMinutes = (() => {
+    const parts = new Intl.DateTimeFormat('en-GB', {
+      timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit', hourCycle: 'h23'
+    }).formatToParts(new Date());
+    const h = Number(parts.find(p => p.type === 'hour')?.value);
+    const m = Number(parts.find(p => p.type === 'minute')?.value);
+    return Number.isFinite(h) && Number.isFinite(m) ? h * 60 + m : null;
+  })();
+
+  const toMinutes = t => {
+    const [h, m] = String(t).split(':').map(Number);
+    return Number.isFinite(h) && Number.isFinite(m) ? h * 60 + m : null;
+  };
+
+  const amMinutes = toMinutes(am.predicted_fix_time);
+  const pmMinutes = toMinutes(pm.predicted_fix_time);
+
+  let upcomingName;
+  if (nowMinutes === null || amMinutes === null || pmMinutes === null) {
+    // Fall back to the old heuristic if we can't parse a clock time.
+    upcomingName = "AM";
+  } else if (nowMinutes < amMinutes) {
+    upcomingName = "AM";
+  } else if (nowMinutes < pmMinutes) {
+    upcomingName = "PM";
+  } else {
+    upcomingName = "AM"; // both fixes for today have passed; next is tomorrow's AM
+  }
+
   const upcoming = w.windows[upcomingName];
   if (!upcoming || !upcoming.predicted_fix_time) return;
 
   line.hidden = false;
-
-  if (active) {
-    if ($("nextFixText")) $("nextFixText").textContent = `Monitoring ${active} fix now — checking periodically`;
-  } else {
-    const label = upcomingName === "AM" ? "Morning" : "Evening";
-    if ($("nextFixText")) $("nextFixText").textContent = `${label} fix expected around ${upcoming.predicted_fix_time} IST`;
-  }
+  const label = upcomingName === "AM" ? "Morning" : "Evening";
+  if ($("nextFixText")) $("nextFixText").textContent = `${label} fix expected around ${upcoming.predicted_fix_time} IST`;
 }
 
 async function manualFetch() {
