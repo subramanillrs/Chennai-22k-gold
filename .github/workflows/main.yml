@@ -4,21 +4,39 @@ on:
   workflow_dispatch:
 
   schedule:
-    # Fires ~30 min before the 9:30 AM predicted fix (window opens 9:15 IST)
-    # 08:45 AM IST = 03:15 UTC
-    - cron: "15 3 * * *"
+    # Dense polling (every 5 min) across two bands that cover the AM
+    # (~09:38-11:03 IST) and PM (~19:19-20:44 IST) predicted fix
+    # windows with a wide margin either side, in case the predicted
+    # times drift day to day. Expressed in UTC (IST = UTC+5:30):
+    #   08:00-12:00 IST = 02:30-06:30 UTC  (covers AM window)
+    #   18:30-21:30 IST = 13:00-16:00 UTC  (covers PM window)
+    # Each run is short (single fetch, no internal sleep/poll loop)
+    # and independently scheduled by GitHub -- so if one tick is
+    # delayed or skipped (GitHub's `schedule` trigger is best-effort,
+    # not guaranteed to the minute), the next tick 5 minutes later
+    # picks up where it left off instead of the whole session being
+    # pushed back, unlike the old design where a single job slept
+    # until the window then polled internally for up to 85 minutes.
+    - cron: "*/5 2-6 * * *"
+    - cron: "*/5 13-16 * * *"
 
-    # Fires ~30 min before the 4:30 PM predicted fix (window opens 16:15 IST)
-    # 03:45 PM IST = 10:15 UTC
-    - cron: "15 10 * * *"
+    # Hourly outside the two dense bands, as a low-cost heartbeat.
+    # This is what catches a session that GitHub delayed so badly it
+    # slipped past the dense polling bands above -- see the
+    # STALE_CATCHUP_HOURS self-heal in update_gold.py.
+    - cron: "0 7-12,17 * * *"
 
 permissions:
   contents: write
 
+concurrency:
+  group: chennai-gold-update
+  cancel-in-progress: false
+
 jobs:
   update:
     runs-on: ubuntu-latest
-    timeout-minutes: 390
+    timeout-minutes: 10
 
     steps:
 
@@ -75,9 +93,9 @@ jobs:
           fi
 
       # ----------------------------------------------------
-      # MONITOR AND UPDATE
+      # RUN (single pass, no internal sleep/poll loop)
       # ----------------------------------------------------
-      - name: Monitor and update Chennai 22K rate
+      - name: Update Chennai 22K rate
         env:
           GITHUB_ACTIONS: "true"
           GITHUB_EVENT_NAME: ${{ github.event_name }}
@@ -91,14 +109,10 @@ jobs:
           echo "Event: $GITHUB_EVENT_NAME"
           echo "Force fetch: $FORCE_FETCH"
           echo ""
-          echo "Starting update_gold.py..."
-          echo ""
-          echo "Scheduled runs:"
-          echo "AM : ~9:30 IST (window opens 9:15)"
-          echo "PM : ~4:30 IST (window opens 16:15)"
-          echo ""
-          echo "During monitoring:"
-          echo "LiveChennai + GoodReturns checked every 10 seconds."
+          echo "This job does ONE fetch-and-save pass then exits."
+          echo "Polling during a monitoring window is achieved by this"
+          echo "workflow re-running every 5 minutes, not by looping"
+          echo "inside a single job."
           echo "============================================================"
 
           python update_gold.py
@@ -210,6 +224,14 @@ jobs:
 
       # ----------------------------------------------------
       # SAVE UPDATED DATA
+      #
+      # Commit every run, not just on a rate change. Each run is
+      # cheap (single fetch) and only every 5 minutes, so this is a
+      # deliberate trade of slightly more commits for live.json's
+      # timestamp always reflecting the truth -- you can always tell
+      # from the repo/PWA whether the pipeline is actually running,
+      # instead of a silent internal loop hiding staleness for up to
+      # 85 minutes.
       # ----------------------------------------------------
       - name: Save updated data
         shell: bash
@@ -228,6 +250,6 @@ jobs:
             echo "No data changes to commit."
           else
             git pull --rebase origin HEAD || true
-            git commit -m "Update Chennai 22K gold rate"
+            git commit -m "Update Chennai 22K gold data [skip ci]"
             git push
           fi
