@@ -841,6 +841,20 @@ def save_live(
         "rate_22k"
     )
 
+    # BUGFIX: "updated_at"/"last_checked_at" get refreshed to `now` on
+    # *every* run, including runs where select_rate() fell back to the
+    # "Previous verified rate" (sources disagreed, or the reading was
+    # implausible) -- i.e. runs where nothing was actually confirmed.
+    # health_status.json's age_hours was computed from "updated_at",
+    # so a feed that's actually stuck (both sources broken, silently
+    # repeating the last good rate every run) always looked perfectly
+    # fresh and never tripped the stale alert. Track "verified_at"
+    # separately: it only advances when this run's reading is
+    # trustworthy (two sources agreeing, or a single source whose
+    # value passed the plausibility check) -- not on a bare fallback
+    # to the previous rate. run_health_check() uses this field.
+    is_verified_reading = selected.get("source") != "Previous verified rate"
+
     data.update(
         {
             "date": now.strftime(
@@ -896,6 +910,11 @@ def save_live(
             "updated_at": now.isoformat(),
             "last_checked_at": now.isoformat(),
             "last_checked": now.isoformat(),
+            "verified_at": (
+                now.isoformat()
+                if is_verified_reading
+                else data.get("verified_at")
+            ),
             "change": (int(rate) - int(previous_rate)) if valid_gold_rate(previous_rate) else 0,
             "sources": {
                 "livechennai": live_source or None,
@@ -1141,8 +1160,19 @@ def run_health_check():
         "updated_at"
     )
 
+    # BUGFIX: use "verified_at" (last genuinely-confirmed reading),
+    # not "updated_at" (last time the script *ran*), so a feed stuck
+    # on repeated "Previous verified rate" fallbacks is correctly
+    # reported as aging/stale instead of looking fresh every run.
+    # Older live.json files won't have "verified_at" yet -- fall back
+    # to "updated_at" for those rather than treating them as infinitely
+    # stale.
+    verified_at = live.get(
+        "verified_at"
+    ) or updated_at
+
     age_hours = _hours_since(
-        updated_at,
+        verified_at,
         now,
     )
 
@@ -1185,6 +1215,7 @@ def run_health_check():
         "status": status,
         "checked_at": now.isoformat(),
         "updated_at": updated_at,
+        "verified_at": verified_at,
         "age_hours": (
             round(age_hours, 2)
             if age_hours is not None
@@ -1638,6 +1669,36 @@ def predict_session_times(
             "PM",
         }:
             session = session_for_minutes(mins)
+
+        # BUGFIX: session_for_time()/session_for_minutes() intentionally
+        # use a wide AM/PM day-half split (any hour 14-23 counts as
+        # "PM") for *labeling* purposes -- but that's much wider than a
+        # plausible fix-time window. A late-night run (health-check
+        # re-save, delayed GitHub Actions retry, manual dispatch after
+        # the real PM fix) was getting tagged session="PM" and its
+        # clock time fed straight into the PM median below. That
+        # dragged the *learned* PM window later and later each time it
+        # happened (e.g. a 23:56 reading pulled the predicted PM fix
+        # from ~16:30 to ~19:34), which in turn made it *more* likely
+        # for the next run to again land late and reinforce the drift.
+        # Only genuine fix-time observations should influence the
+        # learned median, so drop anything outside the plausible
+        # prediction bounds here -- clamping just the final median
+        # (via _clamp_hm below) is not enough, since a bad sample can
+        # still skew *which* value the median lands on.
+        if session == "AM" and not (
+            AM_PREDICTION_MIN[0] * 60 + AM_PREDICTION_MIN[1]
+            <= mins
+            <= AM_PREDICTION_MAX[0] * 60 + AM_PREDICTION_MAX[1]
+        ):
+            continue
+
+        if session == "PM" and not (
+            PM_PREDICTION_MIN[0] * 60 + PM_PREDICTION_MIN[1]
+            <= mins
+            <= PM_PREDICTION_MAX[0] * 60 + PM_PREDICTION_MAX[1]
+        ):
+            continue
 
         if session == "AM":
             am_m.append(mins)
