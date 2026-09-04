@@ -401,6 +401,13 @@ html[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
   pointer-events: none;
   filter: blur(10px);
 }
+.hero-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  position: relative;
+}
 .hero-eyebrow {
   font-family: var(--font-display);
   font-style: italic;
@@ -424,17 +431,18 @@ html[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
   position: relative;
 }
 .hero-rule { width: 100%; height: 1px; background: linear-gradient(90deg, transparent, var(--rule-strong), transparent); margin: 2px 0; position: relative; }
-.hero-foot { display: flex; justify-content: space-between; width: 100%; gap: 16px; position: relative; }
+.hero-foot { display: flex; justify-content: space-between; align-items: flex-start; width: 100%; gap: 16px; position: relative; }
 .hero-foot-col { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; text-align: left; }
 .hero-foot-col:last-child { text-align: right; }
-.hero-foot-label { font-size: var(--fs-xs); font-weight: 600; color: var(--ink-faint); letter-spacing: 0.01em; }
-.hero-foot-val { font-family: var(--font-display); font-size: var(--fs-lg2); font-weight: 600; color: var(--ink); display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
+.hero-foot-label { font-size: var(--fs-xs); font-weight: 600; color: var(--ink-faint); letter-spacing: 0.01em; line-height: 1.2; }
+.hero-foot-val { font-family: var(--font-display); font-size: var(--fs-xl); font-weight: 600; color: var(--ink); display: flex; align-items: center; gap: 5px; flex-wrap: nowrap; line-height: 1.2; }
 .hero-foot-col:last-child .hero-foot-val { justify-content: flex-end; }
-.hero-foot-sub { font-size: var(--fs-xs2); font-weight: 500; color: var(--ink-soft); }
+#hero1.hero-foot-val { font-size: var(--fs-xl2); }
+.hero-foot-sub { font-size: var(--fs-xs2); font-weight: 500; color: var(--ink-soft); line-height: 1.2; }
 
 .share-link {
   position: absolute;
-  top: 16px; right: 16px;
+  right: 0;
   display: inline-flex; align-items: center; gap: 5px;
   font-size: var(--fs-sm); font-weight: 600; color: var(--ink-soft);
   cursor: pointer; padding: 6px 10px;
@@ -447,6 +455,16 @@ html[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
   z-index: 10;
 }
 .share-link:active { transform: scale(0.94); }
+.share-link-inline {
+  position: static;
+  width: 100%;
+  height: 44px;
+  margin-top: 12px;
+  justify-content: center;
+  font-size: var(--fs-base2);
+  padding: 6px 10px;
+  box-sizing: border-box;
+}
 
 .section { display: flex; flex-direction: column; gap: 10px; width: 100%; }
 .section-head { display: flex; align-items: baseline; justify-content: space-between; }
@@ -474,11 +492,10 @@ html[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   width: 100%;
-  padding: 10px 0;
 }
 .purity-cell {
   display: flex; flex-direction: column; gap: 3px;
-  padding: 0 10px;
+  padding: 10px 10px;
   border-right: 1px solid var(--rule);
   text-align: center;
 }
@@ -716,14 +733,14 @@ select.calc-input {
 .history-table thead, .history-table tbody { display: table; width: 100%; table-layout: fixed; }
 .history-table th {
   position: sticky; top: 0; background: var(--paper-sunken); padding: 10px 8px;
-  font-size: var(--fs-xs); font-weight: 600; color: var(--ink-faint); border-bottom: 1px solid var(--rule); text-align: center;
+  font-size: var(--fs-md); font-weight: 700; color: var(--ink-faint); border-bottom: 1px solid var(--rule); text-align: center;
 }
 .history-table td { padding: 11px 8px; border-bottom: 1px solid var(--rule); font-size: var(--fs-lg); font-weight: 600; text-align: center; color: var(--ink); font-family: var(--font-display); }
 .history-table tr:last-child td { border-bottom: none; }
 .history-table tr:hover td { background-color: var(--paper-sunken); }
-.history-table th:nth-child(1), .history-table td:nth-child(1),
-.history-table th:nth-child(2), .history-table td:nth-child(2),
-.history-table th:nth-child(3), .history-table td:nth-child(3) { width: 33.333%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.history-table th:nth-child(1), .history-table td:nth-child(1) { width: 36%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.history-table th:nth-child(2), .history-table td:nth-child(2) { width: 28%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.history-table th:nth-child(3), .history-table td:nth-child(3) { width: 36%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
 .pulldown {
   position: fixed;
@@ -820,6 +837,7 @@ button:active,.btn:active,.chip:active,.range-btn:active,.seg-btn:active{transfo
 .receipt-line{min-height:26px;align-items:center;}
 .share-link{border:1px solid var(--glass-border);font:600 var(--fs-sm)/1 var(--font-sans);appearance:none;-webkit-appearance:none;}
 .share-link.is-sharing{opacity:.65;pointer-events:none;}
+.quote-btn.is-sharing{opacity:.65;pointer-events:none;}
 @media(max-width:640px){
   #makingChips{gap:5px;}
   #makingChips .chip{font-size: var(--fs-xs);padding:8px 4px;}
@@ -949,26 +967,6 @@ html[data-theme="dark"] .target-badge { color: var(--gold); }
 }
 .target-alert-banner[hidden] { display: none; }
 .banner-dismiss { background: none; border: none; font-size: var(--fs-lg); cursor: pointer; color: var(--ink); }
-
-/* AM/PM Spread Toggle */
-.chart-mode-row {
-  display: flex; justify-content: flex-end; align-items: center; margin-top: 8px; margin-bottom: 4px;
-}
-.chart-view-toggle {
-  display: inline-flex; background: var(--paper-sunken); padding: 2px; border-radius: var(--r-full);
-  border: 1px solid var(--rule); gap: 2px;
-}
-.chart-view-toggle button {
-  background: transparent; border: none; font-family: var(--font-sans);
-  font-size: var(--fs-xs); font-weight: 600; color: var(--ink-soft); padding: 4px 10px;
-  border-radius: var(--r-full); cursor: pointer; transition: all 0.2s ease;
-}
-.chart-view-toggle button.active {
-  background: var(--paper-raised); color: var(--ink); box-shadow: 0 1px 4px rgba(0,0,0,0.1);
-}
-html[data-theme="dark"] .chart-view-toggle button.active {
-  background: #242018; color: var(--gold);
-}
 
 /* Receipt Print Actions */
 .receipt-actions-grid {
@@ -1101,7 +1099,7 @@ html[data-theme="dark"] .quote-btn-print {
 
 /* Purity row: unified height */
 .purity-row { gap: 0; }
-.purity-cell { padding: 12px 8px; }
+.purity-cell { padding: 10px 8px; }
 .purity-cell b { font-size: var(--fs-lg2); }
 
 /* Chart panel: clean edges */
@@ -1129,6 +1127,7 @@ details.collapsible summary { padding: 12px 14px; }
 .receipt-total { padding-top: 10px; margin-top: 8px; }
 .receipt-actions-grid { margin-top: 12px; gap: 6px; }
 .quote-btn { height: 40px; border-radius: 10px; font-size: var(--fs-base2); }
+.share-link-inline { height: 40px; border-radius: 10px; }
 
 /* Portfolio: cleaner table */
 .port-table th { font-size: var(--fs-2xs); padding: 6px 5px; }
@@ -1137,7 +1136,7 @@ details.collapsible summary { padding: 12px 14px; }
 .port-form-box { padding: 14px; }
 
 /* History table: uniform row height */
-.history-table th { font-size: var(--fs-xs); padding: 8px 6px; }
+.history-table th { font-size: var(--fs-sm2); padding: 8px 6px; }
 .history-table td { font-size: var(--fs-base); padding: 10px 6px; }
 
 /* Footer: subtle */
@@ -1278,12 +1277,14 @@ footer { padding: 20px 0 8px; font-size: var(--fs-xs2); opacity: 0.7; }
   <div hidden><button id="fetchNow"></button></div>
 
   <section class="hero" id="heroCard">
-    <button class="share-link" id="shareBtn" type="button" aria-label="Share current gold market snapshot">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
-      Share
-    </button>
+    <div class="hero-top-row">
+      <span class="hero-eyebrow">One sovereign, eight grams</span>
+      <button class="share-link" id="shareBtn" type="button" aria-label="Share current gold market snapshot">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+        Share
+      </button>
+    </div>
 
-    <span class="hero-eyebrow">One sovereign, eight grams</span>
     <div class="hero-price" id="hero8">₹ —</div>
     <div id="change8" class="change-pill same">No change</div>
 
@@ -1368,12 +1369,7 @@ footer { padding: 20px 0 8px; font-size: var(--fs-xs2); opacity: 0.7; }
         <button data-range="all">ALL</button>
       </div>
 
-      <div class="chart-mode-row">
-        <div class="chart-view-toggle" id="chartTypeToggle">
-          <button class="active" data-type="spline" type="button">Spline Curve</button>
-          <button data-type="spread" type="button">AM / PM Spread</button>
-        </div>
-      </div>
+
 
       <div class="chart-header-metrics">
         <div class="primary-metric">
@@ -1566,9 +1562,9 @@ footer { padding: 20px 0 8px; font-size: var(--fs-xs2); opacity: 0.7; }
 
           <div class="receipt-actions-grid">
             <button class="quote-btn" id="copyQuoteBtn" type="button">Copy Quotation</button>
-            <button class="quote-btn quote-btn-print" id="printQuoteBtn" type="button">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-              Print Receipt
+            <button class="share-link share-link-inline" id="shareReceiptBtn" type="button">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="13" height="13"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+              Share Receipt
             </button>
           </div>
         </div>
@@ -2249,7 +2245,7 @@ function drawChart() {
     ctx.fillText(Math.round(gridVal).toLocaleString("en-IN"), L - 8, gy + 3.5);
   }
 
-  // 2. Period Open Baseline Reference Line
+  // Period Open Baseline (reference line only — no label)
   const openY = points[0].y;
   ctx.strokeStyle = isDark ? "rgba(212, 171, 99, 0.24)" : "rgba(169, 127, 52, 0.22)";
   ctx.lineWidth = 1;
@@ -2259,12 +2255,6 @@ function drawChart() {
   ctx.lineTo(width - R, openY);
   ctx.stroke();
   ctx.setLineDash([]);
-
-  // OPEN micro tag at baseline
-  ctx.font = "700 8.5px var(--font-sans)";
-  ctx.fillStyle = isDark ? "rgba(212, 171, 99, 0.6)" : "rgba(169, 127, 52, 0.7)";
-  ctx.textAlign = "left";
-  ctx.fillText("OPEN", L + 4, openY - 4);
 
   if (typeof chartViewMode !== "undefined" && chartViewMode === "spread") {
     // AM/PM Session Spread Bar View
@@ -3010,20 +3000,6 @@ const DEFAULT_HISTORY = [
 
 let chartViewMode = "spline";
 
-// --- UPGRADE 6: Chart View Mode Toggle ---
-(function setupChartModeToggle() {
-  const container = document.getElementById("chartTypeToggle");
-  if (!container) return;
-  container.addEventListener("click", e => {
-    const btn = e.target.closest("button[data-type]");
-    if (!btn) return;
-    container.querySelectorAll("button").forEach(b => b.classList.remove("active"));
-    btn.classList.add("active");
-    chartViewMode = btn.dataset.type;
-    if (typeof drawChart === "function") drawChart();
-  });
-})();
-
 // --- UPGRADE 7: Price Target Watcher ---
 (function setupTargetWatcher() {
   const toggleBtn = document.getElementById("targetToggleBtn");
@@ -3103,12 +3079,249 @@ let chartViewMode = "spline";
   setTimeout(updateTargetUI, 400);
 })();
 
-// --- UPGRADE 5: Printable Receipt Slip ---
-(function setupPrintSlip() {
-  const printBtn = document.getElementById("printQuoteBtn");
-  if (!printBtn) return;
-  printBtn.addEventListener("click", () => {
-    window.print();
+// --- UPGRADE 5: Share Receipt (mirrors the hero snapshot share flow) ---
+(function setupShareReceipt() {
+  const btn = document.getElementById("shareReceiptBtn");
+  if (!btn) return;
+
+  const textOf = (id, fallback = "—") => {
+    const el = document.getElementById(id);
+    return el ? ((el.textContent || "").trim() || fallback) : fallback;
+  };
+
+  function roundRect(ctx, x, y, w, h, r) {
+    if (typeof ctx.roundRect === "function") {
+      ctx.beginPath();
+      ctx.roundRect(x, y, w, h, r);
+      return;
+    }
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+  }
+
+  function generateReceiptCard() {
+    const isDark = document.documentElement.getAttribute("data-theme") === "dark" ||
+      (!document.documentElement.getAttribute("data-theme") && window.matchMedia("(prefers-color-scheme: dark)").matches);
+
+    const canvas = document.createElement("canvas");
+    const W = 720;
+    const H = 640;
+    const dpr = Math.min(2, Math.max(1, window.devicePixelRatio || 1.5));
+    canvas.width = Math.round(W * dpr);
+    canvas.height = Math.round(H * dpr);
+    const ctx = canvas.getContext("2d");
+    ctx.scale(dpr, dpr);
+
+    const bgGrad = ctx.createRadialGradient(W / 2, 20, 10, W / 2, H / 2, W * 0.8);
+    if (isDark) {
+      bgGrad.addColorStop(0, "#231e16");
+      bgGrad.addColorStop(0.55, "#14120e");
+      bgGrad.addColorStop(1, "#0a0907");
+    } else {
+      bgGrad.addColorStop(0, "#ffffff");
+      bgGrad.addColorStop(0.55, "#f8f4ea");
+      bgGrad.addColorStop(1, "#eee7d6");
+    }
+    ctx.fillStyle = bgGrad;
+    ctx.fillRect(0, 0, W, H);
+
+    ctx.strokeStyle = isDark ? "rgba(212, 171, 99, 0.36)" : "rgba(169, 127, 52, 0.32)";
+    ctx.lineWidth = 1.5;
+    roundRect(ctx, 16, 16, W - 32, H - 32, 20);
+    ctx.stroke();
+
+    const badgeGrad = ctx.createLinearGradient(36, 36, 74, 74);
+    badgeGrad.addColorStop(0, "#f4dca0");
+    badgeGrad.addColorStop(0.55, "#a97f34");
+    badgeGrad.addColorStop(1, "#6b5223");
+    ctx.fillStyle = badgeGrad;
+    roundRect(ctx, 36, 36, 38, 38, 9);
+    ctx.fill();
+
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "bold 19px 'Fraunces', Georgia, serif";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText("Au", 55, 55);
+
+    ctx.textAlign = "left";
+    ctx.fillStyle = isDark ? "#f2ede2" : "#1c1712";
+    ctx.font = "italic 600 22px 'Fraunces', Georgia, serif";
+    ctx.fillText("Purchase Quotation", 86, 49);
+
+    ctx.fillStyle = isDark ? "#a89d88" : "#6b6255";
+    ctx.font = "500 12px 'Inter', -apple-system, sans-serif";
+    ctx.fillText("Gold 22k rate · Itemized Estimate", 86, 68);
+
+    ctx.strokeStyle = isDark ? "rgba(255,255,255,0.10)" : "rgba(28,23,18,0.10)";
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(36, 100);
+    ctx.lineTo(W - 36, 100);
+    ctx.stroke();
+
+    const lines = [
+      ["Base 22K Gold Cost", textOf("receiptBase", "₹ 0")],
+      [textOf("receiptMakingLabel", "Making Charges"), textOf("receiptMaking", "₹ 0")],
+      [textOf("receiptGstLabel", "GST"), textOf("receiptGst", "₹ 0")],
+      ["Hallmarking / Flat Fees", textOf("receiptFee", "₹ 0")],
+    ];
+    const oldGoldLine = document.getElementById("receiptOldGoldLine");
+    if (oldGoldLine && oldGoldLine.style.display !== "none") {
+      lines.push(["Old Gold Exchange Credit", textOf("receiptOldGold", "-₹ 0")]);
+    }
+
+    let y = 140;
+    ctx.font = "500 15px 'Inter', -apple-system, sans-serif";
+    lines.forEach(([label, val]) => {
+      ctx.fillStyle = isDark ? "#a89d88" : "#6b6255";
+      ctx.textAlign = "left";
+      ctx.fillText(label, 36, y);
+      ctx.fillStyle = isDark ? "#f2ede2" : "#1c1712";
+      ctx.textAlign = "right";
+      ctx.fillText(val, W - 36, y);
+      y += 34;
+    });
+
+    y += 8;
+    ctx.strokeStyle = isDark ? "rgba(255,255,255,0.14)" : "rgba(28,23,18,0.14)";
+    ctx.beginPath();
+    ctx.moveTo(36, y);
+    ctx.lineTo(W - 36, y);
+    ctx.stroke();
+    y += 44;
+
+    ctx.textAlign = "left";
+    ctx.font = "600 14px 'Inter', -apple-system, sans-serif";
+    ctx.fillStyle = isDark ? "#a89d88" : "#6b6255";
+    ctx.fillText(textOf("receiptTotalLabel", "Net Payable Amount"), 36, y);
+
+    ctx.textAlign = "right";
+    ctx.font = "700 34px 'Fraunces', Georgia, serif";
+    ctx.fillStyle = isDark ? "#e8c988" : "#6b5223";
+    ctx.fillText(textOf("calcResult", "₹ —"), W - 36, y + 6);
+
+    y += 44;
+    ctx.textAlign = "left";
+    ctx.font = "500 12px 'Inter', -apple-system, sans-serif";
+    ctx.fillStyle = isDark ? "#786d5c" : "#a89d88";
+    ctx.fillText(textOf("calcSub", "Based on live 22K rate."), 36, y);
+
+    const dt = (typeof live !== "undefined" && live && live.date ? dateText(live.date) : textOf("today")) || "Today";
+    ctx.textAlign = "right";
+    ctx.fillText(dt, W - 36, y);
+
+    ctx.textAlign = "center";
+    ctx.font = "500 11px 'Inter', -apple-system, sans-serif";
+    ctx.fillStyle = isDark ? "#6b6255" : "#a89d88";
+    ctx.fillText("Gold 22k rate · Institutional Terminal", W / 2, H - 34);
+
+    return canvas;
+  }
+
+  btn.addEventListener("click", async () => {
+    try {
+      if (typeof haptic === "function") haptic(15);
+      btn.classList.add("is-sharing");
+
+      const total = textOf("calcResult", "₹ —");
+      const base = textOf("receiptBase", "₹ 0");
+      const making = textOf("receiptMaking", "₹ 0");
+      const gst = textOf("receiptGst", "₹ 0");
+      const fee = textOf("receiptFee", "₹ 0");
+      const shareUrl = window.location.href.split("#")[0];
+
+      const shareText = `🧾 Gold Purchase Quotation\n• Base 22K Gold Cost: ${base}\n• Making Charges: ${making}\n• GST: ${gst}\n• Hallmarking / Flat Fees: ${fee}\n• Net Payable: ${total}\n${shareUrl}`;
+
+      const canvas = generateReceiptCard();
+      const dataUrl = canvas.toDataURL("image/png");
+
+      let shared = false;
+
+      if (navigator.share && navigator.canShare && window.isSecureContext) {
+        try {
+          const blob = await new Promise(res => canvas.toBlob(res, "image/png", 0.96));
+          if (blob) {
+            const file = new File([blob], "gold-receipt.png", { type: "image/png" });
+            if (navigator.canShare({ files: [file] })) {
+              await navigator.share({
+                title: "Gold Purchase Quotation",
+                text: shareText,
+                files: [file]
+              });
+              shared = true;
+            }
+          }
+        } catch (shareErr) {
+          if (shareErr.name === "AbortError") {
+            btn.classList.remove("is-sharing");
+            return;
+          }
+        }
+      }
+
+      if (!shared && navigator.share && window.isSecureContext) {
+        try {
+          await navigator.share({
+            title: "Gold Purchase Quotation",
+            text: shareText,
+            url: shareUrl
+          });
+          shared = true;
+        } catch (shareErr) {
+          if (shareErr.name === "AbortError") {
+            btn.classList.remove("is-sharing");
+            return;
+          }
+        }
+      }
+
+      if (!shared) {
+        let copied = false;
+        try {
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            await navigator.clipboard.writeText(shareText);
+            copied = true;
+          }
+        } catch (_) {}
+
+        if (!copied) {
+          try {
+            const ta = document.createElement("textarea");
+            ta.value = shareText;
+            ta.style.position = "fixed";
+            ta.style.left = "-9999px";
+            ta.style.opacity = "0";
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand("copy");
+            document.body.removeChild(ta);
+            copied = true;
+          } catch (_) {}
+        }
+
+        const a = document.createElement("a");
+        a.href = dataUrl;
+        a.download = `gold-receipt-${(typeof live !== "undefined" && live && live.date) || "quotation"}.png`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+
+        if (typeof toast === "function") {
+          toast(copied ? "Receipt saved & summary copied!" : "Receipt downloaded!");
+        }
+      }
+    } catch (err) {
+      console.error("Share receipt error:", err);
+      if (typeof toast === "function") toast("Could not share receipt");
+    } finally {
+      setTimeout(() => btn.classList.remove("is-sharing"), 400);
+    }
   });
 })();
 
@@ -3843,17 +4056,12 @@ body{background:
   --ae2-hairline:color-mix(in srgb,var(--ink,#1c1712) 10%,transparent);
   --ae2-glow:rgba(194,146,48,.14);
 }
-body:before,body:after{content:"";position:fixed;pointer-events:none;z-index:-2;border-radius:50%;filter:blur(55px);opacity:.5}
-body:before{width:420px;height:420px;left:-250px;top:12vh;background:var(--ae2-glow)}
-body:after{width:360px;height:360px;right:-220px;top:48vh;background:rgba(194,146,48,.08)}
 .app{isolation:isolate}
 .section{counter-increment:ae-section;position:relative}
 .section>.section-head:before{content:counter(ae-section,decimal-leading-zero);font:700 9px/1 var(--font-sans);letter-spacing:.12em;color:var(--ink-faint);opacity:.7;margin-right:8px;align-self:center}
 .section>.section-head{display:flex;align-items:center}
 .section>.section-head h3{flex:1}
 .panel,.hero,.last-box,.collapsible{position:relative}
-.panel:after,.hero:after,.last-box:after,.collapsible:after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:radial-gradient(420px circle at var(--mx,50%) var(--my,0%),rgba(255,255,255,.17),transparent 40%);opacity:0;transition:opacity .35s ease}
-.panel:hover:after,.hero:hover:after,.last-box:hover:after,.collapsible:hover:after{opacity:1}
 .hero{box-shadow:0 18px 50px rgba(54,42,20,.09),inset 0 1px 0 rgba(255,255,255,.55)}
 .hero .hero-price{text-shadow:0 2px 22px rgba(169,127,52,.10)}
 .hero .share-link{backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
@@ -3869,10 +4077,6 @@ body:after{width:360px;height:360px;right:-220px;top:48vh;background:rgba(194,14
 .receipt-card .receipt-total:before{content:"";position:absolute;left:-14px;right:-14px;top:-10px;bottom:-10px;border-radius:16px;background:linear-gradient(90deg,transparent,rgba(194,146,48,.07),transparent);pointer-events:none}
 .history-table tbody tr{cursor:default}
 .history-table tbody tr:hover td:first-child{padding-left:12px;transition:padding .18s ease}
-/* Desktop cursor light: subtle, not decorative noise. */
-@media (pointer:fine) and (min-width:760px){
-  .panel,.hero,.last-box,.collapsible{--mx:50%;--my:0}
-}
 @media(prefers-reduced-motion:reduce){body:before,body:after{display:none}}
 </style>
 
@@ -3932,12 +4136,9 @@ html{scroll-behavior:smooth;scroll-padding-top:84px}
 .ai-insight-value{display:block;font-size: var(--fs-md);line-height:1.2;font-weight:750;color:var(--ink);font-variant-numeric:tabular-nums}
 .ai-insight-value.positive{color:var(--good)}.ai-insight-value.negative{color:var(--bad)}
 .ai-insight-sub{display:block;font-size: var(--fs-xs);color:var(--ink-faint);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-/* Chart hover affordance: the canvas remains the source of truth. */
+/* Chart hover affordance removed — was causing a full-size rounded outline over the chart. */
 .chartwrap{position:relative;touch-action:none}
-.chartwrap:after{content:"Drag to inspect";position:absolute;right:10px;bottom:8px;padding:4px 7px;border-radius:999px;background:color-mix(in srgb,var(--paper-raised,#fff) 82%,transparent);border:1px solid var(--ai-line);font-size: var(--fs-2xs);font-weight:700;letter-spacing:.03em;color:var(--ink-faint);opacity:.72;pointer-events:none;transition:opacity .25s var(--ai-ease)}
 .chartwrap:has(+ .chartmeta){} 
-.chartwrap:hover:after{opacity:.25}
-@media (hover:none){.chartwrap:after{content:"Swipe to inspect"}}
 /* Smarter section headers: stronger hierarchy without adding vertical bulk. */
 .section-head{min-height:28px}
 .section-head h3{letter-spacing:-.015em}
@@ -4022,16 +4223,7 @@ html{scroll-behavior:smooth;scroll-padding-top:84px}
     });
   }
 
-  // Pointer-positioned card sheen, but only for precise pointing devices.
-  if(matchMedia('(hover:hover) and (pointer:fine)').matches){
-    $$('.panel,.hero,.collapsible,.last-box').forEach(card=>{
-      card.addEventListener('pointermove',e=>{
-        const r=card.getBoundingClientRect();
-        card.style.setProperty('--mx',((e.clientX-r.left)/r.width*100)+'%');
-        card.style.setProperty('--my',((e.clientY-r.top)/r.height*100)+'%');
-      },{passive:true});
-    });
-  }
+  // Card sheen effect removed per design update.
 })();
 </script>
 
