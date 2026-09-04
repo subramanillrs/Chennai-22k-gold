@@ -53,11 +53,6 @@ PRE_WINDOW_MINUTES = 15
 WINDOW_DURATION_MINUTES = 85
 MIN_SAMPLES_FOR_PREDICTION = 3
 
-# Scheduled GitHub Actions runs may need to wait for the
-# predicted monitoring window. 300 minutes gives enough room
-# for the PM window without requiring another overlapping cron.
-MAX_SCHEDULE_WAIT_MINUTES = 300
-
 AM_PREDICTION_MIN = (7, 0)
 AM_PREDICTION_MAX = (13, 0)
 PM_PREDICTION_MIN = (14, 0)
@@ -69,6 +64,20 @@ SOURCE_AGREEMENT_TOLERANCE = 50
 ALERT_STALE_HOURS = 20
 ALERT_DISAGREE_HOURS = 3
 ALERT_COOLDOWN_HOURS = 12
+
+# If live.json hasn't had a verified reading in this many hours, and
+# we're not close to the next monitoring window, force a catch-up
+# fetch outside the normal window/cron schedule. Set below
+# ALERT_STALE_HOURS so this self-heal kicks in well before the
+# webhook alert would ever fire.
+STALE_CATCHUP_HOURS = 6
+
+# When outside the actual predicted fix window but inside the wider
+# dense-cron margin (or just outside it), only fetch if within this
+# many minutes of the next window opening. Keeps the extra cron
+# margin (kept for day-to-day drift tolerance) from turning into
+# needless scraping every 5 minutes for hours.
+NEAR_WINDOW_MARGIN_MINUTES = 20
 
 # Optional: set the WEBHOOK_URL environment variable (e.g. a Slack
 # incoming webhook or generic POST endpoint) to receive alerts when
@@ -2031,117 +2040,90 @@ def normal_fetch():
     return True
 
 
-def monitor_window(
-    window
-):
+def poll_window_once(window):
+    """
+    Do a SINGLE fetch-and-save pass for an active monitoring window,
+    then return immediately. No internal sleep loop.
+
+    This function used to poll every POLL_SECONDS in a `while True`
+    loop for up to WINDOW_DURATION_MINUTES, occupying one GitHub
+    Actions job the whole time. That meant a single delayed job start
+    (GitHub's `schedule` trigger is best-effort and can be delayed
+    during high load) delayed the entire day's monitoring. It also
+    only committed to git on a rate CHANGE or when the window ended,
+    so `live.json`'s timestamp could silently lag up to
+    WINDOW_DURATION_MINUTES behind reality even when everything was
+    working.
+
+    Now: each invocation is one fetch, one save, one exit. Repeated,
+    frequent, independently-scheduled invocations (see the
+    poll-frequently.yml workflow) do the polling instead of one long
+    -running job. This makes staleness self-limiting -- the worst
+    delay is one missed cron tick, not one entire monitoring window.
+    """
     prev_rate = get_previous_rate()
 
-    last_selected = None
+    live, good = fetch_all_sources()
 
-    while True:
-        now = now_ist()
+    selected = select_rate(
+        live,
+        good,
+        prev_rate,
+    )
 
-        if now >= window["end"]:
-            if last_selected:
-                rate = last_selected[
-                    "rate_22k"
-                ]
+    if not selected:
+        # Nothing usable this tick. Still record that we checked, so
+        # live.json's "last_checked_at" reflects reality even when a
+        # fetch comes back empty (source down, network error, etc.)
+        # rather than only advancing on a successful read.
+        save_window_info(window)
+        return False
 
-                save_live(
-                    rate,
-                    last_selected,
-                    False,
-                )
+    rate = selected["rate_22k"]
 
-                save_history(
-                    rate,
-                    last_selected,
-                    False,
-                )
+    changed = (
+        prev_rate is not None
+        and rate != prev_rate
+    )
 
-            save_window_info(None)
+    save_live(
+        rate,
+        selected,
+        changed,
+    )
 
-            return False
+    save_history(
+        rate,
+        selected,
+        changed,
+    )
 
-        live, good = fetch_all_sources()
+    save_window_info(
+        window if not changed else None
+    )
 
-        selected = select_rate(
-            live,
-            good,
-            prev_rate,
-        )
+    return changed
 
-        if selected:
-            last_selected = selected
 
-            rate = selected[
-                "rate_22k"
-            ]
+def _in_dense_polling_band(now):
+    """
+    True if `now` falls inside one of the wide dense-polling cron
+    bands defined in the workflow (08:00-12:00 IST or 18:30-21:30
+    IST). Must be kept in sync with the `schedule:` entries in
+    main.yml. Used only to decide whether an off-window tick should
+    skip fetching (see main()) -- has no effect on whether polling
+    actually happens, since that's entirely controlled by GitHub's
+    cron, not by this check.
+    """
+    minutes = now.hour * 60 + now.minute
 
-            if (
-                prev_rate is not None
-                and rate != prev_rate
-            ):
-                save_live(
-                    rate,
-                    selected,
-                    True,
-                )
+    band_1 = (8 * 60, 12 * 60)
+    band_2 = (18 * 60 + 30, 21 * 60 + 30)
 
-                save_history(
-                    rate,
-                    selected,
-                    True,
-                )
-
-                save_window_info(
-                    None
-                )
-
-                return True
-
-            save_live(
-                rate,
-                selected,
-                False,
-            )
-
-        remaining = (
-            window["end"]
-            - now_ist()
-        ).total_seconds()
-
-        if remaining <= 0:
-            if last_selected:
-                rate = last_selected[
-                    "rate_22k"
-                ]
-
-                save_live(
-                    rate,
-                    last_selected,
-                    False,
-                )
-
-                save_history(
-                    rate,
-                    last_selected,
-                    False,
-                )
-
-            save_window_info(None)
-
-            return False
-
-        time.sleep(
-            min(
-                POLL_SECONDS,
-                max(
-                    1,
-                    int(remaining),
-                ),
-            )
-        )
+    return (
+        band_1[0] <= minutes < band_1[1]
+        or band_2[0] <= minutes < band_2[1]
+    )
 
 
 def main():
@@ -2181,8 +2163,10 @@ def main():
         return
 
     # --------------------------------------------------------
-    # If currently inside a monitoring window,
-    # monitor immediately.
+    # If currently inside a monitoring window, do ONE poll pass
+    # and exit. No sleeping, no waiting -- this function is meant
+    # to be invoked frequently (every few minutes) by the
+    # scheduler instead of blocking inside a single long job.
     # --------------------------------------------------------
 
     active = current_window(
@@ -2190,72 +2174,80 @@ def main():
     )
 
     if active:
-        save_window_info(
-            active
-        )
-
-        monitor_window(
-            active
-        )
-
+        poll_window_once(active)
         return
 
     # --------------------------------------------------------
-    # Scheduled GitHub Actions execution.
+    # Not inside a monitoring window right now.
     #
-    # The workflow starts before the predicted session.
-    # Wait until the monitoring window opens, provided the
-    # wait is within MAX_SCHEDULE_WAIT_MINUTES.
+    # STALENESS SELF-HEAL: if live.json hasn't been verified in a
+    # while and we're already past the predicted fix time for the
+    # session that should have run, do a normal fetch anyway rather
+    # than silently waiting for the next window/cron tick. This
+    # covers the case where a scheduled run was delayed or skipped
+    # entirely (GitHub's `schedule` trigger is best-effort and can
+    # be delayed under load) and nothing else would catch it until
+    # the following session.
     # --------------------------------------------------------
 
-    if (
-        is_gha
-        and gha_event == "schedule"
-    ):
-        upcoming = next_window(
-            now
+    live_data = load_json(LIVE_FILE, {})
+    stale_hours = _hours_since(
+        live_data.get("verified_at") or live_data.get("updated_at"),
+        now,
+    )
+
+    upcoming = next_window(now)
+    missed_a_window = (
+        stale_hours is not None
+        and stale_hours >= (STALE_CATCHUP_HOURS)
+        and upcoming["start"] > now + timedelta(hours=1)
+        # ^ only self-heal when the *next* window is still a while
+        # away -- if it's coming up soon, just let it run normally
+        # instead of double-fetching right before it.
+    )
+
+    if missed_a_window:
+        print(
+            f"STALE CATCH-UP: live.json unverified for "
+            f"{stale_hours:.1f}h and no window imminent -- "
+            "forcing a fetch now."
         )
-
-        wait_seconds = (
-            upcoming["start"]
-            - now
-        ).total_seconds()
-
-        if (
-            wait_seconds
-            <= MAX_SCHEDULE_WAIT_MINUTES * 60
-        ):
-            time.sleep(
-                max(
-                    0,
-                    int(wait_seconds),
-                )
-            )
-
-            active = current_window(
-                now_ist()
-            )
-
-            if active:
-                save_window_info(
-                    active
-                )
-
-                monitor_window(
-                    active
-                )
-
-                return
+        save_window_info(None)
+        if not normal_fetch():
+            sys.exit(1)
+        return
 
     # --------------------------------------------------------
-    # Outside monitoring window.
-    # Perform normal fetch.
+    # Outside monitoring window, nothing stale enough to force.
+    #
+    # BUGFIX: this branch used to call normal_fetch() unconditionally
+    # on every tick, including dense-schedule ticks (every 5 min,
+    # 08:00-12:00 and 18:30-21:30 IST -- kept wider than the actual
+    # predicted window to tolerate day-to-day drift) that land
+    # outside the real window. That meant a live scrape of both
+    # sources every 5 minutes for ~4 extra hours/day -- unnecessary
+    # load on LiveChennai/GoodReturns and needless commit noise.
+    #
+    # Fix: inside a dense band but outside the real window, only
+    # fetch if we're within NEAR_WINDOW_MARGIN_MINUTES of the next
+    # window opening (so live.json still ticks over just before/
+    # after a session). The separate hourly heartbeat ticks (outside
+    # both dense bands) are infrequent enough to always fetch --
+    # that's their whole job as a backstop.
     # --------------------------------------------------------
+
+    in_dense_band = _in_dense_polling_band(now)
+
+    should_fetch = (
+        not in_dense_band
+        or upcoming["start"] - now <= timedelta(minutes=NEAR_WINDOW_MARGIN_MINUTES)
+    )
 
     save_window_info(None)
 
-    if not normal_fetch():
-        sys.exit(1)
+    if should_fetch:
+        if not normal_fetch():
+            sys.exit(1)
 
 
 # ============================================================
