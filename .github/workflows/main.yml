@@ -249,7 +249,28 @@ jobs:
           if git diff --cached --quiet; then
             echo "No data changes to commit."
           else
-            git pull --rebase origin HEAD || true
             git commit -m "Update Chennai 22K gold data [skip ci]"
-            git push
+
+            # Retry push with rebase-on-conflict, instead of silently
+            # swallowing a failed rebase with `|| true` and pushing
+            # whatever state that left behind. If a rebase actually
+            # conflicts, abort it cleanly and fail the step loudly
+            # rather than pushing something unpredictable -- the next
+            # scheduled run will pick this data up again.
+            attempt=1
+            max_attempts=3
+            until git push; do
+              if [ "$attempt" -ge "$max_attempts" ]; then
+                echo "ERROR: push failed after $attempt attempts, aborting."
+                git rebase --abort 2>/dev/null || true
+                exit 1
+              fi
+              echo "Push rejected (attempt $attempt/$max_attempts) - rebasing onto latest and retrying..."
+              if ! git pull --rebase origin HEAD; then
+                echo "ERROR: rebase failed (likely a real conflict). Aborting rebase."
+                git rebase --abort 2>/dev/null || true
+                exit 1
+              fi
+              attempt=$((attempt + 1))
+            done
           fi
