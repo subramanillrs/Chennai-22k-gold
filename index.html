@@ -958,6 +958,10 @@ const WORKER_URL = "https://gold-price-fetch.subramanilrs.workers.dev/";
 
 let live = null;
 let history = [];
+// If the live payload's timestamp is older than this, treat it as
+// stale even though its date field still says "today" -- catches SW
+// cache fallback or a stalled pipeline serving an old same-day fetch.
+const STALE_DATA_MAX_AGE_HOURS = 12;
 let selectedRange = 30;
 let fetchBusy = false;
 let scrubIndex = -1;
@@ -1172,7 +1176,10 @@ function getTodayISTDateStr() {
 
 function computeLastMovement() {
   if (!history || history.length < 1 || !live) return;
-  const fullData = [...history];
+  // Sort ascending by actual timestamp first -- history is not
+  // guaranteed to arrive from the source JSON in chronological order,
+  // and walking it unsorted picks the wrong "previous" record.
+  const fullData = [...history].sort((a, b) => recordTimestamp(a) - recordTimestamp(b));
   const lastRec = fullData[fullData.length - 1];
 
   if (!lastRec || lastRec.date !== live.date || Number(lastRec.rate_22k) !== Number(live.rate_22k)) {
@@ -1211,6 +1218,20 @@ function computeLastMovement() {
   }
 }
 
+function isLiveDataFresh(d) {
+  if (!d || !d.date) return false;
+  if (d.date !== getTodayISTDateStr()) return false;
+  // Date string matching alone isn't enough -- a cached response from
+  // earlier today (SW cache fallback, or a stalled pipeline) still has
+  // today's date. Cross-check elapsed time against an actual timestamp
+  // when one is available, so "today" doesn't silently mean "today,
+  // hours ago".
+  const ts = recordTimestamp(d);
+  if (!ts) return true; // no timestamp to check against -- fall back to date-only
+  const ageHours = (Date.now() - ts) / (1000 * 60 * 60);
+  return ageHours <= STALE_DATA_MAX_AGE_HOURS;
+}
+
 function renderLive(d) {
   if (!d) return;
   live = d;
@@ -1220,7 +1241,7 @@ function renderLive(d) {
   if ($("hero8")) $("hero8").textContent = money(rate8);
   if ($("today")) $("today").textContent = dateText(d.date);
 
-  const isFreshToday = d.date === getTodayISTDateStr();
+  const isFreshToday = isLiveDataFresh(d);
   if ($("todayTime")) $("todayTime").textContent = timeText(d.time) + (isFreshToday ? "" : " · Previous Close");
   if ($("staleWarning")) $("staleWarning").hidden = isFreshToday;
 
@@ -1261,7 +1282,7 @@ function renderLive(d) {
 function renderTodayTimeline() {
   if (!live) return;
   const today = live.date;
-  const isFreshToday = today === getTodayISTDateStr();
+  const isFreshToday = isLiveDataFresh(live);
 
   if (!isFreshToday) {
     if ($("amRate")) $("amRate").textContent = "Pending";
@@ -1273,34 +1294,45 @@ function renderTodayTimeline() {
     return;
   }
 
-  let am = null, pm = null;
+  // Only trust an explicit session tag from the source. Guessing a
+  // session from clock hour is unreliable (fix times drift day to
+  // day -- see monitoring_windows.json), so it's used only as a last
+  // resort, and a record built that way is marked estimated rather
+  // than presented as an authoritative fix.
+  const sessionOf = h => {
+    if (h.session) return String(h.session).toUpperCase();
+    const hr = h.time ? parseInt(String(h.time).split(":")[0], 10) : null;
+    if (hr === null || Number.isNaN(hr)) return null;
+    return hr < 14 ? "AM" : "PM";
+  };
 
   const todayHistory = history.filter(h => h.date === today);
-  const amHist = todayHistory.find(h => h.session === "AM" || (h.time && (() => { const hr = parseInt(h.time.split(":")[0], 10); return hr >= 6 && hr < 14; })()));
-  const pmHist = [...todayHistory].reverse().find(h => h.session === "PM" || (h.time && parseInt(h.time.split(":")[0], 10) >= 14));
+  const amHist = todayHistory.find(h => sessionOf(h) === "AM");
+  const pmHist = [...todayHistory].reverse().find(h => sessionOf(h) === "PM");
 
-  if (amHist) am = { rate_22k: Number(amHist.rate_22k), time: amHist.time || "10:30" };
-  if (pmHist) pm = { rate_22k: Number(pmHist.rate_22k), time: pmHist.time || "17:00" };
+  let am = amHist ? { rate_22k: Number(amHist.rate_22k), time: amHist.time || "10:30", estimated: !amHist.session } : null;
+  let pm = pmHist ? { rate_22k: Number(pmHist.rate_22k), time: pmHist.time || "17:00", estimated: !pmHist.session } : null;
 
-  const sessionUpper = String(live.session || "").toUpperCase();
-  const timeHour = live.time ? parseInt(String(live.time).split(":")[0], 10) : null;
-
-  if (!am && (sessionUpper === "AM" || (timeHour !== null && timeHour >= 6 && timeHour < 14))) {
-    am = { rate_22k: Number(live.rate_22k), time: live.time || "10:30" };
+  // The live feed itself is today's most recent tick -- if it isn't
+  // already covered by history, fold it in under its own actual
+  // session (never guessed from the other session's absence).
+  const liveSession = sessionOf(live);
+  if (liveSession === "AM" && !am) {
+    am = { rate_22k: Number(live.rate_22k), time: live.time || "10:30", estimated: !live.session };
   }
-  if (!pm && (sessionUpper === "PM" || (timeHour !== null && timeHour >= 14))) {
-    pm = { rate_22k: Number(live.rate_22k), time: live.time || "17:00" };
+  if (liveSession === "PM" && !pm) {
+    pm = { rate_22k: Number(live.rate_22k), time: live.time || "17:00", estimated: !live.session };
   }
+  // Deliberately NOT synthesizing a fake AM fix from previous_rate_22k
+  // when only PM is known -- that was a guess presented as an
+  // observed value. Show "Pending" instead of a fabricated number.
 
-  if (!am && pm) {
-    const openingRate = Number(live.previous_rate_22k) || Number(live.rate_22k);
-    am = { rate_22k: openingRate, time: "10:30" };
-  }
+  const fmtRate = r => r && Number.isFinite(r.rate_22k) ? money(r.rate_22k) + (r.estimated ? " *" : "") : "Pending";
 
-  if ($("amRate")) $("amRate").textContent = am && Number.isFinite(am.rate_22k) ? money(am.rate_22k) : "Pending";
+  if ($("amRate")) $("amRate").textContent = fmtRate(am);
   if ($("amTime")) $("amTime").textContent = am ? timeText(am.time) : "—";
 
-  if ($("pmRate")) $("pmRate").textContent = pm && Number.isFinite(pm.rate_22k) ? money(pm.rate_22k) : "Pending";
+  if ($("pmRate")) $("pmRate").textContent = fmtRate(pm);
   if ($("pmTime")) $("pmTime").textContent = pm ? timeText(pm.time) : "—";
 
   const isPmActive = Boolean(pm && Number.isFinite(pm.rate_22k));
@@ -1323,12 +1355,19 @@ function getFilteredHistory(range) {
 
 function updateFintechMetrics() {
   if (!history.length || !live) return;
+  // currentRate is the live tick (possibly an intraday AM value, not
+  // yet a closed daily benchmark). That's fine as the "now" side of a
+  // return calculation -- it genuinely is the latest known price --
+  // but the "past" side must never accidentally include TODAY's own
+  // not-yet-closed benchmark, or a short lookback (e.g. 7-day) could
+  // end up comparing live against itself and understating the move.
   const currentRate = Number(live.rate_22k);
+  const today = getTodayISTDateStr();
 
   const calcReturnByDays = (days) => {
     const targetDate = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Kolkata', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date(Date.now() - days * 24 * 60 * 60 * 1000));
     const daily = dailyBenchmarks(history);
-    const pastRecords = daily.filter(h => h.date <= targetDate);
+    const pastRecords = daily.filter(h => h.date <= targetDate && h.date < today);
     if (!pastRecords.length) return null;
     const pastVal = Number(pastRecords[pastRecords.length - 1].rate_22k);
     return pastVal ? ((currentRate - pastVal) / pastVal) * 100 : null;
@@ -1339,15 +1378,23 @@ function updateFintechMetrics() {
     if ($(h.id)) $(h.id).textContent = ret === null ? "—" : (ret >= 0 ? "+" : "") + ret.toFixed(1) + "%";
   });
 
-  const recent30 = getFilteredHistory(30);
+  // Exclude today's own (possibly incomplete) benchmark from the
+  // 30-day average -- it's being compared against currentRate just
+  // below, so including it would let today count twice.
+  const recent30 = getFilteredHistory(30).filter(i => i.date < today);
   const vals30 = recent30.map(i => Number(i.rate_22k));
-  const sma = vals30.reduce((a, b) => a + b, 0) / vals30.length;
-  const smaDiff = currentRate - sma, smaPct = (smaDiff / sma) * 100;
+  const sma = vals30.length ? vals30.reduce((a, b) => a + b, 0) / vals30.length : null;
+  const smaDiff = sma !== null ? currentRate - sma : null, smaPct = sma ? (smaDiff / sma) * 100 : null;
 
-  if ($("smaValue")) $("smaValue").textContent = money(sma);
+  if ($("smaValue")) $("smaValue").textContent = sma !== null ? money(sma) : "₹ —";
   if ($("smaPill")) {
-    $("smaPill").className = "change-pill " + (smaDiff >= 0 ? "up" : "down");
-    $("smaPill").textContent = (smaDiff >= 0 ? "▲ +" : "▼ -") + money(Math.abs(smaDiff)) + ` (${smaPct.toFixed(1)}%)`;
+    if (sma !== null) {
+      $("smaPill").className = "change-pill " + (smaDiff >= 0 ? "up" : "down");
+      $("smaPill").textContent = (smaDiff >= 0 ? "▲ +" : "▼ -") + money(Math.abs(smaDiff)) + ` (${smaPct.toFixed(1)}%)`;
+    } else {
+      $("smaPill").className = "change-pill";
+      $("smaPill").textContent = "—";
+    }
   }
 }
 
