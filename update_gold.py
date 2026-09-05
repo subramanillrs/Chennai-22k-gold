@@ -131,7 +131,7 @@ def valid_gold_rate(value):
         return False
 
 
-def clean_number(text):
+def clean_number(text, min_val=5000, max_val=50000):
     if text is None:
         return None
 
@@ -163,7 +163,7 @@ def clean_number(text):
     for m in matches:
         try:
             val = int(float(m))
-            if valid_gold_rate(val):
+            if min_val <= val <= max_val:
                 return val
         except (ValueError, TypeError):
             continue
@@ -318,7 +318,13 @@ def get_previous_rate():
 # SCRAPERS
 # ============================================================
 
-def extract_livechennai_22k(soup):
+def extract_livechennai_rates(soup):
+    rates = {
+        "rate_22k": None,
+        "rate_24k": None,
+        "rate_8g": None,
+    }
+
     for table in soup.find_all("table"):
         rows = table.find_all("tr")
 
@@ -330,7 +336,8 @@ def extract_livechennai_22k(soup):
         # | "Standard Gold (22 K)" (colspan=2); row 1 = "" | "1 Gm"
         # | "8 Gm" | "1 Gm" | "8 Gm". Expand colspans on row 0 so
         # its column positions line up with the real data columns,
-        # then use row 1 to pick the "22K, 1 Gm" column precisely.
+        # then use row 1 to pick the "22K, 1 Gm", "24K, 1 Gm", and
+        # "22K, 8 Gm" columns precisely.
         def expanded_header(row):
             cells = row.find_all(["th", "td"])
             out = []
@@ -343,15 +350,37 @@ def extract_livechennai_22k(soup):
         top = expanded_header(rows[0])
         sub = expanded_header(rows[1])
 
+        # If row 0 had a Date cell with rowspan (spanning rows 0 and 1),
+        # row 1 will have fewer cells than top. Prepend empty slots so
+        # the subheader columns align with the main header columns.
+        if len(top) > len(sub):
+            sub = ([""] * (len(top) - len(sub))) + sub
+
         col_22k_idx = -1
+        col_24k_idx = -1
+        col_8g_idx = -1
+
         for idx in range(min(len(top), len(sub))):
+            t = top[idx]
+            s = sub[idx]
             if (
-                ("22" in top[idx] or "standard" in top[idx])
-                and "24" not in top[idx]
-                and ("1" in sub[idx] and "8" not in sub[idx])
+                ("22" in t or "standard" in t)
+                and "24" not in t
+                and ("1" in s and "8" not in s)
             ):
                 col_22k_idx = idx
-                break
+            elif (
+                ("22" in t or "standard" in t)
+                and "24" not in t
+                and ("8" in s)
+            ):
+                col_8g_idx = idx
+            elif (
+                ("24" in t or "pure" in t)
+                and "22" not in t
+                and ("1" in s and "8" not in s)
+            ):
+                col_24k_idx = idx
 
         if col_22k_idx != -1:
             for r in rows[2:]:
@@ -366,7 +395,28 @@ def extract_livechennai_22k(soup):
                     )
 
                     if valid_gold_rate(val):
-                        return val
+                        rates["rate_22k"] = val
+                        if col_24k_idx != -1 and col_24k_idx < len(cells):
+                            val_24k = clean_number(
+                                cells[col_24k_idx].get_text(
+                                    " ",
+                                    strip=True,
+                                )
+                            )
+                            if val_24k and val_24k > 0:
+                                rates["rate_24k"] = val_24k
+                        if col_8g_idx != -1 and col_8g_idx < len(cells):
+                            val_8g = clean_number(
+                                cells[col_8g_idx].get_text(
+                                    " ",
+                                    strip=True,
+                                ),
+                                min_val=40000,
+                                max_val=500000,
+                            )
+                            if val_8g and val_8g > 0:
+                                rates["rate_8g"] = val_8g
+                        return rates
 
         for row in rows:
             row_text = row.get_text(
@@ -393,7 +443,8 @@ def extract_livechennai_22k(soup):
                     )
 
                     if valid_gold_rate(val):
-                        return val
+                        rates["rate_22k"] = val
+                        return rates
 
     page_text = re.sub(
         r"\s+",
@@ -432,9 +483,15 @@ def extract_livechennai_22k(soup):
             val = clean_number(match.group(1))
 
             if valid_gold_rate(val):
-                return val
+                rates["rate_22k"] = val
+                return rates
 
-    return None
+    return rates
+
+
+def extract_livechennai_22k(soup):
+    rates = extract_livechennai_rates(soup)
+    return rates.get("rate_22k") if rates else None
 
 
 def fetch_livechennai():
@@ -451,12 +508,25 @@ def fetch_livechennai():
             "html.parser",
         )
 
-        rate = extract_livechennai_22k(soup)
+        rates = extract_livechennai_rates(soup)
 
-        if rate:
+        if rates and rates.get("rate_22k"):
+            r22 = int(rates["rate_22k"])
+            r24 = (
+                int(rates["rate_24k"])
+                if rates.get("rate_24k")
+                else round(r22 * 24 / 22)
+            )
+            r8g = (
+                int(rates["rate_8g"])
+                if rates.get("rate_8g")
+                else r22 * 8
+            )
             return {
                 "source": "LiveChennai",
-                "rate_22k": int(rate),
+                "rate_22k": r22,
+                "rate_24k": r24,
+                "rate_8g": r8g,
                 "url": LIVECHENNAI_URL,
                 "fetched_at": now_ist().isoformat(),
             }
@@ -731,6 +801,17 @@ def select_rate(
             }
 
         # LiveChennai is valid and plausible. Cross-check against GoodReturns.
+        rate_24k = (
+            live.get("rate_24k")
+            if live and live.get("rate_24k")
+            else round(int(live_rate) * 24 / 22)
+        )
+        rate_8g = (
+            live.get("rate_8g")
+            if live and live.get("rate_8g")
+            else int(live_rate) * 8
+        )
+
         if good_rate is not None and valid_gold_rate(good_rate):
             diff = abs(live_rate - good_rate)
             tolerance = _agreement_tolerance(live_rate)
@@ -738,6 +819,8 @@ def select_rate(
             if diff <= tolerance:
                 return {
                     "rate_22k": int(live_rate),
+                    "rate_24k": rate_24k,
+                    "rate_8g": rate_8g,
                     "source": "LiveChennai (MJDMA verified)",
                     "agreement": True,
                     "livechennai": live,
@@ -746,6 +829,8 @@ def select_rate(
             else:
                 return {
                     "rate_22k": int(live_rate),
+                    "rate_24k": rate_24k,
+                    "rate_8g": rate_8g,
                     "source": "LiveChennai (Primary)",
                     "agreement": False,
                     "livechennai": live,
@@ -756,6 +841,8 @@ def select_rate(
         # Only LiveChennai is available
         return {
             "rate_22k": int(live_rate),
+            "rate_24k": rate_24k,
+            "rate_8g": rate_8g,
             "source": "LiveChennai (Primary)",
             "agreement": None,
             "livechennai": live,
@@ -849,12 +936,19 @@ def save_live(
             ),
             "timestamp": now.isoformat(),
             "rate_22k": int(rate),
-            "rate_24k": round(
-                int(rate) * 24 / 22
+            "rate_24k": (
+                selected.get("rate_24k")
+                or round(int(rate) * 24 / 22)
             ),
-            "rate_8g": int(rate) * 8,
+            "rate_8g": (
+                selected.get("rate_8g")
+                or (int(rate) * 8)
+            ),
             "weight_1g": int(rate),
-            "weight_8g": int(rate) * 8,
+            "weight_8g": (
+                selected.get("rate_8g")
+                or (int(rate) * 8)
+            ),
             "session": session_for_time(now),
             "source": selected.get(
                 "source",
@@ -980,14 +1074,21 @@ def save_history(
         "rate_22k": rate,
 
         # Legacy-compatible fields
-        "rate_24k": round(
-            rate * 24 / 22
+        "rate_24k": (
+            selected.get("rate_24k")
+            or round(rate * 24 / 22)
         ),
         "weight_1g": rate,
-        "weight_8g": rate * 8,
+        "weight_8g": (
+            selected.get("rate_8g")
+            or (rate * 8)
+        ),
 
         # Current fields
-        "rate_8g": rate * 8,
+        "rate_8g": (
+            selected.get("rate_8g")
+            or (rate * 8)
+        ),
         "changed": bool(changed),
         "source": selected.get(
             "source",
