@@ -221,8 +221,8 @@ button, input, select { font-family: inherit; color: inherit; border: none; back
 }
 
 .brand-badge {
-  width: 30px;
-  height: 30px;
+  width: 28px;
+  height: 28px;
   border-radius: var(--r-sm);
   background: linear-gradient(135deg, var(--gold-glow), var(--gold) 55%, var(--gold-deep));
   color: #ffffff;
@@ -401,12 +401,17 @@ html[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
   pointer-events: none;
   filter: blur(10px);
 }
-.hero-top-row {
+.hero-top-bar {
   display: flex;
   align-items: center;
   justify-content: center;
   width: 100%;
-  position: relative;
+  gap: 8px;
+}
+.hero-top-spacer {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
 }
 .hero-eyebrow {
   font-family: var(--font-display);
@@ -415,10 +420,13 @@ html[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
   font-weight: 440;
   color: var(--gold-deep);
   position: relative;
+  flex: 1;
+  text-align: center;
+  min-width: 0;
 }
 .hero-price {
   font-family: var(--font-display);
-  font-size: clamp(44px, 12vw, 66px);
+  font-size: clamp(52px, 15vw, 78px);
   font-weight: 680;
   letter-spacing: -0.025em;
   line-height: 1;
@@ -426,7 +434,7 @@ html[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
   display: flex;
   align-items: baseline;
   justify-content: center;
-  gap: 0.14em;
+  text-align: center;
   width: 100%;
   position: relative;
 }
@@ -440,9 +448,23 @@ html[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
 #hero1.hero-foot-val { font-size: var(--fs-xl2); }
 .hero-foot-sub { font-size: var(--fs-xs2); font-weight: 500; color: var(--ink-soft); line-height: 1.2; }
 
+.share-icon-btn {
+  position: relative;
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 32px; height: 32px;
+  flex-shrink: 0;
+  color: var(--ink-soft);
+  cursor: pointer;
+  background: var(--glass-surface);
+  border: 1px solid var(--glass-border);
+  border-radius: 50%;
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  transition: transform var(--transition), background var(--transition);
+  z-index: 10;
+}
+.share-icon-btn:active { transform: scale(0.9); }
 .share-link {
-  position: absolute;
-  right: 0;
   display: inline-flex; align-items: center; gap: 5px;
   font-size: var(--fs-sm); font-weight: 600; color: var(--ink-soft);
   cursor: pointer; padding: 6px 10px;
@@ -452,7 +474,6 @@ html[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
   backdrop-filter: blur(var(--glass-blur));
   -webkit-backdrop-filter: blur(var(--glass-blur));
   transition: transform var(--transition), background var(--transition);
-  z-index: 10;
 }
 .share-link:active { transform: scale(0.94); }
 .share-link-inline {
@@ -529,7 +550,7 @@ html[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
 .timeline-card:last-child { border-right: none; }
 .timeline-card-header { display: flex; align-items: center; justify-content: space-between; }
 .timeline-card-header .lbl { font-size: var(--fs-xs); font-weight: 600; color: var(--ink-faint); }
-.timeline-node { width: 7px; height: 7px; border-radius: 50%; background: var(--rule-strong); flex-shrink: 0; }
+.timeline-node { width: 7px; height: 7px; border-radius: 50%; background: transparent; flex-shrink: 0; }
 .timeline-card.is-active .timeline-node { background: var(--gold); box-shadow: 0 0 6px var(--gold-glow); }
 .timeline-card b { font-family: var(--font-display); font-size: var(--fs-xl); font-weight: 600; color: var(--ink); }
 .timeline-card small { font-size: var(--fs-sm); font-weight: 500; color: var(--ink-soft); }
@@ -566,12 +587,12 @@ html[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
 
 .chart-header-metrics { display: flex; justify-content: space-between; align-items: flex-end; padding-bottom: 12px; border-bottom: 1px solid var(--rule); }
 .primary-metric span { display: block; font-size: var(--fs-xs); font-weight: 600; color: var(--ink-faint); margin-bottom: 3px; }
-.primary-metric strong { font-family: var(--font-display); font-size: var(--fs-xl2); font-weight: 600; }
+.primary-metric strong { font-family: var(--font-display); font-size: var(--fs-lg); font-weight: 600; }
 .primary-metric strong.positive { color: var(--good); }
 .primary-metric strong.negative { color: var(--bad); }
 .secondary-metrics { display: flex; gap: 16px; }
 .sec-metric { display: flex; flex-direction: column; align-items: flex-end; }
-.sec-metric span { font-size: var(--fs-2xs); font-weight: 600; color: var(--ink-faint); margin-bottom: 3px; }
+.sec-metric span { font-size: var(--fs-xs); font-weight: 600; color: var(--ink-faint); margin-bottom: 3px; }
 .sec-metric b { font-family: var(--font-display); font-size: var(--fs-lg); font-weight: 600; color: var(--ink); }
 
 .chartwrap { width: 100%; height: 260px; position: relative; touch-action: none; margin: 2px 0; }
@@ -1094,7 +1115,7 @@ html[data-theme="dark"] .quote-btn-print {
 
 /* Hero card: cleaner spacing */
 .hero { padding: 20px 18px 16px; }
-.hero-price { font-size: clamp(32px, 10vw, 44px); }
+.hero-price { font-size: clamp(24px, 7.2vw, 31px); }
 .hero-foot { padding-top: 4px; }
 
 /* Purity row: unified height */
@@ -1172,7 +1193,7 @@ footer { padding: 20px 0 8px; font-size: var(--fs-xs2); opacity: 0.7; }
 @media (max-width: 420px) {
   .app { padding-left: 12px; padding-right: 12px; gap: 12px; }
   .panel, .hero, details.collapsible, .last-box { padding: 12px; border-radius: 14px; }
-  .hero-price { font-size: var(--fs-2xl); }
+  .hero-price { font-size: clamp(22px, 8vw, 29px); }
   .section-head h3 { font-size: var(--fs-lg2); }
   .segment-ctrl button { font-size: var(--fs-xs); padding: 5px 6px; }
   .purity-cell b { font-size: var(--fs-md); }
@@ -1277,11 +1298,11 @@ footer { padding: 20px 0 8px; font-size: var(--fs-xs2); opacity: 0.7; }
   <div hidden><button id="fetchNow"></button></div>
 
   <section class="hero" id="heroCard">
-    <div class="hero-top-row">
+    <div class="hero-top-bar">
+      <span class="hero-top-spacer" aria-hidden="true"></span>
       <span class="hero-eyebrow">One sovereign, eight grams</span>
-      <button class="share-link" id="shareBtn" type="button" aria-label="Share current gold market snapshot">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
-        Share
+      <button class="share-icon-btn" id="shareBtn" type="button" aria-label="Share current gold market snapshot">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="15" height="15"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
       </button>
     </div>
 
@@ -2015,6 +2036,7 @@ function renderLive(d) {
   }
 
   renderTodayTimeline();
+  if (typeof window.checkTargetPrice === "function") window.checkTargetPrice();
 }
 
 function renderTodayTimeline() {
@@ -3022,7 +3044,12 @@ let chartViewMode = "spline";
       if (banner) banner.hidden = true;
       return;
     }
-    const rate8 = live ? (Number(live.rate_8g) || Number(live.rate_22k) * 8) : 54800;
+    if (!live || !Number.isFinite(Number(live.rate_22k))) {
+      if (badge) badge.textContent = `Target: ₹ ${activeTarget.toLocaleString("en-IN")} · waiting for live rate…`;
+      if (banner) banner.hidden = true;
+      return;
+    }
+    const rate8 = Number(live.rate_8g) || Number(live.rate_22k) * 8;
     const diff = rate8 - activeTarget;
     if (badge) {
       badge.textContent = diff <= 0
