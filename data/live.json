@@ -4,9 +4,9 @@
   "currency": "INR",
   "city": "Chennai",
   "purity": "22K",
-  "date": "2026-09-05",
-  "time": "23:13:31",
-  "timestamp": "2026-09-05T23:13:31.281160+05:30",
+  "date": "2026-09-06",
+  "time": "00:26:06",
+  "timestamp": "2026-09-06T00:26:06.261686+05:30",
   "changed": false,
   "previous_rate_22k": 14190,
   "change": 0,
@@ -17,38 +17,38 @@
       "rate_24k": 15480,
       "rate_8g": 113520,
       "url": "https://www.livechennai.com/gold_silverrate.asp",
-      "fetched_at": "2026-09-05T23:13:31.280802+05:30"
+      "fetched_at": "2026-09-06T00:26:06.261346+05:30"
     },
     "goodreturns": {
       "source": "GoodReturns",
       "rate_22k": 14361,
       "url": "https://www.goodreturns.in/gold-rates/chennai.html",
-      "fetched_at": "2026-09-05T23:13:30.907260+05:30"
+      "fetched_at": "2026-09-06T00:26:05.991160+05:30"
     }
   },
   "source_update_times": [
-    "2026-09-05T23:13:31.280802+05:30",
-    "2026-09-05T23:13:30.907260+05:30"
+    "2026-09-06T00:26:06.261346+05:30",
+    "2026-09-06T00:26:05.991160+05:30"
   ],
   "source_rates": [
     14190,
     14361
   ],
   "sources_agree": true,
-  "last_checked_at": "2026-09-05T23:13:31.281160+05:30",
+  "last_checked_at": "2026-09-06T00:26:06.261686+05:30",
   "source": "LiveChennai (MJDMA verified)",
-  "last_checked": "2026-09-05T23:13:31.281160+05:30",
+  "last_checked": "2026-09-06T00:26:06.261686+05:30",
   "agreement": true,
-  "session": "PM",
+  "session": null,
   "rate_24k": 15480,
   "weight_1g": 14190,
   "weight_8g": 113520,
   "livechennai_rate": 14190,
   "goodreturns_rate": 14361,
-  "livechennai_fetched_at": "2026-09-05T23:13:31.280802+05:30",
-  "goodreturns_fetched_at": "2026-09-05T23:13:30.907260+05:30",
+  "livechennai_fetched_at": "2026-09-06T00:26:06.261346+05:30",
+  "goodreturns_fetched_at": "2026-09-06T00:26:05.991160+05:30",
   "livechennai_url": "https://www.livechennai.com/gold_silverrate.asp",
   "goodreturns_url": "https://www.goodreturns.in/gold-rates/chennai.html",
-  "updated_at": "2026-09-05T23:13:31.281160+05:30",
-  "verified_at": "2026-09-05T23:13:31.281160+05:30"
+  "updated_at": "2026-09-06T00:26:06.261686+05:30",
+  "verified_at": "2026-09-06T00:26:06.261686+05:30"
 }
