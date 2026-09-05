@@ -2737,7 +2737,8 @@ function renderHealth(h) {
 
   if (status === "ok") {
     $("healthTitle") && ($("healthTitle").textContent = "Feed healthy");
-    $("healthSub") && ($("healthSub").textContent = "LiveChennai and GoodReturns feeds are synchronized.");
+    const sub = h.agreement ? "LiveChennai (MJDMA official) & GoodReturns verified." : "LiveChennai official Chennai benchmark active.";
+    $("healthSub") && ($("healthSub").textContent = sub);
     $("healthBadge") && ($("healthBadge").textContent = "OK");
   } else if (status === "stale") {
     $("healthTitle") && ($("healthTitle").textContent = "Feed updating slowly");

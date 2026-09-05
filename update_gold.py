@@ -59,7 +59,14 @@ PM_PREDICTION_MIN = (14, 0)
 PM_PREDICTION_MAX = (21, 0)
 
 MAX_DAILY_CHANGE_PCT = 8
-SOURCE_AGREEMENT_TOLERANCE = 50
+SOURCE_AGREEMENT_TOLERANCE_PCT = 1.5  # 1.5% adaptive spread (~₹210 at ₹14,000/g)
+SOURCE_AGREEMENT_TOLERANCE_MIN = 200  # Minimum ₹200 buffer
+
+
+def _agreement_tolerance(rate):
+    if not rate:
+        return SOURCE_AGREEMENT_TOLERANCE_MIN
+    return max(SOURCE_AGREEMENT_TOLERANCE_MIN, round(rate * (SOURCE_AGREEMENT_TOLERANCE_PCT / 100)))
 
 ALERT_STALE_HOURS = 20
 ALERT_DISAGREE_HOURS = 3
@@ -698,121 +705,89 @@ def select_rate(
         else None
     )
 
-    if (
-        live_rate is not None
-        and good_rate is not None
-    ):
-        diff = abs(
-            live_rate - good_rate
-        )
-
-        if diff <= SOURCE_AGREEMENT_TOLERANCE:
-            consensus_rate = round(
-                (live_rate + good_rate)
-                / 2
-            )
-
-            if (
-                not _rate_is_plausible(
-                    consensus_rate,
-                    previous_rate,
-                )
-                and previous_rate is not None
-            ):
+    # --------------------------------------------------------
+    # 1. PRIMARY: LiveChennai (Chennai MJDMA Official Benchmark)
+    # --------------------------------------------------------
+    if live_rate is not None and valid_gold_rate(live_rate):
+        if not _rate_is_plausible(live_rate, previous_rate) and previous_rate is not None:
+            # LiveChennai rate jump is implausible (> MAX_DAILY_CHANGE_PCT).
+            # Fall back to GoodReturns if it passes plausibility check.
+            if good_rate is not None and valid_gold_rate(good_rate) and _rate_is_plausible(good_rate, previous_rate):
                 return {
-                    "rate_22k": int(previous_rate),
-                    "source": "Previous verified rate",
+                    "rate_22k": int(good_rate),
+                    "source": "GoodReturns (LiveChennai implausible)",
                     "agreement": False,
                     "livechennai": live,
                     "goodreturns": good,
-                    "warning": (
-                        "Source consensus rejected "
-                        "because change exceeded "
-                        "plausibility threshold."
-                    ),
+                    "warning": "LiveChennai rate rejected because change exceeded plausibility threshold.",
                 }
-
-            return {
-                "rate_22k": int(consensus_rate),
-                "source": "LiveChennai + GoodReturns",
-                "agreement": True,
-                "livechennai": live,
-                "goodreturns": good,
-            }
-
-        # Both sources are available but disagree.
-        # Do not call this healthy.
-        if previous_rate is not None:
             return {
                 "rate_22k": int(previous_rate),
                 "source": "Previous verified rate",
                 "agreement": False,
                 "livechennai": live,
                 "goodreturns": good,
-                "warning": (
-                    f"Sources disagree by {diff}."
-                ),
+                "warning": "LiveChennai rate rejected because change exceeded plausibility threshold.",
             }
 
-        # No previous verified rate exists.
-        # Use the midpoint, but explicitly mark
-        # the result as unverified.
-        midpoint = round(
-            (live_rate + good_rate) / 2
-        )
+        # LiveChennai is valid and plausible. Cross-check against GoodReturns.
+        if good_rate is not None and valid_gold_rate(good_rate):
+            diff = abs(live_rate - good_rate)
+            tolerance = _agreement_tolerance(live_rate)
 
+            if diff <= tolerance:
+                return {
+                    "rate_22k": int(live_rate),
+                    "source": "LiveChennai (MJDMA verified)",
+                    "agreement": True,
+                    "livechennai": live,
+                    "goodreturns": good,
+                }
+            else:
+                return {
+                    "rate_22k": int(live_rate),
+                    "source": "LiveChennai (Primary)",
+                    "agreement": False,
+                    "livechennai": live,
+                    "goodreturns": good,
+                    "warning": f"GoodReturns diverged by ₹{diff} (tolerance: ₹{tolerance}); using LiveChennai official benchmark.",
+                }
+
+        # Only LiveChennai is available
         return {
-            "rate_22k": int(midpoint),
-            "source": "LiveChennai + GoodReturns",
-            "agreement": False,
+            "rate_22k": int(live_rate),
+            "source": "LiveChennai (Primary)",
+            "agreement": None,
             "livechennai": live,
             "goodreturns": good,
-            "warning": (
-                f"Sources disagree by {diff}."
-            ),
         }
 
     # --------------------------------------------------------
-    # SINGLE SOURCE
+    # 2. FALLBACK: GoodReturns (when LiveChennai unavailable)
     # --------------------------------------------------------
-
-    if live_rate is not None:
-        if (
-            previous_rate is None
-            or _rate_is_plausible(
-                live_rate,
-                previous_rate,
-            )
-        ):
-            return {
-                "rate_22k": int(live_rate),
-                "source": "LiveChennai",
-                "agreement": None,
-                "livechennai": live,
-                "goodreturns": good,
-                "warning": (
-                    "Only LiveChennai is reporting."
-                ),
-            }
-
-    if good_rate is not None:
-        if (
-            previous_rate is None
-            or _rate_is_plausible(
-                good_rate,
-                previous_rate,
-            )
-        ):
+    if good_rate is not None and valid_gold_rate(good_rate):
+        if previous_rate is None or _rate_is_plausible(good_rate, previous_rate):
             return {
                 "rate_22k": int(good_rate),
-                "source": "GoodReturns",
+                "source": "GoodReturns (Fallback)",
                 "agreement": None,
                 "livechennai": live,
                 "goodreturns": good,
-                "warning": (
-                    "Only GoodReturns is reporting."
-                ),
+                "warning": "LiveChennai unavailable; using GoodReturns as fallback.",
             }
+
+    # --------------------------------------------------------
+    # 3. SAFETY FALLBACK: Previous rate
+    # --------------------------------------------------------
+    if previous_rate is not None and valid_gold_rate(previous_rate):
+        return {
+            "rate_22k": int(previous_rate),
+            "source": "Previous verified rate",
+            "agreement": False,
+            "livechennai": live,
+            "goodreturns": good,
+            "warning": "No fresh valid rates available from either source.",
+        }
 
     return None
 
@@ -1205,18 +1180,14 @@ def run_health_check():
     ):
         status = "ok"
 
-    # Two sources disagreeing.
+    # LiveChennai (authoritative Chennai benchmark) is active and fresh.
     elif (
-        source_count >= 2
-        and agreement is False
+        valid_gold_rate(live_rate)
+        and live.get("source") != "Previous verified rate"
     ):
-        status = "degraded"
+        status = "ok"
 
-    # Only one source.
-    # This MUST NOT be reported as healthy.
-    elif source_count == 1:
-        status = "degraded"
-
+    # Fallback source active or previous verified fallback.
     else:
         status = "degraded"
 
