@@ -255,7 +255,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   padding: calc(20px + env(safe-area-inset-top)) 16px calc(40px + env(safe-area-inset-bottom));
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 20px;
   position: relative;
 }
 
@@ -271,13 +271,14 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   display: flex;
   align-items: center;
   gap: 10px;
-  flex-shrink: 0;
+  flex-shrink: 1;
+  min-width: 0;
 }
 
 .brand-badge {
   width: 28px;
   height: 28px;
-  border-radius: var(--r-sm);
+  border-radius: 50%;
   background: linear-gradient(135deg, var(--gold-glow), var(--gold) 55%, var(--gold-deep));
   color: #ffffff;
   font-family: var(--font-display);
@@ -311,7 +312,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   align-items: center;
   gap: 6px;
   height: 28px;
-  padding: 0 14px;
+  padding: 0 12px;
   background: var(--glass-surface-strong);
   backdrop-filter: blur(var(--glass-blur)) saturate(1.4);
   -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.4);
@@ -321,7 +322,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   font-weight: 600;
   color: var(--ink-soft);
   white-space: nowrap;
-  max-width: 138px;
+  max-width: min(138px, 34vw);
   flex-shrink: 1;
   min-width: 0;
   box-shadow: var(--elev-1);
@@ -366,7 +367,8 @@ html[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 10px 16px;
+  padding: 8px 14px;
+  min-height: 0;
   cursor: pointer;
   list-style: none;
   user-select: none;
@@ -377,19 +379,19 @@ html[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  padding-right: 10px;
+  padding-right: 8px;
 }
-.health-summary-left { display: flex; align-items: center; gap: 8px; }
+.health-summary-left { display: flex; align-items: center; gap: 7px; }
 .feed-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--good); flex-shrink: 0; box-shadow: 0 0 6px var(--good-glow); }
 .health-collapsible.status-stale .feed-dot { background: var(--gold); box-shadow: 0 0 6px var(--gold-glow); }
 .health-collapsible.status-disagreeing .feed-dot { background: var(--bad); box-shadow: 0 0 6px var(--bad-glow); }
-.health-title { font-size: var(--fs-sm2); font-weight: 600; color: var(--ink); }
+.health-title { font-size: var(--fs-xs2); font-weight: 600; color: var(--ink-soft); }
 .health-badge {
   font-size: var(--fs-2xs);
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  padding: 4px 8px;
+  padding: 3px 7px;
   border-radius: var(--r-full);
   background: var(--good-bg);
   color: var(--good);
@@ -403,6 +405,88 @@ html[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
   color: var(--ink-soft);
   line-height: 1.45;
   background: transparent;
+}
+
+/* Accordion shell -- wraps the five main sections (Today's market,
+   Price history, Calculator, Portfolio, Historical log) so only one
+   is expanded at a time, keeping the page short instead of one long
+   scroll. Each .acc-section keeps its original #id, heading id, and
+   all inner markup untouched so existing JS (chart draw, calculator,
+   portfolio, CSV export) keeps working without changes -- only the
+   open/closed presentation is new. */
+.accordion-group {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--rule);
+  border-radius: var(--r-md);
+  overflow: hidden;
+  background: var(--paper-raised);
+  box-shadow: var(--elev-1);
+}
+.acc-section { border-top: 1px solid var(--rule); }
+.acc-section:first-child { border-top: none; }
+.acc-section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 14px 16px;
+  cursor: pointer;
+  user-select: none;
+  list-style: none;
+}
+.acc-section-head::-webkit-details-marker { display: none; }
+.acc-section-head-left { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.acc-section-icon {
+  width: 30px; height: 30px; flex-shrink: 0;
+  border-radius: 9px;
+  background: var(--gold-tint);
+  color: var(--gold-deep);
+  display: flex; align-items: center; justify-content: center;
+}
+.acc-section-icon svg { width: 15px; height: 15px; }
+.acc-section-titles { min-width: 0; }
+.acc-section-titles h2 {
+  font-family: var(--font-display);
+  font-size: var(--fs-xl);
+  font-weight: 600;
+  font-style: italic;
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.acc-section-sub {
+  display: block;
+  font-size: var(--fs-xs);
+  font-weight: 500;
+  color: var(--ink-faint);
+  margin-top: 1px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.acc-section-chevron { flex-shrink: 0; color: var(--ink-faint); font-size: var(--fs-xs); transition: transform var(--transition); }
+.acc-section.open > .acc-section-head .acc-section-chevron { transform: rotate(180deg); }
+.acc-section-body { display: none; padding: 0 16px 16px; }
+.acc-section.open > .acc-section-body { display: block; }
+/* The wrapped sections lose their standalone card chrome (border/shadow/
+   gap) now that the accordion group provides it -- .section/.panel
+   styles still apply everywhere else in the app unchanged. */
+.acc-section-body .section { gap: 12px; }
+/* Overrides the later "aurum-evolution-2" numbering rule
+   (.section > .section-head { display:flex }) which otherwise wins
+   the cascade by source order -- the accordion header already shows
+   an icon + title + subtitle, so the original in-panel heading and
+   its 01/02/03 counter badge are redundant once wrapped here. */
+.acc-section-body .section > .section-head { display: none !important; }
+/* Portfolio keeps its own internal <details> for markup-compatibility
+   reasons, but once nested inside the accordion it's always forced
+   open (see the `open` attribute added in markup) -- so its own
+   summary row would just duplicate the accordion header above it. */
+.acc-section-body #portfolioBlock > summary { display: none !important; }
+@media (prefers-reduced-motion: reduce) {
+  .acc-section-chevron { transition: none; }
 }
 
 .notice {
@@ -658,6 +742,7 @@ html[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
 .timeline-card b { font-family: var(--font-display); font-size: var(--fs-xl); font-weight: 600; color: var(--ink); }
 .timeline-card small { font-size: var(--fs-sm); font-weight: 500; color: var(--ink-soft); }
 .next-fix-line { display: flex; align-items: center; gap: 6px; margin-top: 4px; padding: 10px 14px 0; border-top: 1px solid var(--rule); font-size: var(--fs-sm); font-weight: 500; color: var(--ink-faint); }
+.estimate-legend { margin-top: 4px; padding: 0 14px; font-size: var(--fs-xs); font-weight: 500; color: var(--ink-faint); font-style: italic; }
 .next-fix-line[hidden] { display: none !important; }
 .next-fix-line svg { width: 12px; height: 12px; flex-shrink: 0; }
 
@@ -1478,37 +1563,70 @@ footer { padding: 20px 0 8px; font-size: var(--fs-xs2); opacity: 0.7; }
 
 
 
-  <section class="section" id="todayMarket" aria-labelledby="todayMarketHeading">
-    <div class="section-head">
-      <h2 id="todayMarketHeading">Today's market</h2>
-    </div>
-    <div class="panel">
-      <div class="timeline-horizontal">
-         <div class="timeline-card" id="amCard">
-            <div class="timeline-card-header">
-               <span class="lbl">Morning Fix (AM)</span>
-               <div class="timeline-node" id="amNode"></div>
-            </div>
-            <b id="amRate">Pending</b>
-            <small id="amTime">—</small>
-         </div>
-         <div class="timeline-card" id="pmCard">
-            <div class="timeline-card-header">
-               <span class="lbl">Evening Fix (PM)</span>
-               <div class="timeline-node" id="pmNode"></div>
-            </div>
-            <b id="pmRate">Pending</b>
-            <small id="pmTime">—</small>
-         </div>
-      </div>
-      <div class="next-fix-line" id="nextFixLine" hidden>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-        <span id="nextFixText">—</span>
-      </div>
-    </div>
-  </section>
+  <div class="accordion-group" id="mainAccordion">
 
-  <section class="section" id="priceHistory" aria-labelledby="priceHistoryHeading">
+  <div class="acc-section open" id="todayMarketAcc">
+    <div class="acc-section-head" data-target="todayMarketBody" role="button" tabindex="0" aria-expanded="true" aria-controls="todayMarketBody">
+      <div class="acc-section-head-left">
+        <span class="acc-section-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </span>
+        <div class="acc-section-titles">
+          <h2>Today's market</h2>
+          <span class="acc-section-sub">AM / PM fix</span>
+        </div>
+      </div>
+      <span class="acc-section-chevron" aria-hidden="true">▾</span>
+    </div>
+    <div class="acc-section-body" id="todayMarketBody">
+      <section class="section" id="todayMarket" aria-labelledby="todayMarketHeading">
+        <div class="section-head">
+          <h2 id="todayMarketHeading">Today's market</h2>
+        </div>
+        <div class="panel">
+          <div class="timeline-horizontal">
+             <div class="timeline-card" id="amCard">
+                <div class="timeline-card-header">
+                   <span class="lbl">Morning Fix (AM)</span>
+                   <div class="timeline-node" id="amNode"></div>
+                </div>
+                <b id="amRate">Pending</b>
+                <small id="amTime">—</small>
+             </div>
+             <div class="timeline-card" id="pmCard">
+                <div class="timeline-card-header">
+                   <span class="lbl">Evening Fix (PM)</span>
+                   <div class="timeline-node" id="pmNode"></div>
+                </div>
+                <b id="pmRate">Pending</b>
+                <small id="pmTime">—</small>
+             </div>
+          </div>
+          <div class="next-fix-line" id="nextFixLine" hidden>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <span id="nextFixText">—</span>
+          </div>
+          <div class="estimate-legend" id="estimateLegend" hidden>* Live rate, pending official confirmation</div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <div class="acc-section" id="priceHistoryAcc">
+    <div class="acc-section-head" data-target="priceHistoryBody" role="button" tabindex="0" aria-expanded="false" aria-controls="priceHistoryBody">
+      <div class="acc-section-head-left">
+        <span class="acc-section-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 17 9 11 13 15 21 7"/><polyline points="14 7 21 7 21 14"/></svg>
+        </span>
+        <div class="acc-section-titles">
+          <h2>Price history</h2>
+          <span class="acc-section-sub" id="accChartCount">—</span>
+        </div>
+      </div>
+      <span class="acc-section-chevron" aria-hidden="true">▾</span>
+    </div>
+    <div class="acc-section-body" id="priceHistoryBody">
+      <section class="section" id="priceHistory" aria-labelledby="priceHistoryHeading">
     <div class="section-head">
       <h2 id="priceHistoryHeading">Price history</h2>
       <span id="chartCount">—</span>
@@ -1623,18 +1741,34 @@ footer { padding: 20px 0 8px; font-size: var(--fs-xs2); opacity: 0.7; }
       </div>
     </div>
   </details>
-  </section>
-
-  <section class="section" id="calculator" aria-labelledby="calculatorHeading">
-    <div class="section-head">
-      <h2 id="calculatorHeading">Jewellery calculator</h2>
+      </section>
     </div>
-    <div class="panel">
-      <div class="calc-suite">
+  </div>
 
-        <div class="calc-segmented-mode" role="tablist" aria-label="Calculator mode">
-          <div class="calc-segmented-mode-thumb" id="calcModeThumb" aria-hidden="true"></div>
-          <button class="calc-mode-btn active" type="button" role="tab" aria-selected="true" data-mode="value">By Weight</button>
+  <div class="acc-section" id="calculatorAcc">
+    <div class="acc-section-head" data-target="calculatorBody" role="button" tabindex="0" aria-expanded="false" aria-controls="calculatorBody">
+      <div class="acc-section-head-left">
+        <span class="acc-section-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+        </span>
+        <div class="acc-section-titles">
+          <h2>Jewellery calculator</h2>
+          <span class="acc-section-sub">By weight or budget</span>
+        </div>
+      </div>
+      <span class="acc-section-chevron" aria-hidden="true">▾</span>
+    </div>
+    <div class="acc-section-body" id="calculatorBody">
+      <section class="section" id="calculator" aria-labelledby="calculatorHeading">
+        <div class="section-head">
+          <h2 id="calculatorHeading">Jewellery calculator</h2>
+        </div>
+        <div class="panel">
+          <div class="calc-suite">
+
+            <div class="calc-segmented-mode" role="tablist" aria-label="Calculator mode">
+              <div class="calc-segmented-mode-thumb" id="calcModeThumb" aria-hidden="true"></div>
+              <button class="calc-mode-btn active" type="button" role="tab" aria-selected="true" data-mode="value">By Weight</button>
           <button class="calc-mode-btn" type="button" role="tab" aria-selected="false" data-mode="grams">By Budget</button>
           <select id="calcMode" hidden>
             <option value="value" selected>Calculate Price for Weight</option>
@@ -1734,21 +1868,37 @@ footer { padding: 20px 0 8px; font-size: var(--fs-xs2); opacity: 0.7; }
 
       </div>
     </div>
-  </section>
+      </section>
+    </div>
+  </div>
 
-  <section class="section" id="portfolio" aria-labelledby="portfolioHeading">
-  <details class="collapsible" id="portfolioBlock">
-    <summary>
-      <div class="summary-title">
-        <h2 id="portfolioHeading">Gold portfolio & ROI</h2>
-        <span id="portfolioHeaderSummary">0.0g tracked</span>
+  <div class="acc-section" id="portfolioAcc">
+    <div class="acc-section-head" data-target="portfolioBody" role="button" tabindex="0" aria-expanded="false" aria-controls="portfolioBody">
+      <div class="acc-section-head-left">
+        <span class="acc-section-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        </span>
+        <div class="acc-section-titles">
+          <h2>Portfolio &amp; ROI</h2>
+          <span class="acc-section-sub" id="accPortfolioSummary">0.0g tracked</span>
+        </div>
       </div>
-      <span class="chevron">▼</span>
-    </summary>
-    <div class="collapsible-content">
-      <div class="port-summary-card">
-        <div class="port-summary-grid">
-          <div class="port-metric">
+      <span class="acc-section-chevron" aria-hidden="true">▾</span>
+    </div>
+    <div class="acc-section-body" id="portfolioBody">
+      <section class="section" id="portfolio" aria-labelledby="portfolioHeading">
+      <details class="collapsible" id="portfolioBlock" open>
+        <summary>
+          <div class="summary-title">
+            <h2 id="portfolioHeading">Gold portfolio & ROI</h2>
+            <span id="portfolioHeaderSummary">0.0g tracked</span>
+          </div>
+          <span class="chevron">▼</span>
+        </summary>
+        <div class="collapsible-content">
+          <div class="port-summary-card">
+            <div class="port-summary-grid">
+              <div class="port-metric">
             <span>Total Gold</span>
             <strong id="portTotalGrams">0.0g</strong>
             <small id="portTotalSov">0 Sovereigns</small>
@@ -1822,26 +1972,46 @@ footer { padding: 20px 0 8px; font-size: var(--fs-xs2); opacity: 0.7; }
       </div>
     </div>
   </details>
-  </section>
+      </section>
+    </div>
+  </div>
 
-  <section class="section" id="historicalLog" aria-labelledby="historicalLogHeading">
-    <div class="section-head">
-      <h2 id="historicalLogHeading">Historical Log</h2>
-      <div class="history-actions">
-        <span id="historyCount">—</span>
-        <button class="export-csv-btn" id="exportCsvBtn" type="button" aria-label="Export history to CSV">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          Export CSV
-        </button>
+  <div class="acc-section" id="historicalLogAcc">
+    <div class="acc-section-head" data-target="historicalLogBody" role="button" tabindex="0" aria-expanded="false" aria-controls="historicalLogBody">
+      <div class="acc-section-head-left">
+        <span class="acc-section-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v5h5"/><path d="M3.05 13a9 9 0 1 0 2.13-6.36L3 8"/><path d="M12 7v5l4 2"/></svg>
+        </span>
+        <div class="acc-section-titles">
+          <h2>Historical log</h2>
+          <span class="acc-section-sub" id="accHistoryCount">—</span>
+        </div>
       </div>
+      <span class="acc-section-chevron" aria-hidden="true">▾</span>
     </div>
-    <div class="panel table-wrap">
-      <table class="history-table">
-        <thead><tr><th scope="col">Date</th><th scope="col">Per Gram</th><th scope="col">1 Sov (8g)</th></tr></thead>
-        <tbody id="historyBody"><tr><td colspan="3" style="text-align:center; padding: 20px 0;">Loading records…</td></tr></tbody>
-      </table>
+    <div class="acc-section-body" id="historicalLogBody">
+      <section class="section" id="historicalLog" aria-labelledby="historicalLogHeading">
+        <div class="section-head">
+          <h2 id="historicalLogHeading">Historical Log</h2>
+          <div class="history-actions">
+            <span id="historyCount">—</span>
+            <button class="export-csv-btn" id="exportCsvBtn" type="button" aria-label="Export history to CSV">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Export CSV
+            </button>
+          </div>
+        </div>
+        <div class="panel table-wrap">
+          <table class="history-table">
+            <thead><tr><th scope="col">Date</th><th scope="col">Per Gram</th><th scope="col">1 Sov (8g)</th></tr></thead>
+            <tbody id="historyBody"><tr><td colspan="3" style="text-align:center; padding: 20px 0;">Loading records…</td></tr></tbody>
+          </table>
+        </div>
+      </section>
     </div>
-  </section>
+  </div>
+
+  </div>
 
   </main>
 
@@ -2417,12 +2587,22 @@ function renderTodayTimeline() {
   // observed value. Show "Pending" instead of a fabricated number.
 
   const fmtRate = r => r && Number.isFinite(r.rate_22k) ? money(r.rate_22k) + (r.estimated ? " *" : "") : "Pending";
+  const estimateTip = "Live rate, pending official confirmation";
 
-  if ($("amRate")) $("amRate").textContent = fmtRate(am);
+  if ($("amRate")) {
+    $("amRate").textContent = fmtRate(am);
+    $("amRate").title = am && am.estimated ? estimateTip : "";
+  }
   if ($("amTime")) $("amTime").textContent = am ? timeText(am.time) : "—";
 
-  if ($("pmRate")) $("pmRate").textContent = fmtRate(pm);
+  if ($("pmRate")) {
+    $("pmRate").textContent = fmtRate(pm);
+    $("pmRate").title = pm && pm.estimated ? estimateTip : "";
+  }
   if ($("pmTime")) $("pmTime").textContent = pm ? timeText(pm.time) : "—";
+
+  const anyEstimated = Boolean((am && am.estimated) || (pm && pm.estimated));
+  if ($("estimateLegend")) $("estimateLegend").hidden = !anyEstimated;
 
   const isPmActive = Boolean(pm && Number.isFinite(pm.rate_22k));
   const isAmActive = Boolean(am && Number.isFinite(am.rate_22k) && !isPmActive);
@@ -3252,6 +3432,61 @@ if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("sw.js").catch(e => console.warn("SW skipped:", e));
   });
 }
+
+(function setupAccordion() {
+  const group = $("mainAccordion");
+  if (!group) return;
+  const items = Array.from(group.querySelectorAll(".acc-section"));
+
+  function openItem(item) {
+    items.forEach(i => {
+      const head = i.querySelector(".acc-section-head");
+      const isTarget = i === item;
+      i.classList.toggle("open", isTarget);
+      if (head) head.setAttribute("aria-expanded", isTarget ? "true" : "false");
+    });
+    if (item) item.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  items.forEach(item => {
+    const head = item.querySelector(".acc-section-head");
+    if (!head) return;
+    head.addEventListener("click", () => {
+      const alreadyOpen = item.classList.contains("open");
+      openItem(alreadyOpen ? null : item);
+    });
+    head.addEventListener("keydown", e => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        head.click();
+      }
+    });
+  });
+
+  // Mirror live subtitle text from the original (now-hidden) section
+  // headers into the accordion's compact subtitle spans, so the summary
+  // stays in sync with whatever the existing data-loading code writes
+  // into #chartCount / #portfolioHeaderSummary / #historyCount.
+  function syncSubtitles() {
+    const chartCount = $("chartCount");
+    const accChartCount = $("accChartCount");
+    if (chartCount && accChartCount) accChartCount.textContent = chartCount.textContent;
+
+    const portfolioSummary = $("portfolioHeaderSummary");
+    const accPortfolioSummary = $("accPortfolioSummary");
+    if (portfolioSummary && accPortfolioSummary) accPortfolioSummary.textContent = portfolioSummary.textContent;
+
+    const historyCount = $("historyCount");
+    const accHistoryCount = $("accHistoryCount");
+    if (historyCount && accHistoryCount) accHistoryCount.textContent = historyCount.textContent;
+  }
+  syncSubtitles();
+  const subtitleTargets = ["chartCount", "portfolioHeaderSummary", "historyCount"].map(id => $(id)).filter(Boolean);
+  if (subtitleTargets.length && "MutationObserver" in window) {
+    const mo = new MutationObserver(syncSubtitles);
+    subtitleTargets.forEach(el => mo.observe(el, { childList: true, characterData: true, subtree: true }));
+  }
+})();
 
 (function setupPullToRefresh() {
   const PULL_THRESHOLD = 64, PULL_MAX = 90;
