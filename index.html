@@ -76,21 +76,21 @@
   --rule-strong: #cdbe9d;
 
   --ink: #1c1712;
-  --ink-soft: #6b6255;
-  --ink-faint: #a89d88;
+  --ink-soft: #5c5346;
+  --ink-faint: #62594b;
 
-  --gold: #a97f34;
-  --gold-deep: #6b5223;
-  --gold-glow: #e8c988;
-  --gold-tint: rgba(169, 127, 52, 0.1);
-  --gold-line: rgba(169, 127, 52, 0.32);
+  --gold: #8a641b;
+  --gold-deep: #5e4413;
+  --gold-glow: #dfb96c;
+  --gold-tint: rgba(138, 100, 27, 0.09);
+  --gold-line: rgba(138, 100, 27, 0.35);
 
-  --good: #337a4c;
+  --good: #246d3f;
   --good-glow: #7bd39a;
-  --good-bg: #e1efe4;
-  --bad: #ad3d30;
+  --good-bg: #ddeadf;
+  --bad: #9e3125;
   --bad-glow: #f0857a;
-  --bad-bg: #f5e2df;
+  --bad-bg: #f5ddd9;
 
   /* glass surfaces -- translucent, blurred, layered rather than flat white cards */
   --glass-surface: rgba(255, 255, 255, 0.6);
@@ -118,13 +118,13 @@
     --rule: #2a2620;
     --rule-strong: #3a342a;
     --ink: #f2ede2;
-    --ink-soft: #a89d88;
-    --ink-faint: #6b6255;
-    --gold: #d4ab63;
-    --gold-deep: #e8c988;
+    --ink-soft: #d4cbba;
+    --ink-faint: #8e8e8e;
+    --gold: #ffd700;
+    --gold-deep: #ffec6e;
     --gold-glow: #f4dca0;
-    --gold-tint: rgba(212, 171, 99, 0.14);
-    --gold-line: rgba(212, 171, 99, 0.32);
+    --gold-tint: rgba(255, 215, 0, 0.16);
+    --gold-line: rgba(255, 215, 0, 0.4);
     --good: #7bd39a;
     --good-glow: #7bd39a;
     --good-bg: rgba(63, 110, 74, 0.2);
@@ -166,7 +166,7 @@ html[data-theme="light"] {
 html[data-theme="oled"] {
   --paper: #000000; --bg: #000000; --paper-raised: #080808; --paper-sunken: #020202;
   --rule: #181818; --rule-strong: #262626;
-  --ink: #ffffff; --ink-soft: #a89d88; --ink-faint: #666666;
+  --ink: #ffffff; --ink-soft: #d4cbba; --ink-faint: #8e8e8e;
   --gold: #ffd700; --gold-deep: #ffec6e; --gold-glow: #ffe066;
   --gold-tint: rgba(255, 215, 0, 0.16); --gold-line: rgba(255, 215, 0, 0.4);
   --good: #00e676; --good-glow: #00e676; --good-bg: rgba(0, 230, 118, 0.15);
@@ -184,8 +184,8 @@ html[data-theme="oled"] {
 html[data-theme="dark"] {
   --paper: #100e0a; --bg: #100e0a; --paper-raised: #1c1912; --paper-sunken: #0a0906;
   --rule: #2a2620; --rule-strong: #3a342a;
-  --ink: #f2ede2; --ink-soft: #a89d88; --ink-faint: #6b6255;
-  --gold: #d4ab63; --gold-deep: #e8c988; --gold-glow: #f4dca0;
+  --ink: #f2ede2; --ink-soft: #d4cbba; --ink-faint: #8e8e8e;
+  --gold: #ffd700; --gold-deep: #ffec6e; --gold-glow: #f4dca0;
   --gold-tint: rgba(212, 171, 99, 0.14); --gold-line: rgba(212, 171, 99, 0.32);
   --good: #7bd39a; --good-glow: #7bd39a; --good-bg: rgba(63, 110, 74, 0.2);
   --bad: #e0897c; --bad-glow: #e0897c; --bad-bg: rgba(161, 63, 52, 0.2);
@@ -232,7 +232,7 @@ button, input, select { font-family: inherit; color: inherit; border: none; back
 .app {
   width: 100%;
   max-width: 600px;
-  padding: calc(20px + env(safe-area-inset-top)) 18px calc(40px + env(safe-area-inset-bottom));
+  padding: calc(20px + env(safe-area-inset-top, 0px)) 18px calc(40px + env(safe-area-inset-bottom, 0px));
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -377,7 +377,7 @@ button, input, select { font-family: inherit; color: inherit; border: none; back
 
 .theme-toggle {
   display: inline-flex; align-items: center; justify-content: center;
-  width: 28px; height: 28px; flex-shrink: 0;
+  min-width: 44px; min-height: 44px; width: 44px; height: 44px; flex-shrink: 0;
   background: var(--glass-surface);
   backdrop-filter: blur(var(--glass-blur));
   -webkit-backdrop-filter: blur(var(--glass-blur));
@@ -1165,9 +1165,10 @@ details[open] .chevron { transform: rotate(180deg); }
 #weightChips { display: grid; grid-template-columns: repeat(4, 1fr); }
 #weightChips .chip { width: 100%; }
 .chip {
-  height: 30px; padding: 0 12px; border: 1px solid var(--rule);
+  min-height: 44px; min-width: 44px; box-sizing: border-box;
+  padding: 0 12px; border: 1px solid var(--rule);
   border-radius: var(--r-full); font-size: var(--fs-sm); font-weight: 600; color: var(--ink-soft); cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
+  display: inline-flex; align-items: center; justify-content: center;
   transition: transform var(--transition), background var(--transition), border-color var(--transition), color var(--transition);
 }
 .chip:active { transform: scale(0.93); }
@@ -1177,7 +1178,7 @@ details[open] .chevron { transform: rotate(180deg); }
 .calc-field { display: flex; flex-direction: column; }
 .calc-field label { font-size: var(--fs-xs2); font-weight: 600; color: var(--ink-faint); margin-bottom: 6px; }
 .calc-input {
-  width: 100%; height: 42px; padding: 0 12px;
+  width: 100%; min-height: 44px; height: 44px; padding: 0 12px; box-sizing: border-box;
   background: var(--paper-sunken); border: 1px solid var(--rule); border-radius: var(--r-sm);
   font-size: var(--fs-md); font-weight: 600; color: var(--ink);
   display: flex; align-items: center; transition: border-color var(--transition), box-shadow var(--transition);
@@ -1398,7 +1399,7 @@ html[data-theme="dark"] body:after {
 /* --- UPGRADES: Target Watcher, AM/PM Spread, Print Slip, Portfolio, CSV Export --- */
 .target-toggle {
   display: inline-flex; align-items: center; justify-content: center;
-  width: 28px; height: 28px; flex-shrink: 0;
+  min-width: 44px; min-height: 44px; width: 44px; height: 44px; flex-shrink: 0;
   background: var(--glass-surface);
   backdrop-filter: blur(var(--glass-blur));
   -webkit-backdrop-filter: blur(var(--glass-blur));
@@ -2223,11 +2224,11 @@ footer { padding: 20px 0 8px; font-size: var(--fs-xs2); opacity: 0.7; }
 /* Target card: compact */
 .target-card { margin: 4px 0 8px; padding: 12px 14px; }
 
-/* Make chips uniform */
-.chip { height: 32px; padding: 0 10px; font-size: var(--fs-sm); border-radius: 8px; }
+/* Make chips uniform with 44pt minimum touch target */
+.chip { min-height: 44px; min-width: 44px; padding: 0 10px; font-size: var(--fs-sm); border-radius: 8px; box-sizing: border-box; display: inline-flex; align-items: center; justify-content: center; }
 
-/* Toast: consistent */
-.toast { border-radius: 10px; font-size: var(--fs-base); }
+/* Toast: consistent with safe-area support */
+.toast { border-radius: 10px; font-size: var(--fs-base); bottom: max(24px, calc(24px + env(safe-area-inset-bottom, 0px))); }
 
 /* Smooth all interactive surfaces */
 .panel, .hero, details.collapsible, .last-box, .receipt-card, .port-form-box,
@@ -2235,9 +2236,9 @@ footer { padding: 20px 0 8px; font-size: var(--fs-xs2); opacity: 0.7; }
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-/* Ensure target and theme toggle buttons are same size and aligned */
+/* Ensure target and theme toggle buttons are >= 44pt for touch targets */
 .target-toggle, .theme-toggle {
-  width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0;
+  min-width: 44px; min-height: 44px; width: 44px; height: 44px; border-radius: 50%; flex-shrink: 0;
 }
 
 /* Remove chart dot legend styling since dots are removed */
@@ -2254,12 +2255,12 @@ footer { padding: 20px 0 8px; font-size: var(--fs-xs2); opacity: 0.7; }
   .masthead-title { font-size: clamp(15px, 4.2vw, 19px); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .masthead-actions { display: flex; align-items: center; gap: 5px; flex-shrink: 0; margin-left: auto; }
   .status-pill { max-width: 100px; padding: 0 7px; font-size: 10px; }
-  .target-toggle, .theme-toggle { width: 30px; height: 30px; flex-shrink: 0; }
+  .target-toggle, .theme-toggle { min-width: 44px; min-height: 44px; width: 44px; height: 44px; flex-shrink: 0; }
   .theme-toggle { display: inline-flex !important; visibility: visible !important; }
   .panel, .hero, details.collapsible, .last-box { padding: 12px; border-radius: 14px; }
   .hero-price { font-size: clamp(22px, 8vw, 29px); }
   .section-head h3 { font-size: var(--fs-lg2); }
-  .segment-ctrl button { font-size: var(--fs-xs); padding: 5px 6px; }
+  .segment-ctrl button { font-size: var(--fs-xs); padding: 5px 6px; min-height: 36px; }
   .purity-cell b { font-size: var(--fs-md); }
   .purity-cell small { font-size: var(--fs-2xs); }
   .chart-panel { padding: 10px 10px 8px; }
@@ -2271,7 +2272,7 @@ footer { padding: 20px 0 8px; font-size: var(--fs-xs2); opacity: 0.7; }
   .app { padding-left: 8px; padding-right: 8px; }
   .status-pill { max-width: 82px; padding: 0 5px; font-size: 9px; }
   .masthead-title { font-size: 14px; }
-  .target-toggle, .theme-toggle { width: 28px; height: 28px; }
+  .target-toggle, .theme-toggle { min-width: 44px; min-height: 44px; width: 44px; height: 44px; }
 }
 </style>
 
