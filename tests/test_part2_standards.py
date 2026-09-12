@@ -1,4 +1,5 @@
 import re
+import os
 import sys
 
 def luminance(hex_color):
@@ -16,8 +17,16 @@ def contrast_ratio(c1, c2):
     return (lighter + 0.05) / (darker + 0.05)
 
 def run_tests():
-    with open('/Users/subramanil/.gemini/antigravity/scratch/Chennai-22k-gold/index.html') as f:
+    base_dir = '/Users/subramanil/.gemini/antigravity/scratch/Chennai-22k-gold'
+    with open(os.path.join(base_dir, 'index.html')) as f:
         html = f.read()
+
+    css_content = html
+    for css_file in ['css/design-system.css', 'css/app.css']:
+        path = os.path.join(base_dir, css_file)
+        if os.path.exists(path):
+            with open(path) as f:
+                css_content += "\n" + f.read()
 
     print("=" * 60)
     print("TESTING PART 2: MOBILE STANDARDS, CONTRAST & TOUCH TARGETS")
@@ -56,32 +65,34 @@ def run_tests():
     print(f"  ✓ [CONTRAST] Dark Theme Ink-Faint ({ink_faint_dark}) on Paper ({paper_dark}): {cr_dark_faint:.2f}:1 (WCAG AA >= 4.5:1)")
 
     assert cr_oled_faint >= 4.5, f"OLED Theme Ink-Faint ({ink_faint_dark}) on Black ({paper_oled}): {cr_oled_faint:.2f}:1 (WCAG AA >= 4.5:1)"
+    print(f"  ✓ [CONTRAST] OLED Theme Ink-Faint ({ink_faint_dark}) on Black ({paper_oled}): {cr_oled_faint:.2f}:1 (WCAG AA >= 4.5:1)")
     assert cr_oled_gold >= 4.5, f"OLED Theme Gold ({gold_dark}) on Black ({paper_oled}): {cr_oled_gold:.2f}:1 (WCAG AA >= 4.5:1)"
+    print(f"  ✓ [CONTRAST] OLED Theme Gold ({gold_dark}) on Black ({paper_oled}): {cr_oled_gold:.2f}:1 (WCAG AA >= 4.5:1)")
 
     # 2. Touch Target Compliance (>= 44pt)
-    assert "min-height: 44px" in html, "Missing min-height: 44px rule"
-    assert "min-width: 44px" in html, "Missing min-width: 44px rule"
+    assert "min-height: 44px" in css_content, "Missing min-height: 44px rule in styles"
+    assert "min-width: 44px" in css_content, "Missing min-width: 44px rule in styles"
 
     # Verify .theme-toggle has 44px minimum touch dimensions
-    assert re.search(r'\.theme-toggle\s*\{[^}]*min-width:\s*44px', html), "Theme toggle missing 44px touch target"
-    assert re.search(r'\.theme-toggle\s*\{[^}]*min-height:\s*44px', html), "Theme toggle missing 44px min-height"
+    assert re.search(r'\.theme-toggle\s*\{[^}]*min-width:\s*44px', css_content), "Theme toggle missing 44px touch target"
+    assert re.search(r'\.theme-toggle\s*\{[^}]*min-height:\s*44px', css_content), "Theme toggle missing 44px min-height"
     print("  ✓ [TOUCH TARGET] .theme-toggle satisfies >= 44x44pt touch geometry")
 
     # Verify .target-toggle has 44px minimum touch dimensions
-    assert re.search(r'\.target-toggle\s*\{[^}]*min-width:\s*44px', html), "Target toggle missing 44px touch target"
+    assert re.search(r'\.target-toggle\s*\{[^}]*min-width:\s*44px', css_content), "Target toggle missing 44px touch target"
     print("  ✓ [TOUCH TARGET] .target-toggle satisfies >= 44x44pt touch geometry")
 
     # Verify .chip has 44px minimum touch height
-    assert re.search(r'\.chip\s*\{[^}]*min-height:\s*44px', html), ".chip missing 44px min-height"
+    assert re.search(r'\.chip\s*\{[^}]*min-height:\s*44px', css_content), ".chip missing 44px min-height"
     print("  ✓ [TOUCH TARGET] .chip preset buttons satisfy >= 44pt minimum height")
 
     # Verify .calc-input has 44px minimum height
-    assert re.search(r'\.calc-input\s*\{[^}]*min-height:\s*44px', html), ".calc-input missing 44px min-height"
+    assert re.search(r'\.calc-input\s*\{[^}]*min-height:\s*44px', css_content), ".calc-input missing 44px min-height"
     print("  ✓ [TOUCH TARGET] .calc-input form fields satisfy >= 44pt minimum height")
 
     # 3. Safe Area Insets
-    assert "env(safe-area-inset-bottom" in html, "Missing safe-area-inset-bottom"
-    assert "env(safe-area-inset-top" in html, "Missing safe-area-inset-top"
+    assert "env(safe-area-inset-bottom" in css_content, "Missing safe-area-inset-bottom"
+    assert "env(safe-area-inset-top" in css_content, "Missing safe-area-inset-top"
     print("  ✓ [SAFE AREA] safe-area-inset-top and safe-area-inset-bottom applied to layout and toasts")
 
     print("=" * 60)

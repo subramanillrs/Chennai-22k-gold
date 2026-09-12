@@ -11,13 +11,22 @@
 // be dropped (e.g. after a shell redesign) -- activate() clears any
 // cache that doesn't match the current name.
 
-const CACHE_NAME = "gold22k-shell-v3";
+const CACHE_NAME = "gold22k-shell-v4";
 
 const SHELL_FILES = [
   "./",
   "index.html",
   "manifest.webmanifest",
   "icon.svg",
+  "css/design-system.css",
+  "css/app.css",
+  "js/theme.js",
+  "js/notifications.js",
+  "js/data.js",
+  "js/charts.js",
+  "js/calculators.js",
+  "js/share.js",
+  "js/app.js"
 ];
 
 self.addEventListener("install", (event) => {

@@ -1,0 +1,193 @@
+
+:root {
+  color-scheme: light dark;
+  --font-display: "Fraunces", "Iowan Old Style", "Georgia", serif;
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+
+  /* Type scale -- every font-size in the app maps to one of these
+     steps. Keeps micro-labels, data values, and headings consistent
+     instead of dozens of one-off sizes. */
+  --fs-2xs: 9.5px;   /* chart legend, mini pills */
+  --fs-xs: 10px;     /* eyebrow / faint labels */
+  --fs-xs2: 10.5px;  /* secondary labels, form labels */
+  --fs-sm: 11px;     /* buttons, small body */
+  --fs-sm2: 11.5px;  /* pills, small emphasis */
+  --fs-base: 12px;   /* body text */
+  --fs-base2: 12.5px;/* emphasized body */
+  --fs-md: 13px;     /* inputs, sub-headers */
+  --fs-md2: 13.5px;  /* eyebrow display italic */
+  --fs-lg: 14px;     /* data values: ledger, horizon, table rows */
+  --fs-lg2: 15px;    /* hero-foot values (rate/gram + date match exactly) */
+  --fs-xl: 17px;     /* section heads */
+  --fs-xl2: 19px;    /* emphasis numbers */
+  --fs-2xl: 22px;    /* receipt total */
+  --fs-hero: clamp(44px, 12vw, 66px);
+
+  --r-xs: 4px;
+  --r-sm: 8px;
+  --r-md: 14px;
+  --r-lg: 22px;
+  --r-xl: 28px;
+  --r-full: 9999px;
+
+  --paper: #f8f4ea;
+  --bg: #f8f4ea;
+  --paper-raised: #ffffff;
+  --paper-sunken: #f0eadb;
+
+  --rule: #e3dac4;
+  --rule-strong: #cdbe9d;
+
+  --ink: #1c1712;
+  --ink-soft: #5c5346;
+  --ink-faint: #62594b;
+
+  --gold: #8a641b;
+  --gold-deep: #5e4413;
+  --gold-glow: #dfb96c;
+  --gold-tint: rgba(138, 100, 27, 0.09);
+  --gold-line: rgba(138, 100, 27, 0.35);
+
+  --good: #246d3f;
+  --good-glow: #7bd39a;
+  --good-bg: #ddeadf;
+  --bad: #9e3125;
+  --bad-glow: #f0857a;
+  --bad-bg: #f5ddd9;
+
+  /* glass surfaces -- translucent, blurred, layered rather than flat white cards */
+  --glass-surface: rgba(255, 255, 255, 0.6);
+  --glass-surface-strong: rgba(255, 255, 255, 0.78);
+  --glass-border: rgba(255, 255, 255, 0.5);
+  --glass-highlight: rgba(255, 255, 255, 0.9);
+  --glass-blur: 20px;
+
+  /* material-style elevation: tonal shifts + soft directional shadow, not one shadow-fits-all */
+  --elev-1: 0 1px 2px rgba(28, 23, 18, 0.05), 0 1px 1px rgba(28, 23, 18, 0.04);
+  --elev-2: 0 2px 8px -2px rgba(28, 23, 18, 0.10), 0 8px 24px -12px rgba(28, 23, 18, 0.14);
+  --elev-3: 0 8px 20px -6px rgba(28, 23, 18, 0.16), 0 24px 48px -20px rgba(28, 23, 18, 0.22);
+
+  --shadow-card: var(--elev-2);
+  --transition: 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  --spring: 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #100e0a;
+    --bg: #100e0a;
+    --paper-raised: #1c1912;
+    --paper-sunken: #0a0906;
+    --rule: #2a2620;
+    --rule-strong: #3a342a;
+    --ink: #f2ede2;
+    --ink-soft: #d4cbba;
+    --ink-faint: #8e8e8e;
+    --gold: #ffd700;
+    --gold-deep: #ffec6e;
+    --gold-glow: #f4dca0;
+    --gold-tint: rgba(255, 215, 0, 0.16);
+    --gold-line: rgba(255, 215, 0, 0.4);
+    --good: #7bd39a;
+    --good-glow: #7bd39a;
+    --good-bg: rgba(63, 110, 74, 0.2);
+    --bad: #e0897c;
+    --bad-glow: #e0897c;
+    --bad-bg: rgba(161, 63, 52, 0.2);
+
+    --glass-surface: rgba(35, 31, 23, 0.55);
+    --glass-surface-strong: rgba(40, 36, 27, 0.72);
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --glass-highlight: rgba(255, 255, 255, 0.12);
+
+    --elev-1: 0 1px 2px rgba(0, 0, 0, 0.3);
+    --elev-2: 0 2px 8px -2px rgba(0, 0, 0, 0.35), 0 8px 24px -12px rgba(0, 0, 0, 0.5);
+    --elev-3: 0 8px 20px -6px rgba(0, 0, 0, 0.4), 0 24px 48px -20px rgba(0, 0, 0, 0.6);
+    --shadow-card: var(--elev-2);
+  }
+}
+
+html[data-theme="light"] {
+  --paper: #f8f4ea; --paper-raised: #ffffff; --paper-sunken: #f0eadb;
+  --rule: #e3dac4; --rule-strong: #cdbe9d;
+  --ink: #1c1712; --ink-soft: #6b6255; --ink-faint: #a89d88;
+  --gold: #a97f34; --gold-deep: #6b5223; --gold-glow: #e8c988;
+  --gold-tint: rgba(169, 127, 52, 0.1); --gold-line: rgba(169, 127, 52, 0.32);
+  --good: #337a4c; --good-glow: #7bd39a; --good-bg: #e1efe4;
+  --bad: #ad3d30; --bad-glow: #f0857a; --bad-bg: #f5e2df;
+  --glass-surface: rgba(255, 255, 255, 0.6);
+  --glass-surface-strong: rgba(255, 255, 255, 0.78);
+  --glass-border: rgba(255, 255, 255, 0.5);
+  --glass-highlight: rgba(255, 255, 255, 0.9);
+  --elev-1: 0 1px 2px rgba(28, 23, 18, 0.05), 0 1px 1px rgba(28, 23, 18, 0.04);
+  --elev-2: 0 2px 8px -2px rgba(28, 23, 18, 0.10), 0 8px 24px -12px rgba(28, 23, 18, 0.14);
+  --elev-3: 0 8px 20px -6px rgba(28, 23, 18, 0.16), 0 24px 48px -20px rgba(28, 23, 18, 0.22);
+  --shadow-card: var(--elev-2);
+}
+
+
+html[data-theme="oled"] {
+  --paper: #000000; --bg: #000000; --paper-raised: #080808; --paper-sunken: #020202;
+  --rule: #181818; --rule-strong: #262626;
+  --ink: #ffffff; --ink-soft: #d4cbba; --ink-faint: #8e8e8e;
+  --gold: #ffd700; --gold-deep: #ffec6e; --gold-glow: #ffe066;
+  --gold-tint: rgba(255, 215, 0, 0.16); --gold-line: rgba(255, 215, 0, 0.4);
+  --good: #00e676; --good-glow: #00e676; --good-bg: rgba(0, 230, 118, 0.15);
+  --bad: #ff5252; --bad-glow: #ff5252; --bad-bg: rgba(255, 82, 82, 0.15);
+  --glass-surface: rgba(10, 10, 10, 0.88);
+  --glass-surface-strong: rgba(16, 16, 16, 0.96);
+  --glass-border: rgba(255, 255, 255, 0.10);
+  --glass-highlight: rgba(255, 255, 255, 0.18);
+  --elev-1: 0 1px 2px rgba(0, 0, 0, 0.8);
+  --elev-2: 0 2px 8px -2px rgba(0, 0, 0, 0.9), 0 8px 24px -12px rgba(0, 0, 0, 0.95);
+  --elev-3: 0 8px 20px -6px rgba(0, 0, 0, 0.95), 0 24px 48px -20px rgba(0, 0, 0, 1);
+  --shadow-card: var(--elev-2);
+}
+
+html[data-theme="dark"] {
+  --paper: #100e0a; --bg: #100e0a; --paper-raised: #1c1912; --paper-sunken: #0a0906;
+  --rule: #2a2620; --rule-strong: #3a342a;
+  --ink: #f2ede2; --ink-soft: #d4cbba; --ink-faint: #8e8e8e;
+  --gold: #ffd700; --gold-deep: #ffec6e; --gold-glow: #f4dca0;
+  --gold-tint: rgba(212, 171, 99, 0.14); --gold-line: rgba(212, 171, 99, 0.32);
+  --good: #7bd39a; --good-glow: #7bd39a; --good-bg: rgba(63, 110, 74, 0.2);
+  --bad: #e0897c; --bad-glow: #e0897c; --bad-bg: rgba(161, 63, 52, 0.2);
+  --glass-surface: rgba(35, 31, 23, 0.55);
+  --glass-surface-strong: rgba(40, 36, 27, 0.72);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-highlight: rgba(255, 255, 255, 0.12);
+  --elev-1: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --elev-2: 0 2px 8px -2px rgba(0, 0, 0, 0.35), 0 8px 24px -12px rgba(0, 0, 0, 0.5);
+  --elev-3: 0 8px 20px -6px rgba(0, 0, 0, 0.4), 0 24px 48px -20px rgba(0, 0, 0, 0.6);
+  --shadow-card: var(--elev-2);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+html {
+  font-family: var(--font-sans);
+  background-color: var(--paper);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+  touch-action: pan-y;
+}
+
+body {
+  display: flex;
+  justify-content: center;
+  min-height: 100vh;
+  overflow-x: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+  position: relative;
+  background:
+    radial-gradient(680px 420px at 18% -6%, var(--gold-tint), transparent 60%),
+    radial-gradient(520px 360px at 100% 18%, rgba(63, 122, 76, 0.06), transparent 65%),
+    var(--paper);
+}
+input, select { user-select: auto; -webkit-user-select: auto; }
+button, input, select { font-family: inherit; color: inherit; border: none; background: none; outline: none; }
+
+.num, td, .amount { font-variant-numeric: tabular-nums lining-nums; }
