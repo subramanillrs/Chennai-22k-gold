@@ -12569,5 +12569,23 @@
     "agreement": true,
     "livechennai_rate": 14010,
     "goodreturns_rate": 14010
+  },
+  {
+    "date": "2026-09-18",
+    "time": "12:18:30",
+    "timestamp": "2026-09-18T12:18:30.776643+05:30",
+    "session": "AM",
+    "rate_22k": 14155,
+    "rate_24k": 15442,
+    "weight_1g": 14155,
+    "weight_8g": 113240,
+    "rate_8g": 113240,
+    "changed": true,
+    "source": "LiveChennai (MJDMA verified)",
+    "source_url": "https://www.livechennai.com/gold_silverrate.asp",
+    "type": "intraday",
+    "agreement": true,
+    "livechennai_rate": 14155,
+    "goodreturns_rate": 14009
   }
 ]
