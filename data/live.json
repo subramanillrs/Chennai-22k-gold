@@ -5,41 +5,50 @@
   "city": "Chennai",
   "purity": "22K",
   "date": "2026-09-21",
-  "time": "12:51:42",
-  "timestamp": "2026-09-21T12:51:42.534495+05:30",
-  "changed": true,
-  "previous_rate_22k": 14285,
-  "change": -15,
+  "time": "19:20:13",
+  "timestamp": "2026-09-21T19:20:13.228465+05:30",
+  "changed": false,
+  "previous_rate_22k": 14270,
+  "change": 0,
   "sources": {
-    "livechennai": null,
+    "livechennai": {
+      "source": "LiveChennai",
+      "rate_22k": 14270,
+      "rate_24k": 15567,
+      "rate_8g": 114160,
+      "url": "https://www.livechennai.com/gold_silverrate.asp",
+      "fetched_at": "2026-09-21T19:20:13.228135+05:30"
+    },
     "goodreturns": {
       "source": "GoodReturns",
       "rate_22k": 14270,
       "url": "https://www.goodreturns.in/gold-rates/chennai.html",
-      "fetched_at": "2026-09-21T12:51:22.621675+05:30"
+      "fetched_at": "2026-09-21T19:20:12.526360+05:30"
     }
   },
   "source_update_times": [
-    "2026-09-21T12:51:22.621675+05:30"
+    "2026-09-21T19:20:13.228135+05:30",
+    "2026-09-21T19:20:12.526360+05:30"
   ],
   "source_rates": [
+    14270,
     14270
   ],
-  "sources_agree": null,
-  "last_checked_at": "2026-09-21T12:51:42.534495+05:30",
-  "source": "GoodReturns (Fallback)",
-  "last_checked": "2026-09-21T12:51:42.534495+05:30",
-  "agreement": null,
-  "session": "AM",
+  "sources_agree": true,
+  "last_checked_at": "2026-09-21T19:20:13.228465+05:30",
+  "source": "LiveChennai (MJDMA verified)",
+  "last_checked": "2026-09-21T19:20:13.228465+05:30",
+  "agreement": true,
+  "session": "PM",
   "rate_24k": 15567,
   "weight_1g": 14270,
   "weight_8g": 114160,
-  "livechennai_rate": null,
+  "livechennai_rate": 14270,
   "goodreturns_rate": 14270,
-  "livechennai_fetched_at": null,
-  "goodreturns_fetched_at": "2026-09-21T12:51:22.621675+05:30",
-  "livechennai_url": null,
+  "livechennai_fetched_at": "2026-09-21T19:20:13.228135+05:30",
+  "goodreturns_fetched_at": "2026-09-21T19:20:12.526360+05:30",
+  "livechennai_url": "https://www.livechennai.com/gold_silverrate.asp",
   "goodreturns_url": "https://www.goodreturns.in/gold-rates/chennai.html",
-  "updated_at": "2026-09-21T12:51:42.534495+05:30",
-  "verified_at": "2026-09-21T12:51:42.534495+05:30"
+  "updated_at": "2026-09-21T19:20:13.228465+05:30",
+  "verified_at": "2026-09-21T19:20:13.228465+05:30"
 }
