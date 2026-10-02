@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-02T19:14:00.483826+05:30",
+  "generated_at": "2026-10-02T23:42:35.285669+05:30",
   "all_time_high": {
     "rate_22k": 16800,
     "date": "2026-01-29"
@@ -10,7 +10,7 @@
   },
   "current_month": {
     "month": "2026-10",
-    "average_22k": 13698,
+    "average_22k": 13708,
     "high": 13775,
     "low": 13680
   },
@@ -25,5 +25,5 @@
     "high": 14360,
     "low": 13640
   },
-  "total_records": 1250
+  "total_records": 1251
 }
