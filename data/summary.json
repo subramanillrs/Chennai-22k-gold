@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-08T19:41:38.970691+05:30",
+  "generated_at": "2026-11-08T23:43:28.730758+05:30",
   "all_time_high": {
     "rate_22k": 16800,
     "date": "2026-01-29"
@@ -10,13 +10,13 @@
   },
   "current_month": {
     "month": "2026-11",
-    "average_22k": 13009,
+    "average_22k": 13014,
     "high": 13385,
     "low": 12730
   },
   "current_year": {
     "year": "2026",
-    "average_22k": 13908,
+    "average_22k": 13907,
     "high": 16800,
     "low": 12440
   },
@@ -25,5 +25,5 @@
     "high": 13880,
     "low": 12730
   },
-  "total_records": 1378
+  "total_records": 1379
 }
